@@ -31,6 +31,10 @@ internal static class Program
         ["pattern-json"] = PatternJsonTarget.Run,
         ["recognizers"] = RecognizerTargets.Text,
         ["recognizer-rules"] = RecognizerTargets.Rules,
+        ["edit-tree"] = NeuralTargets.EditTreeText,
+        ["fast-settings"] = NeuralTargets.FastSettings,
+        ["pipeline-config"] = NeuralTargets.PipelineConfig,
+        ["pipeline-file"] = NeuralTargets.PipelineFileBytes,
     };
 
     private static int Main(string[] args)
@@ -54,6 +58,18 @@ internal static class Program
                     break;
                 case "recognizer-rules":
                     RecognizerTargets.SeedRules(args[2]);
+                    break;
+                case "edit-tree":
+                    NeuralTargets.SeedEditTree(args[2]);
+                    break;
+                case "fast-settings":
+                    NeuralTargets.SeedFastSettings(args[2]);
+                    break;
+                case "pipeline-config":
+                    NeuralTargets.SeedPipelineConfig(args[2]);
+                    break;
+                case "pipeline-file":
+                    NeuralTargets.SeedPipelineFile(args[2]);
                     break;
                 case "word-tokenizer":
                 case "segmentation":

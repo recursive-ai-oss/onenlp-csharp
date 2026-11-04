@@ -4,7 +4,7 @@
 #   fuzz/run.sh <target> <seconds> [corpus dir] [extra libFuzzer flags...]
 #   fuzz/run.sh replay <target> <file>...      # run saved inputs once, without libFuzzer (reproduce a finding)
 #
-# Targets: word-tokenizer, segmentation, doc-json, doc-binary, docbin   (see fuzz/README.md)
+# Targets: word-tokenizer, segmentation, doc-json, doc-binary, docbin, edit-tree, fast-settings, pipeline-config, pipeline-file   (see fuzz/README.md)
 #
 # Environment:
 #   ONENLP_FUZZ_WORK    required: where builds, corpora and findings go. Keep it outside the checkout.
@@ -38,6 +38,10 @@ case "$target" in
   doc-json|doc-binary|docbin) maxlen=8192 ;;
   recognizers) maxlen=4096 ;;
   recognizer-rules) maxlen=16384 ;;
+  edit-tree) maxlen=8192 ;;
+  fast-settings) maxlen=1024 ;;
+  pipeline-config) maxlen=16384 ;;
+  pipeline-file) maxlen=65536 ;;
   *) echo "unknown target '$target'" >&2; exit 2 ;;
 esac
 
@@ -73,6 +77,7 @@ mkdir -p "$corpus" "$findings"
 [[ -n "$(ls -A "$corpus")" ]] || printf '\x00' >"$corpus/seed-empty"
 
 "$instrument" "$bin/RecursiveAI.OneNlp.dll" >/dev/null
+"$instrument" "$bin/RecursiveAI.OneNlp.Neural.dll" >/dev/null
 
 dirs=("$corpus")
 [[ -z "$extra" ]] || dirs+=("$extra")
