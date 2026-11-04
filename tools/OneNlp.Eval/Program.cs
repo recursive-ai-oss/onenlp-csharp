@@ -27,6 +27,10 @@ internal static class Program
                [--component NAME] [--language CODE] [--dataset NAME] [--metrics LAS,UPOS,...]
                [--resamples 1000] [--seed N] [--json OUT.json] [--markdown OUT.md]
           span --gold G.iob2 --pred P.iob2 [same options; metrics: micro-F1, macro-F1, precision, recall]
+          segment --raw RAW.txt --out OUT.conllu [--language en] [--mwt]
+               tokenizes and splits sentences with the default pipeline and writes CoNLL-U with only ID and FORM filled, for
+               scoring with 'ud --metrics Tokens,Sentences,Words'. Every token is a word; --mwt also writes the pieces of a split
+               contraction (do + n't) as a multi-word token line, as English UD treebanks annotate them.
           dump-ud   --gold G.conllu --pred P1.conllu [P2.conllu ...] --json OUT.json    (all counts, no bootstrap)
           dump-span --gold G.iob2 --pred P1.iob2 [P2.iob2 ...] --json OUT.json
 
@@ -50,6 +54,8 @@ internal static class Program
                     return RunUd(options);
                 case "span":
                     return RunSpan(options);
+                case "segment":
+                    return Segment.Run(options);
                 case "dump-ud":
                     return DumpUd(options);
                 case "dump-span":

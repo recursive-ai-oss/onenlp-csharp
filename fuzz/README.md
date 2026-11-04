@@ -5,6 +5,7 @@
 | Target | Input | Checks |
 |---|---|---|
 | `word-tokenizer` | arbitrary bytes, read as UTF-8 (or, when the first byte is odd, as raw UTF-16 units, which reaches lone surrogates) | the document built by `Nlp.Analyze`: tokens are non-empty, ordered slices of the text with only whitespace between them, and `FindToken` and `TryGetCharSpan` agree with the offsets |
+| `segmentation` | arbitrary bytes, as above | word tokenizer and sentencizer with no data, neutral data and English data: offsets ascending and in range, every non-white-space character inside a token, sentences partition the tokens |
 | `doc-json` | arbitrary bytes | `Doc.FromJson`: only `InvalidDataException` may escape; a document that reads must write to binary and back to the same bytes, and to JSON and back (unless it holds an unpaired surrogate, which JSON cannot carry) |
 | `doc-binary` | byte 0 is a mode, the rest a serialized document (bit 0 rewrites the header's flags and length to fit the input, bit 1 also appends a valid checksum, so mutations reach the section decoders) | `Doc.FromBytes`: only `InvalidDataException`; a document that reads writes and reads back to the same bytes |
 | `docbin` | same framing, for a bin | `DocBin.FromBytes` and `DocBinReader`: only `InvalidDataException`; the streaming reader yields the same documents as the whole-bin reader |

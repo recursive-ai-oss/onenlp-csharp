@@ -36,6 +36,11 @@ internal static class Program
         Check("annotation", doc[0].Pos == "PROPN" && doc[1].Pos.Length == 0);
         Check("char span", doc.TryGetCharSpan(4, 18, out Span span) && span.ToString() == "Lovelace wrote");
 
+        // Word and sentence segmentation, with English data and the registered sentencizer.
+        Token[] tokens = Nlp.Tokens("Mr. Smith can't go. He's gone!");
+        Check("contraction split", tokens.Length == 10 && tokens[2].ToString() == "ca" && tokens[3].ToString() == "n't");
+        Check("sentences", Nlp.Sentences("Mr. Smith can't go. He's gone!").Count == 2);
+
         // Registration by name, built-in and from this assembly's module initializer.
         using Pipeline pipeline = Pipeline.Blank(Language.English).Add("norm").Add("shout", new Dictionary<string, string> { ["suffix"] = "?" });
         Doc[] docs = [.. pipeline.ProcessMany(["One Two", "THREE"], batchSize: 1)];
@@ -50,7 +55,7 @@ internal static class Program
         TokenEncoding encoding = tokenizer.Encode("héllo wörld"u8);
         Check("utf8 offsets", encoding.Offsets[1].Start == 7 && encoding.Offsets[1].End == 13);
         Check("trim", tokenizer.TrimToTokenBudget("a b c", 2).SequenceEqual("a b"));
-        Check("loader not yet supported", Throws<NotSupportedException>(() => Tokenizer.FromStream(new MemoryStream(), TokenizerFormat.WordPieceVocabulary)));
+        Check("empty vocab.txt rejected", Throws<InvalidDataException>(() => Tokenizer.FromStream(new MemoryStream(), TokenizerFormat.WordPieceVocabulary)));
 
         // Both serialization formats, and the container, under NativeAOT.
         Doc annotated = Nlp.Analyze("Ada Lovelace wrote notes in London \uD83D\uDE00.");

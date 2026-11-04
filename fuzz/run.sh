@@ -4,7 +4,7 @@
 #   fuzz/run.sh <target> <seconds> [corpus dir] [extra libFuzzer flags...]
 #   fuzz/run.sh replay <target> <file>...      # run saved inputs once, without libFuzzer (reproduce a finding)
 #
-# Targets: word-tokenizer, doc-json, doc-binary, docbin   (see fuzz/README.md)
+# Targets: word-tokenizer, segmentation, doc-json, doc-binary, docbin   (see fuzz/README.md)
 #
 # Environment:
 #   ONENLP_FUZZ_WORK    required: where builds, corpora and findings go. Keep it outside the checkout.
@@ -34,7 +34,7 @@ target="${1:?usage: run.sh <target> <seconds> [corpus dir] | run.sh replay <targ
 shift
 
 case "$target" in
-  word-tokenizer) maxlen=4096 ;;
+  word-tokenizer|segmentation) maxlen=4096 ;;
   doc-json|doc-binary|docbin) maxlen=8192 ;;
   *) echo "unknown target '$target'" >&2; exit 2 ;;
 esac

@@ -264,21 +264,18 @@ public class TokenizerContractTests
     {
         Assert.Throws<NotSupportedException>(() => Tokenizer.FromFile("model.bin"));
         Assert.Throws<FileNotFoundException>(() => Tokenizer.FromFile(Path.Combine(Path.GetTempPath(), "onenlp-absent-" + Guid.NewGuid().ToString("N") + ".json")));
-        string file = Path.Combine(Path.GetTempPath(), "onenlp-" + Guid.NewGuid().ToString("N") + "-vocab.txt");
-        File.WriteAllText(file, "[UNK]\n");
-        try
-        {
-            Assert.Throws<NotSupportedException>(() => Tokenizer.FromFile(file));
-        }
-        finally
-        {
-            File.Delete(file);
-        }
-
         using var empty = new MemoryStream();
         foreach (TokenizerFormat format in Enum.GetValues<TokenizerFormat>().Where(f => f != TokenizerFormat.HuggingFaceJson))
         {
-            Assert.Throws<NotSupportedException>(() => Tokenizer.FromStream(empty, format));
+            // An empty vocabulary or model file is malformed; only the format with no loader yet is not supported.
+            if (format == TokenizerFormat.Tiktoken)
+            {
+                Assert.Throws<NotSupportedException>(() => Tokenizer.FromStream(empty, format));
+            }
+            else
+            {
+                Assert.Throws<InvalidDataException>(() => Tokenizer.FromStream(empty, format));
+            }
         }
 
         Assert.Throws<InvalidDataException>(() => Tokenizer.FromStream(empty, TokenizerFormat.HuggingFaceJson));
