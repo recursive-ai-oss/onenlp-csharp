@@ -15,7 +15,21 @@ public class RecognizerTests
         _ => throw new InvalidOperationException(),
     };
 
-    private static string Run(string text) => string.Join(" ; ", Recognizer.English.Recognize(text).Select(Describe));
+    // The number, unit, currency and sequence rules alone: a date such as "2020-01-15" is read as a date by the full English rules.
+    private static readonly Recognizer NumberRules = Recognizer.FromRules(
+        [.. typeof(Recognizer).Assembly.GetManifestResourceNames()
+            .Where(n => n.Replace('\\', '/').Contains("Recognizers/Data/en/", StringComparison.Ordinal)
+                && !n.EndsWith("datetime.rules", StringComparison.Ordinal) && !n.EndsWith("holidays.rules", StringComparison.Ordinal))
+            .Select(n =>
+            {
+                using Stream stream = typeof(Recognizer).Assembly.GetManifestResourceStream(n)!;
+                using var copy = new MemoryStream();
+                stream.CopyTo(copy);
+                return (ReadOnlyMemory<byte>)copy.ToArray();
+            })],
+        Language.English);
+
+    private static string Run(string text) => string.Join(" ; ", NumberRules.Recognize(text).Select(Describe));
 
     [Theory]
     [InlineData("I have 42 apples", "42|CARDINAL|42")]
@@ -236,8 +250,8 @@ public class RecognizerTests
             return doc;
         }
 
-        Assert.Equal(["5 million:MISC", "2020:CARDINAL"], Make(false).Ents.Select(e => e.Text.ToString() + ":" + e.Label));
-        Assert.Equal(["5 million dollars:MONEY", "2020:CARDINAL"], Make(true).Ents.Select(e => e.Text.ToString() + ":" + e.Label));
+        Assert.Equal(["5 million:MISC", "2020:DATE"], Make(false).Ents.Select(e => e.Text.ToString() + ":" + e.Label));
+        Assert.Equal(["5 million dollars:MONEY", "2020:DATE"], Make(true).Ents.Select(e => e.Text.ToString() + ":" + e.Label));
     }
 
     [Fact]

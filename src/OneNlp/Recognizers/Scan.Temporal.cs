@@ -173,6 +173,11 @@ internal sealed partial class Scan
 
     private VocabHit[] Hits(int i)
     {
+        if (i < 0 || i >= _items.Count)
+        {
+            return [];
+        }
+
         if (_vocabDone![i])
         {
             return _vocab![i] ?? [];
@@ -634,6 +639,14 @@ internal sealed partial class Scan
         article = false;
         if (Num(i, out end, out value, out bool ord) && !ord)
         {
+            // "2 and a half": the number rules read the words but not digits before "and a half".
+            if (_items[i].Kind == ItemKind.Digits && value == decimal.Truncate(value) && Is(end, "and", out int an) && Num(end + an, out int fe, out decimal frac, out bool fo)
+                && !fo && frac is > 0 and < 1)
+            {
+                value += frac;
+                end = fe;
+            }
+
             return value > 0 && value <= 1_000_000;
         }
 
@@ -687,6 +700,7 @@ internal sealed partial class Scan
     {
         decimal seconds = 0;
         decimal months = 0;
+        decimal previous = decimal.MaxValue;
         int j = i;
         for (int terms = 0; terms < 6; terms++)
         {
@@ -708,6 +722,15 @@ internal sealed partial class Scan
             {
                 break;
             }
+
+            // "2 hours and 30 minutes": each term is smaller than the one before. "seven days a week" is not one duration.
+            decimal size = u.A > 0 ? u.A : u.B * 2_592_000m;
+            if (terms > 0 && (size >= previous || _items[k].Kind == ItemKind.Word && Is(k, "article") && !Is(j, "and")))
+            {
+                break;
+            }
+
+            previous = size;
 
             if (u.S is "decade")
             {

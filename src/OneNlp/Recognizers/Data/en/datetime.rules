@@ -19,12 +19,12 @@
 [time.month]
 1 | January, =Jan, =Jan.
 2 | February, =Feb, =Feb.
-3 | March, =Mar, =Mar.
+3 | =March, =MARCH, =Mar, =Mar.
 4 | April, =Apr, =Apr.
 5 | =May
 6 | June, =Jun, =Jun.
 7 | July, =Jul, =Jul.
-8 | August, =Aug, =Aug.
+8 | =August, =AUGUST, =Aug, =Aug.
 9 | September, =Sep, =Sept, =Sep., =Sept.
 10 | October, =Oct, =Oct.
 11 | November, =Nov, =Nov.

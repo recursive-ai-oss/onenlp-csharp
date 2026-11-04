@@ -429,16 +429,14 @@ internal sealed partial class Scan
                     yk++;
                 }
 
-                if (YearAt(yk, out int ye, out int y))
+                bool yearGiven = YearAt(yk, out int ye, out int y);
+                if (yearGiven && d <= DateTime.DaysInMonth(y, m))
                 {
-                    if (d <= DateTime.DaysInMonth(y, m))
-                    {
-                        r.Add(Day(i, ye, new DateTime(y, m, d), false));
-                    }
+                    r.Add(Day(i, ye, new DateTime(y, m, d), false));
                 }
 
-                // Without a year: the next one on or after the reference day.
-                if (d <= DateTime.DaysInMonth(2000, m))
+                // Without a year: the next one on or after the reference day. A year that does not fit the day (February 29, 2027) is not skipped.
+                if (!(yearGiven && d > DateTime.DaysInMonth(y, m)) && d <= DateTime.DaysInMonth(2000, m))
                 {
                     r.Add(Day(i, de, NextOccurrence(m, d, a), nr));
                 }
@@ -487,12 +485,13 @@ internal sealed partial class Scan
                     yk++;
                 }
 
-                if (YearAt(yk, out int ye, out int y) && d2 <= DateTime.DaysInMonth(y, m))
+                bool yearGiven = YearAt(yk, out int ye, out int y);
+                if (yearGiven && d2 <= DateTime.DaysInMonth(y, m))
                 {
                     r.Add(Day(i, ye, new DateTime(y, m, d2), false));
                 }
 
-                if (d2 <= DateTime.DaysInMonth(2000, m))
+                if (!(yearGiven && d2 > DateTime.DaysInMonth(y, m)) && d2 <= DateTime.DaysInMonth(2000, m))
                 {
                     r.Add(Day(i, me, NextOccurrence(m, d2, a), nr));
                 }
