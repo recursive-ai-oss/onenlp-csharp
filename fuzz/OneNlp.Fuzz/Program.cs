@@ -17,6 +17,8 @@ internal static class Program
     private static readonly Dictionary<string, Target> Targets = new()
     {
         ["word-tokenizer"] = WordTokenizerTarget.Run,
+        ["vocab-txt"] = VocabularyReaderTargets.RunVocabTxt,
+        ["sentencepiece-model"] = VocabularyReaderTargets.RunSentencePiece,
     };
 
     private static int Main(string[] args)

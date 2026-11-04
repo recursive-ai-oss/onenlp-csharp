@@ -282,7 +282,7 @@ public class TokenizerSeamTests
     {
         var r = new StageRegistry();
         r.AddModel("BPE", _ => new ToyModel());
-        Assert.NotNull(Load("""{"model": {"vocab": {}}}""", r));
+        Assert.NotNull(Load("""{"model": {"merges": [], "vocab": {}}}""", r));
 
         NotSupportedException ex = Assert.Throws<NotSupportedException>(() => Load("""{"model": {"type": "Nope"}}""", r));
         Assert.Contains("'Nope'", ex.Message, StringComparison.Ordinal);
