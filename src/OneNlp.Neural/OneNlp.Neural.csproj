@@ -12,6 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="$(PackagePrefix)$(LibName).Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../OneNlp/OneNlp.csproj" />
     <PackageReference Include="RecursiveAI.OneModel" />
     <PackageReference Include="RecursiveAI.OneModel.Training" />
