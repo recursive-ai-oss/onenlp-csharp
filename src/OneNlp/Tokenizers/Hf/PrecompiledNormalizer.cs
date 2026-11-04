@@ -80,56 +80,75 @@ internal sealed class PrecompiledNormalizer : INormalizer
         byte[] input = [.. bytes];
 
         var b = new NormalizedStringBuilder();
-        int index = 0;
-        while (index < starts16.Count - 1)
+        int[] clusters = OneFont.TextSegmentation.GetGraphemeBoundaries(s);
+        int next = 0;
+        for (int c = 0; c < clusters.Length - 1; c++)
         {
-            int at = startsByte[index];
-            int matchLength = LongestPrefix(input, at, out int poolOffset);
-            if (matchLength == 0)
+            int firstCp = next;
+            while (starts16[next] < clusters[c + 1])
             {
-                for (int k = starts16[index]; k < starts16[index + 1]; k++)
+                next++;
+            }
+
+            // Observed in output of tokenizers 0.22.1: a grapheme cluster shorter than 6 UTF-8 bytes is looked up as a whole, by its longest
+            // matching prefix, and then the whole cluster is replaced (so "\r\n" becomes one space and "e" + two accents becomes "é"
+            // composed, the second accent dropped). Longer clusters are mapped one code point at a time, each by itself.
+            int clusterBytes = startsByte[next] - startsByte[firstCp];
+            if (clusterBytes < 6)
+            {
+                int matched = LongestPrefix(input, startsByte[firstCp], startsByte[next], out int offset);
+                if (matched > 0)
                 {
-                    b.AppendFrom(text, k);
+                    Replace(b, text, starts16[firstCp], starts16[next], offset);
+                    continue;
                 }
-
-                index++;
-                continue;
             }
 
-            // Consume whole code points covering the matched bytes.
-            int last = index;
-            while (last < starts16.Count - 1 && startsByte[last + 1] <= at + matchLength)
+            for (int i = firstCp; i < next; i++)
             {
-                last++;
+                int matched = LongestPrefix(input, startsByte[i], startsByte[i + 1], out int offset);
+                if (matched > 0)
+                {
+                    Replace(b, text, starts16[i], starts16[i + 1], offset);
+                }
+                else
+                {
+                    for (int k = starts16[i]; k < starts16[i + 1]; k++)
+                    {
+                        b.AppendFrom(text, k);
+                    }
+                }
             }
-
-            if (poolOffset >= _pool.Length)
-            {
-                throw new InvalidDataException("The precompiled_charsmap points outside its replacement pool.");
-            }
-
-            int end = poolOffset;
-            while (end < _pool.Length && _pool[end] != 0)
-            {
-                end++;
-            }
-
-            string replacement = Encoding.UTF8.GetString(_pool, poolOffset, end - poolOffset);
-            b.Append(replacement, text.ToOriginal(starts16[index], starts16[last]));
-            index = last;
         }
 
         b.CopyTo(text);
     }
 
+    // Appends the pool string at the offset in place of the UTF-16 range [from, to) of the text.
+    private void Replace(NormalizedStringBuilder b, NormalizedString text, int from, int to, int poolOffset)
+    {
+        if (poolOffset >= _pool.Length)
+        {
+            throw new InvalidDataException("The precompiled_charsmap points outside its replacement pool.");
+        }
+
+        int end = poolOffset;
+        while (end < _pool.Length && _pool[end] != 0)
+        {
+            end++;
+        }
+
+        b.Append(Encoding.UTF8.GetString(_pool, poolOffset, end - poolOffset), text.ToOriginal(from, to));
+    }
+
     // Double-array trie traversal: the unit layout (offset, label, leaf flag, value) is the one the darts-clone format defines.
-    private int LongestPrefix(byte[] key, int from, out int poolOffset)
+    private int LongestPrefix(byte[] key, int from, int limit, out int poolOffset)
     {
         poolOffset = 0;
         int best = 0;
         uint unit = _units.Length > 0 ? _units[0] : 0;
         long node = Offset(unit);
-        for (int i = from; i < key.Length; i++)
+        for (int i = from; i < limit; i++)
         {
             node ^= key[i];
             if ((ulong)node >= (ulong)_units.Length)
