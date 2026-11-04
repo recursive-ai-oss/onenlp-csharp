@@ -96,7 +96,7 @@ internal static class Program
     {
         string original = File.ReadAllText(path, new UTF8Encoding(false, true));
         var rebuilt = new StringBuilder(original.Length);
-        int sentences = 0, words = 0, mwts = 0, empties = 0;
+        int sentences = 0, words = 0, mwts = 0, empties = 0, textMismatches = 0;
         using (var writer = new StringWriter(rebuilt))
         {
             writer.NewLine = "\n";
@@ -106,12 +106,17 @@ internal static class Program
                 words += s.Doc.Length;
                 mwts += s.MultiwordTokens.Count;
                 empties += s.EmptyNodes.Count;
+                if (s.GetComment("text") is { } commentText && commentText != s.Doc.Text)
+                {
+                    textMismatches++;
+                }
+
                 ConllUWriter.Write(writer, s);
             }
         }
 
         string result = rebuilt.ToString();
-        Console.WriteLine($"sentences={sentences} words={words} multiword_tokens={mwts} empty_nodes={empties}");
+        Console.WriteLine($"sentences={sentences} words={words} multiword_tokens={mwts} empty_nodes={empties} text_comment_mismatches={textMismatches}");
         if (result == original)
         {
             Console.WriteLine("roundtrip=identical");
