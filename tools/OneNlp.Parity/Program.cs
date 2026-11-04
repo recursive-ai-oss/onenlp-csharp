@@ -123,7 +123,7 @@ internal static class Program
         Tokenizer tokenizer;
         try
         {
-            tokenizer = Tokenizer.FromFile(tokenizerPath);
+            tokenizer = TokenizerFiles.Load(tokenizerPath);
         }
         catch (NotSupportedException ex)
         {

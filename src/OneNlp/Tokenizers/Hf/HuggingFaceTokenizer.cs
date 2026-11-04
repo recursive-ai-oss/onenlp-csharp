@@ -93,7 +93,7 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
     /// <inheritdoc/>
     protected override TokenEncoding EncodeCore(ReadOnlySpan<char> text, bool addSpecialTokens, TruncationOptions? truncation)
     {
-        TokenEncoding first = EncodeSequence(text.ToString(), typeId: 0);
+        TokenEncoding first = EncodeSequence(ReplaceLoneSurrogates(text), typeId: 0);
         int added = _postProcessor is null || !addSpecialTokens ? 0 : _postProcessor.AddedTokenCount(isPair: false);
         first = Truncate(first, truncation, added);
         return _postProcessor is null ? first : _postProcessor.Process(first, null, addSpecialTokens);
@@ -102,8 +102,8 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
     /// <inheritdoc/>
     protected override TokenEncoding EncodePairCore(ReadOnlySpan<char> text, ReadOnlySpan<char> pair, bool addSpecialTokens, TruncationOptions? truncation)
     {
-        TokenEncoding first = EncodeSequence(text.ToString(), typeId: 0);
-        TokenEncoding second = EncodeSequence(pair.ToString(), typeId: 1);
+        TokenEncoding first = EncodeSequence(ReplaceLoneSurrogates(text), typeId: 0);
+        TokenEncoding second = EncodeSequence(ReplaceLoneSurrogates(pair), typeId: 1);
         if (truncation is not null)
         {
             // Longest-first: shave one token at a time off the longer sequence until both fit with the template's tokens.
@@ -151,6 +151,40 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
         }
 
         return _postProcessor is null ? Concatenate(first, second) : _postProcessor.Process(first, second, addSpecialTokens);
+    }
+
+    // A lone surrogate is not text. Each one is read as U+FFFD, one UTF-16 unit for one unit so offsets are unchanged, which is also what
+    // the reference sees when its input is made from such a string (the UTF-8 entry points replace ill-formed bytes the same way).
+    private static string ReplaceLoneSurrogates(ReadOnlySpan<char> text)
+    {
+        string s = text.ToString();
+        for (int i = 0; i < s.Length; i++)
+        {
+            if (char.IsSurrogate(s[i]) && !(char.IsHighSurrogate(s[i]) && i + 1 < s.Length && char.IsLowSurrogate(s[i + 1])) && !(char.IsLowSurrogate(s[i]) && i > 0 && char.IsHighSurrogate(s[i - 1])))
+            {
+                return Fix(s, i);
+            }
+        }
+
+        return s;
+
+        static string Fix(string s, int first)
+        {
+            char[] chars = s.ToCharArray();
+            for (int i = first; i < chars.Length; i++)
+            {
+                if (char.IsHighSurrogate(chars[i]) && i + 1 < chars.Length && char.IsLowSurrogate(chars[i + 1]))
+                {
+                    i++;
+                }
+                else if (char.IsSurrogate(chars[i]))
+                {
+                    chars[i] = '�';
+                }
+            }
+
+            return new string(chars);
+        }
     }
 
     private TokenEncoding EncodeSequence(string text, int typeId)

@@ -127,6 +127,9 @@ internal sealed class BertNormalizer(bool cleanText, bool handleChineseChars, bo
         }
     }
 
+    // The removed set is the reference library's own (BertCleanData, from its output for every code point): control, format and
+    // private-use characters of its Unicode data, not those of ours; unassigned code points stay. Tab, line feed and carriage return
+    // are not in it; they count as whitespace below.
     private static void Clean(NormalizedString text)
     {
         var b = new NormalizedStringBuilder();
@@ -135,7 +138,7 @@ internal sealed class BertNormalizer(bool cleanText, bool handleChineseChars, bo
         {
             int cp = NormalizerHelpers.CodePointAt(s, i, out int w);
             OffsetPair origin = NormalizerHelpers.OriginOf(text, i, w);
-            if (cp == 0 || cp == 0xFFFD || IsControl(cp))
+            if (BertCleanData.Contains(cp) || cp is >= 0xD800 and <= 0xDFFF)
             {
                 i += w;
                 continue;
@@ -155,10 +158,6 @@ internal sealed class BertNormalizer(bool cleanText, bool handleChineseChars, bo
 
         b.CopyTo(text);
     }
-
-    // Tab, line feed and carriage return are whitespace for the cleaning step; every other control, format, private-use or unassigned code point is dropped.
-    private static bool IsControl(int cp) =>
-        cp is not (0x09 or 0x0A or 0x0D) && CodePointRegex.CategoryOf(cp) is UnicodeCategory.Control or UnicodeCategory.Format or UnicodeCategory.Surrogate or UnicodeCategory.PrivateUse or UnicodeCategory.OtherNotAssigned;
 
     private static void SpaceOutChineseChars(NormalizedString text)
     {
@@ -360,7 +359,7 @@ internal sealed class StripAccentsNormalizer(bool nonSpacingOnly = false) : INor
         for (int i = 0; i < s.Length;)
         {
             int cp = NormalizerHelpers.CodePointAt(s, i, out int w);
-            if (!(nonSpacingOnly ? NormalizerHelpers.IsNonSpacingMark(cp) : NormalizerHelpers.IsMark(cp)))
+            if (!(nonSpacingOnly ? BertAccentsData.Contains(cp) : StripAccentsData.Contains(cp)))
             {
                 for (int k = 0; k < w; k++)
                 {

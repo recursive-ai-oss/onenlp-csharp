@@ -100,7 +100,7 @@ public static class ParityTokenizers
             if (f.GetProperty("id").GetString() == familyId)
             {
                 string path = Path.Combine(models!, f.GetProperty("dir").GetString()!, f.GetProperty("files").GetProperty("primary").GetString()!);
-                return Tokenizer.FromFile(path);
+                return TokenizerFiles.Load(path);
             }
         }
 

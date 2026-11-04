@@ -138,6 +138,24 @@ internal sealed class NormalizedStringBuilder
     /// <param name="index">The unit index.</param>
     internal void AppendFrom(NormalizedString source, int index) => Append(source.Text[index], source.AlignmentAt(index));
 
+    /// <summary>The number of units appended so far.</summary>
+    internal int Length => _alignment.Count;
+
+    /// <summary>Moves every origin by a number of units, not below 0.</summary>
+    /// <param name="by">The amount to add to the start and the end of each origin.</param>
+    internal void ShiftOrigins(int by)
+    {
+        if (by == 0)
+        {
+            return;
+        }
+
+        for (int i = 0; i < _alignment.Count; i++)
+        {
+            _alignment[i] = new OffsetPair(Math.Max(0, _alignment[i].Start + by), Math.Max(0, _alignment[i].End + by));
+        }
+    }
+
     /// <summary>Writes the built text into a normalized string.</summary>
     /// <param name="target">The string to replace the content of.</param>
     internal void CopyTo(NormalizedString target) => target.Replace(_text.ToString(), [.. _alignment]);

@@ -17,7 +17,10 @@ from tokenizers import Tokenizer
 from make_goldens import PAIRS, TEXTS as BASE_TEXTS, encode_dict
 
 # Cases that reach the SentencePiece character map: line breaks, repeated accents, accents on astral letters, ligatures.
-TEXTS = BASE_TEXTS + ["a\r\nb", "ae\u0301\u0301b", "x\U0001D49C\u0301y", "ab\u0301c", "\ufb01x \U0001F600\ufb01"]
+TEXTS = BASE_TEXTS + ["a\r\nb", "ae\u0301\u0301b", "x\U0001D49C\u0301y", "ab\u0301c", "\ufb01x \U0001F600\ufb01",
+    # Found by the parity corpus: controls and noncharacters, mixed whitespace, stacked marks of many scripts, assigned-after-the-reference characters.
+    "\u0016\ufdd0\u2069bc\U000e0036", "\u000b\u000b\r\r\r\u00a0\u00a0\u2029\r\n\u2003some",
+    "\u0915\u0484\u0e36\u1df6\ufe2b\u1df9\u0e38\u036e\u05a4\u1dce\u0483\u094b\u0902\u0915d\u05b6\u1df1\u0e31\u0349\ufe21", "\u1cc9", "\ufde1"]
 
 
 def main():

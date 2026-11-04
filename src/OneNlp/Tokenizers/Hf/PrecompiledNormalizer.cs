@@ -80,6 +80,7 @@ internal sealed class PrecompiledNormalizer : INormalizer
         byte[] input = [.. bytes];
 
         var b = new NormalizedStringBuilder();
+        int leadingDeleted = 0;
         int[] clusters = OneFont.TextSegmentation.GetGraphemeBoundaries(s);
         int next = 0;
         for (int c = 0; c < clusters.Length - 1; c++)
@@ -101,7 +102,11 @@ internal sealed class PrecompiledNormalizer : INormalizer
                 {
                     // The replacement takes the origin of the cluster's first code point only (observed in output of tokenizers 0.22.1:
                     // "e" + accent composed to one letter covers just the "e").
-                    Replace(b, text, starts16[firstCp], starts16[firstCp + 1], offset);
+                    if (Replace(b, text, starts16[firstCp], starts16[firstCp + 1], offset) == 0 && b.Length == 0)
+                    {
+                        leadingDeleted += starts16[next] - starts16[firstCp];
+                    }
+
                     continue;
                 }
             }
@@ -111,7 +116,10 @@ internal sealed class PrecompiledNormalizer : INormalizer
                 int matched = LongestPrefix(input, startsByte[i], startsByte[i + 1], out int offset);
                 if (matched > 0)
                 {
-                    Replace(b, text, starts16[i], starts16[i + 1], offset);
+                    if (Replace(b, text, starts16[i], starts16[i + 1], offset) == 0 && b.Length == 0)
+                    {
+                        leadingDeleted += starts16[i + 1] - starts16[i];
+                    }
                 }
                 else
                 {
@@ -123,11 +131,15 @@ internal sealed class PrecompiledNormalizer : INormalizer
             }
         }
 
+        // Observed in output of tokenizers 0.22.1: characters this map deletes at the very start of the text pull every offset after them
+        // back by their number ('\u0016some' reports "some" at 0-4, not 1-5), although deletions later in the text shift nothing.
+        // Offsets must equal the reference's, so the same shift is made.
+        b.ShiftOrigins(-leadingDeleted);
         b.CopyTo(text);
     }
 
     // Appends the pool string at the offset in place of the UTF-16 range [from, to) of the text.
-    private void Replace(NormalizedStringBuilder b, NormalizedString text, int from, int to, int poolOffset)
+    private int Replace(NormalizedStringBuilder b, NormalizedString text, int from, int to, int poolOffset)
     {
         if (poolOffset >= _pool.Length)
         {
@@ -140,7 +152,9 @@ internal sealed class PrecompiledNormalizer : INormalizer
             end++;
         }
 
-        b.Append(Encoding.UTF8.GetString(_pool, poolOffset, end - poolOffset), text.ToOriginal(from, to));
+        string replacement = Encoding.UTF8.GetString(_pool, poolOffset, end - poolOffset);
+        b.Append(replacement, text.ToOriginal(from, to));
+        return replacement.Length;
     }
 
     // Double-array trie traversal: the unit layout (offset, label, leaf flag, value) is the one the darts-clone format defines.
