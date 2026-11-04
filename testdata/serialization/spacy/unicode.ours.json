@@ -1,0 +1,1 @@
+{"text":"Café 日本語 \uD83D\uDE00 é","tokens":[{"id":0,"start":0,"end":4,"norm":"café"},{"id":1,"start":5,"end":8,"norm":"日本語","conf":0.75},{"id":2,"start":9,"end":10,"norm":"\uD83D\uDE00"},{"id":3,"start":11,"end":13,"norm":"é","conf":0.75}]}
