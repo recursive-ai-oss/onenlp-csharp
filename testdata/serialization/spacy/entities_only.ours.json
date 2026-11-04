@@ -1,0 +1,1 @@
+{"text":"Acme Corp hired Bo.","ents":[{"start":0,"end":9,"label":"ORG"},{"start":16,"end":18,"label":"PERSON"}],"tokens":[{"id":0,"start":0,"end":4,"norm":"acme"},{"id":1,"start":5,"end":9,"norm":"corp","conf":0.75},{"id":2,"start":10,"end":15,"norm":"hired"},{"id":3,"start":16,"end":18,"norm":"bo","conf":0.75},{"id":4,"start":18,"end":19,"norm":"."}]}

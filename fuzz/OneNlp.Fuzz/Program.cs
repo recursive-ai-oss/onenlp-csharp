@@ -9,6 +9,7 @@ using SharpFuzz;
 //
 // Without a libFuzzer host:
 //   replay <target> <file>...   runs saved inputs once each (reproduces a finding)
+//   seeds <target> <dir>        writes valid inputs for the target into <dir>
 //   random <target> <count>     runs <count> random and mutated inputs from a fixed seed, as a smoke check
 internal static class Program
 {
@@ -18,10 +19,37 @@ internal static class Program
     {
         ["word-tokenizer"] = WordTokenizerTarget.Run,
         ["segmentation"] = SegmentationTarget.Run,
+        ["doc-json"] = SerializationTargets.Json,
+        ["doc-binary"] = SerializationTargets.Binary,
+        ["docbin"] = SerializationTargets.Bin,
     };
 
     private static int Main(string[] args)
     {
+        if (args.Length == 3 && args[0] == "seeds")
+        {
+            Directory.CreateDirectory(args[2]);
+            switch (args[1])
+            {
+                case "doc-json":
+                    SerializationTargets.SeedJson(args[2]);
+                    break;
+                case "doc-binary":
+                    SerializationTargets.SeedBinary(args[2]);
+                    break;
+                case "docbin":
+                    SerializationTargets.SeedBin(args[2]);
+                    break;
+                case "word-tokenizer":
+                case "segmentation":
+                    File.WriteAllText(Path.Combine(args[2], "seed-english"), "Mr. Smith can't visit www.x.org/a?b=1. Mail a.b@c-d.com, e.g. U.S.A. well-known 3:30 ... -- :) $$$. Yes!\n\nNext.");
+                    File.WriteAllText(Path.Combine(args[2], "seed-mixed"), "Hello, world! It's 3.14 - 日本語 😀 é end");
+                    break;
+            }
+
+            return 0;
+        }
+
         if (args.Length > 2 && args[0] == "replay" && Targets.TryGetValue(args[1], out Target? replayed))
         {
             foreach (string file in args.Skip(2))

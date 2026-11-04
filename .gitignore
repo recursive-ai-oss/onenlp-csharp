@@ -18,9 +18,9 @@
 !/tests/
 !/bench/
 !/fuzz/
-!/eval/
 !/tools/
 !/docs/
+!/testdata/
 
 bin/
 obj/

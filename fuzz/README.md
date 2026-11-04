@@ -6,6 +6,9 @@
 |---|---|---|
 | `word-tokenizer` | arbitrary bytes, read as UTF-8 (or, when the first byte is odd, as raw UTF-16 units, which reaches lone surrogates) | the document built by `Nlp.Analyze`: tokens are non-empty, ordered slices of the text with only whitespace between them, and `FindToken` and `TryGetCharSpan` agree with the offsets |
 | `segmentation` | arbitrary bytes, as above | word tokenizer and sentencizer with no data, neutral data and English data: offsets ascending and in range, every non-white-space character inside a token, sentences partition the tokens |
+| `doc-json` | arbitrary bytes | `Doc.FromJson`: only `InvalidDataException` may escape; a document that reads must write to binary and back to the same bytes, and to JSON and back (unless it holds an unpaired surrogate, which JSON cannot carry) |
+| `doc-binary` | byte 0 is a mode, the rest a serialized document (bit 0 rewrites the header's flags and length to fit the input, bit 1 also appends a valid checksum, so mutations reach the section decoders) | `Doc.FromBytes`: only `InvalidDataException`; a document that reads writes and reads back to the same bytes |
+| `docbin` | same framing, for a bin | `DocBin.FromBytes` and `DocBinReader`: only `InvalidDataException`; the streaming reader yields the same documents as the whole-bin reader |
 
 Only documented exceptions may escape a library call. Any other exception, a failed invariant, a hang or a memory blow-up is a finding.
 
@@ -14,6 +17,6 @@ Without a libFuzzer host:
     dotnet run -c Release --project fuzz/OneNlp.Fuzz -- random word-tokenizer 20000
     dotnet run -c Release --project fuzz/OneNlp.Fuzz -- replay word-tokenizer some-input...
 
-To fuzz with coverage, instrument `RecursiveAI.OneNlp.dll` with the `SharpFuzz.CommandLine` tool and run the executable under the SharpFuzz libFuzzer host.
+To fuzz with coverage, use `fuzz/run.sh <target> <seconds>`: it builds the harness, writes seed inputs (`seeds <target> <dir>`), instruments `RecursiveAI.OneNlp.dll` with the `SharpFuzz.CommandLine` tool and runs the SharpFuzz libFuzzer host. `ONENLP_FUZZ_WORK` (outside the checkout) and `ONENLP_FUZZ_TOOLS` (holding `libfuzzer-dotnet`, and `sharpfuzz` unless `SHARPFUZZ` names it) are required; findings land in `$ONENLP_FUZZ_WORK/findings/<target>/`. Replay one with `fuzz/run.sh replay <target> <file>`.
 
 To add a target, write `Run(ReadOnlySpan<byte> data)` and add one line to the table in `Program.cs`. Minimized findings go under `tests/` as fixtures (under 1 MB) with a test that feeds them.

@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using RecursiveAI.OneNlp;
+using RecursiveAI.OneNlp.Serialization;
 using RecursiveAI.OneNlp.Tokenizers;
 
 namespace RecursiveAI.OneNlp.AotSmoke;
@@ -50,6 +51,32 @@ internal static class Program
         Check("utf8 offsets", encoding.Offsets[1].Start == 7 && encoding.Offsets[1].End == 13);
         Check("trim", tokenizer.TrimToTokenBudget("a b c", 2).SequenceEqual("a b"));
         Check("loader not yet supported", Throws<NotSupportedException>(() => Tokenizer.FromStream(new MemoryStream(), TokenizerFormat.WordPieceVocabulary)));
+
+        // Both serialization formats, and the container, under NativeAOT.
+        Doc annotated = Nlp.Analyze("Ada Lovelace wrote notes in London \uD83D\uDE00.");
+        annotated.SetAnnotation(TokenColumn.Pos, 0, "PROPN");
+        annotated.SetAnnotation(TokenColumn.Norm, 1, "lovelace");
+        annotated.SetHeads(new int[annotated.Length]);
+        annotated.SetSentenceStart(0, true);
+        annotated.SetConfidence(2, 0.5f);
+        annotated.SetEntities([new SpanSpec(0, 2, "PER", 0.75f)]);
+        Doc fromJson = Doc.FromJson(annotated.ToJson());
+        Check("json round trip", fromJson.Length == annotated.Length && fromJson[0].Pos == "PROPN" && fromJson[1].Norm == "lovelace" && fromJson.Ents[0].Confidence == 0.75f && fromJson[2].Confidence == 0.5f);
+        Doc fromBytes = Doc.FromBytes(annotated.ToBytes());
+        Check("binary round trip", fromBytes.ToJson() == annotated.ToJson() && fromBytes[5].HeadIndex == 0);
+        var bin = new DocBin();
+        bin.Add(annotated);
+        bin.Add(Nlp.Analyze("second"));
+        DocBin binBack = DocBin.FromBytes(bin.ToBytes());
+        int streamed = 0;
+        var binReader = new DocBinReader(new MemoryStream(bin.ToBytes()));
+        while (binReader.TryRead(out _))
+        {
+            streamed++;
+        }
+
+        Check("docbin", binBack.Count == 2 && streamed == 2);
+        Check("hostile input", Throws<InvalidDataException>(() => Doc.FromBytes(new byte[] { 1, 2, 3 })) && Throws<InvalidDataException>(() => Doc.FromJson("{")));
 
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
