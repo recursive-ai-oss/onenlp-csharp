@@ -20,7 +20,7 @@ namespace RecursiveAI.OneNlp.Recipes.EnNer;
 //   eval <model> <eval.jsonl> <out-dir> [--ref ref.tsv] [--raw]
 //   speed <model> <eval.jsonl> [threads]
 //
-// train options: --decoding tagging|spans  --epochs N  --seed N  --context N  --hidden N  --width N  --lr F  --batch-words N
+// train options: --decoding tagging|spans  --epochs N  --seed N  --context N  --hidden N  --width N  --depth N  --norm-rows N  --lr F  --batch-words N
 //                --patience N  --threads N  --checkpoint-every N  --dropout F
 internal static class Program
 {
@@ -28,7 +28,6 @@ internal static class Program
     {
         try
         {
-            EncoderRegistry.Register(LexicalEncoder.EncoderKind, LexicalEncoder.FromSettings);
             switch (args.Length > 0 ? args[0] : string.Empty)
             {
                 case "convert" when args.Length == 3:
@@ -182,9 +181,9 @@ internal static class Program
         }
 
         NerDecoding decoding = Opt(args, "decoding", "tagging") == "spans" ? NerDecoding.Spans : NerDecoding.Tagging;
-        var encoder = new LexicalEncoder(Num(args, "width", 256), 64, 1 << 15, seed);
+        var encoder = new FastEncoder(Num(args, "width", 96), Num(args, "depth", 4), normRows: Num(args, "norm-rows", 20000), seed: seed);
         using Pipeline pipeline = Pipeline.Blank(Language.English)
-            .Add(new EntityRecognizer(encoder, decoding, Num(args, "context", 2), Num(args, "hidden", 256)) { OwnsEncoder = true });
+            .Add(new EntityRecognizer(encoder, decoding, Num(args, "context", 0), Num(args, "hidden", 256)) { OwnsEncoder = true });
 
         var clock = Stopwatch.StartNew();
         var progress = new Progress(p =>

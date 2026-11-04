@@ -1,10 +1,10 @@
 # Provenance: en-ner (tagging and spans)
 
-- **Model:** `en-ner-tagging` and `en-ner-spans`, version 0 (development); a named entity recognizer (PER, ORG, LOC) over a hash-embedding word encoder, English, fast tier. Format: `docs/provenance.md`.
-- **Recipe:** `recipes/en/ner/` (`Program.cs`, `LexicalEncoder.cs`, `run.sh`); defaults are the configuration: width 256, hidden 256, context 2, dropout 0.4, learning rate 0.003, batch 1000 words, patience 6, at most 40 epochs.
-- **Seed(s):** training, data order and initial weights 7 (`--seed`); the data splits are the official ones. Seeds 8 and 9 were trained for the dev spread only.
+- **Model:** `en-ner-tagging`, version 0 (development); a named entity recognizer (PER, ORG, LOC) over the library fast encoder, English, fast tier. Format: `docs/provenance.md`.
+- **Recipe:** `recipes/en/ner/` (`Program.cs`, `run.sh`); defaults are the configuration: FastEncoder width 96 depth 4, head hidden 256, context 0, dropout 0.4, learning rate 0.003, batch 1000 words, patience 6, at most 40 epochs.
+- **Seed(s):** training, data order and initial weights 7 (`--seed`); the data splits are the official ones.
 - **Produced:** 2026-11-04; AMD Ryzen 9 7950X3D (16 cores, 32 threads) shared with other jobs, 4 threads; .NET SDK 10.0.403, runtime 10.0.14; RecursiveAI.OneModel 1.0.0 and OneModel.Training 1.0.0; wall time tagging 1:33, spans 7:05.
-- **Weights:** `model.onenlp` (pipeline file with encoder and head). Tagging 9,978,133 bytes, file sha256 `59050e63939423e34ffd6910d99166d550dc1734fddfe9040d5bb87278222519`, weights hash reported by `Train` `dbfd2fca8edc12b5ba624a9e124bf8a5984498257ee2f508a1c6eae113981f10`. Spans 10,514,963 bytes, file sha256 `bc7f8b66333e343a6eebe49c7e0d9577f190c1c3e5099905ef728ba3256d7357`, weights hash `3e080b3b5e9fc197876fe2b9402745df1fc6fe30d68744e416434a4bb6e9fd37`. Kept on the build machine under `models/en-fast/u16/`; not in git. Retraining at the same seed gives the same weights hash (checked twice for tagging).
+- **Weights:** `model.onenlp` (pipeline file with encoder and head), 12,039,553 bytes, file sha256 `309abffd3229006dfe48ee3df01e02faf909e41b57b1e50e3ae5102aa24f0964`, weights hash reported by `Train` `83f8adcfcb775db79579b01478f94a0c62ce9ced5dbec433b36ad21475cf2e49`. Kept on the build machine under `models/en-fast/u16/`; not in git. Wall time 2:02.
 - **SA lineage:** yes. UNER English-EWT is CC BY-SA 4.0 (and sits on UD English-EWT, also CC BY-SA 4.0). Credit: Universal NER (Mayhew et al. 2024) and Universal Dependencies English Web Treebank.
 - **Licence of the weights:** not released; development model.
 
@@ -33,7 +33,7 @@ None; trained from scratch (no vectors, no transformer).
 
 - Manifest: `tools/fetch/en/MANIFEST.md`, which lists the six files and their roles.
 - Text-level overlap of the test file with train and dev: 114 identical sentence texts (127 after case and whitespace folding), almost all one- and two-word fragments; the official split is kept (`tools/fetch/en/MANIFEST.md`).
-- The test file was not used for early stopping, model selection or hyperparameter choice: yes (not used). The design (tagging against spans) and the settings (sweep of dropout, context, hidden and encoder width, six runs) were chosen on the dev split. The test split was read once for the final configuration, for both designs.
+- The test file was not used for early stopping, model selection or hyperparameter choice: yes (not used). The design (tagging against spans, on the earlier stand-in encoder) and the settings (sweeps of context, encoder width and depth, dropout, learning rate, about twenty runs) were chosen on the dev split. The test split was read once for the final configuration, for both designs.
 
 ## Results
 
@@ -41,5 +41,5 @@ Rows, intervals and the reference in `README.md` next to this file. Regenerate: 
 
 ## Notes
 
-- The encoder is the recipe's stand-in (`LexicalEncoder`); the rows are to be repeated on the library's fast encoder.
+- Seeds 8 and 9 were trained for the dev spread only. The spans design was measured only on the earlier stand-in encoder.
 - 114 test sentences also occur in train or dev (see above).
