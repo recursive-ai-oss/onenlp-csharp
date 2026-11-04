@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).Parity</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).Parity</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/OneNlp/OneNlp.csproj" />
+  </ItemGroup>
+
+</Project>
