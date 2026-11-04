@@ -1,0 +1,54 @@
+{
+  "chars_or_bytes_by_class": {
+    "cjk-run": 426,
+    "combining": 196,
+    "control": 134,
+    "emoji": 302,
+    "empty": 0,
+    "hangul": 116,
+    "invalid-utf8": 629,
+    "lone-surrogate": 174,
+    "long-line": 40000,
+    "numbers": 519,
+    "rtl-bidi": 382,
+    "single-char": 167,
+    "special-lookalike": 2823,
+    "url-code": 2066,
+    "whitespace": 1688
+  },
+  "corpus_sha256": "3c9c1b41c93184f7f44af9199450d26243b67e9620ca37bb9f35fe76809fb4d3",
+  "counts": {
+    "cjk-run": 15,
+    "combining": 15,
+    "control": 15,
+    "emoji": 20,
+    "empty": 1,
+    "hangul": 12,
+    "invalid-utf8": 61,
+    "lone-surrogate": 40,
+    "long-line": 2,
+    "numbers": 32,
+    "rtl-bidi": 12,
+    "single-char": 167,
+    "special-lookalike": 155,
+    "synthetic-pair": 12,
+    "url-code": 39,
+    "whitespace": 38
+  },
+  "files": {
+    "pairs.jsonl": {
+      "bytes": 11435,
+      "sha256": "295c9bf9e421ad2a7bac22dff8626f5a09e62fa856451be2b4434d4d3ef6fa4d"
+    },
+    "records.jsonl": {
+      "bytes": 83497,
+      "sha256": "e8dfc1d3ee1cea69693728dade7a6940b4c308a35905f922e4c93502b8204ff6"
+    }
+  },
+  "format": 1,
+  "inputs": {},
+  "pairs": 12,
+  "profile": "toy",
+  "records": 624,
+  "seed": 20261104
+}

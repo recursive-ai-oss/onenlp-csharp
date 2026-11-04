@@ -16,6 +16,11 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/OneNlp/OneNlp.csproj" />
+    <ProjectReference Include="../../tools/OneNlp.Parity/OneNlp.Parity.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Label="Parity self-check fixtures">
+    <None Include="Parity/toy/**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
