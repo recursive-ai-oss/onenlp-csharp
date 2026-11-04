@@ -17,10 +17,28 @@ internal static class Program
     private static readonly Dictionary<string, Target> Targets = new()
     {
         ["word-tokenizer"] = WordTokenizerTarget.Run,
+        ["tokenizer-json"] = TokenizerJsonTarget.Run,
+        ["code-point-regex"] = CodePointRegexTarget.Run,
+        ["charsmap"] = CharsMapTarget.Run,
     };
 
     private static int Main(string[] args)
     {
+        if (args.Length >= 3 && args[0] == "seeds")
+        {
+            // seeds <target> <directory> [testdata directory]: writes a starting corpus.
+            if (args[1] == "tokenizer-json" && args.Length == 4)
+            {
+                TokenizerJsonTarget.Seeds(args[2], args[3]);
+            }
+            else if (args[1] == "code-point-regex")
+            {
+                CodePointRegexTarget.Seeds(args[2]);
+            }
+
+            return 0;
+        }
+
         if (args.Length > 2 && args[0] == "replay" && Targets.TryGetValue(args[1], out Target? replayed))
         {
             foreach (string file in args.Skip(2))

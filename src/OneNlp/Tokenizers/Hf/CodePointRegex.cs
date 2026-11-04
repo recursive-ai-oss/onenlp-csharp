@@ -744,6 +744,11 @@ internal sealed class CodePointRegex
         // \d \D \s \S \w \W \p{..} \P{..}; returns null (without consuming) for anything else.
         private Func<int, bool>? TryClassEscape()
         {
+            if (_i >= pattern.Length)
+            {
+                throw Fail("trailing backslash");
+            }
+
             char e = pattern[_i];
             switch (e)
             {
@@ -796,6 +801,11 @@ internal sealed class CodePointRegex
 
         private int ReadEscapedLiteral()
         {
+            if (_i >= pattern.Length)
+            {
+                throw Fail("trailing backslash");
+            }
+
             char e = pattern[_i++];
             switch (e)
             {

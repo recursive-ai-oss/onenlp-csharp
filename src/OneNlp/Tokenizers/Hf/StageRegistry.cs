@@ -159,9 +159,20 @@ internal sealed partial class StageRegistry
             table.TryGetValue(type, out factory);
         }
 
-        return factory is null
-            ? throw new NotSupportedException($"The {kind} type '{type}' is not supported.")
-            : factory(config);
+        if (factory is null)
+        {
+            throw new NotSupportedException($"The {kind} type '{type}' is not supported.");
+        }
+
+        try
+        {
+            return factory(config);
+        }
+        catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException or FormatException or OverflowException or ArgumentException or IndexOutOfRangeException)
+        {
+            // A value of the wrong kind or size read straight from the JSON (a missing member, a string where a number belongs).
+            throw new InvalidDataException($"The {kind} '{type}' is malformed: {ex.Message}", ex);
+        }
     }
 
     // Every type the published tokenizer.json documentation lists, so that a file using one fails with a clear message until the

@@ -40,6 +40,8 @@ public class StageEdgeTests
     [InlineData(@"\")]
     [InlineData("(?<n")]
     [InlineData("(?z)")]
+    [InlineData(@"[a-\")]
+    [InlineData(@"[\")]
     public void MalformedPatternsAreRefused(string pattern) =>
         Assert.Throws<InvalidDataException>(() => CodePointRegex.Parse(pattern));
 
@@ -142,7 +144,16 @@ public class StageEdgeTests
         Assert.Equal(["▁", "a", "▁", "a"], e.Tokens.ToArray());
     }
 
+    [Fact]
+    public void InvalidUtf8InsideAStringIsADataError()
+    {
+        // Found by fuzzing: a stray 0xEE byte in a stage type name used to escape as InvalidOperationException.
+        byte[] json = [.. "{\"model\":{\"type\":\"B"u8, 0xEE, .. "PE\",\"vocab\":{},\"merges\":[]}}"u8];
+        Assert.Throws<InvalidDataException>(() => HuggingFaceTokenizerJson.Load(new MemoryStream(json), CharRegistry()));
+    }
+
     [Theory]
+    [InlineData(@"{""model"":{""type"":""BPE"",""vocab"":{},""merges"":[]},""post_processor"":{""type"":""TemplateProcessing"",""single"":[],""pair"":[],""special_tokens"":{""x"":{""id"":""x""}}}}")]
     [InlineData("{}")]
     [InlineData("[]")]
     [InlineData(@"{""model"":{""type"":""NoSuchModel""}}")]

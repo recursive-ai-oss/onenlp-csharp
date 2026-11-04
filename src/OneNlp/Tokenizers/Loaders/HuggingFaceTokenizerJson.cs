@@ -29,6 +29,13 @@ internal static class HuggingFaceTokenizerJson
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(registry);
         byte[] bytes = ReadBounded(stream);
+
+        // Checked up front: the JSON reader parses invalid UTF-8 inside strings and only fails when a string is read.
+        if (!System.Text.Unicode.Utf8.IsValid(bytes))
+        {
+            throw new InvalidDataException("The tokenizer file is not valid UTF-8.");
+        }
+
         JsonDocument document;
         try
         {
