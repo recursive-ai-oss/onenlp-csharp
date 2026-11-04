@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).Bench.Tokenizers</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).Bench.Tokenizers</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <!-- The comparator normalizes with string.Normalize, which needs ICU; the rows must give it the platform's real behaviour. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <!-- Steady timings: no background GC threads. -->
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <NoWarn>$(NoWarn);CA1303;CA1305;CA1031</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.Tokenizers" />
+    <PackageReference Include="Microsoft.ML.Tokenizers.Data.Cl100kBase" />
+    <PackageReference Include="Microsoft.ML.Tokenizers.Data.O200kBase" />
+    <PackageReference Include="Microsoft.ML.Tokenizers.Data.Gpt2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/OneNlp/OneNlp.csproj" />
+  </ItemGroup>
+
+</Project>
