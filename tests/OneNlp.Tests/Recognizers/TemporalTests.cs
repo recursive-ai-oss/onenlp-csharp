@@ -187,6 +187,6 @@ public class TemporalTests
     {
         // Found by fuzzing: "=" alone is a one-symbol form, not an empty case-sensitive form.
         Recognizer r = Recognizer.FromRules([System.Text.Encoding.UTF8.GetBytes("[time.month]\n1 | =\n[time.word]\ntoday | =, =x\n")]);
-        Assert.Empty(r.Recognize("= x", new RecognitionContext(Wed)).OfType<TemporalMatch>().Where(t => t.Kind == TemporalKind.Duration));
+        Assert.DoesNotContain(r.Recognize("= x", new RecognitionContext(Wed)).OfType<TemporalMatch>(), t => t.Kind == TemporalKind.Duration);
     }
 }
