@@ -9,6 +9,7 @@
   </Folder>
   <Folder Name="/bench/">
     <Project Path="bench/OneNlp.Bench/OneNlp.Bench.csproj" />
+    <Project Path="bench/OneNlp.Bench.Tokenizers/OneNlp.Bench.Tokenizers.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/OneNlp.Toy/OneNlp.Toy.csproj" />
