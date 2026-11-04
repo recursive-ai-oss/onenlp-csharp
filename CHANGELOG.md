@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Recognizers (`Recognizer`, `RecognizerComponent`, `Quantity`, `SequenceMatch`, `Nlp.Quantities`, `Nlp.Numbers`, `Nlp.Sequences`): numbers and ordinals in digits and words, percentages, measures (length, mass, volume, area, speed, information, temperature, age), money with ISO 4217 codes, e-mail, URL, IPv4/IPv6, phone-like sequences (unvalidated), hashtags, mentions and GUIDs, from per-language rule data that is embedded in the assembly or loaded from files. English rules are included; see `docs/recognizers.md`.
 - Repository skeleton: `RecursiveAI.OneNlp` and `RecursiveAI.OneNlp.Neural` projects, tests, a NativeAOT smoke app, a benchmark project and a fuzz harness.
 - `Doc`, `Token` and `Span`: columnar documents with character offsets into the original string, interned attribute columns, entities, sentences and confidences.
 - `Pipeline`, `IPipelineComponent`, `IWordTokenizer` and `ComponentRegistry`: ordered components, batch and streaming processing, and reflection-free registration by name.
