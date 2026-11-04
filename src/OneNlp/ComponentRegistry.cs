@@ -67,6 +67,7 @@ public static class ComponentRegistry
                 ? new Segmentation.SentencizerComponent(Segmentation.SegmentationData.ByName(data))
                 : Segmentation.SentencizerComponent.For(settings.TryGetValue("language", out string? code) ? Language.FromCode(code) : Language.Unknown),
             [Matching.EntityRuler.ComponentName] = Matching.EntityRuler.FromSettings,
+            [Recognizers.RecognizerComponent.ComponentName] = Recognizers.RecognizerComponent.FromSettings,
         };
         return table;
     }

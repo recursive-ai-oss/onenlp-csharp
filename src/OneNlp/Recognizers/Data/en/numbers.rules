@@ -1,0 +1,155 @@
+# Number rules for English.
+#
+# Format: [section] headers, then one rule per line, fields separated by "|". "#" starts a comment.
+# Words are matched without regard to case.
+
+[number.digits]
+decimal | .
+group | ,
+negative | -−
+
+[number.cardinal]
+zero | unit | 0
+one | unit | 1
+two | unit | 2
+three | unit | 3
+four | unit | 4
+five | unit | 5
+six | unit | 6
+seven | unit | 7
+eight | unit | 8
+nine | unit | 9
+ten | teen | 10
+eleven | teen | 11
+twelve | teen | 12
+thirteen | teen | 13
+fourteen | teen | 14
+fifteen | teen | 15
+sixteen | teen | 16
+seventeen | teen | 17
+eighteen | teen | 18
+nineteen | teen | 19
+twenty | tens | 20
+thirty | tens | 30
+forty | tens | 40
+fifty | tens | 50
+sixty | tens | 60
+seventy | tens | 70
+eighty | tens | 80
+ninety | tens | 90
+hundred | scale | 100
+thousand | scale | 1000
+million | scale | 1000000
+billion | scale | 1000000000
+trillion | scale | 1000000000000
+quadrillion | scale | 1000000000000000
+quintillion | scale | 1000000000000000000
+sextillion | scale | 1000000000000000000000
+septillion | scale | 1000000000000000000000000
+octillion | scale | 1000000000000000000000000000
+dozen | multiplier | 12
+
+[number.ordinal]
+first | 1
+second | 2 | not-after-number
+third | 3
+fourth | 4
+fifth | 5
+sixth | 6
+seventh | 7
+eighth | 8
+ninth | 9
+tenth | 10
+eleventh | 11
+twelfth | 12
+thirteenth | 13
+fourteenth | 14
+fifteenth | 15
+sixteenth | 16
+seventeenth | 17
+eighteenth | 18
+nineteenth | 19
+twentieth | 20
+thirtieth | 30
+fortieth | 40
+fiftieth | 50
+sixtieth | 60
+seventieth | 70
+eightieth | 80
+ninetieth | 90
+hundredth | 100
+thousandth | 1000
+millionth | 1000000
+billionth | 1000000000
+trillionth | 1000000000000
+
+# The denominator a fraction word stands for: "three quarters" is 3/4, "a half" is 1/2.
+[number.fraction]
+half | 2
+halves | 2
+third | 3
+thirds | 3
+quarter | 4
+quarters | 4
+fourth | 4
+fourths | 4
+fifth | 5
+fifths | 5
+sixth | 6
+sixths | 6
+seventh | 7
+sevenths | 7
+eighth | 8
+eighths | 8
+ninth | 9
+ninths | 9
+tenth | 10
+tenths | 10
+hundredth | 100
+hundredths | 100
+thousandth | 1000
+thousandths | 1000
+
+[number.article]
+a
+an
+
+[number.connector]
+and
+
+[number.negative]
+minus
+negative
+
+[number.point]
+point
+
+# A multiplier touching digits: "3.5k" is 3500. "money" ones only count next to a currency ("$5m"), because 5m is also five metres.
+[number.suffix]
+k | 1000 | any
+m | 1000000 | money
+mm | 1000000 | money
+mn | 1000000 | money
+b | 1000000000 | money
+bn | 1000000000 | money
+tn | 1000000000000 | money
+
+# A number written with an ending takes the ending that fits its last digits: 1st 2nd 3rd 4th 11th 12th 13th 21st.
+[number.ordinal-suffix]
+st | 1 | not-teen
+nd | 2 | not-teen
+rd | 3 | not-teen
+th | 0456789 | any
+th | 123 | teen
+
+[percent]
+%, percent, per cent, pct, ％
+
+[age.unit]
+year | year, years, yr, yrs
+month | month, months, mo, mos
+week | week, weeks, wk, wks
+day | day, days
+
+[age.suffix]
+old

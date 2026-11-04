@@ -21,6 +21,9 @@ public static class HeadRegistry
     {
         [Tagger.ComponentKind] = Tagger.FromConfig,
         [Parser.ComponentKind] = Parser.FromConfig,
+        [Morphologizer.ComponentKind] = Morphologizer.FromConfig,
+        [EditTreeLemmatizer.ComponentKind] = EditTreeLemmatizer.FromConfig,
+        [EntityRecognizer.ComponentKind] = EntityRecognizer.FromConfig,
     };
 
     /// <summary>Registers a head kind.</summary>

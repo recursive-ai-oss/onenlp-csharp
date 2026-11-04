@@ -1,0 +1,646 @@
+# English recognizer gold set, authoring source. Read docs/recognizer-gold.md for the schema and labelling rules.
+#
+# One sentence per line. An expression is written [[text|type|value|grain|flags]]; trailing empty fields may be dropped.
+# flags: comma-separated, 'approx' and/or 'alt=<value>;<value>'. '@ref <ISO timestamp>' sets the reference time (UTC) for the lines below it.
+# build.py turns this file into gold.jsonl (dev) and test.jsonl (test) by hashing each sentence.
+
+@ref 2026-03-18T10:30:00
+
+# ---- numbers
+We ordered [[three|number|3]] pizzas for the party.
+There are [[1,250|number|1250]] seats in the main hall.
+The ratio came out at [[3.14|number|3.14]] in the final run.
+[[Twenty-five|number|25]] people signed up at the lodge.
+The report runs to [[one hundred and twenty|number|120]] pages.
+She counted [[forty|number|40]] birds on the lake.
+Over [[two million|number|2000000]] copies were printed.
+The score swung by [[-7|number|-7]] points after the review.
+He needs [[minus twelve|number|-12]] to balance the books.
+Buy [[a dozen|number|12]] eggs and some milk.
+The jar holds [[2.5 thousand|number|2500]] beads.
+The file has [[1000000|number|1000000]] lines.
+We need [[a hundred|number|100]] chairs for the hall.
+I scored [[ninety-nine|number|99]] on the test.
+The weight of the new term is [[0.75|number|0.75]] in the model.
+They found [[thirty thousand|number|30000]] coins in the wreck.
+The planet has about [[7.9 billion|number|7900000000]] people.
+Please read chapter [[12|number|12]] before the exam.
+[[Seventeen|number|17]] students passed the exam.
+Please bring [[six|number|6]] copies and [[two|number|2]] pens.
+The measured error was [[0.001|number|0.001]] on average.
+A total of [[12,345,678|number|12345678]] records were scanned.
+The vote was [[four hundred and two|number|402]] to [[ninety|number|90]].
+There were [[eleven|number|11]] players on each side.
+Roughly [[a thousand|number|1000]] people attended the lecture.
+
+# ---- ordinals
+She finished [[third|ordinal|3]] in the race.
+He bought the [[3rd|ordinal|3]] edition of the atlas.
+He won [[1st|ordinal|1]] prize at the fair.
+The office is on the [[second|ordinal|2]] floor.
+She celebrated her [[fifteenth|ordinal|15]] birthday with friends.
+It was the [[hundredth|ordinal|100]] day of school.
+He was [[twenty-third|ordinal|23]] in line at the shop.
+The shop is on [[5th|ordinal|5]] Avenue near the park.
+The company marked its [[tenth|ordinal|10]] anniversary quietly.
+She was the [[1,000th|ordinal|1000]] customer of the store.
+They played Beethoven's [[Ninth|ordinal|9]] Symphony at the concert.
+He took the [[fourth|ordinal|4]] seat from the left.
+
+# ---- percentages
+Sales rose [[12%|percentage|12]] over the period.
+[[50 percent|percentage|50]] of the voters stayed home.
+Unemployment fell to [[3.5%|percentage|3.5]] in the survey.
+Nearly [[twelve percent|percentage|12]] of the sample declined to answer.
+The test passed with [[99.9%|percentage|99.9]] accuracy.
+Inflation edged up by [[0.5 percent|percentage|0.5]] in the survey.
+The battery is at [[100%|percentage|100]] again.
+About [[7 per cent|percentage|7]] of the staff work remotely.
+The loan carries an interest rate of [[4.25%|percentage|4.25]] on the loan.
+She gave [[one hundred percent|percentage|100]] at practice.
+The index fell [[3%|percentage|3]] in a single session.
+Only [[eighty-five percent|percentage|85]] of the seats were filled.
+
+# ---- dimensions
+The trail is [[12 kilometers|dimension|12 kilometer]] long.
+The station is [[5 km|dimension|5 kilometer]] from here.
+He is [[180 cm|dimension|180 centimeter]] tall.
+The room is [[6 feet|dimension|6 foot]] wide at the door.
+Cut the board to [[3 inches|dimension|3 inch]] exactly.
+We walked [[2.5 miles|dimension|2.5 mile]] before lunch.
+The pool is [[10 meters|dimension|10 meter]] deep.
+Add [[500 grams|dimension|500 gram]] of flour to the bowl.
+The package weighs [[75 kg|dimension|75 kilogram]] in total.
+The turkey weighs about [[10 pounds|dimension|10 pound]].
+Use [[8 ounces|dimension|8 ounce]] of cream for the sauce.
+She drinks [[2 liters|dimension|2 liter]] of water at work.
+Pour in [[250 ml|dimension|250 milliliter]] of milk.
+The tank holds [[5 gallons|dimension|5 gallon]] of fuel.
+The flat covers [[100 square meters|dimension|100 square meter]] in total.
+The farm is about [[3 acres|dimension|3 acre]] in size.
+The limit on this road is [[60 mph|dimension|60 mile per hour]].
+The train reached [[90 km/h|dimension|90 kilometer per hour]] on the bridge.
+The laptop has [[16 GB|dimension|16 gigabyte]] of memory.
+The log file grew to [[512 megabytes|dimension|512 megabyte]] on the server.
+The archive needs [[2 terabytes|dimension|2 terabyte]] of disk space.
+The bulb draws [[40 watts|dimension|40 watt]] from the mains.
+The airport is [[three miles|dimension|3 mile]] away from the hotel.
+The ladder is [[1.8 meters|dimension|1.8 meter]] high.
+The screw is [[20 mm|dimension|20 millimeter]] long.
+They ran [[15 yards|dimension|15 yard]] before the whistle.
+The reserve covers [[4 hectares|dimension|4 hectare]] of forest.
+The plant produces [[300 kilowatts|dimension|300 kilowatt]] at peak.
+
+# ---- temperatures
+The lab is kept at [[25 degrees Celsius|temperature|25 celsius]] in the vault.
+His fever was [[98.6 degrees Fahrenheit|temperature|98.6 fahrenheit]] at the clinic.
+Preheat the oven to [[200°C|temperature|200 celsius]] before baking.
+It fell to [[-5°C|temperature|-5 celsius]] in the valley.
+The gas was cooled to [[300 kelvin|temperature|300 kelvin]] in the chamber.
+It was [[20 degrees|temperature|20 degree]] outside the hall.
+Water boils at [[100 °C|temperature|100 celsius]] at sea level.
+On the ridge it dropped to [[minus ten degrees Celsius|temperature|-10 celsius]] in the valley.
+Paper burns at [[451 degrees Fahrenheit|temperature|451 fahrenheit]] in the novel.
+The freezer holds [[0°F|temperature|0 fahrenheit]] steadily.
+
+# ---- ages
+She is [[5 years old|age|5 year]] and loves painting.
+They adopted a [[3-year-old|age|3 year]] dog from the shelter.
+The puppy is [[10 months old|age|10 month]] now.
+The chicks are [[12 weeks old|age|12 week]] and nearly grown.
+The foal was only [[2 days old|age|2 day]] when we saw it.
+My grandmother is [[90 years of age|age|90 year]] and still hikes.
+He turned [[18 years old|age|18 year]] and left home.
+A [[six-month-old|age|6 month]] baby was asleep in the stroller.
+Their son is [[twenty years old|age|20 year]] and studies law.
+
+# ---- currency
+It costs [[$50|currency|50 USD]] at the door.
+The ticket is [[€20.50|currency|20.5 EUR]] online.
+The fund raised [[£3 million|currency|3000000 GBP]] this year.
+The lamp costs [[50 dollars|currency|50 USD]] in the shop.
+The invoice total is [[USD 1,200|currency|1200 USD]] including tax.
+He paid [[20 euros|currency|20 EUR]] for the book.
+The room costs [[CHF 75|currency|75 CHF]] per room.
+Coffee is [[$5.99|currency|5.99 USD]] a bag.
+The sweets cost [[₹500|currency|500 INR]] in the market.
+The ride cost [[5000 yen|currency|5000 JPY]] in total.
+The fine was [[1,000 pounds|currency|1000 GBP]] for parking.
+The deal is worth [[$2.5 billion|currency|2500000000 USD]] to the buyer.
+The laptop sells for [[€1,299|currency|1299 EUR]] in Berlin.
+Send [[100 USD|currency|100 USD]] to the account below.
+A sandwich costs [[eight dollars|currency|8 USD]] downtown.
+The pen costs [[$0.99|currency|0.99 USD]] each.
+The refund is [[15 EUR|currency|15 EUR]] per ticket.
+Parking costs [[£12.40|currency|12.4 GBP]] in the garage.
+The quote came to [[CAD 300|currency|300 CAD]] for the job.
+The studio is worth [[2 million dollars|currency|2000000 USD]] on paper.
+The prize was [[$1,000,000|currency|1000000 USD]] in cash.
+The fee is [[AUD 45.00|currency|45 AUD]] per person.
+
+# ---- e-mail
+Write to [[john.doe@example.com|email]] for details.
+Send the file to [[support+billing@mail.example.org|email]] for review.
+Her new address is [[a.b_c-d@sub.example.co.uk|email]] soon.
+Contact [[info@example.net|email]] or call the desk.
+Mail [[hr@example.com|email]] and [[sales@example.com|email]] together.
+The sender was [[no-reply@notifications.example.io|email]] again.
+Please forward it to [[maria.garcia@example.es|email]] right away.
+Use [[team@example.com|email]] for questions.
+
+# ---- URLs
+Visit [[https://example.com/docs/start?lang=en|url]] to begin.
+The site [[www.example.org|url]] is down for repairs.
+The health check is at [[http://localhost:8080/health|url]] on the server.
+Prices are listed on [[example.com/pricing|url]] for each plan.
+Download it from [[ftp://files.example.net/pub/archive.zip|url]] if you can.
+The page [[https://sub.example.co.uk/a/b#top|url]] has the table.
+Read the guide at [[docs.example.io|url]] first.
+See [[https://example.com/a/b/c.html|url]], then reply.
+
+# ---- IP addresses
+The server answers on [[192.168.1.10|ip]] only.
+Block [[203.0.113.7|ip]] at the firewall.
+The proxy is [[198.51.100.23|ip]] in the old rack.
+Set the gateway to [[10.0.0.1|ip]] and reboot.
+The host [[2001:db8::ff00:42:8329|ip]] is the IPv6 peer.
+The mask is [[255.255.255.0|ip]] on this subnet.
+The link-local address [[fe80::1|ip]] was in the log.
+
+# ---- phone-like
+Call [[+1 (415) 555-0132|phone]] for support.
+Our office line is [[415-555-0187|phone]] in the city.
+Ring [[(212) 555-0147|phone]] and ask for Sam.
+The London desk is [[+44 20 7946 0958|phone]] during the week.
+Dial [[1-800-555-0100|phone]] to reach the helpline.
+Her mobile is [[+49 30 1234567|phone]] in Berlin.
+The Paris office is [[+33 1 23 45 67 89|phone]] on the card.
+Text [[650-555-0123|phone]] with the code.
+
+# ---- hashtags, mentions, GUIDs
+Everyone posted [[#summer2026|hashtag]] photos together.
+Follow the thread under [[#OneNLP|hashtag]] for updates.
+She tagged the post [[#TBT|hashtag]] and moved on.
+Use [[#nlp|hashtag]] and [[#dotnet|hashtag]] when you share.
+Thanks [[@recursiveai|mention]] for the quick fix.
+Ask [[@jane_doe|mention]] and [[@dotnet|mention]] about it.
+The order id is [[3f2504e0-4f89-11d3-9a0c-0305e82c3301|guid]] in the log.
+Lookup key [[9b2d5c7e-1a4f-4e6b-8c3d-7f0a5e2b1c94|guid]] failed twice.
+The empty id is [[00000000-0000-0000-0000-000000000000|guid]] by convention.
+Session [[A1B2C3D4-E5F6-4789-8ABC-DEF012345678|guid]] has expired.
+
+# ---- dates: explicit
+The deadline is [[March 20, 2026|date|2026-03-20|day]] for everyone.
+Her birthday is on [[20 June 2026|date|2026-06-20|day]] as always.
+Submit the form by [[2026-04-15|date|2026-04-15|day]] please.
+He was born on [[04/15/1990|date|1990-04-15|day]] in Ohio.
+The party is on [[May 5th|date|2026-05-05|day]] at the club.
+We will meet on [[the 5th of May|date|2026-05-05|day]] as planned.
+See you [[Friday, March 27|date|2026-03-27|day]] at the usual place.
+The museum opens on [[Apr 3|date|2026-04-03|day]] after repairs.
+The lease ends on [[December 1st, 2026|date|2026-12-01|day]] sharp.
+The contract starts on [[Jan 1, 2027|date|2027-01-01|day]] as agreed.
+The leap day [[February 29, 2028|date|2028-02-29|day]] is a Tuesday.
+Let's meet on [[the 25th|date|2026-03-25|day]] if that works.
+
+# ---- dates: relative
+I'll call you [[tomorrow|date|2026-03-19|day]] about the plan.
+[[Yesterday|date|2026-03-17|day]] was cold and wet.
+The report is due [[today|date|2026-03-18|day]] by the end of the shift.
+We leave [[the day after tomorrow|date|2026-03-20|day]] for the coast.
+It happened [[the day before yesterday|date|2026-03-16|day]] at the club.
+The class resumes [[next Monday|date|2026-03-23|day]] as usual.
+Let's meet [[next Friday|date|2026-03-27|day|alt=2026-03-20]] to sign it.
+I saw him [[last Friday|date|2026-03-13|day]] at the market.
+Come over [[this Friday|date|2026-03-20|day]] for dinner.
+He will arrive [[Thursday|date|2026-03-19|day]] with the samples.
+We will launch [[in 2 days|date|2026-03-20|day]] if all goes well.
+It was sent [[3 days ago|date|2026-03-15|day]] by post.
+The paper is due [[2 weeks from now|date|2026-04-01|day]] at the latest.
+He left [[a week ago|date|2026-03-11|day]] for the coast.
+The trip starts [[in three weeks|date|2026-04-08|day]] from the station.
+The exam is [[next Wednesday|date|2026-03-25|day]] in the main hall.
+I last saw her [[last Monday|date|2026-03-16|day|alt=2026-03-09]] near the library.
+We will hike on [[Sunday|date|2026-03-22|day]] if it clears up.
+
+# ---- dates: holidays
+[[Christmas|date|2026-12-25|day]] with the whole family.
+[[Easter|date|2026-04-05|day]] is coming soon.
+We plan to travel at [[Easter 2027|date|2027-03-28|day]] with the family.
+The family gathers for [[Thanksgiving|date|2026-11-26|day]] with the whole family.
+The party is held on [[New Year's Eve|date|2026-12-31|day]] downtown.
+The parade is on [[Independence Day|date|2026-07-04|day]] as always.
+The kids love [[Halloween|date|2026-10-31|day]] more than any other holiday.
+They plan a trip for [[Valentine's Day|date|2027-02-14|day]] in Paris.
+The store is closed on [[Labor Day|date|2026-09-07|day]] again.
+The market closes for [[Memorial Day|date|2026-05-25|day]] as usual.
+The office is closed on [[Good Friday|date|2026-04-03|day]] again.
+The flowers are for [[Mother's Day|date|2026-05-10|day]] at home.
+The card is for [[Father's Day|date|2026-06-21|day]] at home.
+The inspection is [[the first Monday after Easter 2027|date|2027-03-29|day]] as scheduled.
+The party is on [[Christmas Day 2027|date|2027-12-25|day]] at our place.
+The audit is on [[the last Friday of March|date|2026-03-27|day]] by plan.
+The club meets on [[the third Thursday of April|date|2026-04-16|day]] downtown.
+The picnic is on [[the 4th of July|date|2026-07-04|day]] at the lake.
+
+# ---- date ranges
+The team is off [[next week|daterange|2026-03-23/2026-03-30|week]] for training.
+We reviewed the numbers [[this week|daterange|2026-03-16/2026-03-23|week]] already.
+The bug appeared [[last week|daterange|2026-03-09/2026-03-16|week]] in testing.
+The new tariff starts [[next month|daterange|2026-04-01/2026-05-01|month]] in the south.
+Revenue was higher [[last month|daterange|2026-02-01/2026-03-01|month]] than expected.
+The budget closes [[this month|daterange|2026-03-01/2026-04-01|month]] for review.
+The census runs [[next year|daterange|2027-01-01/2028-01-01|year]] in all regions.
+They moved house [[last year|daterange|2025-01-01/2026-01-01|year]] after the flood.
+The plan covers [[this year|daterange|2026-01-01/2027-01-01|year]] only.
+The festival takes place in [[June 2027|daterange|2027-06-01/2027-07-01|month]] in the old town.
+The book comes out in [[March 2026|daterange|2026-03-01/2026-04-01|month]] from the press.
+The treaty was signed in [[1969|daterange|1969-01-01/1970-01-01|year]] after long talks.
+The games are set for [[2031|daterange|2031-01-01/2032-01-01|year]] in the capital.
+Results for [[Q3 2026|daterange|2026-07-01/2026-10-01|quarter]] will follow.
+Growth was slow in [[the first quarter of 2026|daterange|2026-01-01/2026-04-01|quarter]] overall.
+Most of the work happens in [[the second half of 2026|daterange|2026-07-01/2027-01-01|half]] of the plan.
+Music changed a lot in [[the 1990s|daterange|1990-01-01/2000-01-01|decade]] and after.
+The conference runs [[from April 6 to April 10|daterange|2026-04-06/2026-04-11|day]] in Oslo.
+We are away [[between June 1 and June 15|daterange|2026-06-01/2026-06-16|day]] on a trip.
+The course runs [[May 4 - May 8|daterange|2026-05-04/2026-05-09|day]] downtown.
+Let's go hiking [[this weekend|daterange|2026-03-21/2026-03-23|day]] if the weather holds.
+They are visiting [[next weekend|daterange|2026-03-28/2026-03-30|day]] with the kids.
+The store is closed [[from Monday to Friday|daterange|2026-03-23/2026-03-28|day|alt=2026-03-16/2026-03-21]] for repairs.
+Lakes are busy [[this summer|daterange|2026-06-01/2026-09-01|season|approx]] as usual.
+It snowed a lot [[last winter|daterange|2025-12-01/2026-03-01|season|approx]] up north.
+The firm was founded in [[spring 2021|daterange|2021-03-01/2021-06-01|season|approx]] by friends.
+The album came out in [[fall 2025|daterange|2025-09-01/2025-12-01|season|approx]] to good reviews.
+They toured Europe in [[summer of 2024|daterange|2024-06-01/2024-09-01|season|approx]] with a small band.
+The company started in [[early 2021|daterange|2021-01-01/2021-05-01|year|approx]] with a few people.
+Sales peaked in [[mid 2022|daterange|2022-05-01/2022-09-01|year|approx]] before the dip.
+The product was retired in [[late 2023|daterange|2023-09-01/2024-01-01|year|approx]] after a long run.
+The rains should stop by [[early May|daterange|2026-05-01/2026-05-11|month|approx]] in this region.
+The garden is at its best in [[mid-April|daterange|2026-04-11/2026-04-21|month|approx]] downtown.
+The harvest ends in [[late June|daterange|2026-06-21/2026-07-01|month|approx]] in this region.
+The programme will grow in [[the 2030s|daterange|2030-01-01/2040-01-01|decade]] by plan.
+The shop is closed from [[January to March 2027|daterange|2027-01-01/2027-04-01|month]] for repairs.
+
+# ---- times
+The meeting starts at [[3pm|time|T15:00|hour]] sharp.
+The doors open at [[3:30 pm|time|T15:30|minute]] as usual.
+The train leaves at [[15:45|time|T15:45|minute]] from the main platform.
+Lunch is served at [[noon|time|T12:00|hour]] at the hotel.
+The server restarts at [[midnight|time|T00:00|hour]] in the rack.
+My alarm rings at [[7:05 AM|time|T07:05|minute]] in the flat.
+The log shows an error at [[10:15:30|time|T10:15:30|second]] exactly.
+Breakfast starts at [[8 a.m.|time|T08:00|hour]] sharp in the hall.
+We usually eat at [[5 in the afternoon|time|T17:00|hour]] at home.
+The shift begins at [[09:00|time|T09:00|minute]] at the depot.
+The bar closes at [[11 pm|time|T23:00|hour]] in the old town.
+The talk ends at [[6:45 p.m.|time|T18:45|minute]] in the small room.
+The call is at [[3pm PST|time|T15:00-08:00|hour]] on the bridge line.
+The window opens at [[12:00 UTC|time|T12:00Z|minute]] for all teams.
+The webinar starts at [[9am EST|time|T09:00-05:00|hour]] sharp.
+The broadcast is at [[noon GMT|time|T12:00Z|hour]] as announced.
+The market opens at [[18:30 CET|time|T18:30+01:00|minute]] on the screen.
+The lecture is at [[9am JST|time|T09:00+09:00|hour]] on the stream.
+The clock stopped at [[23:59:59|time|T23:59:59|second]] in the video.
+Expect them at [[around 3pm|time|T15:00|hour|approx]] or so.
+We'll eat at [[about noon|time|T12:00|hour|approx]] if we can.
+The show begins at [[7pm CST|time|T19:00-06:00|hour]] in the hall.
+Dinner is at [[8:30 PM PST|time|T20:30-08:00|minute]] at the lodge.
+
+# ---- datetimes
+Let's talk [[tomorrow at 3pm|datetime|2026-03-19T15:00|hour]] about the plan.
+The review is [[Friday at 10:30am|datetime|2026-03-20T10:30|minute]] in the annex.
+The launch is set for [[March 25 at noon|datetime|2026-03-25T12:00|hour]] on the main stage.
+The backup runs at [[2026-04-01 14:00|datetime|2026-04-01T14:00|minute]] on the server.
+The workshop starts [[next Monday at 9am|datetime|2026-03-23T09:00|hour]] sharp.
+The call ended [[yesterday at 5:15 pm|datetime|2026-03-17T17:15|minute]] after a long talk.
+The release is planned for [[December 1 at 6pm PST|datetime|2026-12-01T18:00-08:00|hour]] on the west coast.
+The build will finish [[in 2 hours|datetime|2026-03-18T12:30|minute]] if nothing breaks.
+Dinner will be ready [[in 45 minutes|datetime|2026-03-18T11:15|minute]] I hope.
+The alarm went off [[30 minutes ago|datetime|2026-03-18T10:00|minute]] as planned.
+The flight leaves on [[May 5, 2026 at 8:00 AM|datetime|2026-05-05T08:00|minute]] from gate B.
+The concert starts at [[3pm on March 22|datetime|2026-03-22T15:00|hour]] in the park.
+Our train leaves [[the day after tomorrow at 7:45 pm|datetime|2026-03-20T19:45|minute]] from Oslo.
+The sync is [[Monday at noon|datetime|2026-03-23T12:00|hour]] as agreed.
+The record was written at [[2026-06-30T09:15:00Z|datetime|2026-06-30T09:15:00Z|second]] by the service.
+The vote is [[tomorrow at 9:30 EST|datetime|2026-03-19T09:30-05:00|minute]] in the senate.
+The deploy is at [[Jan 5 2027 at 14:00 UTC|datetime|2027-01-05T14:00Z|minute]] on the calendar.
+We left [[last night at 11pm|datetime|2026-03-17T23:00|hour]] after the show.
+Drinks are [[this Friday at 4 pm|datetime|2026-03-20T16:00|hour]] at the pub.
+
+# ---- time ranges
+The clinic is open [[from 3pm to 5pm|timerange|T15:00/T17:00|hour]] at the north site.
+Office hours are [[between 9 and 11 am|timerange|T09:00/T11:00|hour]] at the front desk.
+The shop opens [[9am-5pm|timerange|T09:00/T17:00|hour]] in the old town.
+Visits are allowed [[from 10:30 to 11:45|timerange|T10:30/T11:45|minute]] only.
+Breakfast runs [[from 8 am to noon|timerange|T08:00/T12:00|hour]] at the hotel.
+Choir practice is [[2pm to 4:30pm|timerange|T14:00/T16:30|minute]] in the hall.
+Maintenance happens [[between 13:00 and 14:30|timerange|T13:00/T14:30|minute]] on the line.
+The pool is closed [[from 6 pm until 9 pm|timerange|T18:00/T21:00|hour]] for lessons.
+
+# ---- date-time ranges
+The hackathon runs [[from Monday 9am to Friday 5pm|datetimerange|2026-03-23T09:00/2026-03-27T17:00|hour]] on site.
+Let's meet [[tomorrow from 2pm to 4pm|datetimerange|2026-03-19T14:00/2026-03-19T16:00|hour]] to decide.
+The seminar is [[Friday 2pm-4pm|datetimerange|2026-03-20T14:00/2026-03-20T16:00|hour]] in the annex.
+Maintenance is [[from 2026-05-01 09:00 to 2026-05-01 17:00|datetimerange|2026-05-01T09:00/2026-05-01T17:00|minute]] on the cluster.
+I'm free [[tomorrow morning|datetimerange|2026-03-19T06:00/2026-03-19T12:00|hour|approx]] to talk.
+The crew will arrive [[this afternoon|datetimerange|2026-03-18T12:00/2026-03-18T18:00|hour|approx]] to start work.
+The band plays [[Saturday evening|datetimerange|2026-03-21T18:00/2026-03-22T00:00|hour|approx]] in the square.
+
+# ---- durations
+The meeting lasted [[2 hours|duration|7200]] in the end.
+The ferry crossing takes [[3 days|duration|259200]] in rough seas.
+Wait for [[an hour|duration|3600]] and try again.
+Cook it for [[half an hour|duration|1800]] on low heat.
+The film runs for [[90 minutes|duration|5400]] without a break.
+The visa is valid for [[two weeks|duration|1209600]] from entry.
+The trial lasted [[3 months|duration|P3M]] with no results.
+The warranty covers [[1 year|duration|P1Y]] from purchase.
+The flight took [[2 hours and 30 minutes|duration|9000]] in total.
+Hold your breath for [[5 seconds|duration|5]] then release.
+He worked abroad for [[1 year and 6 months|duration|P1Y6M]] before returning.
+The cache keeps data for [[48 hours|duration|172800]] by default.
+Rest for [[ten minutes|duration|600]] between sets.
+The pass is good for [[a week|duration|604800]] on all lines.
+She studied in Lyon for [[four years|duration|P4Y]] before moving.
+The batch takes [[1.5 hours|duration|5400]] to finish.
+The leave was [[a day|duration|86400]] long, no more.
+The contract runs for [[six months|duration|P6M]] and renews.
+Wait [[45 seconds|duration|45]] before pressing the key.
+The drive took [[3 hours 15 minutes|duration|11700]] with traffic.
+
+# ---- sets and recurrences
+The team meets [[every Monday|set|XXXX-WXX-1|day]] in the annex.
+The cron job runs [[every day|set|P1D|day]] without fail.
+The bins are collected [[daily|set|P1D|day]] downtown.
+The newsletter goes out [[weekly|set|P1W|week]] on the list.
+The panel meets [[every 2 weeks|set|P2W|week]] to review cases.
+Rent is due [[monthly|set|P1M|month]] by contract.
+Stand-up is [[every Monday at 9am|set|XXXX-WXX-1T09:00|hour]] in the open space.
+The fair returns [[every year|set|P1Y|year]] to the same field.
+The report is published [[yearly|set|P1Y|year]] in the spring.
+The alarm sounds [[every day at noon|set|T12:00|hour]] across the camp.
+Choir practice is [[every Friday|set|XXXX-WXX-5|day]] after work.
+The pump cycles [[every 3 hours|set|PT3H|hour]] through the night.
+Fees are billed [[every month|set|P1M|month]] by the bank.
+The lawn is cut [[every other day|set|P2D|day]] in summer.
+
+# ---- more sequences and ranges
+Open [[https://www.example.com/|url]] in a browser.
+Her blog lives at [[blog.example.org/posts/2026|url]] these days.
+The API root is [[https://api.example.com/v2/items?id=42&sort=asc|url]] for all calls.
+Fax it to [[+1 212-555-0166|phone]] before the end.
+The helpline is [[0800 555 0142|phone]] in the UK.
+Call the desk on [[(020) 7946 0321|phone]] for rooms.
+The tour used [[#RoadTrip2027|hashtag]] on every post.
+Add [[#openSource|hashtag]] to the post.
+Ping [[@maria_g|mention]] on the thread.
+The device id is [[c56a4180-65aa-42ec-a945-5fd21dec0538|guid]] in the registry.
+Task [[6ba7b810-9dad-11d1-80b4-00c04fd430c8|guid]] was cancelled.
+The exam runs [[Monday from 9am to 11am|datetimerange|2026-03-23T09:00/2026-03-23T11:00|hour]] in the hall.
+Let's work on it [[March 25 2pm-5pm|datetimerange|2026-03-25T14:00/2026-03-25T17:00|hour]] together.
+The sale runs [[from Friday 8am to Sunday 8pm|datetimerange|2026-03-20T08:00/2026-03-22T20:00|hour]] online.
+The bus runs [[from 5:30 to 22:00|timerange|T05:30/T22:00|minute]] in town.
+
+# ---- no expression (a false positive here is an error)
+Can you march with us to the end of the street?
+Will you marry me, said the old poem.
+The word may is a modal verb in English.
+He sat on the bench in the sun and read a book.
+Please call me back as soon as you can.
+The cat slept on the warm windowsill by the door.
+She plays the violin better than anyone I know.
+The committee will decide what to do about it.
+Dr. Smith's office is on Mars Street.
+They built a small wooden boat by the river.
+Nobody knew where the keys had gone.
+We should talk about it over a cup of tea.
+The quick brown fox jumps over the lazy dog.
+Thank you very much for all your kind help.
+The library has many old books on local history.
+
+# ---- other reference times
+@ref 2026-12-31T23:30:00
+The party restarts [[tomorrow|date|2027-01-01|day]] at the club.
+The ledger closes [[next year|daterange|2027-01-01/2028-01-01|year]] for audit.
+The email was sent [[yesterday|date|2026-12-30|day]] to the board.
+The server will be back [[in 1 hour|datetime|2027-01-01T00:30|minute]] if the update works.
+The plan runs [[next month|daterange|2027-01-01/2027-02-01|month]] for the first time.
+We review it [[this week|daterange|2026-12-28/2027-01-04|week]] at the latest.
+
+@ref 2028-02-28T09:00:00
+The party is [[tomorrow|date|2028-02-29|day]] at the club.
+The move is [[the day after tomorrow|date|2028-03-01|day]] if the van is free.
+The inspector comes [[in 2 days|date|2028-03-01|day]] to check the site.
+The invoice goes out [[next month|daterange|2028-03-01/2028-04-01|month]] with the others.
+The call is [[this Friday|date|2028-03-03|day]] after lunch.
+The lease started [[a year ago|date|2027-02-28|day]] on paper.
+
+@ref 2026-01-05T08:00:00
+We meet [[next Friday|date|2026-01-16|day|alt=2026-01-09]] for lunch.
+I saw her [[last Monday|date|2025-12-29|day]] on the train.
+The next sprint begins [[next Monday|date|2026-01-12|day]] as planned.
+The holiday ended [[yesterday|date|2026-01-04|day]] for most of us.
+
+# ======== Second batch. Everything above keeps its split (auto); everything below is assigned explicitly.
+@ref 2026-03-18T10:30:00
+
+@split test
+# ---- mentions
+Huge thanks to [[@open_source_fan|mention]] for the patch.
+Cc [[@nlp_team|mention]] and [[@jsmith|mention]] on the ticket.
+The reply from [[@dotnetfdn|mention]] arrived late.
+Hey [[@amy|mention]], the build is green.
+[[@Ops_Bot42|mention]] posted the alert in the channel.
+Please loop in [[@release_manager|mention]] before merging.
+Congrats to [[@kim_lee|mention]] and [[@raj_p|mention]] on the launch.
+# ---- guids
+Trace [[7c9e6679-7425-40de-944b-e07fc1f90ae7|guid]] is missing from the store.
+The tenant [[123e4567-e89b-12d3-a456-426614174000|guid]] owns the vault.
+Delete record [[f47ac10b-58cc-4372-a567-0e02b2c3d479|guid]] and its children.
+Correlation id [[0c8c7d10-9f3a-4b5e-8a21-5d6e7f809a1b|guid]] was logged twice.
+Compare [[5f3c8a2e-6d7b-41c9-9e0f-1a2b3c4d5e6f|guid]] with [[8e2d1c4b-3a5f-4678-9b0c-d1e2f3a4b5c6|guid]].
+The key [[AAAAAAAA-BBBB-4CCC-8DDD-EEEEEEEEEEEE|guid]] is reserved for tests.
+# ---- hashtags
+The campaign trended as [[#SaveTheDate|hashtag]] online.
+Posts under [[#Berlin2026|hashtag]] and [[#travel|hashtag]] got shared widely.
+She wrote [[#blessed|hashtag]] under the photo.
+The tag [[#C_sharp|hashtag]] is for code posts.
+Our launch used [[#ship_it|hashtag]] everywhere.
+Add [[#ai|hashtag]] to the title.
+Everyone joined the chat with [[#WomenInTech|hashtag]] after the keynote.
+# ---- IP addresses
+The router sits at [[172.16.254.1|ip]] on the lab network.
+Ping [[8.8.4.4|ip]] to test the link.
+The VPN assigned [[100.64.12.9|ip]] to the laptop.
+Traffic from [[2001:db8:85a3::8a2e:370:7334|ip]] was dropped.
+Add [[192.0.2.44|ip]] to the allow list.
+The broadcast address is [[255.255.255.255|ip]] for this subnet.
+The host answered from [[10.20.30.40|ip]] and [[10.20.30.41|ip]] alternately.
+# ---- date-time ranges
+The retreat runs [[from Thursday 9am to Saturday 3pm|datetimerange|2026-03-19T09:00/2026-03-21T15:00|hour]] in the hills.
+Support is open [[tomorrow from 8am to 6pm|datetimerange|2026-03-19T08:00/2026-03-19T18:00|hour]] for all.
+The test window is [[Sunday 1pm-3pm|datetimerange|2026-03-22T13:00/2026-03-22T15:00|hour]] on the cluster.
+The freeze is [[from 2026-06-01 08:00 to 2026-06-03 20:00|datetimerange|2026-06-01T08:00/2026-06-03T20:00|minute]] for the release.
+The ceremony is [[April 4 from 10am to noon|datetimerange|2026-04-04T10:00/2026-04-04T12:00|hour]] at the town hall.
+We are free [[Friday between 2pm and 4pm|datetimerange|2026-03-20T14:00/2026-03-20T16:00|hour]] to meet.
+The cleanup is [[Saturday 9am-11am|datetimerange|2026-03-21T09:00/2026-03-21T11:00|hour]] by the river.
+# ---- time ranges
+Lectures run [[10am to noon|timerange|T10:00/T12:00|hour]] on campus.
+The gate is open [[from 06:30 to 19:00|timerange|T06:30/T19:00|minute]] at the north entrance.
+Kids swim [[between 4 and 5:30 pm|timerange|T16:00/T17:30|minute]] at the pool.
+The shop is open [[8:00-20:00|timerange|T08:00/T20:00|minute]] in the mall.
+Rehearsal is [[1pm - 3:30pm|timerange|T13:00/T15:30|minute]] in studio B.
+Doors are open [[from 7 to 9 pm|timerange|T19:00/T21:00|hour]] at the hall.
+Calls are taken [[from noon to 2pm|timerange|T12:00/T14:00|hour]] at the desk.
+# ---- temperatures
+Set the oven to [[180 degrees Celsius|temperature|180 celsius]] for the cake.
+It reached [[104°F|temperature|104 fahrenheit]] in the greenhouse.
+Liquid nitrogen boils near [[77 kelvin|temperature|77 kelvin]] at normal pressure.
+Lows hit [[-12°C|temperature|-12 celsius]] on the plateau.
+Store the sample at [[4°C|temperature|4 celsius]] in the fridge.
+The soup was [[65 degrees|temperature|65 degree]] when it was served.
+Heat the oil to [[350 °F|temperature|350 fahrenheit]] first.
+# ---- ages
+The boy is [[7 years old|age|7 year]] and plays chess.
+A [[4-month-old|age|4 month]] kitten wandered in.
+Our cat is [[14 years of age|age|14 year]] but lively.
+The tree is [[200 years old|age|200 year]] by ring count.
+She was [[thirty-five years old|age|35 year]] when she moved.
+The twins are [[3 weeks old|age|3 week]] and healthy.
+A [[10-day-old|age|10 day]] calf stood up in the barn.
+# ---- percentages
+Turnout was [[61%|percentage|61]] in the capital.
+Rates rose to [[2.75%|percentage|2.75]] at the meeting.
+[[Thirty percent|percentage|30]] of the code is tests.
+Battery health is [[87 %|percentage|87]] after the update.
+The discount is [[15 percent|percentage|15]] for members.
+Humidity stays near [[45%|percentage|45]] inside the vault.
+Margins shrank by [[1.5 per cent|percentage|1.5]] in the report.
+# ---- sets
+The team meets [[every Wednesday at 2pm|set|XXXX-WXX-3T14:00|hour]] online.
+Reports are sent [[every week|set|P1W|week]] to the board.
+The trash goes out [[every 2 days|set|P2D|day]] in this street.
+Pills are taken [[every 6 hours|set|PT6H|hour]] with water.
+Dues are paid [[quarterly|set|P3M|month]] by members.
+Rotations happen [[every Sunday|set|XXXX-WXX-7|day]] in the yard.
+The bins are emptied [[every Tuesday|set|XXXX-WXX-2|day]] morning.
+# ---- ordinals
+Our team came in [[eighth|ordinal|8]] overall.
+He lives on the [[12th|ordinal|12]] floor.
+It was her [[3rd|ordinal|3]] attempt at the record.
+The [[fiftieth|ordinal|50]] guest got a prize.
+Turn right at the [[second|ordinal|2]] light.
+Read the [[thirty-first|ordinal|31]] entry carefully.
+# ---- phones, urls, e-mails
+Call [[+44 161 496 0123|phone]] after hours.
+The line is [[(303) 555-0101|phone]] in Denver.
+Fax [[212.555.0199|phone]] for orders.
+Reach us at [[+1-202-555-0143|phone]] for help.
+The helpdesk is [[+81 3-1234-5678|phone]] in Tokyo.
+Mirror: [[https://mirror.example.net/pkg/v2/index.json|url]] for packages.
+Open [[http://192.0.2.10:3000/dashboard|url]] in the browser.
+The repo is [[git.example.org/team/project|url]] for now.
+Docs are at [[https://docs.example.com/guide/install#linux|url]] for you.
+The feed [[https://example.com/rss.xml|url]] updates often.
+Try [[www.example.co.uk/shop?item=42|url]] to order.
+Reach [[billing@example.org|email]] with questions.
+Write to [[first.last@mail.example.com|email]] directly.
+The list [[announce-list@example.net|email]] is moderated.
+Copy [[ops_team@example.io|email]] and [[cto@example.io|email]] on it.
+Send scans to [[scans+2026@example.com|email]] please.
+# ---- numbers, dimensions, currency
+We shipped [[nine|number|9]] boxes to the depot.
+The bridge has [[1,402|number|1402]] rivets.
+About [[three hundred and fifty|number|350]] guests came.
+She typed [[0.002|number|0.002]] by mistake.
+Add [[sixty-four|number|64]] more rows to the table.
+[[One hundred|number|100]] volunteers helped out.
+The sky held [[fifteen thousand|number|15000]] balloons.
+The rope is [[30 meters|dimension|30 meter]] long.
+Mix in [[750 ml|dimension|750 milliliter]] of broth.
+The suitcase weighs [[23 kg|dimension|23 kilogram]] when full.
+The drive holds [[1 TB|dimension|1 terabyte]] of video.
+The runway is [[3,000 feet|dimension|3000 foot]] long.
+The car reaches [[120 km/h|dimension|120 kilometer per hour]] on the track.
+The lot is [[500 square feet|dimension|500 square foot]] in size.
+The motor draws [[1.5 kilowatts|dimension|1.5 kilowatt]] at full load.
+A ticket costs [[$12|currency|12 USD]] at the gate.
+The mug is [[€75|currency|75 EUR]] in the shop.
+Tea is [[£8.50|currency|8.5 GBP]] per box.
+The charge is [[INR 250|currency|250 INR]] per head.
+# ---- dates
+Mark [[April 12, 2026|date|2026-04-12|day]] on the calendar.
+The exam is on [[Tuesday|date|2026-03-24|day]] in the main hall.
+Registration closes [[2026-08-31|date|2026-08-31|day]] for everyone.
+The trial begins [[September 9th|date|2026-09-09|day]] in court.
+She will be back [[in 10 days|date|2026-03-28|day]] from the coast.
+It shipped [[5 days ago|date|2026-03-13|day]] from the depot.
+Meet on [[the 1st of June|date|2026-06-01|day]] at the gate.
+The vote was held on [[11/03/2025|date|2025-11-03|day]] in the council.
+The costume party is [[Halloween 2027|date|2027-10-31|day]] this time.
+The picnic is on [[Memorial Day 2027|date|2027-05-31|day]] at the lake.
+The feast is on [[Thanksgiving 2027|date|2027-11-25|day]] at our house.
+# ---- date ranges
+Tickets go on sale [[from May 1 to May 3|daterange|2026-05-01/2026-05-04|day]] only.
+Sales will peak in [[August 2026|daterange|2026-08-01/2026-09-01|month]] at the shore.
+The stadium opens in [[2028|daterange|2028-01-01/2029-01-01|year]] if funded.
+Plans for [[Q1 2027|daterange|2027-01-01/2027-04-01|quarter]] are due soon.
+Disco was big in [[the 1980s|daterange|1980-01-01/1990-01-01|decade]] and after.
+The tour is set for [[summer 2027|daterange|2027-06-01/2027-09-01|season|approx]] in the north.
+The label closed in [[late 2025|daterange|2025-09-01/2026-01-01|year|approx]] after a long run.
+The roses bloom in [[early June|daterange|2026-06-01/2026-06-11|month|approx]] by the wall.
+Output doubles in [[the first half of 2027|daterange|2027-01-01/2027-07-01|half]] by plan.
+The new rule applies [[next quarter|daterange|2026-04-01/2026-07-01|quarter]] to all branches.
+# ---- date-times and times
+Call me [[tomorrow at 8am|datetime|2026-03-19T08:00|hour]] first thing.
+The ship docks [[Sunday at 6:30 pm|datetime|2026-03-22T18:30|minute]] at pier nine.
+The deadline is [[April 1 at 5pm|datetime|2026-04-01T17:00|hour]] sharp.
+We met [[2 hours ago|datetime|2026-03-18T08:30|minute]] in the lobby.
+The patch lands [[2026-05-02 03:15|datetime|2026-05-02T03:15|minute]] on the mirror.
+Dinner is [[next Tuesday at 7pm|datetime|2026-03-24T19:00|hour]] at the usual place.
+Wake me at [[6 am|time|T06:00|hour]] if it rains.
+The last bus leaves at [[22:15|time|T22:15|minute]] from the square.
+Tea is at [[2:45 pm|time|T14:45|minute]] in the garden.
+The briefing starts at [[4pm CET|time|T16:00+01:00|hour]] on the call.
+Stocks close at [[10 p.m. EST|time|T22:00-05:00|hour]] in the feed.
+# ---- durations
+The break lasts [[15 minutes|duration|900]] in total.
+Stay for [[two days|duration|172800]] if you can.
+The lease runs [[18 months|duration|P18M]] from signing.
+The talk took [[3 hours|duration|10800]] with questions.
+Hold for [[a minute|duration|60]] before moving on.
+He lived there [[five years|duration|P5Y]] before leaving.
+# ---- nothing to find
+The old clock on the wall kept perfect time.
+Could you please close the window behind you?
+Nothing about the plan seemed unusual to him.
+A long road ran along the edge of the field.
+They argued about the best way to cook rice.
+
+@split dev
+# ---- dev examples of the same patterns
+Thanks [[@code_wizard|mention]] for the review.
+Ask [[@helpdesk|mention]] for access.
+The job id is [[b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e|guid]] in the queue.
+Row [[6f9619ff-8b86-d011-b42d-00c04fc964ff|guid]] was removed.
+Tagging the picture [[#sunsetlovers|hashtag]] again.
+Use [[#devops|hashtag]] for posts about builds.
+The probe hit [[203.0.113.99|ip]] twice.
+Reset the node at [[10.1.2.3|ip]] and wait.
+The IPv6 peer [[2001:db8:1::42|ip]] timed out.
+The shop opens [[from Monday 8am to Monday 6pm|datetimerange|2026-03-23T08:00/2026-03-23T18:00|hour]] for the sale.
+Let's talk [[Thursday 3pm-5pm|datetimerange|2026-03-19T15:00/2026-03-19T17:00|hour]] about it.
+The pool is open [[7am to 9am|timerange|T07:00/T09:00|hour]] for laps.
+Lunch is [[between 12 and 1 pm|timerange|T12:00/T13:00|hour]] in the canteen.
+Keep it at [[8°C|temperature|8 celsius]] in transit.
+Mix at [[40 degrees Celsius|temperature|40 celsius]] for ten minutes.
+She is [[9 years old|age|9 year]] and rides a bike.
+A [[2-year-old|age|2 year]] mare stood in the paddock.
+Support rose by [[8%|percentage|8]] in the poll.
+[[Ninety percent|percentage|90]] of the files were fine.
+The cleaners come [[every Thursday|set|XXXX-WXX-4|day]] to the office.
+Meetings are held [[every 3 days|set|P3D|day]] during the push.
+He came [[fourth|ordinal|4]] in the heat.
+Call [[+34 91 123 45 67|phone]] to book.
+Visit [[https://example.org/about|url]] to learn more.
+Mail [[press@example.com|email]] for the kit.

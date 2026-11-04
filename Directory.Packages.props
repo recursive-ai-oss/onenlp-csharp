@@ -10,6 +10,11 @@
     <!-- Test, benchmark and fuzz projects only. -->
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <!-- Comparator for the tokenizer speed rows (bench only). -->
+    <PackageVersion Include="Microsoft.ML.Tokenizers" Version="2.0.1" />
+    <PackageVersion Include="Microsoft.ML.Tokenizers.Data.Cl100kBase" Version="2.0.1" />
+    <PackageVersion Include="Microsoft.ML.Tokenizers.Data.O200kBase" Version="2.0.1" />
+    <PackageVersion Include="Microsoft.ML.Tokenizers.Data.Gpt2" Version="2.0.1" />
     <PackageVersion Include="SharpFuzz" Version="2.2.0" />
   </ItemGroup>
 </Project>
