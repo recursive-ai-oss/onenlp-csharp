@@ -59,14 +59,12 @@ public class NounChunkTests
             }
         }
 
-        // The known residue: spaCy mis-reports the left edge of a phrase when arcs cross several times in a row (heavily
-        // non-projective random trees); none of these occurs in the treebank trees, which carry the real-data weight.
+        // Zero differences on this fixture. (Larger exploratory runs on other seeds found 3 differences in 90,000 random trees, all heavily
+        // non-projective: spaCy under-reports a phrase's left edge when arcs cross several times in a row. See docs/parser.md.)
         Assert.True(total >= 6000);
-        Assert.True(mismatches.Count <= KnownMismatches, $"{mismatches.Count} of {total} differ:\n{string.Join('\n', mismatches.Take(5))}");
+        Assert.True(mismatches.Count == 0, $"{mismatches.Count} of {total} differ:\n{string.Join('\n', mismatches.Take(5))}");
         Assert.DoesNotContain(mismatches, m => m.StartsWith("ud ", StringComparison.Ordinal));
     }
-
-    private const int KnownMismatches = 3;
 
     [Fact]
     public void UniversalDependenciesKeepsCaseMarkersAndClausesOut()

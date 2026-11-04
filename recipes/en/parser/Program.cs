@@ -70,7 +70,9 @@ internal static class Program
 
     private static Pipeline NewPipeline(Dictionary<string, string> o) =>
         Pipeline.Blank(Language.English).Add(new Parser(
-            new HashEmbeddingEncoder(Int(o, "width", 128), Int(o, "buckets", 32768), seed: 1) { },
+            o.GetValueOrDefault("encoder", "hash") == "fast"
+                ? new FastEncoder(Int(o, "width", 96), Int(o, "depth", 4))
+                : new HashEmbeddingEncoder(Int(o, "width", 128), Int(o, "buckets", 32768), seed: 1),
             arcSize: Int(o, "arc", 256),
             labelSize: Int(o, "label", 128),
             contextLayers: Int(o, "context", 2))

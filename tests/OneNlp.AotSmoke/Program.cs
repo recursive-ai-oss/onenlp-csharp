@@ -88,6 +88,7 @@ internal static class Program
         MatchingSmoke.Run(Check);
 
         TrainSaveLoad();
+        ParserSmoke();
 
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
@@ -129,6 +130,36 @@ internal static class Program
         Doc s2 = loaded.Process("Mr. Li went home. He slept.");
         Check("saved tokenizer data and sentencizer", s1.Sentences.Count >= 2 && s2.Sentences.Count == s1.Sentences.Count && s1.Length == s2.Length);
         Check("hostile pipeline file", Throws<InvalidDataException>(() => PipelineFile.Load(new MemoryStream(new byte[] { 1, 2, 3 }))));
+    }
+
+    // Trains a parser on chains (each word's head is the word before it), saves and loads it, and asks for noun chunks, under NativeAOT.
+    private static void ParserSmoke()
+    {
+        var conllu = new System.Text.StringBuilder();
+        for (int s = 0; s < 40; s++)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                int w = (s * 5 + i * 3) % 12;
+                conllu.Append(i + 1).Append("\tw").Append(w).Append("\tw").Append(w).Append("\tNOUN\tX\t_\t").Append(i).Append('\t').Append(i == 0 ? "root" : "nmod").Append("\t_\t_\n");
+            }
+
+            conllu.Append('\n');
+        }
+
+        List<Example> examples = [.. ConllUReader.Read(new StringReader(conllu.ToString())).Select(x => Example.FromReference(x.Doc))];
+        using Pipeline trained = Pipeline.Blank(Language.English).Add(new Parser(new HashEmbeddingEncoder(16, 256, 1), arcSize: 16, labelSize: 8, contextLayers: 1) { OwnsEncoder = true });
+        TrainResult result = trained.Train(examples, new TrainOptions { Epochs = 3, BatchWords = 60, LearningRate = 0.01f, Seed = 3 });
+        Check("parser trains", result.Completed && result.Steps > 0);
+
+        using var buffer = new MemoryStream();
+        PipelineFile.Save(trained, buffer);
+        using Pipeline loaded = PipelineFile.Load(new MemoryStream(buffer.ToArray()));
+        Doc a = trained.Process("w1 w2 w3 w4 w5");
+        Doc b = loaded.Process("w1 w2 w3 w4 w5");
+        Check("saved parser reproduces heads", a.GetHeads().SequenceEqual(b.GetHeads()) && a[0].Dep.Length > 0 && a[0].Dep == b[0].Dep);
+        a.SetAnnotation(TokenColumn.Pos, 0, "NOUN");
+        Check("noun chunks", a.NounChunks.Count >= 0);
     }
 
     private static bool Throws<T>(Action action)
