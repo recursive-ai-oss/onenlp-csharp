@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).AotSmoke</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).AotSmoke</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/OneNlp/OneNlp.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/OneNlp/OneNlp.csproj" />
+    <Project Path="src/OneNlp.Neural/OneNlp.Neural.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OneNlp.Tests/OneNlp.Tests.csproj" />
+    <Project Path="tests/OneNlp.AotSmoke/OneNlp.AotSmoke.csproj" />
+  </Folder>
+  <Folder Name="/bench/">
+    <Project Path="bench/OneNlp.Bench/OneNlp.Bench.csproj" />
+  </Folder>
+  <Folder Name="/fuzz/">
+    <Project Path="fuzz/OneNlp.Fuzz/OneNlp.Fuzz.csproj" />
+  </Folder>
+</Solution>

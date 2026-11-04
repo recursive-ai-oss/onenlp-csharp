@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>$(PackagePrefix)$(LibName).Neural</AssemblyName>
+    <RootNamespace>$(PackagePrefix)$(LibName).Neural</RootNamespace>
+    <PackageId>$(PackagePrefix)$(LibName).Neural</PackageId>
+    <Description>spaCy-class NLP for .NET: the neural layer on OneModel. Encoders and trainable pipeline components. An early preview with only the encoder contract so far. Unaffiliated with other projects named OneNLP.</Description>
+    <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../OneNlp/OneNlp.csproj" />
+    <PackageReference Include="RecursiveAI.OneModel" />
+    <PackageReference Include="RecursiveAI.OneModel.Training" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../PACKAGE.md" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-MIT" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-APACHE" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

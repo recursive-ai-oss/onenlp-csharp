@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>$(PackagePrefix)$(LibName)</AssemblyName>
+    <RootNamespace>$(PackagePrefix)$(LibName)</RootNamespace>
+    <PackageId>$(PackagePrefix)$(LibName)</PackageId>
+    <Description>spaCy-class NLP for .NET: the model-free core. Doc, Span and Token with character offsets into the original text, a component pipeline, and tokenizer contracts, with no native code, NativeAOT and trim clean. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(PackagePrefix)$(LibName).Tests" />
+    <InternalsVisibleTo Include="$(PackagePrefix)$(LibName).Fuzz" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RecursiveAI.OneFont" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../PACKAGE.md" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-MIT" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-APACHE" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

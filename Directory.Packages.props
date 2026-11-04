@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Recursive AI libraries, from nuget.org. -->
+    <PackageVersion Include="RecursiveAI.OneFont" Version="1.3.0" />
+    <PackageVersion Include="RecursiveAI.OneModel" Version="1.0.0" />
+    <PackageVersion Include="RecursiveAI.OneModel.Training" Version="1.0.0" />
+    <!-- Test, benchmark and fuzz projects only. -->
+    <PackageVersion Include="xunit.v3" Version="4.0.2" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
+    <PackageVersion Include="SharpFuzz" Version="2.2.0" />
+  </ItemGroup>
+</Project>

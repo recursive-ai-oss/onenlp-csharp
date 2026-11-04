@@ -1,0 +1,75 @@
+<Project>
+
+  <!-- Machine-specific overrides (for example an output location) go in this file, which git ignores. -->
+  <Import Project="$(MSBuildThisFileDirectory)Directory.Build.local.props" Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.local.props')" />
+
+  <PropertyGroup Label="Name">
+    <!-- The one place the project name lives. -->
+    <LibName>OneNlp</LibName>
+    <!-- NuGet package IDs carry the publisher prefix; this is the only place it is written. -->
+    <PackagePrefix>RecursiveAI.</PackagePrefix>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Output">
+    <!-- Build output stays out of the source folders. Set ONENLP_ARTIFACTS to a directory to collect the output of every checkout
+         of this repository there (each under its own folder name, so worktrees do not collide); the default is artifacts/ at the
+         repository root, which .gitignore covers. -->
+    <_CheckoutName>$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory)))))</_CheckoutName>
+    <ArtifactsPath Condition="'$(ONENLP_ARTIFACTS)' != ''">$(ONENLP_ARTIFACTS)/$(_CheckoutName)</ArtifactsPath>
+    <ArtifactsPath Condition="'$(ONENLP_ARTIFACTS)' == ''">$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Language and analysis">
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <!-- Safe, bounds-checked C# throughout. Unsafe code is limited to named hot loops, and none of it is allowed in this project yet. -->
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Deterministic>true</Deterministic>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup Label="Usings">
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.IO" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Threading.Tasks" />
+  </ItemGroup>
+
+  <PropertyGroup Label="Reproducible packages">
+    <!-- Path mapping is for the packages only (projects under src/). Test projects keep real paths: some tests locate test data from
+         [CallerFilePath], which a mapped path would break on CI. -->
+    <_ProjectDir>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)'))</_ProjectDir>
+    <_SrcDir>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', 'src'))</_SrcDir>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true' and $(_ProjectDir.StartsWith('$(_SrcDir)'))">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package metadata">
+    <Authors>Recursive AI, LLC</Authors>
+    <Company>Recursive AI, LLC</Company>
+    <Copyright>Copyright (c) Recursive AI, LLC</Copyright>
+    <PackageLicenseExpression>MIT OR Apache-2.0</PackageLicenseExpression>
+    <!-- The one place the package version lives. All packages of this repository share it. -->
+    <Version>0.1.0-preview.1</Version>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/recursive-ai-oss/onenlp-csharp</RepositoryUrl>
+    <PackageProjectUrl>https://recursiveai.org/onenlp/</PackageProjectUrl>
+    <PackageReadmeFile>PACKAGE.md</PackageReadmeFile>
+    <PackageTags>nlp;tokenizer;wordpiece;bpe;sentencepiece;tiktoken;ner;pos;language-detection;recognizers;dates;entities;spacy;catalyst;microsoft-recognizers-text;lingua;microsoft-ml-tokenizers;nativeaot;trimmable</PackageTags>
+    <PackageReleaseNotes>See CHANGELOG.md in the repository.</PackageReleaseNotes>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <!-- No baseline until the first release is published; set PackageValidationBaselineVersion after it. -->
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+</Project>

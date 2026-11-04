@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).Fuzz</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).Fuzz</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpFuzz" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/OneNlp/OneNlp.csproj" />
+  </ItemGroup>
+
+</Project>
