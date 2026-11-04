@@ -172,7 +172,7 @@ public sealed class Tagger : TrainableHead
                 }
 
                 ids[t] = doc.Strings.Add(_labels[best]);
-                confidence[t] = Math.Clamp(row[best], 0f, 1f);
+                confidence[t] = float.IsNaN(row[best]) ? 0f : Math.Clamp(row[best], 0f, 1f);
             }
 
             doc.SetColumn(Column, ids);

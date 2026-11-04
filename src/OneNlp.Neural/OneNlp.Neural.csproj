@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="$(PackagePrefix)$(LibName).Tests" />
+    <InternalsVisibleTo Include="$(PackagePrefix)$(LibName).Fuzz" />
   </ItemGroup>
 
   <ItemGroup>
