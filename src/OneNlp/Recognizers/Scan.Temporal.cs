@@ -699,6 +699,7 @@ internal sealed partial class Scan
     private void DurationAt(int i, List<Cand> r)
     {
         decimal seconds = 0;
+        decimal years = 0;
         decimal months = 0;
         decimal previous = decimal.MaxValue;
         int j = i;
@@ -732,14 +733,22 @@ internal sealed partial class Scan
 
             previous = size;
 
-            if (u.S is "decade")
+            // Years and months keep their own amounts ("18 months" is P18M, "1 year and 6 months" P1Y6M); only a fraction of a year becomes months.
+            seconds += amount * u.A;
+            switch (u.S)
             {
-                months += amount * 120;
-            }
-            else
-            {
-                seconds += amount * u.A;
-                months += amount * u.B;
+                case "year":
+                    years += amount;
+                    break;
+                case "decade":
+                    years += amount * 10;
+                    break;
+                case "month":
+                    months += amount;
+                    break;
+                case "quarter":
+                    months += amount * 3;
+                    break;
             }
 
             j = e;
@@ -748,6 +757,11 @@ internal sealed partial class Scan
                 // "an hour and a half", "two days and a half"
                 seconds += u.A / 2m;
                 months += u.B / 2m;
+                if (u.S == "decade")
+                {
+                    years += 5;
+                    months -= u.B / 2m;
+                }
                 j += hn + ha + hh;
                 terms = 6;
             }
@@ -755,8 +769,8 @@ internal sealed partial class Scan
             var v = new TemporalValue
             {
                 Kind = TemporalKind.Duration,
-                Text = TemporalValue.DurationText(seconds, months),
-                Seconds = months == 0 ? seconds : null,
+                Text = TemporalValue.DurationText(seconds, years, months),
+                Seconds = years == 0 && months == 0 ? seconds : null,
             };
             r.Add(new Cand(i, j, v));
         }

@@ -132,7 +132,7 @@ internal sealed class TemporalData
         foreach (string form in forms.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
             Words.Add(form, word);
-            string bare = form[0] == '=' ? form[1..] : form;
+            string bare = form.Length > 1 && form[0] == '=' ? form[1..] : form;
             var items = new List<Item>();
             Lexer.Lex(bare, items);
             Starts.Add(bare.Substring(items[0].Start, items[0].End - items[0].Start));

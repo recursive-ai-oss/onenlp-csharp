@@ -159,25 +159,26 @@ internal sealed class TemporalValue
     }
 
     /// <summary>The value text of a duration (see <see cref="TemporalMatch.Value"/>): whole seconds, or ISO 8601 when it names months or years.</summary>
-    internal static string DurationText(decimal seconds, decimal months)
+    internal static string DurationText(decimal seconds, decimal years, decimal months)
     {
         CultureInfo c = CultureInfo.InvariantCulture;
-        if (months == 0)
+        if (years == 0 && months == 0)
         {
             return Trim(seconds).ToString(c);
         }
 
+        // A fraction of a year is stated in months (2.5 years is P2Y6M); the other units keep their amounts.
+        decimal wholeYears = decimal.Truncate(years);
+        months += (years - wholeYears) * 12;
         var sb = new StringBuilder("P");
-        decimal years = decimal.Truncate(months / 12);
-        decimal restMonths = months - (years * 12);
-        if (years != 0)
+        if (wholeYears != 0)
         {
-            sb.Append(Trim(years).ToString(c)).Append('Y');
+            sb.Append(Trim(wholeYears).ToString(c)).Append('Y');
         }
 
-        if (restMonths != 0)
+        if (months != 0)
         {
-            sb.Append(Trim(restMonths).ToString(c)).Append('M');
+            sb.Append(Trim(months).ToString(c)).Append('M');
         }
 
         decimal days = decimal.Truncate(seconds / 86400);

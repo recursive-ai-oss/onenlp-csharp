@@ -77,6 +77,9 @@ public class TemporalTests
     [Theory]
     [InlineData("two weeks", "two weeks|Duration|1209600")]
     [InlineData("1 year and 6 months", "1 year and 6 months|Duration|P1Y6M")]
+    [InlineData("18 months", "18 months|Duration|P18M")]
+    [InlineData("2.5 years", "2.5 years|Duration|P2Y6M")]
+    [InlineData("a year and a half", "a year and a half|Duration|P1Y6M")]
     [InlineData("an hour and a half", "an hour and a half|Duration|5400")]
     [InlineData("2 and a half hours", "2 and a half hours|Duration|9000")]
     [InlineData("seven days a week", "seven days|Duration|604800 ; a week|Duration|604800")]
@@ -164,5 +167,13 @@ public class TemporalTests
         Assert.Contains("Line 2", e.Message);
         Assert.Throws<RecognizerRulesException>(() => Recognizer.FromRules([System.Text.Encoding.UTF8.GetBytes("[time.holiday]\nFoo Day | sometimes | all\n")]));
         Assert.Throws<RecognizerRulesException>(() => Recognizer.FromRules([System.Text.Encoding.UTF8.GetBytes("[time.word]\nnonsense | x\n")]));
+    }
+
+    [Fact]
+    public void ALoneEqualsSignIsAFormNotAMarker()
+    {
+        // Found by fuzzing: "=" alone is a one-symbol form, not an empty case-sensitive form.
+        Recognizer r = Recognizer.FromRules([System.Text.Encoding.UTF8.GetBytes("[time.month]\n1 | =\n[time.word]\ntoday | =, =x\n")]);
+        Assert.Empty(r.Recognize("= x", new RecognitionContext(Wed)).OfType<TemporalMatch>().Where(t => t.Kind == TemporalKind.Duration));
     }
 }
