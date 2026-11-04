@@ -44,7 +44,7 @@ internal static class Program
         TokenEncoding encoding = tokenizer.Encode("héllo wörld"u8);
         Check("utf8 offsets", encoding.Offsets[1].Start == 7 && encoding.Offsets[1].End == 13);
         Check("trim", tokenizer.TrimToTokenBudget("a b c", 2).SequenceEqual("a b"));
-        Check("loader not yet supported", Throws<NotSupportedException>(() => Tokenizer.FromFile("vocab.txt")));
+        Check("loader not yet supported", Throws<NotSupportedException>(() => Tokenizer.FromStream(new MemoryStream(), TokenizerFormat.WordPieceVocabulary)));
 
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
