@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Black-box comparator: runs Catalyst's English pipeline over the English-EWT test text and writes CoNLL-U / entity spans
+       for scoring. Not part of the solution and never shipped; comparators are allowed in tools only. The versions are pinned here
+       (VersionOverride) rather than in the shared package list. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OneNlp.Tools.CatalystOracle</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <!-- Catalyst pins a MessagePack version with an advisory. The tool only reads our own test text; the warning stays visible but does not fail this comparator build. -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1902</WarningsNotAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Catalyst" VersionOverride="26.10.6514" />
+    <PackageReference Include="Catalyst.Models.English" VersionOverride="26.9.5316" />
+  </ItemGroup>
+
+</Project>

@@ -190,6 +190,7 @@ public class BpeModelTests
     [InlineData("bpe-roberta.jsonl", "FacebookAI_roberta-base")]
     [InlineData("bpe-qwen.jsonl", "Qwen_Qwen2.5-0.5B")]
     [InlineData("bpe-modernbert.jsonl", "answerdotai_ModernBERT-base")]
+    [InlineData("bpe-mmbert.jsonl", "jhu-clsp_mmBERT-base")]
     [InlineData("bpe-tinyllama.jsonl", "TinyLlama_TinyLlama-1.1B-Chat-v1.0")]
     public void MatchesReferenceModelOutput(string golden, string modelDir)
     {
@@ -221,5 +222,35 @@ public class BpeModelTests
 
         Assert.True(mismatches.Count == 0, $"{pieces} pieces, {tokens} tokens; mismatches: {string.Join(" | ", mismatches)}");
         Assert.True(pieces > 1000);
+    }
+
+    /// <summary>The model built from TinyLlama's SentencePiece file gives the oracle's tokens for the pieces of its converted tokenizer.json.</summary>
+    [Fact]
+    public void SentencePieceBpeFileMatchesTheConvertedJsonModel()
+    {
+        string? goldens = Environment.GetEnvironmentVariable("ONENLP_BPE_GOLDENS");
+        string? models = Environment.GetEnvironmentVariable("ONENLP_TOKENIZER_MODELS");
+        if (goldens is null || models is null)
+        {
+            Assert.Skip("ONENLP_BPE_GOLDENS and ONENLP_TOKENIZER_MODELS are not set.");
+        }
+
+        using FileStream file = File.OpenRead(Path.Combine(models, "TinyLlama_TinyLlama-1.1B-Chat-v1.0", "tokenizer.model"));
+        BpeModel model = RecursiveAI.OneNlp.Tokenizers.Loaders.SentencePieceModelFile.ReadBpeModel(file);
+        int pieces = 0;
+        var mismatches = new List<string>();
+        foreach (string line in File.ReadLines(Path.Combine(goldens, "bpe-tinyllama.jsonl")))
+        {
+            using JsonDocument rec = JsonDocument.Parse(line);
+            string piece = rec.RootElement.GetProperty("p").GetString()!;
+            List<ModelToken> expected = [.. rec.RootElement.GetProperty("t").EnumerateArray().Select(t => new ModelToken(t[0].GetInt32(), t[1].GetString()!, t[2].GetInt32(), t[3].GetInt32()))];
+            pieces++;
+            if (!expected.SequenceEqual(Run(model, piece)) && mismatches.Count < 5)
+            {
+                mismatches.Add($"'{(piece.Length > 30 ? piece[..30] : piece)}'");
+            }
+        }
+
+        Assert.True(mismatches.Count == 0, $"{pieces} pieces; mismatches: {string.Join(" | ", mismatches)}");
     }
 }
