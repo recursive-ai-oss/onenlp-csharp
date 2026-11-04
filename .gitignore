@@ -19,6 +19,7 @@
 !/bench/
 !/fuzz/
 !/tools/
+!/recipes/
 !/docs/
 !/testdata/
 

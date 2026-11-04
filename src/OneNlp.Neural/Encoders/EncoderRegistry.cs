@@ -17,6 +17,7 @@ public static class EncoderRegistry
     private static readonly ConcurrentDictionary<string, EncoderFactory> Factories = new(StringComparer.Ordinal)
     {
         [HashEmbeddingEncoder.EncoderKind] = HashEmbeddingEncoder.FromSettings,
+        [FastEncoder.EncoderKind] = FastEncoder.FromSettings,
     };
 
     /// <summary>Registers an encoder kind.</summary>
