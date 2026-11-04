@@ -254,6 +254,19 @@ internal sealed class BpeModel : ITokenizerModel
     /// <exception cref="InvalidDataException">The object is malformed.</exception>
     internal static BpeModel FromConfig(StageConfig config)
     {
+        try
+        {
+            return ReadConfig(config);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // System.Text.Json reports a string that is not valid UTF-8 this way, when it is read rather than when the file is parsed.
+            throw new InvalidDataException("The BPE model has a string that is not valid UTF-8 or a value of the wrong kind.", ex);
+        }
+    }
+
+    private static BpeModel ReadConfig(StageConfig config)
+    {
         System.Text.Json.JsonElement root = config.Element;
         if (!root.TryGetProperty("vocab", out System.Text.Json.JsonElement vocabElement) || vocabElement.ValueKind != System.Text.Json.JsonValueKind.Object)
         {

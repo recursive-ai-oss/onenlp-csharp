@@ -46,6 +46,8 @@ internal static class Program
         Check("trim", tokenizer.TrimToTokenBudget("a b c", 2).SequenceEqual("a b"));
         Check("loader not yet supported", Throws<NotSupportedException>(() => Tokenizer.FromStream(new MemoryStream(), TokenizerFormat.WordPieceVocabulary)));
 
+        Check("tiktoken ranks", TiktokenRoundTrip());
+
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
     }
@@ -124,5 +126,20 @@ internal static class Program
 
             return new TokenEncoding([.. ids], [.. tokens], [.. offsets], new bool[ids.Count]);
         }
+    }
+
+    // A tiny Tiktoken encoding: the 256 bytes and the token "ab".
+    private static bool TiktokenRoundTrip()
+    {
+        var ranks = new System.Text.StringBuilder();
+        for (int b = 0; b < 256; b++)
+        {
+            ranks.Append(Convert.ToBase64String([(byte)b])).Append(' ').Append(b).Append('\n');
+        }
+
+        ranks.Append(Convert.ToBase64String("ab"u8)).Append(" 256\n");
+        var tokenizer = TiktokenTokenizer.Create(new MemoryStream(System.Text.Encoding.ASCII.GetBytes(ranks.ToString())), new System.Text.RegularExpressions.Regex(@"\w+|\s+|[^\w\s]+"));
+        TokenEncoding e = tokenizer.Encode("abab 日");
+        return e.Ids[0] == 256 && e.Ids[1] == 256 && tokenizer.Decode(e.Ids) == "abab 日";
     }
 }

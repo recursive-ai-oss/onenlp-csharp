@@ -165,6 +165,15 @@ public class BpeModelTests
     }
 
     [Fact]
+    public void InvalidUtf8InAVocabularyKeyIsAnInvalidFileNotACrash()
+    {
+        // Found by fuzzing: the JSON parser accepts the bad byte and only fails when the name is read.
+        byte[] json = [.. "{\"vocab\":{\"a\":0,\"b"u8, 0x9E, 0x9E, .. "\":1},\"merges\":[]}"u8];
+        using JsonDocument doc = JsonDocument.Parse(json);
+        Assert.Throws<InvalidDataException>(() => BpeModel.FromConfig(new StageConfig(doc.RootElement.Clone(), StageRegistry.Default)));
+    }
+
+    [Fact]
     public void RegistryBuildsBpeFromTheDefaultRegistry()
     {
         using JsonDocument doc = JsonDocument.Parse("""{"vocab":{"a":0,"b":1,"ab":2},"merges":["a b"]}""");

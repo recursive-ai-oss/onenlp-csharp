@@ -17,6 +17,8 @@ internal static class Program
     private static readonly Dictionary<string, Target> Targets = new()
     {
         ["word-tokenizer"] = WordTokenizerTarget.Run,
+        ["tiktoken-ranks"] = TiktokenRanksTarget.Run,
+        ["bpe-model"] = BpeModelTarget.Run,
     };
 
     private static int Main(string[] args)
