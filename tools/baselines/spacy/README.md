@@ -24,7 +24,7 @@ The reference the English fast tier is compared against: spaCy's released comman
 tools/fetch/en/fetch.sh <data-root>
 tools/baselines/spacy/run.sh setup     <data-root> <work-dir>     # seqeval and the CoNLL 2018 script, run as black boxes
 tools/baselines/spacy/run.sh convert   <data-root> <work-dir>
-tools/baselines/spacy/run.sh train-ud  <data-root> <work-dir>     # long: see the results file
+tools/baselines/spacy/run.sh train-ud  <data-root> <work-dir>     # about 27 min on one Apple M2 core
 tools/baselines/spacy/run.sh train-ner <data-root> <work-dir>
 tools/baselines/spacy/run.sh score-ud  <data-root> <work-dir>
 tools/baselines/spacy/run.sh score-ner <data-root> <work-dir>
@@ -41,4 +41,4 @@ tools/baselines/spacy/run.sh score-ner <data-root> <work-dir>
   - spaCy does not produce multiword-token lines; in `gold` mode the gold ranges are copied through.
 - **NER scoring.** `predict_ner.py` runs the pipeline on the gold UNER tokens; `score_ner.py` computes entity-level micro F1 with seqeval 1.2.2 (MIT, conlleval-style).
 
-Results, training times and job ids are in `PROVENANCE.md` next to this file.
+Results (with intervals), training times and job ids are in `PROVENANCE.md` next to this file.

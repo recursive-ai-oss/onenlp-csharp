@@ -33,4 +33,29 @@ public static class Nlp
     /// <returns>The sentences in order, each a span of whole tokens with character offsets into <paramref name="text"/>. Empty for a text without tokens.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     public static IReadOnlyList<Span> Sentences(string text) => Analyze(text).Sentences;
+
+    /// <summary>
+    /// Finds numbers, ordinals, percentages, measures and amounts of money in English text and resolves each to a value:
+    /// <c>$5m</c> is 5,000,000 USD, <c>twenty-first</c> is the ordinal 21, <c>3.5 km</c> is 3.5 kilometers.
+    /// </summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>. Empty when there are none.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    public static IEnumerable<Quantity> Quantities(string text) => Recognizers.Recognizer.English.Recognize(text).OfType<Quantity>();
+
+    /// <summary>Finds plain numbers and ordinals in English text (<see cref="QuantityKind.Cardinal"/> and <see cref="QuantityKind.Ordinal"/> only).</summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <returns>The results in text order, with UTF-16 offsets into <paramref name="text"/>. A number that belongs to a unit, a percent sign or a currency is part of that measure and is not listed here.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    public static IEnumerable<Quantity> Numbers(string text) =>
+        Recognizers.Recognizer.English.Recognize(text).OfType<Quantity>().Where(q => q.Kind is QuantityKind.Cardinal or QuantityKind.Ordinal);
+
+    /// <summary>
+    /// Finds e-mail addresses, URLs, IP addresses, hashtags, mentions, GUIDs and phone-like sequences in a text. Phone-like sequences are
+    /// unvalidated; use a dedicated contact-parsing library for validated, canonical phones.
+    /// </summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    public static IEnumerable<SequenceMatch> Sequences(string text) => Recognizers.Recognizer.English.Recognize(text).OfType<SequenceMatch>();
 }

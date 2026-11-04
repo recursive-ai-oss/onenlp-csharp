@@ -41,6 +41,11 @@ internal static class Program
         Check("contraction split", tokens.Length == 10 && tokens[2].ToString() == "ca" && tokens[3].ToString() == "n't");
         Check("sentences", Nlp.Sentences("Mr. Smith can't go. He's gone!").Count == 2);
 
+        // Recognizers: rule data embedded in the assembly, numbers, money and sequences, and the pipeline component.
+        Check("quantities", Nlp.Quantities("Pay $5m for 3 km by the twenty-first").Select(q => q.Text + "=" + q.Value).SequenceEqual(["$5m=5000000", "3 km=3", "twenty-first=21"]));
+        Check("sequences", Nlp.Sequences("mail a@b.com or 10.0.0.1").Select(s => s.Kind).SequenceEqual([SequenceKind.Email, SequenceKind.IpAddress]));
+        Check("recognizer component", Pipeline.Blank(Language.English).Add("recognizers").Process("It cost $5.").Ents.Count == 1);
+
         // Registration by name, built-in and from this assembly's module initializer.
         using Pipeline pipeline = Pipeline.Blank(Language.English).Add("norm").Add("shout", new Dictionary<string, string> { ["suffix"] = "?" });
         Doc[] docs = [.. pipeline.ProcessMany(["One Two", "THREE"], batchSize: 1)];
@@ -88,6 +93,8 @@ internal static class Program
         MatchingSmoke.Run(Check);
 
         TrainSaveLoad();
+        EntitySmoke(NerDecoding.Tagging);
+        EntitySmoke(NerDecoding.Spans);
 
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
@@ -129,6 +136,28 @@ internal static class Program
         Doc s2 = loaded.Process("Mr. Li went home. He slept.");
         Check("saved tokenizer data and sentencizer", s1.Sentences.Count >= 2 && s2.Sentences.Count == s1.Sentences.Count && s1.Length == s2.Length);
         Check("hostile pipeline file", Throws<InvalidDataException>(() => PipelineFile.Load(new MemoryStream(new byte[] { 1, 2, 3 }))));
+    }
+
+    // Trains a named entity recognizer from JSON Lines with custom labels, saves and loads it, under NativeAOT.
+    private static void EntitySmoke(NerDecoding decoding)
+    {
+        var lines = new System.Text.StringBuilder();
+        for (int s = 0; s < 40; s++)
+        {
+            string name = (s % 2 == 0) ? "Zorp" : "Vexa";
+            string label = (s % 2 == 0) ? "WIDGET" : "GADGET";
+            lines.Append("{\"text\":\"we saw ").Append(name).Append(" today\",\"entities\":[[7,11,\"").Append(label).Append("\"]]}\n");
+        }
+
+        List<Example> examples = [.. JsonlReader.Read(new StringReader(lines.ToString()))];
+        using Pipeline trained = Pipeline.Blank(Language.English).Add(new EntityRecognizer(new HashEmbeddingEncoder(16, 256, 1), decoding, context: 1, hidden: 16, maxSpanLength: 3) { OwnsEncoder = true });
+        TrainResult result = trained.Train(examples, new TrainOptions { Epochs = 15, BatchWords = 60, LearningRate = 0.02f, Seed = 3 });
+        using var buffer = new MemoryStream();
+        PipelineFile.Save(trained, buffer);
+        using Pipeline loaded = PipelineFile.Load(new MemoryStream(buffer.ToArray()));
+        Doc a = trained.Process("we saw Vexa today");
+        Doc b = loaded.Process("we saw Vexa today");
+        Check("ner " + decoding, result.Completed && a.Ents.Count == 1 && a.Ents[0].Label == "GADGET" && b.Ents.Count == 1 && b.Ents[0].Label == "GADGET" && a.Ents[0].Confidence == b.Ents[0].Confidence);
     }
 
     private static bool Throws<T>(Action action)

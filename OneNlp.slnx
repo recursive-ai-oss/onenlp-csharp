@@ -9,6 +9,7 @@
   </Folder>
   <Folder Name="/bench/">
     <Project Path="bench/OneNlp.Bench/OneNlp.Bench.csproj" />
+    <Project Path="bench/OneNlp.Bench.Tokenizers/OneNlp.Bench.Tokenizers.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/OneNlp.Toy/OneNlp.Toy.csproj" />
@@ -17,6 +18,7 @@
   </Folder>
   <Folder Name="/recipes/">
     <Project Path="recipes/en/fast-tagging/EnglishFastTagging.csproj" />
+    <Project Path="recipes/en/ner/OneNlp.Recipes.EnNer.csproj" />
   </Folder>
   <Folder Name="/fuzz/">
     <Project Path="fuzz/OneNlp.Fuzz/OneNlp.Fuzz.csproj" />
