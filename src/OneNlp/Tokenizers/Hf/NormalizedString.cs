@@ -27,7 +27,16 @@ internal sealed class NormalizedString
         _alignment = new OffsetPair[original.Length];
         for (int i = 0; i < _alignment.Length; i++)
         {
-            _alignment[i] = new OffsetPair(originOffset + i, originOffset + i + 1);
+            // Both halves of a surrogate pair stand for the same character, so both cover its two units.
+            if (char.IsHighSurrogate(original[i]) && i + 1 < original.Length && char.IsLowSurrogate(original[i + 1]))
+            {
+                _alignment[i] = _alignment[i + 1] = new OffsetPair(originOffset + i, originOffset + i + 2);
+                i++;
+            }
+            else
+            {
+                _alignment[i] = new OffsetPair(originOffset + i, originOffset + i + 1);
+            }
         }
     }
 
@@ -158,10 +167,18 @@ internal sealed class PreTokenizedString
     internal void SplitEach(Func<NormalizedString, IEnumerable<NormalizedString>> split)
     {
         ArgumentNullException.ThrowIfNull(split);
+        SplitEach((_, piece) => split(piece));
+    }
+
+    /// <summary>Like <see cref="SplitEach(Func{NormalizedString, IEnumerable{NormalizedString}})"/>, with the index of the piece, for stages that treat the first piece differently.</summary>
+    /// <param name="split">Called once per piece with its index, in order.</param>
+    internal void SplitEach(Func<int, NormalizedString, IEnumerable<NormalizedString>> split)
+    {
+        ArgumentNullException.ThrowIfNull(split);
         var result = new List<NormalizedString>(_splits.Count);
-        foreach (NormalizedString piece in _splits)
+        for (int index = 0; index < _splits.Count; index++)
         {
-            foreach (NormalizedString part in split(piece))
+            foreach (NormalizedString part in split(index, _splits[index]))
             {
                 if (part.Length > 0)
                 {

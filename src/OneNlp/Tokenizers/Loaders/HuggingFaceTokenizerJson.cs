@@ -112,7 +112,14 @@ internal static class HuggingFaceTokenizerJson
             throw t.Bad("max_length", "at least 1");
         }
 
-        return new TruncationOptions(max, ReadSide(t, "direction", TokenizerSide.Right));
+        TruncationStrategy strategy = t.OptionalString("strategy") switch
+        {
+            null or "LongestFirst" => TruncationStrategy.LongestFirst,
+            "OnlyFirst" => TruncationStrategy.OnlyFirst,
+            "OnlySecond" => TruncationStrategy.OnlySecond,
+            _ => throw t.Bad("strategy", "LongestFirst, OnlyFirst or OnlySecond"),
+        };
+        return new TruncationOptions(max, ReadSide(t, "direction", TokenizerSide.Right), strategy, t.Int("stride", 0));
     }
 
     private static PaddingOptions? ReadPadding(StageConfig root)

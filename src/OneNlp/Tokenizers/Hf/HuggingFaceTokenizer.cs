@@ -38,6 +38,11 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
         _postProcessor = postProcessor;
         _decoder = decoder;
         _added = added ?? AddedVocabulary.Empty;
+        if (_added.Count > 0)
+        {
+            _added.Prepare(_normalizer);
+        }
+
         _addedOutsideModel = _added.Tokens.Count(t => _model.TokenToId(t.Content) is null);
     }
 
@@ -106,16 +111,27 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
             int room = Math.Max(0, truncation.MaxLength - added);
             int keepFirst = first.Length;
             int keepSecond = second.Length;
-            while (keepFirst + keepSecond > room)
+            switch (truncation.Strategy)
             {
-                if (keepFirst >= keepSecond)
-                {
-                    keepFirst--;
-                }
-                else
-                {
-                    keepSecond--;
-                }
+                case TruncationStrategy.OnlyFirst:
+                    keepFirst = Math.Min(keepFirst, Math.Max(0, room - keepSecond));
+                    break;
+                case TruncationStrategy.OnlySecond:
+                    keepSecond = Math.Min(keepSecond, Math.Max(0, room - keepFirst));
+                    break;
+                default:
+                    // The longer sequence is cut to the length of the shorter first; after that the budget is shared, and the sequence
+                    // that was longer keeps the odd token (the first one when they were equally long), as observed in output of tokenizers 0.22.1.
+                    if (keepFirst + keepSecond > room)
+                    {
+                        bool firstLonger = keepFirst >= keepSecond;
+                        int shortLength = firstLonger ? keepSecond : keepFirst;
+                        int keepShort = Math.Min(shortLength, room / 2);
+                        int keepLong = room - keepShort;
+                        (keepFirst, keepSecond) = firstLonger ? (keepLong, keepShort) : (keepShort, keepLong);
+                    }
+
+                    break;
             }
 
             first = Keep(first, keepFirst, truncation.Side);
@@ -127,35 +143,62 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
 
     private TokenEncoding EncodeSequence(string text, int typeId)
     {
-        var normalized = new NormalizedString(text);
-        _normalizer?.Normalize(normalized);
-        var pieces = new PreTokenizedString(normalized);
-        _preTokenizer?.PreTokenize(pieces);
-
         var ids = new List<int>();
         var tokens = new List<string>();
         var offsets = new List<TokenOffset>();
         var words = new List<int>();
+        var special = new List<bool>();
         var modelTokens = new List<ModelToken>();
-        for (int w = 0; w < pieces.Splits.Count; w++)
+        int word = 0;
+        foreach (InputPiece input in SplitInput(text))
         {
-            NormalizedString piece = pieces.Splits[w];
-            modelTokens.Clear();
-            _model.Tokenize(piece.Text, modelTokens);
-            foreach (ModelToken t in modelTokens)
+            if (input.Token is { } added)
             {
-                OffsetPair o = piece.ToOriginal(t.Start, t.End);
-                ids.Add(t.Id);
-                tokens.Add(t.Value);
-                offsets.Add(new TokenOffset(o.Start, o.End));
-                words.Add(w);
+                ids.Add(added.Id);
+                tokens.Add(added.Content);
+                offsets.Add(new TokenOffset(input.Origin.Start, input.Origin.End));
+                words.Add(word++);
+                special.Add(false);  // the mask marks tokens a post-processor adds, not added tokens found in the input (observed in output of tokenizers 0.22.1)
+                continue;
+            }
+
+            var pieces = new PreTokenizedString(input.Text!);
+            _preTokenizer?.PreTokenize(pieces);
+            foreach (NormalizedString piece in pieces.Splits)
+            {
+                modelTokens.Clear();
+                _model.Tokenize(piece.Text, modelTokens);
+                foreach (ModelToken t in modelTokens)
+                {
+                    OffsetPair o = piece.ToOriginal(t.Start, t.End);
+                    ids.Add(t.Id);
+                    tokens.Add(t.Value);
+                    offsets.Add(new TokenOffset(o.Start, o.End));
+                    words.Add(word);
+                    special.Add(false);
+                }
+
+                word++;
             }
         }
 
         int n = ids.Count;
         var typeIds = new int[n];
         Array.Fill(typeIds, typeId);
-        return new TokenEncoding([.. ids], [.. tokens], [.. offsets], new bool[n], typeIds, wordIds: [.. words]);
+        return new TokenEncoding([.. ids], [.. tokens], [.. offsets], [.. special], typeIds, wordIds: [.. words]);
+    }
+
+    // Added tokens are cut out first; the text between them is then normalized piece by piece.
+    private List<InputPiece> SplitInput(string text)
+    {
+        if (_added.Count > 0)
+        {
+            return _added.Split(text, _normalizer);
+        }
+
+        var whole = new NormalizedString(text);
+        _normalizer?.Normalize(whole);
+        return whole.Length == 0 ? [] : [new InputPiece(whole, null, default)];
     }
 
     private static TokenEncoding Truncate(TokenEncoding encoding, TruncationOptions? truncation, int addedTokens) =>
