@@ -1,0 +1,71 @@
+{
+ "text": "It rained. We stayed in.",
+ "sents": [
+  {
+   "start": 0,
+   "end": 10
+  },
+  {
+   "start": 11,
+   "end": 24
+  }
+ ],
+ "tokens": [
+  {
+   "id": 0,
+   "start": 0,
+   "end": 2,
+   "pos": "PRON",
+   "dep": "nsubj",
+   "head": 1
+  },
+  {
+   "id": 1,
+   "start": 3,
+   "end": 9,
+   "pos": "VERB",
+   "dep": "ROOT",
+   "head": 1
+  },
+  {
+   "id": 2,
+   "start": 9,
+   "end": 10,
+   "pos": "PUNCT",
+   "dep": "punct",
+   "head": 1
+  },
+  {
+   "id": 3,
+   "start": 11,
+   "end": 13,
+   "pos": "PRON",
+   "dep": "nsubj",
+   "head": 4
+  },
+  {
+   "id": 4,
+   "start": 14,
+   "end": 20,
+   "pos": "VERB",
+   "dep": "ROOT",
+   "head": 4
+  },
+  {
+   "id": 5,
+   "start": 21,
+   "end": 23,
+   "pos": "ADV",
+   "dep": "advmod",
+   "head": 4
+  },
+  {
+   "id": 6,
+   "start": 23,
+   "end": 24,
+   "pos": "PUNCT",
+   "dep": "punct",
+   "head": 4
+  }
+ ]
+}
