@@ -5,6 +5,7 @@
 | Target | Input | Checks |
 |---|---|---|
 | `word-tokenizer` | arbitrary bytes, read as UTF-8 (or, when the first byte is odd, as raw UTF-16 units, which reaches lone surrogates) | the document built by `Nlp.Analyze`: tokens are non-empty, ordered slices of the text with only whitespace between them, and `FindToken` and `TryGetCharSpan` agree with the offsets |
+| `segmentation` | arbitrary bytes, as above | word tokenizer and sentencizer with no data, neutral data and English data: offsets ascending and in range, every non-white-space character inside a token, sentences partition the tokens |
 
 Only documented exceptions may escape a library call. Any other exception, a failed invariant, a hang or a memory blow-up is a finding.
 

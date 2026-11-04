@@ -52,7 +52,7 @@ public class DocTests
     public void TokenizerSplitsAsDocumented()
     {
         Assert.Equal(["Hello", ",", "world", "!"], Texts("Hello, world!"));
-        Assert.Equal(["don't", "well-known", "3.14", "1,000"], Texts("don't well-known 3.14 1,000"));
+        Assert.Equal(["do", "n't", "well", "-", "known", "3.14", "1,000"], Texts("don't well-known 3.14 1,000"));
         Assert.Equal(["a", "-", "b", "1", ".", "x", "end", "."], Texts("a - b 1 . x end."));
         Assert.Equal(["😀", "😀"], Texts("😀😀"));
         Assert.Equal(["cafe\u0301"], Texts("cafe\u0301"));
@@ -84,7 +84,7 @@ public class DocTests
     [Fact]
     public void UnsetAnnotationsHaveDocumentedDefaults()
     {
-        Doc doc = Analyze("one two");
+        Doc doc = Pipeline.Blank().Process("one two");
         Token t = doc[1];
         Assert.Equal("", t.Pos);
         Assert.Equal("", t.Lemma);

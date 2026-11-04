@@ -17,6 +17,7 @@ internal static class Program
     private static readonly Dictionary<string, Target> Targets = new()
     {
         ["word-tokenizer"] = WordTokenizerTarget.Run,
+        ["segmentation"] = SegmentationTarget.Run,
     };
 
     private static int Main(string[] args)
@@ -35,9 +36,14 @@ internal static class Program
         if (args.Length == 3 && args[0] == "random" && Targets.TryGetValue(args[1], out Target? target) && int.TryParse(args[2], out int count))
         {
             var random = new Random(12345);
-            byte[] seed = System.Text.Encoding.UTF8.GetBytes("Hello, world! It's 3.14 - 日本語 😀 e\u0301 end");
+            byte[][] seeds =
+            [
+                System.Text.Encoding.UTF8.GetBytes("Hello, world! It's 3.14 - 日本語 😀 e\u0301 end"),
+                System.Text.Encoding.UTF8.GetBytes("Mr. Smith can't visit www.x.org/a?b=1. Mail a.b@c-d.com, e.g. U.S.A. well-known 3:30 ... -- \"Hi.\" Yes!\n\nNext."),
+            ];
             for (int i = 0; i < count; i++)
             {
+                byte[] seed = seeds[random.Next(seeds.Length)];
                 byte[] input = random.Next(3) == 0 ? new byte[random.Next(64)] : (byte[])seed.Clone();
                 if (input.Length > 0 && input != seed)
                 {

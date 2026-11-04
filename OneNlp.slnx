@@ -10,6 +10,9 @@
   <Folder Name="/bench/">
     <Project Path="bench/OneNlp.Bench/OneNlp.Bench.csproj" />
   </Folder>
+  <Folder Name="/eval/">
+    <Project Path="eval/OneNlp.Eval/OneNlp.Eval.csproj" />
+  </Folder>
   <Folder Name="/fuzz/">
     <Project Path="fuzz/OneNlp.Fuzz/OneNlp.Fuzz.csproj" />
   </Folder>
