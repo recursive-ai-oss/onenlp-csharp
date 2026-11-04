@@ -18,6 +18,8 @@ NE=uner-en-ewt-8ed072de
 THREADS=${THREADS:-8}
 export OMP_NUM_THREADS=$THREADS OPENBLAS_NUM_THREADS=$THREADS MKL_NUM_THREADS=$THREADS
 mkdir -p "$WORK/ud" "$WORK/ner"
+# Resource report of the training run: GNU time on Linux, BSD time on macOS.
+if [ "$(uname)" = Darwin ]; then TIMEV="/usr/bin/time -l"; else TIMEV="/usr/bin/time -v"; fi
 
 case $STAGE in
 setup)
@@ -39,11 +41,11 @@ convert)
   sha256sum "$WORK"/ud/*.spacy "$WORK"/ner/*.spacy
   ;;
 train-ud)
-  /usr/bin/time -v $SPACY train "$HERE/tagger_parser.cfg" --output "$WORK/model-ud" \
+  $TIMEV $SPACY train "$HERE/tagger_parser.cfg" --output "$WORK/model-ud" \
     --paths.train "$WORK/ud/en_ewt-ud-train.spacy" --paths.dev "$WORK/ud/en_ewt-ud-dev.spacy"
   ;;
 train-ner)
-  /usr/bin/time -v $SPACY train "$HERE/ner.cfg" --output "$WORK/model-ner" \
+  $TIMEV $SPACY train "$HERE/ner.cfg" --output "$WORK/model-ner" \
     --paths.train "$WORK/ner/train.spacy" --paths.dev "$WORK/ner/dev.spacy"
   ;;
 score-ud)

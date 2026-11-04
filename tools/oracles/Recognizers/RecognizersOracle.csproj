@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Black-box comparator: runs Microsoft.Recognizers.Text over the recognizer gold sets and writes predictions in the gold schema.
+       Not part of the solution and never shipped; comparators are allowed in tools only. Versions are pinned here (VersionOverride). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OneNlp.Tools.RecognizersOracle</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <!-- The package builds CultureInfo objects (en-US), which need ICU. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <!-- The comparator's own dependencies may carry advisories; the warning stays visible but does not fail this tool build. -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Recognizers.Text" VersionOverride="1.8.13" />
+    <PackageReference Include="Microsoft.Recognizers.Text.Number" VersionOverride="1.8.13" />
+    <PackageReference Include="Microsoft.Recognizers.Text.NumberWithUnit" VersionOverride="1.8.13" />
+    <PackageReference Include="Microsoft.Recognizers.Text.DateTime" VersionOverride="1.8.13" />
+    <PackageReference Include="Microsoft.Recognizers.Text.Sequence" VersionOverride="1.8.13" />
+  </ItemGroup>
+
+</Project>

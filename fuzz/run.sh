@@ -39,6 +39,8 @@ case "$target" in
   charsmap) maxlen=262144 ;;
   word-tokenizer | segmentation) maxlen=4096 ;;
   doc-json | doc-binary | docbin) maxlen=8192 ;;
+  recognizers) maxlen=4096 ;;
+  recognizer-rules) maxlen=16384 ;;
   *) echo "unknown target '$target'" >&2; exit 2 ;;
 esac
 

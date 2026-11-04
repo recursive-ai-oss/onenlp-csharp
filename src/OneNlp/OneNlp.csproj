@@ -18,6 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Recognizers/Data/**/*.rules" LogicalName="Recognizers/Data/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="RecursiveAI.OneFont" />
   </ItemGroup>
 

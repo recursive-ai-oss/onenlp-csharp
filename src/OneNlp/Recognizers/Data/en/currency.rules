@@ -1,0 +1,86 @@
+# Currency rules, English.
+#
+# [currency.symbol]: form | ISO 4217 code | prefix, suffix or both | confidence (optional). The sign for "$5" or "5€".
+# [currency.name]: forms, comma-separated | ISO 4217 code | value of one in the currency (optional, 0.01 for cents) | confidence (optional).
+# [currency.code]: the alphabetic codes of the ISO 4217 list of currencies, in capitals, as
+#                  "USD 5" or "5 USD". Lower-case "usd" is not read: several codes are English words (ALL, TRY, TOP, PEN).
+
+[currency.symbol]
+$ | USD | both | 0.9
+US$ | USD | prefix
+U$S | USD | prefix
+A$ | AUD | prefix
+AU$ | AUD | prefix
+C$ | CAD | prefix
+CA$ | CAD | prefix
+CAN$ | CAD | prefix
+NZ$ | NZD | prefix
+HK$ | HKD | prefix
+S$ | SGD | prefix
+R$ | BRL | prefix
+MX$ | MXN | prefix
+NT$ | TWD | prefix
+€ | EUR | both
+£ | GBP | both
+¥ | JPY | both | 0.7
+￥ | JPY | both | 0.7
+₹ | INR | both
+₩ | KRW | both
+₽ | RUB | both
+₺ | TRY | both
+₪ | ILS | both
+₫ | VND | both
+฿ | THB | both
+₱ | PHP | both
+₴ | UAH | both
+₦ | NGN | both
+₡ | CRC | both
+₲ | PYG | both
+₸ | KZT | both
+₼ | AZN | both
+₾ | GEL | both
+zł | PLN | suffix
+Kč | CZK | suffix
+
+[currency.name]
+dollar, dollars, buck, bucks, us dollar, us dollars, american dollar, american dollars | USD | 1 | 0.9
+cent, cents, ¢ | USD | 0.01 | 0.7
+canadian dollar, canadian dollars | CAD
+australian dollar, australian dollars | AUD
+new zealand dollar, new zealand dollars | NZD
+hong kong dollar, hong kong dollars | HKD
+singapore dollar, singapore dollars | SGD
+euro, euros | EUR
+eurocent, eurocents, euro cent, euro cents | EUR | 0.01
+pound sterling, pounds sterling, british pound, british pounds, quid | GBP
+penny, pence | GBP | 0.01 | 0.7
+yen | JPY
+yuan, renminbi, rmb | CNY
+rupee, rupees | INR | 1 | 0.9
+rouble, roubles, ruble, rubles | RUB
+won | KRW
+mexican peso, mexican pesos | MXN
+swiss franc, swiss francs | CHF
+rand | ZAR
+reais, brazilian real, brazilian reais | BRL
+turkish lira, turkish liras | TRY
+swedish krona, swedish kronor | SEK
+norwegian krone, norwegian kroner | NOK
+danish krone, danish kroner | DKK
+shekel, shekels, sheqel, sheqels | ILS
+baht | THB
+dirham, dirhams | AED | 1 | 0.8
+riyal, riyals | SAR | 1 | 0.7
+zloty, zlotys, zloties | PLN
+forint | HUF
+dong | VND
+naira | NGN
+
+[currency.code]
+AED, AFN, ALL, AMD, ANG, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYN, BZD
+CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, FKP, GBP, GEL
+GHS, GIP, GMD, GNF, GTQ, GYD, HKD, HNL, HTG, HUF, IDR, ILS, INR, IQD, IRR, ISK, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD
+KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MXV, MYR, MZN, NAD, NGN, NIO
+NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SHP, SLE, SOS, SRD
+SSP, STN, SVC, SYP, SZL, THB, TJS, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, UYI, UYU, UYW, UZS, VED, VES, VND, VUV
+WST, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XDR, XOF, XPD, XPF, XPT, XSU, XUA, YER, ZAR, ZMW, ZWG

@@ -33,6 +33,8 @@ internal static class Program
         ["vocab-txt"] = VocabularyReaderTargets.RunVocabTxt,
         ["sentencepiece-model"] = VocabularyReaderTargets.RunSentencePiece,
         ["pattern-json"] = PatternJsonTarget.Run,
+        ["recognizers"] = RecognizerTargets.Text,
+        ["recognizer-rules"] = RecognizerTargets.Rules,
     };
 
     private static int Main(string[] args)
@@ -50,6 +52,12 @@ internal static class Program
                     break;
                 case "docbin":
                     SerializationTargets.SeedBin(args[2]);
+                    break;
+                case "recognizers":
+                    RecognizerTargets.SeedText(args[2]);
+                    break;
+                case "recognizer-rules":
+                    RecognizerTargets.SeedRules(args[2]);
                     break;
                 case "word-tokenizer":
                 case "segmentation":
