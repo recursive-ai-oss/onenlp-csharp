@@ -276,12 +276,13 @@ public class TokenizerContractTests
         }
 
         using var empty = new MemoryStream();
-        foreach (TokenizerFormat format in Enum.GetValues<TokenizerFormat>().Where(f => f != TokenizerFormat.HuggingFaceJson))
+        foreach (TokenizerFormat format in Enum.GetValues<TokenizerFormat>().Where(f => f is not (TokenizerFormat.HuggingFaceJson or TokenizerFormat.Tiktoken)))
         {
             Assert.Throws<NotSupportedException>(() => Tokenizer.FromStream(empty, format));
         }
 
         Assert.Throws<InvalidDataException>(() => Tokenizer.FromStream(empty, TokenizerFormat.HuggingFaceJson));
+        Assert.Throws<InvalidDataException>(() => Tokenizer.FromStream(empty, TokenizerFormat.Tiktoken));
 
         Assert.Throws<ArgumentOutOfRangeException>(() => Tokenizer.FromStream(empty, (TokenizerFormat)99));
         Assert.Throws<ArgumentNullException>(() => Tokenizer.FromStream(null!, TokenizerFormat.Tiktoken));
