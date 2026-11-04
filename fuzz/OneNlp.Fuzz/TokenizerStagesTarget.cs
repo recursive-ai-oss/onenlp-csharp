@@ -117,6 +117,10 @@ internal static class TokenizerJsonTarget
         {
             // A hostile split pattern ran out of its step budget.
         }
+        catch (InvalidDataException)
+        {
+            // A model that cannot encode a word (for example WordPiece without its unknown token), as the reference also refuses.
+        }
     }
 
     /// <summary>Writes the tokenizer.json documents of the golden file, and each stage config on its own, as seeds.</summary>
