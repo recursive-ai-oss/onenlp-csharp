@@ -5,7 +5,7 @@ namespace RecursiveAI.OneNlp.Tests;
 
 /// <summary>
 /// Compares real tokenizer.json files with reference encodings written by tools/stage_goldens/make_real_goldens.py. The files are not
-/// in the repository: set ONENLP_TOKENIZER_MODELS to the directory of model sub-directories and ONENLP_REAL_GOLDENS to the reference
+/// in the repository: set ONENLP_TOKENIZER_MODELS to the directory of model sub-directories and ONENLP_TOKENIZER_JSON_GOLDENS to the reference
 /// JSON; without both the test does nothing.
 /// </summary>
 public class RealTokenizerGoldenTests
@@ -18,7 +18,7 @@ public class RealTokenizerGoldenTests
     public void RealFilesMatchTheReference()
     {
         string? root = Environment.GetEnvironmentVariable("ONENLP_TOKENIZER_MODELS");
-        string? goldPath = Environment.GetEnvironmentVariable("ONENLP_REAL_GOLDENS");
+        string? goldPath = Environment.GetEnvironmentVariable("ONENLP_TOKENIZER_JSON_GOLDENS");
         if (string.IsNullOrEmpty(root) || string.IsNullOrEmpty(goldPath))
         {
             return;
