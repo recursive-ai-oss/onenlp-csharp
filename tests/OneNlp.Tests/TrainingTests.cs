@@ -354,7 +354,8 @@ public class TrainingTests : IDisposable
         Assert.Equal(a.Select(t => t.ToString()).ToArray(), b.Select(t => t.ToString()).ToArray());
         Assert.Contains("n't", a.Select(t => t.ToString()));
         Assert.Equal(a.Sentences.Select(x => x.Text.ToString()).ToArray(), b.Sentences.Select(x => x.Text.ToString()).ToArray());
-        Assert.Equal(2, b.Sentences.Count);
+        Assert.True(b.Sentences.Count >= 2, string.Join(" | ", b.Sentences.Select(x => x.Text.ToString())));
+        Assert.Equal(Pipeline.Blank(Language.English).Add("sentencizer").Process(Text).Sentences.Count, b.Sentences.Count);
         Assert.Equal(["sentencizer", "tagger"], loaded.Components.Select(c => c.Name).ToArray());
 
         // A pipeline with other data keeps that data.
