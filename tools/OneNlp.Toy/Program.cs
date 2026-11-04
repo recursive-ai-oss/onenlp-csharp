@@ -165,6 +165,8 @@ internal static class Program
             Dropout = 0.1f,
             Seed = 11,
             DevExamples = dev,
+            Score = DevScores.Ud("XPOS"),
+            Patience = 3,
             CheckpointDirectory = args[3],
             CheckpointEvery = checkpointEvery,
             Progress = progress,

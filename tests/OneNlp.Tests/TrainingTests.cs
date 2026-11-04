@@ -218,6 +218,31 @@ public class TrainingTests : IDisposable
     }
 
     [Fact]
+    public void TheUdScorerPlugsInAsTheDevScore()
+    {
+        using Pipeline pipeline = NewPipeline();
+        var scores = new List<double>();
+        pipeline.Train(ToyExamples(80, 1), new TrainOptions
+        {
+            Epochs = 6,
+            BatchWords = 120,
+            LearningRate = 0.02f,
+            Seed = 1,
+            Score = DevScores.Ud("XPOS"),
+            Progress = new SyncProgress<TrainProgress>(p =>
+            {
+                if (p.DevScore is { } s)
+                {
+                    scores.Add(s);
+                }
+            }),
+        });
+        Assert.Equal(6, scores.Count);
+        Assert.True(scores[^1] > 90 && scores[^1] <= 100, "XPOS accuracy is reported in points");
+        Assert.Throws<ArgumentException>(() => DevScores.Ud("nope"));
+    }
+
+    [Fact]
     public void FrozenEncoderWeightsDoNotMove()
     {
         List<Example> train = ToyExamples(40, 1);
