@@ -113,6 +113,19 @@ public class TemporalTests
         Assert.Equal("Mother's Day 2026|Date|2026-05-10", Run("Mother's Day 2026"));
         Assert.Equal("Mother's Day 2026|Date|2026-03-15", Run("Mother's Day 2026", region: "gb"));
         Assert.Equal("Boxing Day 2026|Date|2026-12-26", Run("Boxing Day 2026", region: "gb"));
+
+        // Dates published at gov.uk/bank-holidays for England and Wales (Open Government Licence v3.0).
+        Assert.Equal("Good Friday 2028|Date|2028-04-14", Run("Good Friday 2028", region: "gb"));
+        Assert.Equal("Easter Monday 2027|Date|2027-03-29", Run("Easter Monday 2027", region: "gb"));
+        Assert.Equal("Early May bank holiday 2028|Date|2028-05-01", Run("Early May bank holiday 2028", region: "gb"));
+        Assert.Equal("Spring bank holiday 2028|Date|2028-05-29", Run("Spring bank holiday 2028", region: "gb"));
+        Assert.Equal("Summer bank holiday 2027|Date|2027-08-30", Run("Summer bank holiday 2027", region: "gb"));
+
+        // The federal holidays of 5 U.S.C. 6103 in 2027.
+        Assert.Equal("Labor Day 2027|Date|2027-09-06", Run("Labor Day 2027"));
+        Assert.Equal("Columbus Day 2027|Date|2027-10-11", Run("Columbus Day 2027"));
+        Assert.Equal("Presidents' Day 2027|Date|2027-02-15", Run("Presidents' Day 2027"));
+        Assert.Equal("Martin Luther King Jr. Day 2027|Date|2027-01-18", Run("Martin Luther King Jr. Day 2027"));
     }
 
     [Fact]
