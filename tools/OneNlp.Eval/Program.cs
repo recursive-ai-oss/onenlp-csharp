@@ -33,8 +33,11 @@ internal static class Program
                contraction (do + n't) as a multi-word token line, as English UD treebanks annotate them.
           recognizers --gold GOLD.jsonl --pred PRED.jsonl [--component NAME] [--dataset NAME] [--resamples 1000] [--seed N]
                [--json OUT.json] [--markdown OUT.md] [--errors OUT.tsv]
+               [--ref-pred REF.jsonl --ref-component NAME [--compare-markdown OUT.md] [--compare-json OUT.json]]
                scores recognizer predictions against a recognizer gold file (docs/recognizer-gold.md): exact-span and relaxed F1 and
                resolution accuracy per type, with bootstrap intervals over sentences. --errors lists the misses (development files only).
+               --ref-pred adds a paired bootstrap against another system on the same sentences: F1 and value accuracy per type with the
+               difference interval and a within-noise / ahead / behind verdict (docs/measurement.md).
           recognize --in X.jsonl --out Y.jsonl [--lang en] [--rules FILE ...]
                runs the recognizers (numbers, ordinals, percents, measures, money, e-mail, URL, IP, phone-like, hashtag, mention, GUID)
                over JSON lines {"id":..,"text":..} (or plain text lines) and writes one JSON line of results per input. Offsets are

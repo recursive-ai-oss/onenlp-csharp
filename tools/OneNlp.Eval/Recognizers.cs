@@ -51,12 +51,27 @@ internal static class Recognizers
         }
 
         views.Add(new View("temporal (any subtype)", Temporal.Contains, true));
+        views.Add(new View("all but date/time, duration, set", x => !Temporal.Contains(x) && x is not ("duration" or "set"), false));
         views.Add(new View("all types", _ => true, false));
 
+        Sentence[]? reference = null;
+        if (o.TryGetValue("ref-pred", out List<string>? refPath) && refPath.Count > 0)
+        {
+            Dictionary<string, Sentence> byId = Read(refPath[0], requireText: false).ToDictionary(s => s.Id, StringComparer.Ordinal);
+            reference = [.. gold.Select(g => byId.TryGetValue(g.Id, out Sentence? p) ? p : new Sentence(g.Id, g.Text, []))];
+        }
+
+        var comparison = new List<ComparisonRow>();
         var rows = new List<RowResult>();
         foreach (View view in views)
         {
             Counts[] counts = [.. gold.Select((g, i) => Count(g, pred[i], view))];
+            if (reference is not null)
+            {
+                Counts[] other = [.. gold.Select((g, i) => Count(g, reference[i], view))];
+                comparison.Add(Compare(view.Name, counts, other, resamples, seed));
+            }
+
             rows.Add(new RowResult(
                 view.Name,
                 counts.Sum(c => c.Gold),
@@ -69,6 +84,22 @@ internal static class Recognizers
                 counts.Sum(c => c.Resolvable) == 0 ? null : Interval(counts, resamples, seed, ValueAccuracy),
                 counts.Sum(c => c.Resolvable) == 0 ? null : Interval(counts, resamples, seed, FullAccuracy),
                 counts.Sum(c => c.ResolvableOverlap) == 0 ? null : Interval(counts, resamples, seed, OverlapAccuracy)));
+        }
+
+        if (reference is not null)
+        {
+            string refName = Optional(o, "ref-component", "reference");
+            string table = ComparisonMarkdown(system, refName, dataset, resamples, seed, comparison);
+            Console.Out.Write(table);
+            if (o.TryGetValue("compare-markdown", out List<string>? cm) && cm.Count > 0)
+            {
+                File.WriteAllText(cm[0], table, new UTF8Encoding(false));
+            }
+
+            if (o.TryGetValue("compare-json", out List<string>? cj) && cj.Count > 0)
+            {
+                WriteComparisonJson(cj[0], system, refName, dataset, comparison);
+            }
         }
 
         string markdown = ToMarkdown(system, dataset, gold.Length, resamples, seed, rows);
@@ -89,6 +120,88 @@ internal static class Recognizers
         }
 
         return 0;
+    }
+
+    /// <summary>One metric of one type, ours against the reference on the same sentences.</summary>
+    private sealed record MetricComparison(PairedResult Paired, string Verdict);
+
+    private sealed record ComparisonRow(string Name, int Gold, MetricComparison F1, MetricComparison? Value);
+
+    /// <summary>
+    /// Verdict by the within-noise rule of docs/measurement.md: the two intervals overlap means "within noise"; otherwise "ahead" when ours is
+    /// higher and "behind" when it is lower. The paired difference (ours minus reference) is reported beside it.
+    /// </summary>
+    private static MetricComparison Judge(Counts[] ours, Counts[] reference, Statistic<Counts> statistic, int resamples, ulong seed)
+    {
+        PairedResult paired = Bootstrap.Paired(ours, reference, statistic, resamples, seed);
+        string verdict = NoiseRule.WithinNoise(paired.First, paired.Second) ? "within noise" : paired.First.Estimate > paired.Second.Estimate ? "ahead" : "behind";
+        return new MetricComparison(paired, verdict);
+    }
+
+    private static ComparisonRow Compare(string name, Counts[] ours, Counts[] reference, int resamples, ulong seed) =>
+        new(
+            name,
+            ours.Sum(c => c.Gold),
+            Judge(ours, reference, F1, resamples, seed),
+            ours.Sum(c => c.Resolvable) == 0 || reference.Sum(c => c.Resolvable) == 0 ? null : Judge(ours, reference, ValueAccuracy, resamples, seed));
+
+    private static string Cell(MetricComparison? m) =>
+        m is null
+            ? "n/a | n/a | n/a | n/a"
+            : string.Create(
+                CultureInfo.InvariantCulture,
+                $"{Ci(m.Paired.First)} | {Ci(m.Paired.Second)} | {m.Paired.Difference.Estimate:+0.0;-0.0;0.0} [{m.Paired.Difference.Low:+0.0;-0.0;0.0}, {m.Paired.Difference.High:+0.0;-0.0;0.0}] | {m.Verdict}");
+
+    private static string ComparisonMarkdown(string ours, string reference, string dataset, int resamples, ulong seed, List<ComparisonRow> rows)
+    {
+        var sb = new StringBuilder();
+        sb.Append(CultureInfo.InvariantCulture, $"{ours} against {reference} on {dataset} (paired bootstrap over sentences, {resamples} resamples, seed {seed}). Verdict: the two 95% intervals overlap = within noise, else ahead or behind.\n\n");
+        sb.Append("| Type | Gold | F1 ours | F1 reference | F1 difference | F1 verdict | Value acc. ours | Value acc. reference | Value difference | Value verdict |\n");
+        sb.Append("|---|---:|---|---|---|---|---|---|---|---|\n");
+        foreach (ComparisonRow r in rows)
+        {
+            sb.Append(CultureInfo.InvariantCulture, $"| {r.Name} | {r.Gold} | {Cell(r.F1)} | {Cell(r.Value)} |\n");
+        }
+
+        return sb.ToString();
+    }
+
+    private static void WriteMetric(Utf8JsonWriter w, string name, MetricComparison? m)
+    {
+        if (m is null)
+        {
+            return;
+        }
+
+        w.WriteStartObject(name);
+        WriteInterval(w, "ours", m.Paired.First);
+        WriteInterval(w, "reference", m.Paired.Second);
+        WriteInterval(w, "difference", m.Paired.Difference);
+        w.WriteString("verdict", m.Verdict);
+        w.WriteEndObject();
+    }
+
+    private static void WriteComparisonJson(string path, string ours, string reference, string dataset, List<ComparisonRow> rows)
+    {
+        using FileStream stream = File.Create(path);
+        using var w = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
+        w.WriteStartObject();
+        w.WriteString("system", ours);
+        w.WriteString("reference", reference);
+        w.WriteString("dataset", dataset);
+        w.WriteStartArray("rows");
+        foreach (ComparisonRow r in rows)
+        {
+            w.WriteStartObject();
+            w.WriteString("type", r.Name);
+            w.WriteNumber("gold", r.Gold);
+            WriteMetric(w, "f1", r.F1);
+            WriteMetric(w, "value_accuracy", r.Value);
+            w.WriteEndObject();
+        }
+
+        w.WriteEndArray();
+        w.WriteEndObject();
     }
 
     private static string Required(Dictionary<string, List<string>> o, string name) =>
