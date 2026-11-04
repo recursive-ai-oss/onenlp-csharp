@@ -120,15 +120,27 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
                     keepSecond = Math.Min(keepSecond, Math.Max(0, room - keepFirst));
                     break;
                 default:
-                    // The longer sequence is cut to the length of the shorter first; after that the budget is shared, and the sequence
-                    // that was longer keeps the odd token (the first one when they were equally long), as observed in output of tokenizers 0.22.1.
-                    if (keepFirst + keepSecond > room)
+                    // Longest-first removes one token at a time from the longer sequence. When both are equally long, it takes the one it did not
+                    // take from last, starting with the first (observed in output of tokenizers 0.22.1). Done in closed form: cut the longer
+                    // down to the shorter, then alternate.
+                    int excess = keepFirst + keepSecond - room;
+                    if (excess > 0)
                     {
-                        bool firstLonger = keepFirst >= keepSecond;
-                        int shortLength = firstLonger ? keepSecond : keepFirst;
-                        int keepShort = Math.Min(shortLength, room / 2);
-                        int keepLong = room - keepShort;
-                        (keepFirst, keepSecond) = firstLonger ? (keepLong, keepShort) : (keepShort, keepLong);
+                        int cut = Math.Min(Math.Abs(keepFirst - keepSecond), excess);
+                        bool lastWasFirst = keepFirst > keepSecond && cut > 0;
+                        if (keepFirst > keepSecond)
+                        {
+                            keepFirst -= cut;
+                        }
+                        else
+                        {
+                            keepSecond -= cut;
+                        }
+
+                        excess -= cut;
+                        int takeFromTieFirst = lastWasFirst ? excess / 2 : (excess + 1) / 2;
+                        keepFirst = Math.Max(0, keepFirst - takeFromTieFirst);
+                        keepSecond = Math.Max(0, keepSecond - (excess - takeFromTieFirst));
                     }
 
                     break;
@@ -155,7 +167,7 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
             if (input.Token is { } added)
             {
                 ids.Add(added.Id);
-                tokens.Add(added.Content);
+                tokens.Add(input.Matched ?? added.Content);  // the matched text, stripped whitespace included (observed in output of tokenizers 0.22.1)
                 offsets.Add(new TokenOffset(input.Origin.Start, input.Origin.End));
                 words.Add(word++);
                 special.Add(false);  // the mask marks tokens a post-processor adds, not added tokens found in the input (observed in output of tokenizers 0.22.1)

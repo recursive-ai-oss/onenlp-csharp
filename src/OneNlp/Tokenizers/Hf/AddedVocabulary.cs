@@ -16,7 +16,8 @@ internal sealed record AddedToken(int Id, string Content, bool Special, bool Sin
 /// <param name="Text">The normalized text, or <see langword="null"/> for an added token.</param>
 /// <param name="Token">The added token, or <see langword="null"/> for text.</param>
 /// <param name="Origin">For an added token, the range of the original input it covers (whitespace its flags stripped included).</param>
-internal readonly record struct InputPiece(NormalizedString? Text, AddedToken? Token, OffsetPair Origin);
+/// <param name="Matched">For an added token, the text that was matched: the stripped whitespace included, and the normalized spelling for a normalized token.</param>
+internal readonly record struct InputPiece(NormalizedString? Text, AddedToken? Token, OffsetPair Origin, string? Matched = null);
 
 /// <summary>The added tokens of a tokenizer: lookups by ID and by content, and the pass that cuts them out of the input.</summary>
 internal sealed class AddedVocabulary
@@ -94,7 +95,7 @@ internal sealed class AddedVocabulary
         {
             if (token is not null)
             {
-                result.Add(new InputPiece(null, token, new OffsetPair(start, end)));
+                result.Add(new InputPiece(null, token, new OffsetPair(start, end), input[start..end]));
                 continue;
             }
 
@@ -104,7 +105,7 @@ internal sealed class AddedVocabulary
             {
                 if (t is not null)
                 {
-                    result.Add(new InputPiece(null, t, piece.ToOriginal(s, e)));
+                    result.Add(new InputPiece(null, t, piece.ToOriginal(s, e), piece.Text[s..e]));
                 }
                 else if (e > s)
                 {

@@ -110,26 +110,31 @@ internal static class EncodingParts
             }
 
             int trailing = 0;
-            while (trailing < t.Length - leading && IsSpaceMark(t[t.Length - 1 - trailing]))
+            while (trailing < t.Length && IsSpaceMark(t[t.Length - 1 - trailing]))
             {
                 trailing++;
+            }
+
+            // The space the pre-tokenizer put in front of the text is not counted as leading (observed in output of tokenizers 0.22.1:
+            // a lone prefix-space token keeps its start and loses its end, giving an empty span at the start of the text).
+            if (i == 0 && addPrefixSpace && leading > 0)
+            {
+                leading--;
             }
 
             int start = o.Start;
             int end = o.End;
             if (leading > 0)
             {
-                // With a prefix space added by the pre-tokenizer, one leading space on the first token is the one we added: keep it
-                // (observed in output of tokenizers 0.22.1; more than one leading space means the text had its own).
-                if ((i == 0 || o.Start == 0) && addPrefixSpace && leading == 1)
-                {
-                    leading = 0;
-                }
-
                 start = Math.Min(start + leading, end);
             }
 
-            if (trailing > 0 && end >= trailing)
+            if (trailing > 0 && i == 0 && addPrefixSpace && t.Length == 1)
+            {
+                // The prefix space stands for the first character of the text, which may be two UTF-16 units wide: the span is empty.
+                end = start;
+            }
+            else if (trailing > 0 && end >= trailing)
             {
                 end = Math.Max(end - trailing, start);
             }
@@ -191,7 +196,8 @@ internal sealed class RobertaProcessor((string Token, int Id) sep, (string Token
         List<TokenEncoding> es = trimOffsets ? [.. encodings.Select(e => EncodingParts.TrimOffsets(e, addPrefixSpace))] : encodings;
         if (!addSpecialTokens)
         {
-            return es;
+            // Observed in output of tokenizers 0.22.1: pairs carry type id 0 throughout, special tokens or not.
+            return [.. es.Select(e => EncodingParts.WithTypeId(e, 0))];
         }
 
         var parts = new List<TokenEncoding>
