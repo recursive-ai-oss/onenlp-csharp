@@ -23,7 +23,7 @@ namespace RecursiveAI.OneNlp;
 /// each component in turn.
 /// </para>
 /// </remarks>
-public sealed class Doc : IEnumerable<Token>
+public sealed partial class Doc : IEnumerable<Token>
 {
     private const int AttributeCount = 6;
 
