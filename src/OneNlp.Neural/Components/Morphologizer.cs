@@ -164,7 +164,7 @@ public sealed class Morphologizer : TrainableHead
                 (string posValue, string morphValue) = _parts[best];
                 pos[t] = doc.Strings.Add(posValue);
                 morph[t] = morphValue.Length == 0 ? 0 : doc.Strings.Add(morphValue);
-                confidence[t] = Math.Clamp(row[best], 0f, 1f);
+                confidence[t] = float.IsNaN(row[best]) ? 0f : Math.Clamp(row[best], 0f, 1f);
             }
 
             doc.SetColumn(TokenColumn.Pos, pos);

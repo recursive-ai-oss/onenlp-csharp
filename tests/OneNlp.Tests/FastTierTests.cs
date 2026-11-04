@@ -164,6 +164,31 @@ public class FastTierTests
         Assert.All(results, r => Assert.True(r.ScaledError < 1e-2, $"{r.ScaledError}"));
     }
 
+    private static string Here([System.Runtime.CompilerServices.CallerFilePath] string path = "") => path;
+
+    // Found by fuzzing pipeline files: weights with NaN values gave NaN probabilities, and Process threw on the confidence.
+    [Fact]
+    public void PipelineWithNaNWeightsStillPredicts()
+    {
+        string path = Path.Combine(Path.GetDirectoryName(Here())!, "..", "..", "testdata", "neural", "pipeline-nan-weights.bin");
+        using Pipeline pipeline = PipelineFile.Load(path);
+        Doc doc = pipeline.Process("Walking talks, 42 times.");
+        Assert.True(doc.Length > 0);
+        for (int i = 0; i < doc.Length; i++)
+        {
+            Assert.InRange(doc[i].Confidence, 0f, 1f);
+        }
+    }
+
+    [Theory]
+    [InlineData("""{"width":2048,"depth":0,"normRows":4194304,"prefixRows":1,"suffixRows":1,"shapeRows":1,"seed":0}""")]
+    [InlineData("""{"width":2048,"depth":32,"normRows":5000,"prefixRows":5000,"suffixRows":5000,"shapeRows":5000,"seed":0}""")]
+    public void FastEncoderRefusesHugeTables(string settings)
+    {
+        using var document = System.Text.Json.JsonDocument.Parse(settings);
+        Assert.Throws<ArgumentOutOfRangeException>(() => FastEncoder.FromSettings(document.RootElement));
+    }
+
     private static (double Tag, double Pos, double Morph, double Lemma) Score(Pipeline pipeline, List<Example> test)
     {
         int tag = 0, pos = 0, morph = 0, lemma = 0, total = 0;

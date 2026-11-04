@@ -32,6 +32,20 @@ The file length is exactly `32 + C + W`.
 - `tokenizer` is `{"kind": "rule"}` or `{"kind": "uax", "data": "none"|"neutral"|"english"}`, the segmentation data set the tokenizer uses. Other tokenizers cannot be saved yet.
 - A `builtin` component may carry `settings`, an object of at most 64 short strings, written by components that implement `IConfigurableComponent` and passed to `ComponentRegistry.Create` on load (the sentencizer writes `data`).
 
+## Kinds
+
+Encoder kinds (`encoders[i].kind`, with `settings`) and head kinds (`components[j].kind`, with `config`) that the loader knows. Weights of each are named under `encoder<i>.` and `head<j>.`.
+
+| Kind | Settings or config | Weights |
+|---|---|---|
+| encoder `hash-embedding` | `width`, `buckets`, `seed` | `embed.weight` `[buckets, width]`; `project.weight`, `project.bias` |
+| encoder `fast` | `width` (8 to 2048), `depth` (0 to 32), `normRows`, `prefixRows`, `suffixRows`, `shapeRows` (each 1 to 4,194,304, and rows times width over the four tables at most 33,554,432 values together), `seed` | `embed_norm.weight`, `embed_prefix.weight`, `embed_suffix.weight`, `embed_shape.weight` (`[rows, width]`); `mix.weight` `[width, 4 * width]`, `mix.bias`, `mix_norm.weight`, `mix_norm.bias`; for each layer `i`: `window<i>.weight` `[width, 3 * width]`, `window<i>.bias`, `window_norm<i>.weight`, `window_norm<i>.bias` |
+| head `tagger` | `column` (`Tag`, `Pos` or `Morph`), `labels` | `output.weight` `[labels, width]`, `output.bias` |
+| head `morphologizer` | `labels`: joint labels, each `POS=<upos>` or `POS=<upos>\|<features>`, at most 65,536 | `output.weight`, `output.bias` as the tagger |
+| head `lemmatizer` | `labels`: classes, each `l` or `r` followed by a serialized edit tree, at most 262,144 | `output.weight`, `output.bias` as the tagger |
+
+The `fast` encoder's hash is part of the format: FNV-1a over UTF-16 units, seeded per attribute and finished with SplitMix64 (`docs/contracts.md`), so a saved model hashes every token to the same rows on every platform. A serialized edit tree is `M<prefix>,<suffix>(<left>)(<right>)` for a match node and `S<n>:<original><m>:<replacement>` for a substitution, where `<n>` and `<m>` are the lengths in UTF-16 units of the strings that follow them; at most 4,096 characters and 64 levels deep. A label list with a repeated entry, a morphologizer label not starting with `POS=`, a lemmatizer class not starting with `l` or `r`, or a tree that does not parse is an `InvalidDataException`.
+
 ## Bounds on read
 
 Config at most 16 MiB with JSON nesting at most 32; weights at most 1 GiB; at most 64 encoders and 1,024 components; label sets at most 1,048,576 entries of at most 4,096 characters; an embedding table at most 67,108,864 values and a head's output layer at most 67,108,864 weights. The declared lengths are compared with the real length of the data before anything is allocated. Any failure is an `InvalidDataException`.

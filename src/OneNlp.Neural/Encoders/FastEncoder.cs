@@ -53,7 +53,7 @@ public sealed class FastEncoder : IEncoder
     private const int MaxWidth = 2048;
     private const int MaxDepth = 32;
     private const int MaxRows = 1 << 22;
-    private const long MaxTableValues = 1L << 26;
+    private const long MaxTableValues = 1L << 25;
     private const int ShapeRun = 4;
     private static readonly ulong[] AttributeSeeds = [0x9E3779B97F4A7C15UL, 0xC2B2AE3D27D4EB4FUL, 0x165667B19E3779F9UL, 0x27D4EB2F165667C5UL];
 
@@ -69,7 +69,7 @@ public sealed class FastEncoder : IEncoder
     /// <param name="suffixRows">Rows of the table for the suffix. Default 5,000.</param>
     /// <param name="shapeRows">Rows of the table for the shape. Default 2,500.</param>
     /// <param name="seed">Seed of the initial weights. Default 0.</param>
-    /// <exception cref="ArgumentOutOfRangeException">A size is out of range; each table has 1 to 4,194,304 rows and at most 67,108,864 values.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">A size is out of range; each table has 1 to 4,194,304 rows and the four tables hold at most 33,554,432 values together.</exception>
     public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(width, 8);
@@ -77,14 +77,18 @@ public sealed class FastEncoder : IEncoder
         ArgumentOutOfRangeException.ThrowIfLessThan(depth, 0);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(depth, MaxDepth);
         _rows = [normRows, prefixRows, suffixRows, shapeRows];
+        long values = 0;
         foreach (int rows in _rows)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(rows, 1);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(rows, MaxRows);
-            if ((long)rows * width > MaxTableValues)
-            {
-                throw new ArgumentOutOfRangeException(nameof(normRows), rows, $"An embedding table (rows x width) may hold at most {MaxTableValues} values.");
-            }
+            values += (long)rows * width;
+        }
+
+        // A settings object read from a file must not be able to ask for gigabytes before the weights are looked at.
+        if (values > MaxTableValues)
+        {
+            throw new ArgumentOutOfRangeException(nameof(normRows), values, $"The four embedding tables (rows x width) may hold at most {MaxTableValues} values together.");
         }
 
         Width = width;
