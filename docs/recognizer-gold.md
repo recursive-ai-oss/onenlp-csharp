@@ -115,3 +115,13 @@ Both comparators are mapped into this schema by scripts of ours (`tools/oracles/
 - **Years.** Both put a past month and day in the next year. The development set avoids such expressions; this is why `from April 6 to April 10` replaced a March example.
 - **Zones.** Neither keeps a stated zone as an offset in the form of the gold (Recognizers.Text drops it, Duckling converts to UTC); items with a zone are scored as they come.
 - **Not mapped.** Duckling's `quantity` products and credit-card or other dimensions; Recognizers.Text's relative ordinals (`next`, `last`).
+
+## Our recognizers
+
+`tools/oracles/score_ours.sh` runs `OneNlp.Eval recognize` over the sentences, maps its output with `tools/recognizers-gold/map_ours.py` and scores it with the unchanged scorer; `--ref-pred` adds the paired comparison with Microsoft.Recognizers.Text. Results are in `testdata/recognizers/en/comparators/`: `ours.{test,gold}.{md,json}` are the scores, `ours-vs-recognizers.{test,gold}.{md,json}` the comparisons.
+
+- **Mapping.** `CARDINAL`, `ORDINAL` and `PERCENT` become `number`, `ordinal` and `percentage`; `MONEY` becomes `currency` (`<value> <ISO code>`); `QUANTITY` becomes `temperature`, `age` or `dimension` by its dimension (`<value> <unit>`); the sequence kinds keep their names (`PHONE_LIKE` is `phone`, `IP_ADDRESS` is `ip`). Offsets are the engine's UTF-16 offsets.
+- **Not emitted yet:** `date`, `time`, `datetime`, `daterange`, `timerange`, `datetimerange`, `duration` and `set`. Their rows score 0 and the comparison calls them "behind" by construction. The row **all but date/time, duration, set** pools the 14 types the engine emits and is the one to read; the **all types** row includes the types not yet built and is not a verdict.
+- **Verdict.** Per type and per metric (exact-span F1, value accuracy on exact matches), the two systems are scored on the same sentences and the 95% bootstrap intervals compared by the within-noise rule of `docs/measurement.md`: overlapping intervals are "within noise", otherwise "ahead" or "behind". The paired difference (ours minus the reference) and its interval are printed beside it, because with 10 to 20 items per type an overlapping interval is a weak statement.
+- **Convention differences** are the comparator's, not ours: it reports the end of "from A to B" day ranges as B and drops stated time zones. They affect only date/time rows.
+- **Throughput** is measured by `tools/oracles/bench_recognizers.sh` (about 10 MB made from the development split, 3 runs each, comparator with its number, unit, currency and sequence models). Indicative only, on a shared machine.

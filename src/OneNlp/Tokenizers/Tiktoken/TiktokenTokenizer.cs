@@ -205,18 +205,26 @@ public sealed class TiktokenTokenizer : Tokenizer
     /// <exception cref="ArgumentException">An ID is not a token of this encoding.</exception>
     public byte[] DecodeBytes(ReadOnlySpan<int> ids, bool skipSpecialTokens = false)
     {
-        using var buffer = new MemoryStream();
+        byte[] joined = new byte[JoinedLength(ids, skipSpecialTokens)];
+        JoinInto(ids, skipSpecialTokens, joined);
+        return joined;
+    }
+
+    // The length is summed first so the bytes are written once into a buffer of exactly the right size, not through a growing stream.
+    private int JoinedLength(ReadOnlySpan<int> ids, bool skipSpecialTokens)
+    {
+        long total = 0;
         foreach (int id in ids)
         {
             if (_ranks.BytesOf(id) is { } bytes)
             {
-                buffer.Write(bytes);
+                total += bytes.Length;
             }
             else if (_specialById.TryGetValue(id, out string? special))
             {
                 if (!skipSpecialTokens)
                 {
-                    buffer.Write(Encoding.UTF8.GetBytes(special));
+                    total += Encoding.UTF8.GetByteCount(special);
                 }
             }
             else
@@ -225,13 +233,43 @@ public sealed class TiktokenTokenizer : Tokenizer
             }
         }
 
-        return buffer.ToArray();
+        return checked((int)total);
+    }
+
+    private void JoinInto(ReadOnlySpan<int> ids, bool skipSpecialTokens, Span<byte> destination)
+    {
+        int at = 0;
+        foreach (int id in ids)
+        {
+            if (_ranks.BytesOf(id) is { } bytes)
+            {
+                bytes.CopyTo(destination[at..]);
+                at += bytes.Length;
+            }
+            else if (!skipSpecialTokens && _specialById.TryGetValue(id, out string? special))
+            {
+                at += Encoding.UTF8.GetBytes(special, destination[at..]);
+            }
+        }
     }
 
     /// <inheritdoc/>
     /// <remarks>Invalid UTF-8 in the joined bytes becomes U+FFFD, as <c>errors="replace"</c> does in the Python library. Special tokens are written unless skipped, like the Python library when <paramref name="skipSpecialTokens"/> is <see langword="false"/>.</remarks>
     /// <exception cref="ArgumentException">An ID is not a token of this encoding.</exception>
-    public override string Decode(ReadOnlySpan<int> ids, bool skipSpecialTokens = true) => Encoding.UTF8.GetString(DecodeBytes(ids, skipSpecialTokens));
+    public override string Decode(ReadOnlySpan<int> ids, bool skipSpecialTokens = true)
+    {
+        int length = JoinedLength(ids, skipSpecialTokens);
+        byte[] rented = ArrayPool<byte>.Shared.Rent(length);
+        try
+        {
+            JoinInto(ids, skipSpecialTokens, rented);
+            return Encoding.UTF8.GetString(rented, 0, length);
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(rented);
+        }
+    }
 
     /// <inheritdoc/>
     public override OperationStatus EncodeToIds(ReadOnlySpan<char> text, Span<int> ids, out int written, out int consumed, bool addSpecialTokens = true)
