@@ -46,6 +46,12 @@ internal static class Program
         Check("trim", tokenizer.TrimToTokenBudget("a b c", 2).SequenceEqual("a b"));
         Check("loader not yet supported", Throws<NotSupportedException>(() => Tokenizer.FromStream(new MemoryStream(), TokenizerFormat.WordPieceVocabulary)));
 
+        // The tokenizer.json stages: loader, normalizers with generated tables, split patterns, post-processing, decoding.
+        foreach (string failed in StageSmoke.Run())
+        {
+            Check(failed, false);
+        }
+
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
     }
