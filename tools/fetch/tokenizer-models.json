@@ -1,0 +1,110 @@
+{
+  "hf": [
+    {
+      "repo": "google-bert/bert-base-uncased",
+      "dir": "google-bert_bert-base-uncased",
+      "files": [
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "vocab.txt"
+      ]
+    },
+    {
+      "repo": "google-bert/bert-base-multilingual-cased",
+      "dir": "google-bert_bert-base-multilingual-cased",
+      "files": [
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "vocab.txt"
+      ]
+    },
+    {
+      "repo": "FacebookAI/xlm-roberta-base",
+      "dir": "FacebookAI_xlm-roberta-base",
+      "files": [
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "sentencepiece.bpe.model"
+      ]
+    },
+    {
+      "repo": "google-t5/t5-small",
+      "dir": "google-t5_t5-small",
+      "files": [
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "spiece.model"
+      ]
+    },
+    {
+      "repo": "jhu-clsp/mmBERT-base",
+      "dir": "jhu-clsp_mmBERT-base",
+      "files": [
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "special_tokens_map.json"
+      ]
+    },
+    {
+      "repo": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+      "dir": "TinyLlama_TinyLlama-1.1B-Chat-v1.0",
+      "files": [
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "special_tokens_map.json",
+        "tokenizer.model"
+      ]
+    },
+    {
+      "repo": "openai-community/gpt2",
+      "dir": "openai-community_gpt2",
+      "files": [
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "vocab.json",
+        "merges.txt"
+      ]
+    },
+    {
+      "repo": "FacebookAI/roberta-base",
+      "dir": "FacebookAI_roberta-base",
+      "files": [
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "vocab.json",
+        "merges.txt"
+      ]
+    },
+    {
+      "repo": "Qwen/Qwen2.5-0.5B",
+      "dir": "Qwen_Qwen2.5-0.5B",
+      "files": [
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "vocab.json",
+        "merges.txt"
+      ]
+    },
+    {
+      "repo": "answerdotai/ModernBERT-base",
+      "dir": "answerdotai_ModernBERT-base",
+      "files": [
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "special_tokens_map.json"
+      ]
+    }
+  ],
+  "tiktoken": [
+    {
+      "name": "cl100k_base",
+      "url": "https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken",
+      "license": "No separate licence is published for the encoding files; they are published for the MIT-licensed tiktoken package."
+    },
+    {
+      "name": "o200k_base",
+      "url": "https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken",
+      "license": "No separate licence is published for the encoding files; they are published for the MIT-licensed tiktoken package."
+    }
+  ]
+}

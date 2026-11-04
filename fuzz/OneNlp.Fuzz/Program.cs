@@ -24,12 +24,15 @@ internal static class Program
         ["charsmap"] = CharsMapTarget.Run,
         ["tiktoken-ranks"] = TiktokenRanksTarget.Run,
         ["bpe-model"] = BpeModelTarget.Run,
+        ["conllu"] = ConllUTarget.Run,
+        ["jsonl"] = JsonlTarget.Run,
         ["segmentation"] = SegmentationTarget.Run,
         ["doc-json"] = SerializationTargets.Json,
         ["doc-binary"] = SerializationTargets.Binary,
         ["docbin"] = SerializationTargets.Bin,
         ["vocab-txt"] = VocabularyReaderTargets.RunVocabTxt,
         ["sentencepiece-model"] = VocabularyReaderTargets.RunSentencePiece,
+        ["pattern-json"] = PatternJsonTarget.Run,
     };
 
     private static int Main(string[] args)

@@ -18,7 +18,7 @@ namespace RecursiveAI.OneNlp.Segmentation;
 /// A trained sentence segmenter is a separate, later component. Safe for concurrent use.
 /// </para>
 /// </remarks>
-public sealed class SentencizerComponent : IPipelineComponent
+public sealed class SentencizerComponent : IPipelineComponent, IConfigurableComponent
 {
     /// <summary>The registry name, <c>sentencizer</c>.</summary>
     public const string ComponentName = "sentencizer";
@@ -31,12 +31,19 @@ public sealed class SentencizerComponent : IPipelineComponent
     public SentencizerComponent(SegmentationData? data = null)
     {
         data ??= SegmentationData.Neutral;
+        Data = data;
         _nonFinal = data.NonFinalAbbreviations.GetAlternateLookup<ReadOnlySpan<char>>();
         _hasNonFinal = data.NonFinalAbbreviations.Count > 0;
     }
 
+    /// <summary>The language data in use.</summary>
+    public SegmentationData Data { get; }
+
     /// <inheritdoc/>
     public string Name => ComponentName;
+
+    /// <inheritdoc/>
+    public IReadOnlyDictionary<string, string> Settings => new Dictionary<string, string> { ["data"] = Data.Name };
 
     /// <summary>Creates the component for a language: English data for English, the neutral defaults otherwise.</summary>
     /// <param name="language">The language.</param>

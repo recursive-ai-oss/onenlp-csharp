@@ -1,0 +1,1 @@
+[{"LOWER":"hello"},{"IS_PUNCT":true,"OP":"?"},{"LOWER":{"IN":["world","there"]}}]

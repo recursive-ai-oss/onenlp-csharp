@@ -1,0 +1,135 @@
+{
+  "comment": "Tokenizer families under parity. files: the files the C# loaders are pointed at (relative to the model directory); primary is the default.",
+  "families": [
+    {
+      "id": "bert-base-uncased",
+      "oracle": "hf",
+      "dir": "google-bert_bert-base-uncased",
+      "oracle_file": "tokenizer.json",
+      "files": {
+        "primary": "tokenizer.json",
+        "vocab": "vocab.txt"
+      },
+      "pairs": true
+    },
+    {
+      "id": "bert-base-multilingual-cased",
+      "oracle": "hf",
+      "dir": "google-bert_bert-base-multilingual-cased",
+      "oracle_file": "tokenizer.json",
+      "files": {
+        "primary": "tokenizer.json",
+        "vocab": "vocab.txt"
+      },
+      "pairs": true
+    },
+    {
+      "id": "xlm-roberta-base",
+      "oracle": "hf",
+      "dir": "FacebookAI_xlm-roberta-base",
+      "oracle_file": "tokenizer.json",
+      "files": {
+        "primary": "tokenizer.json",
+        "sentencepiece": "sentencepiece.bpe.model"
+      },
+      "pairs": true
+    },
+    {
+      "id": "t5-small",
+      "oracle": "hf",
+      "dir": "google-t5_t5-small",
+      "oracle_file": "tokenizer.json",
+      "files": {
+        "primary": "tokenizer.json",
+        "sentencepiece": "spiece.model"
+      },
+      "pairs": false
+    },
+    {
+      "id": "mmbert-base",
+      "oracle": "hf",
+      "dir": "jhu-clsp_mmBERT-base",
+      "oracle_file": "tokenizer.json",
+      "files": {
+        "primary": "tokenizer.json"
+      },
+      "pairs": false
+    },
+    {
+      "id": "tinyllama-1.1b-chat",
+      "oracle": "hf",
+      "dir": "TinyLlama_TinyLlama-1.1B-Chat-v1.0",
+      "oracle_file": "tokenizer.json",
+      "files": {
+        "primary": "tokenizer.json",
+        "sentencepiece": "tokenizer.model"
+      },
+      "pairs": false
+    },
+    {
+      "id": "gpt2",
+      "oracle": "hf",
+      "dir": "openai-community_gpt2",
+      "oracle_file": "tokenizer.json",
+      "files": {
+        "primary": "tokenizer.json",
+        "vocab_merges": "vocab.json"
+      },
+      "pairs": false
+    },
+    {
+      "id": "roberta-base",
+      "oracle": "hf",
+      "dir": "FacebookAI_roberta-base",
+      "oracle_file": "tokenizer.json",
+      "files": {
+        "primary": "tokenizer.json",
+        "vocab_merges": "vocab.json"
+      },
+      "pairs": true
+    },
+    {
+      "id": "qwen2.5-0.5b",
+      "oracle": "hf",
+      "dir": "Qwen_Qwen2.5-0.5B",
+      "oracle_file": "tokenizer.json",
+      "files": {
+        "primary": "tokenizer.json",
+        "vocab_merges": "vocab.json"
+      },
+      "pairs": false
+    },
+    {
+      "id": "modernbert-base",
+      "oracle": "hf",
+      "dir": "answerdotai_ModernBERT-base",
+      "oracle_file": "tokenizer.json",
+      "files": {
+        "primary": "tokenizer.json"
+      },
+      "pairs": false
+    },
+    {
+      "id": "cl100k_base",
+      "oracle": "tiktoken",
+      "oracle_name": "cl100k_base",
+      "dir": "tiktoken",
+      "sha256": "223921b76ee99bde995b7ff738513eef100fb51d18c93597a113bcffe865b2a7",
+      "files": {
+        "primary": "cl100k_base.tiktoken"
+      },
+      "pairs": false
+    },
+    {
+      "id": "o200k_base",
+      "oracle": "tiktoken",
+      "oracle_name": "o200k_base",
+      "dir": "tiktoken",
+      "sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+      "files": {
+        "primary": "o200k_base.tiktoken"
+      },
+      "pairs": false
+    }
+  ]
+}

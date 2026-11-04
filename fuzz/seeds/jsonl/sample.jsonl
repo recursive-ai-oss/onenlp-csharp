@@ -1,0 +1,2 @@
+{"text": "Ada met Bob in Paris.", "entities": [[0, 3, "PER"], [8, 11, "PER"], [15, 20, "LOC"]], "spans": {"sc": [[0, 7, "X"]]}, "cats": {"pos": 1, "neg": 0.25}}
+{"text": "Hi there", "tokens": [[0, 2], [3, 8]]}

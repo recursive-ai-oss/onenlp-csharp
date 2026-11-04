@@ -39,7 +39,7 @@ public sealed class UdCorpus
 
     internal string Characters => _characters.ToString();
 
-    /// <summary>Reads a CoNLL-U file. Comment lines are ignored; empty nodes are skipped.</summary>
+    /// <summary>Reads a CoNLL-U file with <see cref="Data.ConllUReader"/>. Comment lines are ignored; empty nodes are skipped.</summary>
     /// <param name="reader">The source; it is read to the end and not disposed.</param>
     /// <returns>The corpus.</returns>
     /// <exception cref="InvalidDataException">A line does not have ten tab-separated columns, word IDs are not consecutive, a head is out
@@ -49,33 +49,54 @@ public sealed class UdCorpus
         ArgumentNullException.ThrowIfNull(reader);
         var corpus = new UdCorpus();
         var builder = new SentenceBuilder(corpus);
-        int lineNumber = 0;
-        string? line;
-        while ((line = reader.ReadLine()) is not null)
+        try
         {
-            lineNumber++;
-            if (line.Length == 0)
+            foreach (Data.ConllUSentence sentence in Data.ConllUReader.Read(reader))
             {
+                AddSentence(builder, sentence);
                 builder.Finish();
-                continue;
             }
-
-            if (line[0] == '#')
-            {
-                continue;
-            }
-
-            string[] columns = line.Split('\t');
-            if (columns.Length != 10)
-            {
-                throw new InvalidDataException($"Line {lineNumber.ToString(CultureInfo.InvariantCulture)}: a CoNLL-U word line needs 10 tab-separated columns.");
-            }
-
-            builder.Add(columns, lineNumber);
+        }
+        catch (Data.DataFormatException e)
+        {
+            throw new InvalidDataException(e.Message, e);
         }
 
-        builder.Finish();
         return corpus;
+    }
+
+    // Feeds a sentence read by the shared CoNLL-U reader to the builder as the columns of its lines, multiword token lines included.
+    private static void AddSentence(SentenceBuilder builder, Data.ConllUSentence sentence)
+    {
+        Doc doc = sentence.Doc;
+        int next = 0;
+        for (int i = 0; i < doc.Length; i++)
+        {
+            if (next < sentence.MultiwordTokens.Count && sentence.MultiwordTokens[next].FirstWord == i)
+            {
+                Data.MultiwordToken m = sentence.MultiwordTokens[next++];
+                builder.Add(
+                    [string.Create(CultureInfo.InvariantCulture, $"{m.FirstWord + 1}-{m.LastWord + 1}"), m.Form, "_", "_", "_", "_", "_", "_", "_", "_"],
+                    0);
+            }
+
+            Token t = doc[i];
+            int headId = t.HeadIndex == i ? 0 : t.HeadIndex + 1;
+            builder.Add(
+                [
+                    (i + 1).ToString(CultureInfo.InvariantCulture),
+                    sentence.Forms[i],
+                    OrUnderscore(t.Lemma),
+                    OrUnderscore(t.Pos),
+                    OrUnderscore(t.Tag),
+                    OrUnderscore(t.Morph),
+                    headId.ToString(CultureInfo.InvariantCulture),
+                    OrUnderscore(t.Dep),
+                    "_",
+                    "_",
+                ],
+                0);
+        }
     }
 
     /// <summary>Reads a CoNLL-U file from a path.</summary>
