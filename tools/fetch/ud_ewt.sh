@@ -18,7 +18,7 @@ fetch() { # <split> <destination directory>
 fetch train "$root/train/ud/en_ewt"
 fetch dev "$root/train/ud/en_ewt"
 fetch test "$root/eval/ud/en_ewt"
-sums="$(dirname "$0")/ud_ewt.sha256"
+sums="$(cd "$(dirname "$0")" && pwd)/ud_ewt.sha256"
 if [ -s "$sums" ]; then
   ( cd "$root" && sha256sum -c "$sums" )
 else

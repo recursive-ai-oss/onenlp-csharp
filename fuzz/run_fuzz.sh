@@ -5,8 +5,7 @@
 #
 # <workdir> must already hold what setup_fuzz.sh prepared. Run from the repository root with `dotnet` on PATH. Seeds are files of
 # any name under the seed directories (at most 256 KB each). Findings (crash-*, oom-*, timeout-*) are left in
-# <workdir>/<target>/findings. The run stops early when a timing lock file named by ONENLP_TIMING_LOCK (default
-# ~/WORKER-BENCH.lock) appears, because a timing run is under way.
+# <workdir>/<target>/findings. The run stops early when the file named by ONENLP_TIMING_LOCK appears (if set), because a timing run is under way.
 set -u
 work=$1; target=$2; seconds=$3; shift 3
 repo=$(pwd)
@@ -30,10 +29,10 @@ setsid "$work/libfuzzer-dotnet" --target_path="$out/pub/RecursiveAI.OneNlp.Fuzz"
   > "$out/fuzz.log" 2>&1 &
 pid=$!
 trap 'kill -- -$pid 2>/dev/null' EXIT
-lock="${ONENLP_TIMING_LOCK:-$HOME/WORKER-BENCH.lock}"
+lock="${ONENLP_TIMING_LOCK:-}"
 while kill -0 $pid 2>/dev/null; do
   sleep 20
-  if [ -e "$lock" ]; then
+  if [ -n "$lock" ] && [ -e "$lock" ]; then
     echo "a timing lock appeared; stopping"; kill -- -$pid; break
   fi
 done
