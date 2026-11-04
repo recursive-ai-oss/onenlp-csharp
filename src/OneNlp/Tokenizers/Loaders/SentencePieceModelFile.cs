@@ -1,4 +1,5 @@
 using System.Text.Json;
+using RecursiveAI.OneNlp.Tokenizers.Bpe;
 using RecursiveAI.OneNlp.Tokenizers.Hf;
 using RecursiveAI.OneNlp.Tokenizers.Unigram;
 
@@ -54,7 +55,7 @@ internal static class SentencePieceModelFile
             case 1:
                 break;
             case 2:
-                throw new NotSupportedException("This is a BPE-type SentencePiece model, which is not supported yet.");
+                return LoadBpe(data, registry);
             default:
                 throw new NotSupportedException($"SentencePiece model type {data.ModelType} (word or character) is not supported.");
         }
@@ -114,5 +115,78 @@ internal static class SentencePieceModelFile
             postProcessor: null,
             WordPieceVocabularyFile.FromJson(decoderJson, registry, registry.CreateDecoder),
             new AddedVocabulary(added));
+    }
+
+    // A BPE-type model (Llama-style): the whole text is one piece, with spaces written as the escape character and the dummy prefix
+    // put in front, and merges are ranked by the scores of the pieces they make (Sennrich et al. 2016; the SentencePiece model format).
+    private static HuggingFaceTokenizer LoadBpe(SentencePieceData data, StageRegistry registry)
+    {
+        if (!data.EscapeWhitespaces || !data.RemoveExtraWhitespaces)
+        {
+            throw new NotSupportedException("SentencePiece models that keep extra spaces or do not escape spaces are not supported.");
+        }
+
+        if (data.Charsmap.Length == 0 && data.NormalizerName is not ("" or "identity"))
+        {
+            throw new NotSupportedException($"The model names the normalizer '{data.NormalizerName}' but carries no compiled table for it.");
+        }
+
+        (BpeModel model, List<AddedToken> added) = BuildBpe(data);
+
+        string steps = data.AddDummyPrefix
+            ? """{"type":"Prepend","prepend":"\u2581"},{"type":"Replace","pattern":{"String":" "},"content":"\u2581"}"""
+            : """{"type":"Replace","pattern":{"String":" "},"content":"\u2581"}""";
+        if (data.Charsmap.Length != 0)
+        {
+            steps = $$"""{"type":"Precompiled","precompiled_charsmap":"{{Convert.ToBase64String(data.Charsmap)}}"},""" + steps;
+        }
+
+        INormalizer normalizer = WordPieceVocabularyFile.FromJson($$"""{"type":"Sequence","normalizers":[{{steps}}]}""", registry, registry.CreateNormalizer);
+        string stripPrefix = data.AddDummyPrefix ? """,{"type":"Strip","content":" ","start":1,"stop":0}""" : string.Empty;
+        string decoder = data.ByteFallback ? ByteFallbackDecoderHead + stripPrefix + "]}" : Metaspace.Replace("__PREFIX__", data.AddDummyPrefix ? "true" : "false", StringComparison.Ordinal);
+        return new HuggingFaceTokenizer(
+            model,
+            normalizer,
+            preTokenizer: null,
+            postProcessor: null,
+            WordPieceVocabularyFile.FromJson(decoder, registry, registry.CreateDecoder),
+            new AddedVocabulary(added));
+    }
+
+    /// <summary>Reads only the BPE model of a BPE-type file, without the stages (for comparing it with a converted <c>tokenizer.json</c>).</summary>
+    /// <param name="stream">The model file.</param>
+    internal static BpeModel ReadBpeModel(Stream stream)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        using var buffer = new MemoryStream();
+        stream.CopyTo(buffer);
+        SentencePieceData data = SentencePieceProto.Read(buffer.GetBuffer().AsSpan(0, (int)buffer.Length));
+        return data.ModelType == 2 ? BuildBpe(data).Model : throw new InvalidDataException("The file is not a BPE-type SentencePiece model.");
+    }
+
+    private static (BpeModel Model, List<AddedToken> Added) BuildBpe(SentencePieceData data)
+    {
+        var scores = new float[data.Scores.Length];
+        var mergeable = new bool[data.Pieces.Length];
+        var added = new List<AddedToken>();
+        for (int i = 0; i < scores.Length; i++)
+        {
+            if (!float.IsFinite(data.Scores[i]))
+            {
+                throw new InvalidDataException("A piece has a score that is not a finite number.");
+            }
+
+            scores[i] = data.Scores[i];
+            mergeable[i] = data.Types[i] == SentencePieceData.Normal;
+            if (data.Types[i] == SentencePieceData.UserDefined)
+            {
+                added.Add(new AddedToken(i, data.Pieces[i], Special: false, SingleWord: false, LeftStrip: false, RightStrip: false, Normalized: false));
+            }
+        }
+
+        string? unk = data.UnkId >= 0 && data.UnkId < data.Pieces.Length ? data.Pieces[data.UnkId] : null;
+        var model = BpeModel.FromSentencePieces(data.Pieces, scores, mergeable, new BpeOptions(UnknownToken: unk, FuseUnknown: true, ByteFallback: data.ByteFallback));
+
+        return (model, added);
     }
 }
