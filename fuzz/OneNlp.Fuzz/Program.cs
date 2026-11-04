@@ -19,6 +19,7 @@ internal static class Program
     {
         ["word-tokenizer"] = WordTokenizerTarget.Run,
         ["tokenizer-json"] = TokenizerJsonTarget.Run,
+        ["tokenizer-json-models"] = TokenizerJsonTarget.RunWithModels,
         ["code-point-regex"] = CodePointRegexTarget.Run,
         ["charsmap"] = CharsMapTarget.Run,
         ["tiktoken-ranks"] = TiktokenRanksTarget.Run,
@@ -52,7 +53,7 @@ internal static class Program
                     File.WriteAllText(Path.Combine(args[2], "seed-english"), "Mr. Smith can't visit www.x.org/a?b=1. Mail a.b@c-d.com, e.g. U.S.A. well-known 3:30 ... -- :) $$$. Yes!\n\nNext.");
                     File.WriteAllText(Path.Combine(args[2], "seed-mixed"), "Hello, world! It's 3.14 - 日本語 😀 é end");
                     break;
-                case "tokenizer-json" when args.Length == 4:
+                case "tokenizer-json" or "tokenizer-json-models" when args.Length == 4:
                     TokenizerJsonTarget.Seeds(args[2], args[3]);
                     break;
                 case "code-point-regex":

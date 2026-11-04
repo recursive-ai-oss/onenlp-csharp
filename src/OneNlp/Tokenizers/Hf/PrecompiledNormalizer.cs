@@ -99,7 +99,9 @@ internal sealed class PrecompiledNormalizer : INormalizer
                 int matched = LongestPrefix(input, startsByte[firstCp], startsByte[next], out int offset);
                 if (matched > 0)
                 {
-                    Replace(b, text, starts16[firstCp], starts16[next], offset);
+                    // The replacement takes the origin of the cluster's first code point only (observed in output of tokenizers 0.22.1:
+                    // "e" + accent composed to one letter covers just the "e").
+                    Replace(b, text, starts16[firstCp], starts16[firstCp + 1], offset);
                     continue;
                 }
             }

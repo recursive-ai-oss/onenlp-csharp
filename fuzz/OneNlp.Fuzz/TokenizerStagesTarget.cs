@@ -71,12 +71,18 @@ internal static class TokenizerJsonTarget
         return r;
     }
 
-    internal static void Run(ReadOnlySpan<byte> data)
+    /// <summary>The loader with the toy model standing in for every model type.</summary>
+    internal static void Run(ReadOnlySpan<byte> data) => Run(data, Registry);
+
+    /// <summary>The loader with the real models (WordPiece, BPE, Unigram, WordLevel) behind the stages.</summary>
+    internal static void RunWithModels(ReadOnlySpan<byte> data) => Run(data, StageRegistry.Default);
+
+    private static void Run(ReadOnlySpan<byte> data, StageRegistry registry)
     {
         Tokenizer tokenizer;
         try
         {
-            tokenizer = HuggingFaceTokenizerJson.Load(new MemoryStream(data.ToArray()), Registry);
+            tokenizer = HuggingFaceTokenizerJson.Load(new MemoryStream(data.ToArray()), registry);
         }
         catch (Exception ex) when (ex is InvalidDataException or NotSupportedException)
         {

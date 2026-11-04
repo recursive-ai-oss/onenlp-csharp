@@ -6,6 +6,7 @@
 |---|---|---|
 | `word-tokenizer` | arbitrary bytes, read as UTF-8 (or, when the first byte is odd, as raw UTF-16 units, which reaches lone surrogates) | the document built by `Nlp.Analyze`: tokens are non-empty, ordered slices of the text with only whitespace between them, and `FindToken` and `TryGetCharSpan` agree with the offsets |
 | `tokenizer-json` | bytes read as a `tokenizer.json`, with a one-token-per-character toy model in place of the subword model | loading raises only `InvalidDataException`/`NotSupportedException`; when it loads, single and pair encodings keep parallel arrays and in-range offsets, decoding does not throw, and a split pattern that costs too much ends in `InvalidOperationException` |
+| `tokenizer-json-models` | the same, with the real WordPiece, BPE, Unigram and WordLevel models behind the stages | the same rules |
 | `code-point-regex` | a regular expression, a NUL byte, then a text | parsing raises only `InvalidDataException`; matching raises only `InvalidOperationException` (step budget or depth); matches are ordered non-empty ranges inside the text |
 | `charsmap` | bytes used as the data of a SentencePiece character map normalizer | construction raises only `InvalidDataException`; normalizing never throws |
 | `segmentation` | arbitrary bytes, as above | word tokenizer and sentencizer with no data, neutral data and English data: offsets ascending and in range, every non-white-space character inside a token, sentences partition the tokens |

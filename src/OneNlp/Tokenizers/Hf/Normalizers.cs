@@ -233,9 +233,13 @@ internal sealed class UnicodeFormNormalizer(bool compatibility, bool compose) : 
             {
                 // Each output unit takes the origin of the input unit at the same position, and the last input unit when the output is
                 // longer; a composed character therefore keeps the origin of its first component (observed in output of tokenizers 0.22.1).
+                // When the output is shorter, the first unit keeps the first input and the rest line up with the end of the input, so a
+                // mark left over after a composition keeps its own origin (also observed in output of tokenizers 0.22.1).
+                int shrink = Math.Max(0, chunk.Length - normalized.Length);
                 for (int k = 0; k < normalized.Length; k++)
                 {
-                    b.Append(normalized[k], text.AlignmentAt(start + Math.Min(k, chunk.Length - 1)));
+                    int input = k == 0 ? 0 : Math.Min(k + shrink, chunk.Length - 1);
+                    b.Append(normalized[k], text.AlignmentAt(start + input));
                 }
             }
         }

@@ -35,7 +35,7 @@ target="${1:?usage: run.sh <target> <seconds> [corpus dir] | run.sh replay <targ
 shift
 
 case "$target" in
-  tokenizer-json | code-point-regex | vocab-txt | sentencepiece-model | bpe-model | tiktoken-ranks) maxlen=65536 ;;
+  tokenizer-json | tokenizer-json-models | code-point-regex | vocab-txt | sentencepiece-model | bpe-model | tiktoken-ranks) maxlen=65536 ;;
   charsmap) maxlen=262144 ;;
   word-tokenizer | segmentation) maxlen=4096 ;;
   doc-json | doc-binary | docbin) maxlen=8192 ;;
