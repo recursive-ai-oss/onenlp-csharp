@@ -440,3 +440,207 @@ We meet [[next Friday|date|2026-01-16|day|alt=2026-01-09]] for lunch.
 I saw her [[last Monday|date|2025-12-29|day]] on the train.
 The next sprint begins [[next Monday|date|2026-01-12|day]] as planned.
 The holiday ended [[yesterday|date|2026-01-04|day]] for most of us.
+
+# ======== Second batch. Everything above keeps its split (auto); everything below is assigned explicitly.
+@ref 2026-03-18T10:30:00
+
+@split test
+# ---- mentions
+Huge thanks to [[@open_source_fan|mention]] for the patch.
+Cc [[@nlp_team|mention]] and [[@jsmith|mention]] on the ticket.
+The reply from [[@dotnetfdn|mention]] arrived late.
+Hey [[@amy|mention]], the build is green.
+[[@Ops_Bot42|mention]] posted the alert in the channel.
+Please loop in [[@release_manager|mention]] before merging.
+Congrats to [[@kim_lee|mention]] and [[@raj_p|mention]] on the launch.
+# ---- guids
+Trace [[7c9e6679-7425-40de-944b-e07fc1f90ae7|guid]] is missing from the store.
+The tenant [[123e4567-e89b-12d3-a456-426614174000|guid]] owns the vault.
+Delete record [[f47ac10b-58cc-4372-a567-0e02b2c3d479|guid]] and its children.
+Correlation id [[0c8c7d10-9f3a-4b5e-8a21-5d6e7f809a1b|guid]] was logged twice.
+Compare [[5f3c8a2e-6d7b-41c9-9e0f-1a2b3c4d5e6f|guid]] with [[8e2d1c4b-3a5f-4678-9b0c-d1e2f3a4b5c6|guid]].
+The key [[AAAAAAAA-BBBB-4CCC-8DDD-EEEEEEEEEEEE|guid]] is reserved for tests.
+# ---- hashtags
+The campaign trended as [[#SaveTheDate|hashtag]] online.
+Posts under [[#Berlin2026|hashtag]] and [[#travel|hashtag]] got shared widely.
+She wrote [[#blessed|hashtag]] under the photo.
+The tag [[#C_sharp|hashtag]] is for code posts.
+Our launch used [[#ship_it|hashtag]] everywhere.
+Add [[#ai|hashtag]] to the title.
+Everyone joined the chat with [[#WomenInTech|hashtag]] after the keynote.
+# ---- IP addresses
+The router sits at [[172.16.254.1|ip]] on the lab network.
+Ping [[8.8.4.4|ip]] to test the link.
+The VPN assigned [[100.64.12.9|ip]] to the laptop.
+Traffic from [[2001:db8:85a3::8a2e:370:7334|ip]] was dropped.
+Add [[192.0.2.44|ip]] to the allow list.
+The broadcast address is [[255.255.255.255|ip]] for this subnet.
+The host answered from [[10.20.30.40|ip]] and [[10.20.30.41|ip]] alternately.
+# ---- date-time ranges
+The retreat runs [[from Thursday 9am to Saturday 3pm|datetimerange|2026-03-19T09:00/2026-03-21T15:00|hour]] in the hills.
+Support is open [[tomorrow from 8am to 6pm|datetimerange|2026-03-19T08:00/2026-03-19T18:00|hour]] for all.
+The test window is [[Sunday 1pm-3pm|datetimerange|2026-03-22T13:00/2026-03-22T15:00|hour]] on the cluster.
+The freeze is [[from 2026-06-01 08:00 to 2026-06-03 20:00|datetimerange|2026-06-01T08:00/2026-06-03T20:00|minute]] for the release.
+The ceremony is [[April 4 from 10am to noon|datetimerange|2026-04-04T10:00/2026-04-04T12:00|hour]] at the town hall.
+We are free [[Friday between 2pm and 4pm|datetimerange|2026-03-20T14:00/2026-03-20T16:00|hour]] to meet.
+The cleanup is [[Saturday 9am-11am|datetimerange|2026-03-21T09:00/2026-03-21T11:00|hour]] by the river.
+# ---- time ranges
+Lectures run [[10am to noon|timerange|T10:00/T12:00|hour]] on campus.
+The gate is open [[from 06:30 to 19:00|timerange|T06:30/T19:00|minute]] at the north entrance.
+Kids swim [[between 4 and 5:30 pm|timerange|T16:00/T17:30|minute]] at the pool.
+The shop is open [[8:00-20:00|timerange|T08:00/T20:00|minute]] in the mall.
+Rehearsal is [[1pm - 3:30pm|timerange|T13:00/T15:30|minute]] in studio B.
+Doors are open [[from 7 to 9 pm|timerange|T19:00/T21:00|hour]] at the hall.
+Calls are taken [[from noon to 2pm|timerange|T12:00/T14:00|hour]] at the desk.
+# ---- temperatures
+Set the oven to [[180 degrees Celsius|temperature|180 celsius]] for the cake.
+It reached [[104°F|temperature|104 fahrenheit]] in the greenhouse.
+Liquid nitrogen boils near [[77 kelvin|temperature|77 kelvin]] at normal pressure.
+Lows hit [[-12°C|temperature|-12 celsius]] on the plateau.
+Store the sample at [[4°C|temperature|4 celsius]] in the fridge.
+The soup was [[65 degrees|temperature|65 degree]] when it was served.
+Heat the oil to [[350 °F|temperature|350 fahrenheit]] first.
+# ---- ages
+The boy is [[7 years old|age|7 year]] and plays chess.
+A [[4-month-old|age|4 month]] kitten wandered in.
+Our cat is [[14 years of age|age|14 year]] but lively.
+The tree is [[200 years old|age|200 year]] by ring count.
+She was [[thirty-five years old|age|35 year]] when she moved.
+The twins are [[3 weeks old|age|3 week]] and healthy.
+A [[10-day-old|age|10 day]] calf stood up in the barn.
+# ---- percentages
+Turnout was [[61%|percentage|61]] in the capital.
+Rates rose to [[2.75%|percentage|2.75]] at the meeting.
+[[Thirty percent|percentage|30]] of the code is tests.
+Battery health is [[87 %|percentage|87]] after the update.
+The discount is [[15 percent|percentage|15]] for members.
+Humidity stays near [[45%|percentage|45]] inside the vault.
+Margins shrank by [[1.5 per cent|percentage|1.5]] in the report.
+# ---- sets
+The team meets [[every Wednesday at 2pm|set|XXXX-WXX-3T14:00|hour]] online.
+Reports are sent [[every week|set|P1W|week]] to the board.
+The trash goes out [[every 2 days|set|P2D|day]] in this street.
+Pills are taken [[every 6 hours|set|PT6H|hour]] with water.
+Dues are paid [[quarterly|set|P3M|month]] by members.
+Rotations happen [[every Sunday|set|XXXX-WXX-7|day]] in the yard.
+The bins are emptied [[every Tuesday|set|XXXX-WXX-2|day]] morning.
+# ---- ordinals
+Our team came in [[eighth|ordinal|8]] overall.
+He lives on the [[12th|ordinal|12]] floor.
+It was her [[3rd|ordinal|3]] attempt at the record.
+The [[fiftieth|ordinal|50]] guest got a prize.
+Turn right at the [[second|ordinal|2]] light.
+Read the [[thirty-first|ordinal|31]] entry carefully.
+# ---- phones, urls, e-mails
+Call [[+44 161 496 0123|phone]] after hours.
+The line is [[(303) 555-0101|phone]] in Denver.
+Fax [[212.555.0199|phone]] for orders.
+Reach us at [[+1-202-555-0143|phone]] for help.
+The helpdesk is [[+81 3-1234-5678|phone]] in Tokyo.
+Mirror: [[https://mirror.example.net/pkg/v2/index.json|url]] for packages.
+Open [[http://192.0.2.10:3000/dashboard|url]] in the browser.
+The repo is [[git.example.org/team/project|url]] for now.
+Docs are at [[https://docs.example.com/guide/install#linux|url]] for you.
+The feed [[https://example.com/rss.xml|url]] updates often.
+Try [[www.example.co.uk/shop?item=42|url]] to order.
+Reach [[billing@example.org|email]] with questions.
+Write to [[first.last@mail.example.com|email]] directly.
+The list [[announce-list@example.net|email]] is moderated.
+Copy [[ops_team@example.io|email]] and [[cto@example.io|email]] on it.
+Send scans to [[scans+2026@example.com|email]] please.
+# ---- numbers, dimensions, currency
+We shipped [[nine|number|9]] boxes to the depot.
+The bridge has [[1,402|number|1402]] rivets.
+About [[three hundred and fifty|number|350]] guests came.
+She typed [[0.002|number|0.002]] by mistake.
+Add [[sixty-four|number|64]] more rows to the table.
+[[One hundred|number|100]] volunteers helped out.
+The sky held [[fifteen thousand|number|15000]] balloons.
+The rope is [[30 meters|dimension|30 meter]] long.
+Mix in [[750 ml|dimension|750 milliliter]] of broth.
+The suitcase weighs [[23 kg|dimension|23 kilogram]] when full.
+The drive holds [[1 TB|dimension|1 terabyte]] of video.
+The runway is [[3,000 feet|dimension|3000 foot]] long.
+The car reaches [[120 km/h|dimension|120 kilometer per hour]] on the track.
+The lot is [[500 square feet|dimension|500 square foot]] in size.
+The motor draws [[1.5 kilowatts|dimension|1.5 kilowatt]] at full load.
+A ticket costs [[$12|currency|12 USD]] at the gate.
+The mug is [[€75|currency|75 EUR]] in the shop.
+Tea is [[£8.50|currency|8.5 GBP]] per box.
+The charge is [[INR 250|currency|250 INR]] per head.
+# ---- dates
+Mark [[April 12, 2026|date|2026-04-12|day]] on the calendar.
+The exam is on [[Tuesday|date|2026-03-24|day]] in the main hall.
+Registration closes [[2026-08-31|date|2026-08-31|day]] for everyone.
+The trial begins [[September 9th|date|2026-09-09|day]] in court.
+She will be back [[in 10 days|date|2026-03-28|day]] from the coast.
+It shipped [[5 days ago|date|2026-03-13|day]] from the depot.
+Meet on [[the 1st of June|date|2026-06-01|day]] at the gate.
+The vote was held on [[11/03/2025|date|2025-11-03|day]] in the council.
+The costume party is [[Halloween 2027|date|2027-10-31|day]] this time.
+The picnic is on [[Memorial Day 2027|date|2027-05-31|day]] at the lake.
+The feast is on [[Thanksgiving 2027|date|2027-11-25|day]] at our house.
+# ---- date ranges
+Tickets go on sale [[from May 1 to May 3|daterange|2026-05-01/2026-05-04|day]] only.
+Sales will peak in [[August 2026|daterange|2026-08-01/2026-09-01|month]] at the shore.
+The stadium opens in [[2028|daterange|2028-01-01/2029-01-01|year]] if funded.
+Plans for [[Q1 2027|daterange|2027-01-01/2027-04-01|quarter]] are due soon.
+Disco was big in [[the 1980s|daterange|1980-01-01/1990-01-01|decade]] and after.
+The tour is set for [[summer 2027|daterange|2027-06-01/2027-09-01|season|approx]] in the north.
+The label closed in [[late 2025|daterange|2025-09-01/2026-01-01|year|approx]] after a long run.
+The roses bloom in [[early June|daterange|2026-06-01/2026-06-11|month|approx]] by the wall.
+Output doubles in [[the first half of 2027|daterange|2027-01-01/2027-07-01|half]] by plan.
+The new rule applies [[next quarter|daterange|2026-04-01/2026-07-01|quarter]] to all branches.
+# ---- date-times and times
+Call me [[tomorrow at 8am|datetime|2026-03-19T08:00|hour]] first thing.
+The ship docks [[Sunday at 6:30 pm|datetime|2026-03-22T18:30|minute]] at pier nine.
+The deadline is [[April 1 at 5pm|datetime|2026-04-01T17:00|hour]] sharp.
+We met [[2 hours ago|datetime|2026-03-18T08:30|minute]] in the lobby.
+The patch lands [[2026-05-02 03:15|datetime|2026-05-02T03:15|minute]] on the mirror.
+Dinner is [[next Tuesday at 7pm|datetime|2026-03-24T19:00|hour]] at the usual place.
+Wake me at [[6 am|time|T06:00|hour]] if it rains.
+The last bus leaves at [[22:15|time|T22:15|minute]] from the square.
+Tea is at [[2:45 pm|time|T14:45|minute]] in the garden.
+The briefing starts at [[4pm CET|time|T16:00+01:00|hour]] on the call.
+Stocks close at [[10 p.m. EST|time|T22:00-05:00|hour]] in the feed.
+# ---- durations
+The break lasts [[15 minutes|duration|900]] in total.
+Stay for [[two days|duration|172800]] if you can.
+The lease runs [[18 months|duration|P18M]] from signing.
+The talk took [[3 hours|duration|10800]] with questions.
+Hold for [[a minute|duration|60]] before moving on.
+He lived there [[five years|duration|P5Y]] before leaving.
+# ---- nothing to find
+The old clock on the wall kept perfect time.
+Could you please close the window behind you?
+Nothing about the plan seemed unusual to him.
+A long road ran along the edge of the field.
+They argued about the best way to cook rice.
+
+@split dev
+# ---- dev examples of the same patterns
+Thanks [[@code_wizard|mention]] for the review.
+Ask [[@helpdesk|mention]] for access.
+The job id is [[b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e|guid]] in the queue.
+Row [[6f9619ff-8b86-d011-b42d-00c04fc964ff|guid]] was removed.
+Tagging the picture [[#sunsetlovers|hashtag]] again.
+Use [[#devops|hashtag]] for posts about builds.
+The probe hit [[203.0.113.99|ip]] twice.
+Reset the node at [[10.1.2.3|ip]] and wait.
+The IPv6 peer [[2001:db8:1::42|ip]] timed out.
+The shop opens [[from Monday 8am to Monday 6pm|datetimerange|2026-03-23T08:00/2026-03-23T18:00|hour]] for the sale.
+Let's talk [[Thursday 3pm-5pm|datetimerange|2026-03-19T15:00/2026-03-19T17:00|hour]] about it.
+The pool is open [[7am to 9am|timerange|T07:00/T09:00|hour]] for laps.
+Lunch is [[between 12 and 1 pm|timerange|T12:00/T13:00|hour]] in the canteen.
+Keep it at [[8°C|temperature|8 celsius]] in transit.
+Mix at [[40 degrees Celsius|temperature|40 celsius]] for ten minutes.
+She is [[9 years old|age|9 year]] and rides a bike.
+A [[2-year-old|age|2 year]] mare stood in the paddock.
+Support rose by [[8%|percentage|8]] in the poll.
+[[Ninety percent|percentage|90]] of the files were fine.
+The cleaners come [[every Thursday|set|XXXX-WXX-4|day]] to the office.
+Meetings are held [[every 3 days|set|P3D|day]] during the push.
+He came [[fourth|ordinal|4]] in the heat.
+Call [[+34 91 123 45 67|phone]] to book.
+Visit [[https://example.org/about|url]] to learn more.
+Mail [[press@example.com|email]] for the kit.

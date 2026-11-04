@@ -6,17 +6,17 @@ A hand-labelled set of numbers, quantities, sequences and dates/times in short s
 
 | File | Role |
 |---|---|
-| `testdata/recognizers/en/gold.jsonl` | **Development split** (220 sentences, 212 items). Open for everyone. |
-| `testdata/recognizers/en/test.jsonl` | **Held-out test split** (160 sentences, 158 items). |
+| `testdata/recognizers/en/gold.jsonl` | **Development split** (245 sentences, 237 items). Open for everyone. |
+| `testdata/recognizers/en/test.jsonl` | **Held-out test split** (313 sentences, 312 items). |
 | `tools/recognizers-gold/en.src.txt` | The authoring source both files are built from (it holds both splits). |
 | `tools/recognizers-gold/build.py` | Validates the source and writes the two files. |
 | `testdata/recognizers/en/comparators/` | Scores of the comparators on both splits. |
 
-SHA-256 at freeze: `gold.jsonl` `8c76907197db430ef298f1c0b7aac42561979d7b95aa3b2236865ba6f0f44d76`, `test.jsonl` `7e985dc159c8d19e40f5a8bfef218da8675a4f1fc33f28b3d13fcaec2d917adf`.
+SHA-256 at freeze (second batch): `gold.jsonl` `6ad9be4e3f9fd8aa25c1565769b95adfc97e02c006d64e6893a34a9f03f09cd2`, `test.jsonl` `dd81db526c51e91404e256b0804c7bc1a361a610876db142a70e3c027b7b3bef`. The first freeze (220 + 160 sentences, test `7e985dc1…`) is a subset of both: no sentence changed split.
 
 **The separation rule.** Work on a recognizer reads and tunes against `gold.jsonl` only. Nobody who builds or tunes a recognizer opens `test.jsonl`, `en.src.txt` or the comparators' scores on `test`, and test items are never copied into rules, vocabularies, unit tests or training data. The test split is scored once per milestone and reported as it comes. The files are committed, so the rule rests on discipline. Adding sentences later is allowed, but never moves one between splits: re-run `build.py` only after reading its stratification rule below, and compare the test hash.
 
-**Split.** Sentences are grouped by the type of their first item (sentences with no item form their own group). Within a group they are ordered by the SHA-256 of their id and the first 40% (rounded up) are test. The id is the first 12 hex digits of the SHA-256 of `reference + "\n" + text`.
+**Split.** The first 380 sentences were assigned by a stratified hash rule: they are grouped by the type of their first item (sentences with no item form their own group). Within a group they are ordered by the SHA-256 of their id and the first 40% (rounded up) are test. The second batch (a second set of test sentences that raises every type to at least 10 test items, and a few development sentences with the same patterns) is assigned explicitly by `@split test` and `@split dev` lines in the source, so adding it moved no earlier sentence. The id is the first 12 hex digits of the SHA-256 of `reference + "\n" + text`.
 
 ## Line schema (JSON Lines, UTF-8)
 

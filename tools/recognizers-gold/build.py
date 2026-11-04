@@ -3,6 +3,7 @@
 
 Usage: build.py [--out DIR]   (default: ../../testdata/recognizers/en)
 
+An '@split dev|test|auto' line in the source assigns the sentences below it; 'auto' (default) uses the stratified hash rule.
 Writes gold.jsonl (the development split) and test.jsonl (the held-out split), validates every label against the schema in
 docs/recognizer-gold.md and prints the counts and SHA-256 of both files. The split is stratified by the type of each
 sentence's first item; it is final once the test file is published, after which lines are only added knowingly.
@@ -116,7 +117,9 @@ def main():
     ap.add_argument("--out", default=os.path.join(here, "..", "..", "testdata", "recognizers", "en"))
     out = ap.parse_args().out
     ref = None
+    forced = "auto"
     docs = {}
+    assigned = {}
     for n, raw in enumerate(open(os.path.join(here, "en.src.txt"), encoding="utf-8"), 1):
         line = raw.rstrip("\n")
         if not line.strip() or line.startswith("#"):
@@ -125,17 +128,25 @@ def main():
             ref = line[5:].strip()
             assert REF.match(ref), f"line {n}: bad reference"
             continue
+        if line.startswith("@split "):
+            forced = line[7:].strip()
+            assert forced in ("auto", "dev", "test"), f"line {n}: bad split"
+            continue
         assert ref, "no reference time"
         text, items = parse_line(line, ref, n)
         did = hashlib.sha256((ref + "\n" + text).encode("utf-8")).hexdigest()[:12]
         assert did not in docs, f"line {n}: duplicate sentence"
+        assigned[did] = forced
         docs[did] = {"id": did, "text": text, "reference": ref, "timezone": "UTC", "items": items}
-    # Stratified by the type of the first item (or none), so every type reaches both splits: within a stratum, ordered by the
+    # Sentences under an explicit '@split dev' or '@split test' line go where it says. The others ('@split auto', the default) are
+    # stratified by the type of the first item (or none), so every type reaches both splits: within a stratum, ordered by the
     # hash of the id, the first 40% (rounded up) are test.
     strata = {}
     for did, d in docs.items():
+        if assigned[did] != "auto":
+            continue
         strata.setdefault(d["items"][0]["type"] if d["items"] else "none", []).append(did)
-    test_ids = set()
+    test_ids = {d for d, how in assigned.items() if how == "test"}
     for ids in strata.values():
         ids.sort(key=lambda i: hashlib.sha256(i.encode()).hexdigest())
         test_ids.update(ids[:-(-len(ids) * 2 // 5)])
