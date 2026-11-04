@@ -93,6 +93,8 @@ internal static class Program
         MatchingSmoke.Run(Check);
 
         TrainSaveLoad();
+        EntitySmoke(NerDecoding.Tagging);
+        EntitySmoke(NerDecoding.Spans);
 
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
@@ -134,6 +136,28 @@ internal static class Program
         Doc s2 = loaded.Process("Mr. Li went home. He slept.");
         Check("saved tokenizer data and sentencizer", s1.Sentences.Count >= 2 && s2.Sentences.Count == s1.Sentences.Count && s1.Length == s2.Length);
         Check("hostile pipeline file", Throws<InvalidDataException>(() => PipelineFile.Load(new MemoryStream(new byte[] { 1, 2, 3 }))));
+    }
+
+    // Trains a named entity recognizer from JSON Lines with custom labels, saves and loads it, under NativeAOT.
+    private static void EntitySmoke(NerDecoding decoding)
+    {
+        var lines = new System.Text.StringBuilder();
+        for (int s = 0; s < 40; s++)
+        {
+            string name = (s % 2 == 0) ? "Zorp" : "Vexa";
+            string label = (s % 2 == 0) ? "WIDGET" : "GADGET";
+            lines.Append("{\"text\":\"we saw ").Append(name).Append(" today\",\"entities\":[[7,11,\"").Append(label).Append("\"]]}\n");
+        }
+
+        List<Example> examples = [.. JsonlReader.Read(new StringReader(lines.ToString()))];
+        using Pipeline trained = Pipeline.Blank(Language.English).Add(new EntityRecognizer(new HashEmbeddingEncoder(16, 256, 1), decoding, context: 1, hidden: 16, maxSpanLength: 3) { OwnsEncoder = true });
+        TrainResult result = trained.Train(examples, new TrainOptions { Epochs = 15, BatchWords = 60, LearningRate = 0.02f, Seed = 3 });
+        using var buffer = new MemoryStream();
+        PipelineFile.Save(trained, buffer);
+        using Pipeline loaded = PipelineFile.Load(new MemoryStream(buffer.ToArray()));
+        Doc a = trained.Process("we saw Vexa today");
+        Doc b = loaded.Process("we saw Vexa today");
+        Check("ner " + decoding, result.Completed && a.Ents.Count == 1 && a.Ents[0].Label == "GADGET" && b.Ents.Count == 1 && b.Ents[0].Label == "GADGET" && a.Ents[0].Confidence == b.Ents[0].Confidence);
     }
 
     private static bool Throws<T>(Action action)

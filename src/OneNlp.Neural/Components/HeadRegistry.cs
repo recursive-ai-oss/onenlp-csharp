@@ -20,6 +20,7 @@ public static class HeadRegistry
     private static readonly ConcurrentDictionary<string, HeadFactory> Factories = new(StringComparer.Ordinal)
     {
         [Tagger.ComponentKind] = Tagger.FromConfig,
+        [EntityRecognizer.ComponentKind] = EntityRecognizer.FromConfig,
     };
 
     /// <summary>Registers a head kind.</summary>
