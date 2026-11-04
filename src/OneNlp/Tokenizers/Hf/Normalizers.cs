@@ -212,7 +212,7 @@ internal sealed class UnicodeFormNormalizer(bool compatibility, bool compose) : 
             while (i < s.Length)
             {
                 int cp = NormalizerHelpers.CodePointAt(s, i, out int mw);
-                if (!NormalizerHelpers.IsMark(cp) && !UnicodeNormalization.CombinesWithPrevious(cp))
+                if (!UnicodeNormalization.CombinesWithPrevious(cp))
                 {
                     break;
                 }
@@ -221,26 +221,34 @@ internal sealed class UnicodeFormNormalizer(bool compatibility, bool compose) : 
             }
 
             string chunk = s.Substring(start, i - start);
-            string normalized = IsWellFormed(chunk) ? UnicodeNormalization.Normalize(chunk, compatibility, compose) : chunk;
+            var sources = new List<int>(chunk.Length);
+            string normalized = IsWellFormed(chunk) ? UnicodeNormalization.Normalize(chunk, compatibility, compose, sources) : chunk;
             if (string.Equals(normalized, chunk, StringComparison.Ordinal))
             {
                 for (int k = start; k < i; k++)
                 {
                     b.AppendFrom(text, k);
                 }
+
+                continue;
             }
-            else
+
+            // Unit index and width of every input code point of the run, to give each output code point the origin of its source.
+            var inputStarts = new List<int>(chunk.Length);
+            for (int k = 0; k < chunk.Length; k += char.IsHighSurrogate(chunk[k]) ? 2 : 1)
             {
-                // Each output unit takes the origin of the input unit at the same position, and the last input unit when the output is
-                // longer; a composed character therefore keeps the origin of its first component (observed in output of tokenizers 0.22.1).
-                // When the output is shorter, the first unit keeps the first input and the rest line up with the end of the input, so a
-                // mark left over after a composition keeps its own origin (also observed in output of tokenizers 0.22.1).
-                int shrink = Math.Max(0, chunk.Length - normalized.Length);
-                for (int k = 0; k < normalized.Length; k++)
-                {
-                    int input = k == 0 ? 0 : Math.Min(k + shrink, chunk.Length - 1);
-                    b.Append(normalized[k], text.AlignmentAt(start + input));
-                }
+                inputStarts.Add(k);
+            }
+
+            int output = 0;
+            for (int n = 0; n < sources.Count; n++)
+            {
+                int from = inputStarts[sources[n]];
+                int width = char.IsHighSurrogate(chunk[from]) ? 2 : 1;
+                OffsetPair origin = NormalizerHelpers.OriginOf(text, start + from, width);
+                int outWidth = char.IsHighSurrogate(normalized[output]) ? 2 : 1;
+                b.Append(normalized.AsSpan(output, outWidth), origin);
+                output += outWidth;
             }
         }
 

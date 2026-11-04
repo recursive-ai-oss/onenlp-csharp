@@ -34,20 +34,52 @@ internal static class UnicodeNormalization
     /// <param name="text">The text; unpaired surrogates are kept as they are.</param>
     /// <param name="compatibility">Use compatibility decompositions (NFKC, NFKD) instead of canonical ones only.</param>
     /// <param name="compose">Recompose afterwards (NFC, NFKC) instead of leaving the text decomposed.</param>
-    internal static string Normalize(string text, bool compatibility, bool compose)
+    internal static string Normalize(string text, bool compatibility, bool compose) => Normalize(text, compatibility, compose, null);
+
+    /// <summary>Normalizes a well-formed string and says which input code point each output code point stands for.</summary>
+    /// <param name="text">The text; unpaired surrogates are kept as they are.</param>
+    /// <param name="compatibility">Use compatibility decompositions instead of canonical ones only.</param>
+    /// <param name="compose">Recompose afterwards.</param>
+    /// <param name="sources">Receives, per output code point, the index (in code points) of the input code point whose slot it holds.</param>
+    /// <remarks>
+    /// Observed in output of tokenizers 0.22.1 (the origin of every normalized character, probed with its public NormalizedString API):
+    /// the pieces of a decomposed character all keep that character's origin, and canonical reordering moves characters but not origins.
+    /// </remarks>
+    internal static string Normalize(string text, bool compatibility, bool compose, List<int>? sources)
     {
         var cps = new List<int>(text.Length + 4);
+        var slots = new List<int>(text.Length + 4);
+        int index = 0;
         for (int i = 0; i < text.Length;)
         {
             int cp = NormalizerHelpers.CodePointAt(text, i, out int w);
+            int before = cps.Count;
             Decompose(cp, compatibility, cps);
+            for (int k = before; k < cps.Count; k++)
+            {
+                slots.Add(index);
+            }
+
+            index++;
             i += w;
         }
 
         Reorder(cps);
+        int decomposed = cps.Count;
         if (compose)
         {
             cps = Compose(cps);
+        }
+
+        if (sources is not null)
+        {
+            // Origins stay by position. When composing made the run shorter, the first character keeps the first origin and the rest line up
+            // with the end of the run (observed in output of tokenizers 0.22.1; the shortened run is one starter with its marks).
+            int shrink = decomposed - cps.Count;
+            for (int k = 0; k < cps.Count; k++)
+            {
+                sources.Add(k == 0 ? slots[0] : slots[Math.Min(k + shrink, decomposed - 1)]);
+            }
         }
 
         var sb = new StringBuilder(cps.Count);

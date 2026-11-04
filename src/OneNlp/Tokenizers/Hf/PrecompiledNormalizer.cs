@@ -102,7 +102,7 @@ internal sealed class PrecompiledNormalizer : INormalizer
                 {
                     // The replacement takes the origin of the cluster's first code point only (observed in output of tokenizers 0.22.1:
                     // "e" + accent composed to one letter covers just the "e").
-                    if (Replace(b, text, starts16[firstCp], starts16[firstCp + 1], offset) == 0 && b.Length == 0)
+                    if (Replace(b, text, starts16[firstCp], starts16[next], offset) == 0 && b.Length == 0)
                     {
                         leadingDeleted += next - firstCp;
                     }
@@ -176,7 +176,28 @@ internal sealed class PrecompiledNormalizer : INormalizer
         }
 
         string replacement = Encoding.UTF8.GetString(_pool, poolOffset, end - poolOffset);
-        b.Append(replacement, text.ToOriginal(from, to));
+
+        // Observed in output of tokenizers 0.22.1: the k-th character of the replacement covers the k-th code point of the text it replaces,
+        // and the last one when the replacement is longer (U+0958 U+0301 becomes two characters that cover U+0958 and U+0301 in turn;
+        // a replacement shorter than its input leaves the later code points uncovered).
+        var origins = new List<OffsetPair>();
+        for (int k = from; k < to;)
+        {
+            int w = char.IsHighSurrogate(text.Text[k]) && k + 1 < to ? 2 : 1;
+            origins.Add(text.ToOriginal(k, k + w));
+            k += w;
+        }
+
+        int index = 0;
+        for (int k = 0; k < replacement.Length;)
+        {
+            int w = char.IsHighSurrogate(replacement[k]) && k + 1 < replacement.Length ? 2 : 1;
+            OffsetPair origin = origins[Math.Min(index, origins.Count - 1)];
+            b.Append(replacement.AsSpan(k, w), origin);
+            k += w;
+            index++;
+        }
+
         return replacement.Length;
     }
 
