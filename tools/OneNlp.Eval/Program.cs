@@ -31,6 +31,10 @@ internal static class Program
                tokenizes and splits sentences with the default pipeline and writes CoNLL-U with only ID and FORM filled, for
                scoring with 'ud --metrics Tokens,Sentences,Words'. Every token is a word; --mwt also writes the pieces of a split
                contraction (do + n't) as a multi-word token line, as English UD treebanks annotate them.
+          recognize --in X.jsonl --out Y.jsonl [--lang en] [--rules FILE ...]
+               runs the recognizers (numbers, ordinals, percents, measures, money, e-mail, URL, IP, phone-like, hashtag, mention, GUID)
+               over JSON lines {"id":..,"text":..} (or plain text lines) and writes one JSON line of results per input. Offsets are
+               UTF-16 (start, end) and code points (cpStart, cpEnd). The time spent recognizing is printed to standard error.
           dump-ud   --gold G.conllu --pred P1.conllu [P2.conllu ...] --json OUT.json    (all counts, no bootstrap)
           dump-span --gold G.iob2 --pred P1.iob2 [P2.iob2 ...] --json OUT.json
 
@@ -56,6 +60,8 @@ internal static class Program
                     return RunSpan(options);
                 case "segment":
                     return Segment.Run(options);
+                case "recognize":
+                    return RecognizeCommand.Run(options);
                 case "dump-ud":
                     return DumpUd(options);
                 case "dump-span":

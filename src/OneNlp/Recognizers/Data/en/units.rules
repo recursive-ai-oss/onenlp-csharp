@@ -1,0 +1,70 @@
+# Units that follow a number, English. Fields: canonical name | dimension | surface forms, comma-separated | confidence (optional).
+# A form starting with "=" is case-sensitive; the others are matched without regard to case. Forms may have several words ("miles per hour").
+# Short forms that are also common words (in, a, at, am, min) are left out on purpose: a unit is only recognized right after a number.
+
+[unit]
+millimeter | length | mm, millimeter, millimeters, millimetre, millimetres
+centimeter | length | cm, centimeter, centimeters, centimetre, centimetres
+meter | length | =m, meter, meters, metre, metres
+kilometer | length | km, kilometer, kilometers, kilometre, kilometres
+micrometer | length | micron, microns, micrometer, micrometers, µm, μm
+inch | length | inch, inches
+foot | length | ft, foot, feet
+yard | length | yd, yds, yard, yards
+mile | length | mi, mile, miles
+nautical mile | length | nautical mile, nautical miles, nmi
+
+milligram | mass | mg, milligram, milligrams
+gram | mass | =g, gram, grams, gramme, grammes
+kilogram | mass | kg, kgs, kilogram, kilograms, kilo, kilos
+microgram | mass | µg, μg, mcg, microgram, micrograms
+tonne | mass | tonne, tonnes, metric ton, metric tons
+ton | mass | ton, tons
+pound | mass | lb, lbs, pound, pounds
+ounce | mass | oz, ounce, ounces
+stone | mass | stone
+
+milliliter | volume | ml, milliliter, milliliters, millilitre, millilitres
+liter | volume | =l, =L, liter, liters, litre, litres
+gallon | volume | gal, gallon, gallons
+quart | volume | qt, quart, quarts
+pint | volume | pint, pints
+cup | volume | cup, cups
+fluid ounce | volume | fl oz, fl. oz, fl. oz., fluid ounce, fluid ounces
+tablespoon | volume | tbsp, tablespoon, tablespoons
+teaspoon | volume | tsp, teaspoon, teaspoons
+cubic meter | volume | m3, m³, cubic meter, cubic meters, cubic metre, cubic metres
+cubic centimeter | volume | cm3, cm³, cc, cubic centimeter, cubic centimeters
+
+square meter | area | m2, m², sq m, sq. m, square meter, square meters, square metre, square metres
+square kilometer | area | km2, km², sq km, sq. km, square kilometer, square kilometers, square kilometre, square kilometres
+square foot | area | ft2, ft², sq ft, sq. ft, sq. ft., square foot, square feet
+square inch | area | in2, in², sq in, sq. in, square inch, square inches
+square mile | area | mi2, mi², sq mi, sq. mi, square mile, square miles
+acre | area | acre, acres
+hectare | area | ha, hectare, hectares
+
+kilometer per hour | speed | km/h, km/hr, kmh, kph, kilometer per hour, kilometers per hour, kilometre per hour, kilometres per hour
+mile per hour | speed | mph, mi/h, mi/hr, mile per hour, miles per hour
+meter per second | speed | m/s, mps, meter per second, meters per second, metre per second, metres per second
+foot per second | speed | ft/s, foot per second, feet per second
+knot | speed | kt, kts, knot, knots
+
+bit | information | bit, bits
+byte | information | byte, bytes, =B
+kilobyte | information | =KB, =kB, kilobyte, kilobytes
+megabyte | information | =MB, megabyte, megabytes
+gigabyte | information | =GB, gigabyte, gigabytes
+terabyte | information | =TB, terabyte, terabytes
+petabyte | information | =PB, petabyte, petabytes
+kibibyte | information | KiB, kibibyte, kibibytes
+mebibyte | information | MiB, mebibyte, mebibytes
+gibibyte | information | GiB, gibibyte, gibibytes
+tebibyte | information | TiB, tebibyte, tebibytes
+kilobit | information | =Kb, kbit, kilobit, kilobits
+megabit | information | =Mb, mbit, megabit, megabits
+gigabit | information | =Gb, gbit, gigabit, gigabits
+
+celsius | temperature | °c, ºC, ˚C, ° c, degrees celsius, degree celsius, degrees centigrade, degrees c, celsius, centigrade
+fahrenheit | temperature | °f, ºF, ˚F, ° f, degrees fahrenheit, degree fahrenheit, degrees f, fahrenheit
+kelvin | temperature | kelvin, kelvins, degrees kelvin

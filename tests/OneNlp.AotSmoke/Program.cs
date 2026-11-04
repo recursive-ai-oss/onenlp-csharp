@@ -36,6 +36,11 @@ internal static class Program
         Check("contraction split", tokens.Length == 10 && tokens[2].ToString() == "ca" && tokens[3].ToString() == "n't");
         Check("sentences", Nlp.Sentences("Mr. Smith can't go. He's gone!").Count == 2);
 
+        // Recognizers: rule data embedded in the assembly, numbers, money and sequences, and the pipeline component.
+        Check("quantities", Nlp.Quantities("Pay $5m for 3 km by the twenty-first").Select(q => q.Text + "=" + q.Value).SequenceEqual(["$5m=5000000", "3 km=3", "twenty-first=21"]));
+        Check("sequences", Nlp.Sequences("mail a@b.com or 10.0.0.1").Select(s => s.Kind).SequenceEqual([SequenceKind.Email, SequenceKind.IpAddress]));
+        Check("recognizer component", Pipeline.Blank(Language.English).Add("recognizers").Process("It cost $5.").Ents.Count == 1);
+
         // Registration by name, built-in and from this assembly's module initializer.
         using Pipeline pipeline = Pipeline.Blank(Language.English).Add("norm").Add("shout", new Dictionary<string, string> { ["suffix"] = "?" });
         Doc[] docs = [.. pipeline.ProcessMany(["One Two", "THREE"], batchSize: 1)];
