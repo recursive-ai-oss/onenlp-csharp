@@ -3,6 +3,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using RecursiveAI.OneNlp;
 using RecursiveAI.OneNlp.Serialization;
+using RecursiveAI.OneNlp.Data;
+using RecursiveAI.OneNlp.Neural;
+using RecursiveAI.OneNlp.Neural.Components;
+using RecursiveAI.OneNlp.Neural.Encoders;
+using RecursiveAI.OneNlp.Neural.Training;
 using RecursiveAI.OneNlp.Tokenizers;
 
 namespace RecursiveAI.OneNlp.AotSmoke;
@@ -82,8 +87,48 @@ internal static class Program
 
         MatchingSmoke.Run(Check);
 
+        TrainSaveLoad();
+
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
+    }
+
+    // Reads CoNLL-U, trains a tagger with Train, saves the pipeline, loads it back and compares predictions, all under NativeAOT.
+    private static void TrainSaveLoad()
+    {
+        var conllu = new System.Text.StringBuilder();
+        for (int s = 0; s < 40; s++)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                int w = (s * 7 + i * 3) % 12;
+                conllu.Append(i + 1).Append("\tw").Append(w).Append("\tw").Append(w).Append("\tX\tT").Append(w % 3).Append("\t_\t0\troot\t_\t_\n");
+            }
+
+            conllu.Append('\n');
+        }
+
+        List<Example> examples = [.. ConllUReader.Read(new StringReader(conllu.ToString())).Select(x => Example.FromReference(x.Doc))];
+        using Pipeline trained = Pipeline.Blank(Language.English).Add("sentencizer").Add(new Tagger(new HashEmbeddingEncoder(16, 256, 1)) { OwnsEncoder = true });
+        TrainResult result = trained.Train(examples, new TrainOptions { Epochs = 4, BatchWords = 60, LearningRate = 0.02f, Seed = 3 });
+        Check("train", result.Completed && result.Steps > 0);
+
+        using var buffer = new MemoryStream();
+        PipelineFile.Save(trained, buffer);
+        using Pipeline loaded = PipelineFile.Load(new MemoryStream(buffer.ToArray()));
+        Doc a = trained.Process("w1 w2 w3 w4 w5");
+        Doc b = loaded.Process("w1 w2 w3 w4 w5");
+        bool same = a.Length == b.Length && a.Length == 5;
+        for (int i = 0; same && i < a.Length; i++)
+        {
+            same = a[i].Tag == b[i].Tag && a[i].Tag.Length > 0 && a[i].Confidence == b[i].Confidence;
+        }
+
+        Check("saved pipeline reproduces predictions", same);
+        Doc s1 = trained.Process("Mr. Li went home. He slept.");
+        Doc s2 = loaded.Process("Mr. Li went home. He slept.");
+        Check("saved tokenizer data and sentencizer", s1.Sentences.Count >= 2 && s2.Sentences.Count == s1.Sentences.Count && s1.Length == s2.Length);
+        Check("hostile pipeline file", Throws<InvalidDataException>(() => PipelineFile.Load(new MemoryStream(new byte[] { 1, 2, 3 }))));
     }
 
     private static bool Throws<T>(Action action)

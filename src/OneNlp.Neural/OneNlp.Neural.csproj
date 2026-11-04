@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Neural</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Neural</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Neural</PackageId>
-    <Description>spaCy-class NLP for .NET: the neural layer on OneModel. Encoders and trainable pipeline components. An early preview with only the encoder contract so far. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the neural layer on OneModel. The encoder seam, trainable pipeline components, training (Train) and saved pipelines. An early preview. Unaffiliated with other projects named OneNLP.</Description>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>

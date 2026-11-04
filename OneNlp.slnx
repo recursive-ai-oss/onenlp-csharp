@@ -11,6 +11,7 @@
     <Project Path="bench/OneNlp.Bench/OneNlp.Bench.csproj" />
   </Folder>
   <Folder Name="/tools/">
+    <Project Path="tools/OneNlp.Toy/OneNlp.Toy.csproj" />
     <Project Path="tools/OneNlp.Eval/OneNlp.Eval.csproj" />
     <Project Path="tools/OneNlp.Parity/OneNlp.Parity.csproj" />
   </Folder>

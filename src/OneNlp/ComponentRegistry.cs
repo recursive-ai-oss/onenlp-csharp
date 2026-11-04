@@ -61,9 +61,11 @@ public static class ComponentRegistry
         var table = new ConcurrentDictionary<string, ComponentFactory>(StringComparer.Ordinal)
         {
             [NormComponent.ComponentName] = _ => new NormComponent(),
-            // Setting "language" (a language code, default none) picks the segmentation data.
-            [Segmentation.SentencizerComponent.ComponentName] = settings => Segmentation.SentencizerComponent.For(
-                settings.TryGetValue("language", out string? code) ? Language.FromCode(code) : Language.Unknown),
+            // Setting "data" (none, neutral or english) picks the segmentation data; otherwise setting "language" (a language code)
+            // does; with neither, the neutral data.
+            [Segmentation.SentencizerComponent.ComponentName] = settings => settings.TryGetValue("data", out string? data)
+                ? new Segmentation.SentencizerComponent(Segmentation.SegmentationData.ByName(data))
+                : Segmentation.SentencizerComponent.For(settings.TryGetValue("language", out string? code) ? Language.FromCode(code) : Language.Unknown),
             [Matching.EntityRuler.ComponentName] = Matching.EntityRuler.FromSettings,
         };
         return table;

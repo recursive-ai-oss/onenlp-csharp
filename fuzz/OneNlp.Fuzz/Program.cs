@@ -20,6 +20,8 @@ internal static class Program
         ["word-tokenizer"] = WordTokenizerTarget.Run,
         ["tiktoken-ranks"] = TiktokenRanksTarget.Run,
         ["bpe-model"] = BpeModelTarget.Run,
+        ["conllu"] = ConllUTarget.Run,
+        ["jsonl"] = JsonlTarget.Run,
         ["segmentation"] = SegmentationTarget.Run,
         ["doc-json"] = SerializationTargets.Json,
         ["doc-binary"] = SerializationTargets.Binary,

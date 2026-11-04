@@ -18,10 +18,25 @@ public sealed class SegmentationData
     private static readonly char[] MarkRunChars = ['.', '-', '!', '?', '*', '=', '_', '~', '<', '>', '#', '$', '+', '/', '\\'];
     private static readonly string[] CommonEmoticons = [":-)", ":)", ":-(", ":(", ";-)", ";)", ":-D", ":D", ":-P", ":P", ":'(", ":-/", ":/", ":-O", ":O", "<3", "=)", "=D", "^_^"];
 
+    /// <summary>The name of the built-in data set: <c>none</c>, <c>neutral</c> or <c>english</c>. Saved pipelines record it.</summary>
+    public string Name { get; private init; } = string.Empty;
+
+    /// <summary>Finds a built-in data set by its <see cref="Name"/>.</summary>
+    /// <param name="name"><c>none</c>, <c>neutral</c> or <c>english</c>.</param>
+    /// <returns>The data set.</returns>
+    /// <exception cref="ArgumentException">There is no such data set.</exception>
+    public static SegmentationData ByName(string name) => name switch
+    {
+        "none" => None,
+        "neutral" => Neutral,
+        "english" => English,
+        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral or english.", nameof(name)),
+    };
+
     /// <summary>No adjustments: tokens are the UAX #29 word segments that are not white space.</summary>
     public static SegmentationData None { get; } = new(
         keepUrlsAndEmails: false, joinHyphenated: false, hyphenPrefixes: null, digitJoiners: NoMarks, markRuns: NoMarks, emoticons: [],
-        specialCases: [], abbreviations: [], clitics: [], nTSuffix: false, nonFinalAbbreviations: []);
+        specialCases: [], abbreviations: [], clitics: [], nTSuffix: false, nonFinalAbbreviations: []) { Name = "none" };
 
     /// <summary>
     /// Language-neutral defaults: URLs and e-mail addresses stay whole, a hyphen between two letters or digits does not split,
@@ -30,7 +45,7 @@ public sealed class SegmentationData
     /// </summary>
     public static SegmentationData Neutral { get; } = new(
         keepUrlsAndEmails: true, joinHyphenated: true, hyphenPrefixes: null, digitJoiners: DigitJoinerMarks, markRuns: MarkRunChars, emoticons: CommonEmoticons,
-        specialCases: [], abbreviations: [], clitics: [], nTSuffix: false, nonFinalAbbreviations: []);
+        specialCases: [], abbreviations: [], clitics: [], nTSuffix: false, nonFinalAbbreviations: []) { Name = "neutral" };
 
     /// <summary>
     /// English: the neutral defaults plus UD English tokenization: contractions split at the apostrophe (<c>do</c> <c>n't</c>,
@@ -65,7 +80,7 @@ public sealed class SegmentationData
         [
             "mr.", "mrs.", "ms.", "dr.", "prof.", "sr.", "jr.", "st.", "mt.", "messrs.", "gen.", "col.", "capt.", "lt.", "sgt.", "rev.", "hon.",
             "gov.", "sen.", "rep.", "vs.",
-        ]);
+        ]) { Name = "english" };
 
     private SegmentationData(
         bool keepUrlsAndEmails, bool joinHyphenated, string[]? hyphenPrefixes, char[] digitJoiners, char[] markRuns, string[] emoticons, Dictionary<string, int[]> specialCases,

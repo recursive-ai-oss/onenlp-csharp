@@ -44,6 +44,9 @@ public sealed class UaxWordTokenizer : IWordTokenizer
         _hyphenPrefixes = _data.HyphenPrefixes?.GetAlternateLookup<ReadOnlySpan<char>>();
     }
 
+    /// <summary>The adjustments this tokenizer applies.</summary>
+    public SegmentationData Data => _data;
+
     /// <summary>Creates the tokenizer for a language: English data for English, the neutral defaults otherwise.</summary>
     /// <param name="language">The language.</param>
     public static UaxWordTokenizer For(Language language) => new(SegmentationData.For(language));
