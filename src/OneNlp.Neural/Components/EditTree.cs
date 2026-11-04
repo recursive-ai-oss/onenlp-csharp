@@ -58,6 +58,7 @@ internal sealed class EditTree
 
         // Longest common substring by dynamic programming; the earliest one in the form wins a tie, so the tree is a function of the pair.
         int bestLength = 0, bestForm = 0, bestLemma = 0;
+        // Both rows are at most MaxAnalysedLength + 1 ints: longer pairs returned above.
         Span<int> previous = stackalloc int[lemma.Length + 1];
         Span<int> current = stackalloc int[lemma.Length + 1];
         previous.Clear();
