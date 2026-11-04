@@ -60,8 +60,67 @@ internal static class Program
             return 0;
         }
 
-        Console.Error.WriteLine("usage: RecognizersOracle raw <in.jsonl> <out.jsonl> | probe <reference> <text>");
+        if (args.Length is 3 or 4 && args[0] == "bench")
+        {
+            return Bench(args[1], args[2], args.Length == 4 && args[3] == "with-datetime");
+        }
+
+        Console.Error.WriteLine("usage: RecognizersOracle raw <in.jsonl> <out.jsonl> | probe <reference> <text> | bench <lines.txt> <reference> [with-datetime]");
         return 2;
+    }
+
+    /// <summary>
+    /// Times the models over a file of text lines, after a warm-up pass over the first lines that builds the models. By default it runs only
+    /// the number, unit, currency and sequence models (the work our recognizers do); with-datetime adds the date/time model.
+    /// </summary>
+    private static int Bench(string path, string referenceText, bool withDateTime)
+    {
+        string[] lines = File.ReadAllLines(path);
+        DateTime reference = DateTime.Parse(referenceText, System.Globalization.CultureInfo.InvariantCulture);
+        for (int i = 0; i < Math.Min(200, lines.Length); i++)
+        {
+            RunModels(lines[i], reference, withDateTime);
+        }
+
+        long chars = 0;
+        long results = 0;
+        long allocated = GC.GetAllocatedBytesForCurrentThread();
+        var timer = System.Diagnostics.Stopwatch.StartNew();
+        foreach (string line in lines)
+        {
+            results += RunModels(line, reference, withDateTime);
+            chars += line.Length;
+        }
+
+        timer.Stop();
+        allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+        double seconds = timer.Elapsed.TotalSeconds;
+        Console.WriteLine($"{lines.Length} texts, {chars} chars, {results} results; recognition time {seconds:F3} s ({chars / seconds / 1e6:F2} M chars/s); allocated {allocated / 1e6:F1} MB");
+        return 0;
+    }
+
+    private static int RunModels(string text, DateTime reference, bool withDateTime)
+    {
+        int n = NumberRecognizer.RecognizeNumber(text, Culture).Count;
+        n += NumberRecognizer.RecognizeOrdinal(text, Culture).Count;
+        n += NumberRecognizer.RecognizePercentage(text, Culture).Count;
+        n += NumberWithUnitRecognizer.RecognizeCurrency(text, Culture).Count;
+        n += NumberWithUnitRecognizer.RecognizeDimension(text, Culture).Count;
+        n += NumberWithUnitRecognizer.RecognizeTemperature(text, Culture).Count;
+        n += NumberWithUnitRecognizer.RecognizeAge(text, Culture).Count;
+        n += SequenceRecognizer.RecognizeEmail(text, Culture).Count;
+        n += SequenceRecognizer.RecognizeURL(text, Culture).Count;
+        n += SequenceRecognizer.RecognizeIpAddress(text, Culture).Count;
+        n += SequenceRecognizer.RecognizePhoneNumber(text, Culture).Count;
+        n += SequenceRecognizer.RecognizeHashtag(text, Culture).Count;
+        n += SequenceRecognizer.RecognizeMention(text, Culture).Count;
+        n += SequenceRecognizer.RecognizeGUID(text, Culture).Count;
+        if (withDateTime)
+        {
+            n += DateTimeRecognizer.RecognizeDateTime(text, Culture, DateTimeOptions.None, reference).Count;
+        }
+
+        return n;
     }
 
     private static void WriteModels(Utf8JsonWriter w, string text, DateTime reference)
