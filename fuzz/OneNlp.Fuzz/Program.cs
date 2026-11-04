@@ -9,6 +9,7 @@ using SharpFuzz;
 //
 // Without a libFuzzer host:
 //   replay <target> <file>...   runs saved inputs once each (reproduces a finding)
+//   seeds <target> <dir>        writes valid inputs for the target into <dir>
 //   random <target> <count>     runs <count> random and mutated inputs from a fixed seed, as a smoke check
 internal static class Program
 {
@@ -20,20 +21,43 @@ internal static class Program
         ["tokenizer-json"] = TokenizerJsonTarget.Run,
         ["code-point-regex"] = CodePointRegexTarget.Run,
         ["charsmap"] = CharsMapTarget.Run,
+        ["tiktoken-ranks"] = TiktokenRanksTarget.Run,
+        ["bpe-model"] = BpeModelTarget.Run,
+        ["segmentation"] = SegmentationTarget.Run,
+        ["doc-json"] = SerializationTargets.Json,
+        ["doc-binary"] = SerializationTargets.Binary,
+        ["docbin"] = SerializationTargets.Bin,
+        ["vocab-txt"] = VocabularyReaderTargets.RunVocabTxt,
+        ["sentencepiece-model"] = VocabularyReaderTargets.RunSentencePiece,
     };
 
     private static int Main(string[] args)
     {
         if (args.Length >= 3 && args[0] == "seeds")
         {
-            // seeds <target> <directory> [testdata directory]: writes a starting corpus.
-            if (args[1] == "tokenizer-json" && args.Length == 4)
+            Directory.CreateDirectory(args[2]);
+            switch (args[1])
             {
-                TokenizerJsonTarget.Seeds(args[2], args[3]);
-            }
-            else if (args[1] == "code-point-regex")
-            {
-                CodePointRegexTarget.Seeds(args[2]);
+                case "doc-json":
+                    SerializationTargets.SeedJson(args[2]);
+                    break;
+                case "doc-binary":
+                    SerializationTargets.SeedBinary(args[2]);
+                    break;
+                case "docbin":
+                    SerializationTargets.SeedBin(args[2]);
+                    break;
+                case "word-tokenizer":
+                case "segmentation":
+                    File.WriteAllText(Path.Combine(args[2], "seed-english"), "Mr. Smith can't visit www.x.org/a?b=1. Mail a.b@c-d.com, e.g. U.S.A. well-known 3:30 ... -- :) $$$. Yes!\n\nNext.");
+                    File.WriteAllText(Path.Combine(args[2], "seed-mixed"), "Hello, world! It's 3.14 - 日本語 😀 é end");
+                    break;
+                case "tokenizer-json" when args.Length == 4:
+                    TokenizerJsonTarget.Seeds(args[2], args[3]);
+                    break;
+                case "code-point-regex":
+                    CodePointRegexTarget.Seeds(args[2]);
+                    break;
             }
 
             return 0;
@@ -53,9 +77,14 @@ internal static class Program
         if (args.Length == 3 && args[0] == "random" && Targets.TryGetValue(args[1], out Target? target) && int.TryParse(args[2], out int count))
         {
             var random = new Random(12345);
-            byte[] seed = System.Text.Encoding.UTF8.GetBytes("Hello, world! It's 3.14 - 日本語 😀 e\u0301 end");
+            byte[][] seeds =
+            [
+                System.Text.Encoding.UTF8.GetBytes("Hello, world! It's 3.14 - 日本語 😀 e\u0301 end"),
+                System.Text.Encoding.UTF8.GetBytes("Mr. Smith can't visit www.x.org/a?b=1. Mail a.b@c-d.com, e.g. U.S.A. well-known 3:30 ... -- \"Hi.\" Yes!\n\nNext."),
+            ];
             for (int i = 0; i < count; i++)
             {
+                byte[] seed = seeds[random.Next(seeds.Length)];
                 byte[] input = random.Next(3) == 0 ? new byte[random.Next(64)] : (byte[])seed.Clone();
                 if (input.Length > 0 && input != seed)
                 {

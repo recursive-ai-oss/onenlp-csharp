@@ -91,10 +91,23 @@ internal sealed partial class StageRegistry
     internal IPreTokenizer CreatePreTokenizer(StageConfig config) => Create(_preTokenizers, "pre-tokenizer", config);
 
     /// <summary>Builds a model from its JSON object.</summary>
-    /// <param name="config">The object. Hugging Face files omit <c>type</c> for BPE-like models in old versions; a missing type is read as <c>BPE</c>.</param>
+    /// <param name="config">The object. Older Hugging Face files omit <c>type</c>; it is then inferred from the fields (see <c>InferModelType</c>).</param>
     /// <exception cref="NotSupportedException">The type is documented but not implemented yet, or unknown.</exception>
     /// <exception cref="InvalidDataException">The object is malformed.</exception>
-    internal ITokenizerModel CreateModel(StageConfig config) => Create(_models, "model", config, defaultType: "BPE");
+    internal ITokenizerModel CreateModel(StageConfig config) => Create(_models, "model", config, defaultType: InferModelType(config));
+
+    // Older files leave out the model's type. Observed in the files of bert-base-uncased (WordPiece), t5-small and xlm-roberta-base
+    // (Unigram), which have none: a vocabulary given as a list of [piece, score] pairs is Unigram, an object with merges is BPE, and an
+    // object without merges is WordPiece.
+    private static string InferModelType(StageConfig config)
+    {
+        if (config.Has("merges") || !config.Has("vocab"))
+        {
+            return "BPE";
+        }
+
+        return config.Element.GetProperty("vocab").ValueKind == System.Text.Json.JsonValueKind.Array ? "Unigram" : "WordPiece";
+    }
 
     /// <summary>Builds a post-processor from its JSON object.</summary>
     /// <param name="config">The object, which names its type.</param>

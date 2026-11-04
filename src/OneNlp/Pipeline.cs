@@ -39,9 +39,12 @@ public sealed class Pipeline : IDisposable
     /// <summary>The components in the order they run.</summary>
     public IReadOnlyList<IPipelineComponent> Components => _components;
 
-    /// <summary>Makes a pipeline with the <see cref="RuleWordTokenizer"/> and no components (spaCy's <c>spacy.blank</c>).</summary>
-    /// <param name="language">The language label to give the pipeline.</param>
-    public static Pipeline Blank(Language language = default) => new(new RuleWordTokenizer(), language);
+    /// <summary>
+    /// Makes a pipeline with the <see cref="Segmentation.UaxWordTokenizer"/> for the language and no components (spaCy's <c>spacy.blank</c>).
+    /// Add <c>sentencizer</c> for rule-based sentence boundaries.
+    /// </summary>
+    /// <param name="language">The language of the pipeline; English gets English tokenization data, any other language (or none) the neutral defaults.</param>
+    public static Pipeline Blank(Language language = default) => new(Segmentation.UaxWordTokenizer.For(language), language);
 
     /// <summary>Adds a component after the existing ones.</summary>
     /// <param name="component">The component; the pipeline takes ownership and disposes it with the pipeline.</param>

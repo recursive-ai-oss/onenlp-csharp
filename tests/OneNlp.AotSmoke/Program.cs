@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using RecursiveAI.OneNlp;
+using RecursiveAI.OneNlp.Serialization;
 using RecursiveAI.OneNlp.Tokenizers;
 
 namespace RecursiveAI.OneNlp.AotSmoke;
@@ -30,6 +31,11 @@ internal static class Program
         Check("annotation", doc[0].Pos == "PROPN" && doc[1].Pos.Length == 0);
         Check("char span", doc.TryGetCharSpan(4, 18, out Span span) && span.ToString() == "Lovelace wrote");
 
+        // Word and sentence segmentation, with English data and the registered sentencizer.
+        Token[] tokens = Nlp.Tokens("Mr. Smith can't go. He's gone!");
+        Check("contraction split", tokens.Length == 10 && tokens[2].ToString() == "ca" && tokens[3].ToString() == "n't");
+        Check("sentences", Nlp.Sentences("Mr. Smith can't go. He's gone!").Count == 2);
+
         // Registration by name, built-in and from this assembly's module initializer.
         using Pipeline pipeline = Pipeline.Blank(Language.English).Add("norm").Add("shout", new Dictionary<string, string> { ["suffix"] = "?" });
         Doc[] docs = [.. pipeline.ProcessMany(["One Two", "THREE"], batchSize: 1)];
@@ -44,7 +50,35 @@ internal static class Program
         TokenEncoding encoding = tokenizer.Encode("héllo wörld"u8);
         Check("utf8 offsets", encoding.Offsets[1].Start == 7 && encoding.Offsets[1].End == 13);
         Check("trim", tokenizer.TrimToTokenBudget("a b c", 2).SequenceEqual("a b"));
-        Check("loader not yet supported", Throws<NotSupportedException>(() => Tokenizer.FromStream(new MemoryStream(), TokenizerFormat.WordPieceVocabulary)));
+        Check("empty vocab.txt rejected", Throws<InvalidDataException>(() => Tokenizer.FromStream(new MemoryStream(), TokenizerFormat.WordPieceVocabulary)));
+
+        // Both serialization formats, and the container, under NativeAOT.
+        Doc annotated = Nlp.Analyze("Ada Lovelace wrote notes in London \uD83D\uDE00.");
+        annotated.SetAnnotation(TokenColumn.Pos, 0, "PROPN");
+        annotated.SetAnnotation(TokenColumn.Norm, 1, "lovelace");
+        annotated.SetHeads(new int[annotated.Length]);
+        annotated.SetSentenceStart(0, true);
+        annotated.SetConfidence(2, 0.5f);
+        annotated.SetEntities([new SpanSpec(0, 2, "PER", 0.75f)]);
+        Doc fromJson = Doc.FromJson(annotated.ToJson());
+        Check("json round trip", fromJson.Length == annotated.Length && fromJson[0].Pos == "PROPN" && fromJson[1].Norm == "lovelace" && fromJson.Ents[0].Confidence == 0.75f && fromJson[2].Confidence == 0.5f);
+        Doc fromBytes = Doc.FromBytes(annotated.ToBytes());
+        Check("binary round trip", fromBytes.ToJson() == annotated.ToJson() && fromBytes[5].HeadIndex == 0);
+        var bin = new DocBin();
+        bin.Add(annotated);
+        bin.Add(Nlp.Analyze("second"));
+        DocBin binBack = DocBin.FromBytes(bin.ToBytes());
+        int streamed = 0;
+        var binReader = new DocBinReader(new MemoryStream(bin.ToBytes()));
+        while (binReader.TryRead(out _))
+        {
+            streamed++;
+        }
+
+        Check("docbin", binBack.Count == 2 && streamed == 2);
+        Check("hostile input", Throws<InvalidDataException>(() => Doc.FromBytes(new byte[] { 1, 2, 3 })) && Throws<InvalidDataException>(() => Doc.FromJson("{")));
+
+        Check("tiktoken ranks", TiktokenRoundTrip());
 
         // The tokenizer.json stages: loader, normalizers with generated tables, split patterns, post-processing, decoding.
         foreach (string failed in StageSmoke.Run())
@@ -130,5 +164,20 @@ internal static class Program
 
             return new TokenEncoding([.. ids], [.. tokens], [.. offsets], new bool[ids.Count]);
         }
+    }
+
+    // A tiny Tiktoken encoding: the 256 bytes and the token "ab".
+    private static bool TiktokenRoundTrip()
+    {
+        var ranks = new System.Text.StringBuilder();
+        for (int b = 0; b < 256; b++)
+        {
+            ranks.Append(Convert.ToBase64String([(byte)b])).Append(' ').Append(b).Append('\n');
+        }
+
+        ranks.Append(Convert.ToBase64String("ab"u8)).Append(" 256\n");
+        var tokenizer = TiktokenTokenizer.Create(new MemoryStream(System.Text.Encoding.ASCII.GetBytes(ranks.ToString())), new System.Text.RegularExpressions.Regex(@"\w+|\s+|[^\w\s]+"));
+        TokenEncoding e = tokenizer.Encode("abab 日");
+        return e.Ids[0] == 256 && e.Ids[1] == 256 && tokenizer.Decode(e.Ids) == "abab 日";
     }
 }

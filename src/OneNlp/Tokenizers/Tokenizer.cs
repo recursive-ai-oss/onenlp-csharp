@@ -58,7 +58,9 @@ public abstract class Tokenizer
         };
 
         using FileStream stream = File.OpenRead(path);
-        return FromStream(stream, format);
+        return format == TokenizerFormat.Tiktoken
+            ? Loaders.TiktokenRanksFile.Load(stream, Path.GetFileName(path)) // the file name can name the encoding
+            : FromStream(stream, format);
     }
 
     /// <summary>Loads a tokenizer from a stream in a stated format.</summary>
