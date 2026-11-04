@@ -31,6 +31,10 @@ internal static class Program
                tokenizes and splits sentences with the default pipeline and writes CoNLL-U with only ID and FORM filled, for
                scoring with 'ud --metrics Tokens,Sentences,Words'. Every token is a word; --mwt also writes the pieces of a split
                contraction (do + n't) as a multi-word token line, as English UD treebanks annotate them.
+          recognizers --gold GOLD.jsonl --pred PRED.jsonl [--component NAME] [--dataset NAME] [--resamples 1000] [--seed N]
+               [--json OUT.json] [--markdown OUT.md] [--errors OUT.tsv]
+               scores recognizer predictions against a recognizer gold file (docs/recognizer-gold.md): exact-span and relaxed F1 and
+               resolution accuracy per type, with bootstrap intervals over sentences. --errors lists the misses (development files only).
           dump-ud   --gold G.conllu --pred P1.conllu [P2.conllu ...] --json OUT.json    (all counts, no bootstrap)
           dump-span --gold G.iob2 --pred P1.iob2 [P2.iob2 ...] --json OUT.json
 
@@ -56,6 +60,8 @@ internal static class Program
                     return RunSpan(options);
                 case "segment":
                     return Segment.Run(options);
+                case "recognizers":
+                    return Recognizers.Run(options);
                 case "dump-ud":
                     return DumpUd(options);
                 case "dump-span":
