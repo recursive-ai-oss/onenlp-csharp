@@ -15,7 +15,8 @@ namespace RecursiveAI.OneNlp.Tokenizers.Hf;
 /// plain groups); alternation; <c>? * + {n} {n,} {n,m}</c> with lazy (<c>?</c>) and possessive (<c>+</c>) forms; lookahead
 /// <c>(?= )</c> and <c>(?! )</c>; atomic groups <c>(?&gt; )</c>; <c>\b \B \A \z \Z ^ $</c>; scoped flags <c>i s m</c>. Properties: general
 /// categories (short and long names), scripts, <c>Alphabetic</c>, <c>White_Space</c>, <c>Any</c>. Anything else is refused at parse time.
-/// Nesting is limited, and matching stops with an exception when it would recurse deeper than a fixed bound.
+/// Nesting is limited, and matching stops with an <see cref="InvalidOperationException"/> when it would recurse deeper than a fixed bound
+/// or spend more steps than a budget that grows with the text length, so a hostile pattern cannot hang or crash the caller.
 /// </remarks>
 internal sealed class CodePointRegex
 {
@@ -56,7 +57,17 @@ internal sealed class CodePointRegex
         {
             int end = -1;
             ctx.Depth = 0;
-            if (_root.Match(ctx, pos, e => { end = e; return true; }) && end > pos)
+            bool matched;
+            try
+            {
+                matched = _root.Match(ctx, pos, e => { end = e; return true; });
+            }
+            catch (InsufficientExecutionStackException ex)
+            {
+                throw new InvalidOperationException("The pattern recursed too deeply on this text.", ex);
+            }
+
+            if (matched && end > pos)
             {
                 result.Add(new OffsetPair(pos, end));
                 pos = end;
@@ -142,9 +153,21 @@ internal sealed class CodePointRegex
 
     private sealed class Context(string text)
     {
+        // Work allowed for one Matches call: patterns come from files we do not trust, so a pattern such as (a+)+b on a long run of 'a'
+        // must end with an error instead of running for years. Real split patterns use a few dozen steps per character.
+        private long _stepsLeft = 2_000_000 + (500L * text.Length);
+
         internal string Text { get; } = text;
 
         internal int Depth { get; set; }
+
+        internal void Tick()
+        {
+            if (--_stepsLeft < 0)
+            {
+                throw new InvalidOperationException("The pattern took too many steps on this text.");
+            }
+        }
     }
 
     private abstract class Node
@@ -195,6 +218,7 @@ internal sealed class CodePointRegex
         {
             foreach (Node o in options)
             {
+                c.Tick();
                 if (o.Match(c, pos, k))
                 {
                     return true;
@@ -258,6 +282,7 @@ internal sealed class CodePointRegex
 
                 for (int n = ends.Count; n >= min; n--)
                 {
+                    c.Tick();
                     if (k(n == 0 ? pos : ends[n - 1]))
                     {
                         return true;
@@ -272,6 +297,7 @@ internal sealed class CodePointRegex
             int count = 0;
             while (true)
             {
+                c.Tick();
                 if (count >= min && k(q))
                 {
                     return true;
@@ -295,6 +321,7 @@ internal sealed class CodePointRegex
 
         private bool Run(Context c, int pos, int count, Func<int, bool> k)
         {
+            c.Tick();
             if (++c.Depth > MaxMatchDepth)
             {
                 throw new InvalidOperationException("The pattern recursed too deeply on this text.");
@@ -304,6 +331,7 @@ internal sealed class CodePointRegex
             {
                 if (greedy || possessive)
                 {
+                    System.Runtime.CompilerServices.RuntimeHelpers.EnsureSufficientExecutionStack();
                     if (count < max && body.Match(c, pos, p => (p != pos || count < min) && Run(c, p, count + 1, k)))
                     {
                         return true;
