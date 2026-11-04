@@ -55,6 +55,9 @@ byte | information | byte, bytes, =B
 kilobyte | information | =KB, =kB, kilobyte, kilobytes
 megabyte | information | =MB, megabyte, megabytes
 gigabyte | information | =GB, gigabyte, gigabytes
+watt | power | watt, watts
+kilowatt | power | =kW, kilowatt, kilowatts
+megawatt | power | =MW, megawatt, megawatts
 terabyte | information | =TB, terabyte, terabytes
 petabyte | information | =PB, petabyte, petabytes
 kibibyte | information | KiB, kibibyte, kibibytes

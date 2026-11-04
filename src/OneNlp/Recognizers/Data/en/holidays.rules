@@ -1,0 +1,68 @@
+# Holidays and observances, English.
+#
+# [time.holiday]: forms | rule | regions
+#   rule:    fixed MM-DD                      the same date every year
+#            nth N|last WEEKDAY MONTH [+-D]   the Nth (or last) weekday of a month, plus or minus days (mon..sun)
+#            easter +-D                       days from Western Easter Sunday (Gregorian computus)
+#            nearest WEEKDAY MM-DD            the weekday closest to a date
+#   regions: us, gb or all (comma-separated). The recognizer's region selects the rows; all rows named all apply everywhere.
+#
+# Sources: United States federal holidays, 5 U.S.C. 6103; United Kingdom bank holidays, gov.uk/bank-holidays; the Western Christian calendar
+# for the moveable feasts; the rest are the customary dates. Dates are the calendar day of the observance, not the day a weekend holiday is
+# observed in lieu. Holidays that follow a lunar calendar (Eid, Diwali, Passover, Hanukkah, Ramadan, Lunar New Year) are not in this table.
+
+[time.holiday]
+New Year's Day, New Years Day | fixed 01-01 | all
+New Year's Eve, New Years Eve | fixed 12-31 | all
+Martin Luther King Jr. Day, Martin Luther King Jr Day, Martin Luther King Day, MLK Day | nth 3 mon 1 | us
+Groundhog Day | fixed 02-02 | us
+Valentine's Day, Valentines Day | fixed 02-14 | all
+Presidents' Day, Presidents Day, President's Day, Washington's Birthday | nth 3 mon 2 | us
+St. Patrick's Day, St Patrick's Day, Saint Patrick's Day | fixed 03-17 | all
+St David's Day, St. David's Day | fixed 03-01 | gb
+Pi Day | fixed 03-14 | all
+April Fools' Day, April Fool's Day, April Fools Day | fixed 04-01 | all
+Earth Day | fixed 04-22 | all
+St George's Day, St. George's Day | fixed 04-23 | gb
+Tax Day | fixed 04-15 | us
+May Day | fixed 05-01 | all
+Cinco de Mayo | fixed 05-05 | all
+Memorial Day | nth last mon 5 | us
+Juneteenth | fixed 06-19 | us
+Flag Day | fixed 06-14 | us
+Independence Day | fixed 07-04 | us
+Labor Day | nth 1 mon 9 | us
+Columbus Day, Indigenous Peoples' Day, Indigenous Peoples Day | nth 2 mon 10 | us
+Halloween | fixed 10-31 | all
+Veterans Day | fixed 11-11 | us
+Armistice Day | fixed 11-11 | all
+Election Day | nth 1 mon 11 +1 | us
+Thanksgiving, Thanksgiving Day | nth 4 thu 11 | all
+Black Friday | nth 4 thu 11 +1 | all
+Cyber Monday | nth 4 thu 11 +4 | all
+St Andrew's Day, St. Andrew's Day | fixed 11-30 | gb
+Bonfire Night, Guy Fawkes Night, Guy Fawkes Day | fixed 11-05 | gb
+Remembrance Sunday | nearest sun 11-11 | gb
+Christmas Eve | fixed 12-24 | all
+Christmas, Christmas Day, Xmas | fixed 12-25 | all
+Boxing Day | fixed 12-26 | all
+Leap Day | fixed 02-29 | all
+Burns Night | fixed 01-25 | gb
+Epiphany | fixed 01-06 | all
+Mother's Day, Mothers Day | nth 2 sun 5 | us
+Mothering Sunday, Mother's Day, Mothers Day | easter -21 | gb
+Father's Day, Fathers Day | nth 3 sun 6 | all
+Early May bank holiday | nth 1 mon 5 | gb
+Spring bank holiday | nth last mon 5 | gb
+Summer bank holiday | nth last mon 8 | gb
+Shrove Tuesday, Pancake Day, Mardi Gras | easter -47 | all
+Ash Wednesday | easter -46 | all
+Palm Sunday | easter -7 | all
+Maundy Thursday | easter -3 | all
+Good Friday | easter -2 | all
+Holy Saturday | easter -1 | all
+Easter, Easter Sunday | easter 0 | all
+Easter Monday | easter 1 | gb
+Ascension Day, Ascension Thursday | easter 39 | all
+Pentecost, Whit Sunday, Whitsun | easter 49 | all
+Whit Monday | easter 50 | gb

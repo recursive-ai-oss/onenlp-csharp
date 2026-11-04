@@ -6,7 +6,7 @@ Usage: map_ours.py <recognize output.jsonl> <predictions.jsonl>
 Types: CARDINAL, ORDINAL and PERCENT map to number, ordinal and percentage; MONEY to currency ("<value> <ISO code>"); QUANTITY to
 temperature or age when its dimension says so and to dimension otherwise ("<value> <unit>"); the Sequence kinds keep their names
 (PHONE_LIKE is phone, IP_ADDRESS is ip, GUID is guid). Values are the shortest decimal string. Offsets are the engine's UTF-16 offsets.
-The engine emits no date, time or duration results yet, so none appear.
+Temporal results (DATE, TIME, DATETIME, DURATION, SET) keep their kind in lower case (date, daterange, ...), value, grain and approx.
 """
 import json
 import sys
@@ -36,6 +36,12 @@ def map_result(r):
     elif label == "QUANTITY":
         kind = {"temperature": "temperature", "age": "age"}.get(r.get("dimension"), "dimension")
         item.update(type=kind, value=f"{canon(r['value'])} {r.get('unit', '')}")
+    elif label in ("DATE", "TIME", "DATETIME", "DURATION", "SET"):
+        item.update(type=r["kind"].lower(), value=r["value"])
+        if "grain" in r:
+            item["grain"] = r["grain"]
+        if r.get("approx"):
+            item["approx"] = True
     else:
         return None
     return item

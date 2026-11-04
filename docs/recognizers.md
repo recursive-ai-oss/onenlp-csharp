@@ -1,6 +1,6 @@
 # Recognizers
 
-Behaviour of the recognizers for numbers, ordinals, percentages, measures, money and address-like sequences. Language-neutral where it can be; the English rules are the first data set. Rules are data: adding a language means writing rule files (see "Rule data"), not code.
+Behaviour of the recognizers for numbers, ordinals, percentages, measures, money, address-like sequences, and dates and times. Language-neutral where it can be; the English rules are the first data set. Rules are data: adding a language means writing rule files (see "Rule data"), not code.
 
 ## Results
 
@@ -20,6 +20,11 @@ Behaviour of the recognizers for numbers, ordinals, percentages, measures, money
 | `SequenceMatch`, `Hashtag` | `HASHTAG` | |
 | `SequenceMatch`, `Mention` | `MENTION` | |
 | `SequenceMatch`, `Uuid` | `GUID` | |
+| `TemporalMatch`, `Kind = Date` or `DateRange` | `DATE` | A day or a period of days: `March 5, 2026`, `next Friday`, `spring 2021`. |
+| `TemporalMatch`, `Kind = Time` or `TimeRange` | `TIME` | A time of day or a range of times of day: `3pm`, `from 9am to 5pm`. |
+| `TemporalMatch`, `Kind = DateTime` or `DateTimeRange` | `DATETIME` | A day and a time, or a part of a day: `tomorrow at 3pm`, `Saturday evening`. |
+| `TemporalMatch`, `Kind = Duration` | `DURATION` | An amount of time: `two weeks`, `1 year and 6 months`. |
+| `TemporalMatch`, `Kind = Set` | `SET` | A recurrence: `every Monday at 9am`, `daily`. |
 
 `CARDINAL`, `ORDINAL`, `PERCENT`, `MONEY` and `QUANTITY` are the names OntoNotes uses for numbers, and spaCy's English models use them too. A NER model that predicts the UNER types (`PER`, `ORG`, `LOC`) does not use these names, so recognizer entities and model entities coexist in one `Doc`.
 
@@ -36,8 +41,10 @@ Values are not converted between units: `5 km` is 5 with unit `kilometer`.
 Every rule proposes results independently. Overlaps are settled the same way every time:
 
 1. the longest result wins;
-2. of equal length, the type earlier in this order: `URL`, `EMAIL`, `MENTION`, `HASHTAG`, `GUID`, `IP_ADDRESS`, `PHONE_LIKE`, `MONEY`, `PERCENT`, `QUANTITY`, `ORDINAL`, `CARDINAL`;
+2. of equal length, the type earlier in this order: `URL`, `EMAIL`, `MENTION`, `HASHTAG`, `GUID`, `IP_ADDRESS`, `DATE`/`TIME`/`DATETIME`/`DURATION`/`SET`, `PHONE_LIKE`, `MONEY`, `PERCENT`, `QUANTITY`, `ORDINAL`, `CARDINAL`;
 3. then the earlier start, then the higher confidence.
+
+The date and time labels rank after `IP_ADDRESS` and before `PHONE_LIKE`, so `2031` is a year, not a cardinal, and `30 minutes` is a duration, not a measure.
 
 A result overlapping one already taken is dropped. So `$5 million` (money) beats `5 million` (a number), and `a@b.com` beats the `b` and `com` inside it.
 
@@ -134,6 +141,83 @@ Not accepted: dates (`2020-01-15`, `15.01.2020`), decimals (`3.14159265`), plain
 - `@` and a user name of letters, digits and `_`, with `.` and `-` inside, not touching a preceding letter, digit, `_`, `@`, `+` or `.`; an `@host.example` after the name is part of a fediverse handle. `Normalized` is the name lower-cased without the `@`.
 - GUID (RFC 9562 §4): 8-4-4-4-12 hexadecimal digits, optionally in braces or after `urn:uuid:`. Version and variant bits are not checked. Not touching a letter, digit or hyphen. `Normalized` is 36 lower-case characters.
 
+## Dates and times
+
+`Recognizer.Recognize(text, new RecognitionContext(reference) { Region = "us" })` resolves dates and times to values. `Nlp.Dates(text, reference)` lists them, and `Nlp.ParseDate(text, reference)` returns the first as a `DateRange`. The English rules are `Data/en/datetime.rules` (vocabulary) and `Data/en/holidays.rules` (holiday table); the grammar that combines the words is code.
+
+### Result
+
+`TemporalMatch` has the `Kind` (below), a `Value` string, a `Granularity` (null for durations), an `Approximate` flag, the `UtcOffset` the text names, and a `Range` (`DateRange`: `Start` inclusive, `End` exclusive, `Granularity`, `Approximate`) on the calendar. A day runs from its midnight to the next; an instant such as `3pm` runs for its precision (an hour; `3:05pm` a minute). A time of day with no date is placed on the reference day; with no reference date its `Range` is null. Durations and sets have no `Range`; a fixed-length duration has `Amount` as a `TimeSpan`.
+
+| Kind | Examples | `Value` |
+|---|---|---|
+| `Date` | `March 5, 2026`, `tomorrow`, `the 4th of July`, `Easter 2027`, `in 3 days`, `a week ago` | `2026-03-05` |
+| `Time` | `3pm`, `7:05 AM`, `15:45`, `noon`, `5 in the afternoon`, `3.30pm`, `9am JST` | `T15:00`, `T09:00+09:00`; `Z` for UTC and GMT |
+| `DateTime` | `tomorrow at 3pm`, `3pm on March 22`, `in 45 minutes`, `2026-06-30T09:15:00Z` | `2026-03-19T15:00` |
+| `DateRange` | `next week`, `last winter`, `the first quarter of 2026`, `late 2023`, `the 1990s`, `from April 6 to April 10`, `May 4-8`, `1990-2000`, `the past three days` | `2026-03-23/2026-03-30` |
+| `TimeRange` | `9am-5pm`, `from 6 pm until 9 pm`, `between 12 and 1 pm` | `T09:00/T17:00` |
+| `DateTimeRange` | `tomorrow morning`, `Saturday evening`, `Monday from 9am to 11am`, `from Monday 8am to Monday 6pm` | `2026-03-23T09:00/2026-03-23T11:00` |
+| `Duration` | `two weeks`, `45 seconds`, `an hour and a half`, `2 hours and 30 minutes` | seconds as an integer (`1209600`); ISO 8601 `P1Y6M` when it names months or years |
+| `Set` | `every Monday`, `every Monday at 9am`, `daily`, `every 3 hours`, `every other day`, `every day at noon` | TIMEX3: `XXXX-WXX-1`, `XXXX-WXX-1T09:00`, `P1D`, `PT3H`, `P2D`, `T12:00` |
+
+`Granularity` is the unit the expression is stated in: for an instant its precision (`Second`, `Minute`, `Hour`, `Day`); for a range the kind of period (`Week`, `Month`, `Quarter`, `Half`, `Season`, `Year`, `Decade`, or `Day` for explicit day ranges and weekends, `Hour` or `Minute` for ranges of times); for a set the recurrence unit. This is the gold-set convention (`docs/recognizer-gold.md`).
+
+### Reference date, zones and region
+
+- **Relative expressions need a reference date** (`today`, `next Friday`, `in 3 days`, `Christmas` with no year, `the 25th`, `March 5` with no year). Without one (`RecognitionContext.ReferenceDate` null) they are not reported; absolute ones are (`March 5, 2027`, `3pm`, `two weeks`, `every Monday`). Wall-clock expressions are read in the reference's offset.
+- **Zones are explicit.** `PST`, `UTC+2`, `GMT-05:00` and a trailing `Z` or `+hh:mm` after a time are kept in `Value` and `UtcOffset` and become the offset of `Range`. The recognizer carries no time zone database: a named zone is a fixed offset, so there is no daylight-saving arithmetic (`PST` is always -08:00; `PDT` is -07:00). A reference date in `America/New_York` is just its `DateTimeOffset`. The abbreviation table is `time.zone`; ambiguous abbreviations (`CST`, `BST`, `IST`) take the reading English text usually means, and `IST` is left out.
+- **Region** (`RecognitionContext.Region`, `us` default or `gb`) picks the holiday rows and the order of numeric dates: `04/05/2026` is April 5 in `us` and 4 May in `gb`; a first number above 12 and a dotted date are always day first.
+
+### How expressions resolve
+
+- **Weekdays.** A bare weekday or `this` weekday is the first such day on or after the reference day (today counts). `next Friday` is Friday of the next week (weeks run Monday to Sunday). `last Friday` is the latest one before today. `Wednesday of next week` is that day in that week. `Monday, March 23` is the date; the weekday is not checked.
+- **Missing year.** A month and day, a holiday or `the 25th` is the first such day on or after the reference day, so a date that has passed this year is next year's.
+- **Ranges are half-open.** The end of a range of days or longer periods is the start of the period after the stated end (`from April 6 to April 10` ends at `2026-04-11`; `through 2027` at `2028-01-01`). A clock end point is the instant stated (`from 3pm to 5pm` is `T15:00/T17:00`). A second weekday or month-day counts from the first (`from Monday to Friday` is the week of the Monday it names; `December 28 to January 3` crosses the year).
+- **Times of day.** `3pm` and `3:30 pm` have am/pm; `15:45` and `09:00` are 24-hour; `H:MM` with no am/pm is read as a clock time; a bare hour (`at 9`) is not a time, because it has no am/pm. In a range the first end takes the second's am/pm (`between 12 and 1 pm`, `from 9 to 5 pm`), moving to am when that would put it after the end (`between 11 and 1 pm`). `5 in the afternoon` and `10 at night` use the day part. `noon` and `midnight` are `12:00` and `00:00`.
+- **Parts of a day** are approximate ranges: morning 06:00-12:00, afternoon 12:00-18:00, evening 18:00-24:00, night 20:00-24:00. `tonight` is the night of today, `last night` the night of yesterday, `this morning` the morning of today.
+- **Periods.** Weeks run Monday to Sunday; `this weekend` is Saturday and Sunday of the current week and `next weekend` those of the next week. Seasons are meteorological, northern hemisphere (spring March-May, summer June-August, fall September-November, winter December-February), approximate, and `winter 2024` starts in December 2024. `early`, `mid` and `late` split a year into January-April, May-August and September-December and a month into days 1-10, 11-20 and 21-end, approximate. `H1`/`Q3` and `the second half of ...` give halves and quarters; with no year they are in the reference year. `last winter` is the latest season that has ended; `this summer` the one that contains today or comes next.
+- **Offsets.** `in 3 days`, `3 days ago`, `a year from now`, `the day after tomorrow`, `two days before Christmas`, `the third Thursday of April`, `the first Monday after Easter 2027`. Units of a day or more give a date; hours, minutes and seconds give a date-time at that precision.
+- **Durations** are an amount and a unit (`two weeks`, `a day`, `half an hour`, `1.5 hours`, `an hour and a half`); several terms join with `and` or a comma when each is smaller than the one before (`2 hours and 30 minutes`; `seven days a week` is not one duration). `a second` alone is not a duration.
+- **Sets** are `daily`, `weekly`, `monthly`, `quarterly`, `yearly`, `every`/`each` with a weekday or an optional count and a unit, and `every other`. With a time (`every Monday at 9am`, `daily at noon`) the value carries it.
+
+### Holidays
+
+The table is `Data/en/holidays.rules`: forms | rule | regions (`us`, `gb`, `all`). Rules are `fixed MM-DD`, `nth N|last WEEKDAY MONTH [+-DAYS]`, `easter +-DAYS` and `nearest WEEKDAY MM-DD`. Easter is the Western (Gregorian) date from the "Anonymous Gregorian" computus (Meeus, *Astronomical Algorithms* ch. 8, after Butcher 1876), valid for every Gregorian year; the other moveable feasts count from it (Good Friday is -2, Ash Wednesday -46, Pentecost +49). The dates are the calendar days of the observances, not the weekday a holiday is observed in lieu of a weekend.
+
+| Region | Holidays |
+|---|---|
+| `us` | the United States federal holidays of 5 U.S.C. 6103 (New Year's Day, Martin Luther King Jr. Day, Washington's Birthday/Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day, Columbus Day, Veterans Day, Thanksgiving, Christmas), Election Day, Tax Day, Flag Day, Groundhog Day, Mother's Day (second Sunday of May) |
+| `gb` | the bank holidays of England and Wales as published at gov.uk/bank-holidays (New Year's Day, Good Friday, Easter Monday, Early May, Spring and Summer bank holidays, Christmas Day, Boxing Day), Mothering Sunday (three weeks before Easter, also "Mother's Day"), Remembrance Sunday, Bonfire Night, St David's, St George's and St Andrew's days, Burns Night, Whit Monday |
+| `all` | Valentine's Day, St Patrick's Day, April Fools' Day, Halloween, Thanksgiving, Black Friday, Cyber Monday, Christmas Eve and Day, Boxing Day, New Year's Eve, Easter and its feasts, Father's Day, Pi Day, May Day, Cinco de Mayo, Earth Day, Epiphany, Armistice Day, Leap Day |
+
+Holidays that follow a lunar calendar (Eid, Diwali, Passover, Hanukkah, Ramadan, Lunar New Year) are not in the table: they need a calendar table per year, which is data a later set of rules can add.
+
+### Rule data for dates and times
+
+| Section | Fields | Meaning |
+|---|---|---|
+| `time.month` | `1-12 \| forms` | Month names and abbreviations. Forms starting `=` are case-sensitive, which keeps `May` and `March` from matching the verbs |
+| `time.weekday` | `1-7 \| forms [\| plural forms]` | Monday is 1; plurals make a weekly set |
+| `time.unit` | `name \| forms \| seconds \| months` | `day \| day, days \| 86400 \| 0` |
+| `time.season` | `name \| forms \| first month \| months` | |
+| `time.daypart` | `name \| forms \| start hour \| end hour` | End 24 is midnight |
+| `time.meridiem` | `am or pm \| forms` | `a.m.`, `p.m.` included |
+| `time.word` | `role \| forms` | The words the grammar uses: `today`, `next`, `ago`, `from`, `rangeto` (to, until, `-`), `early`, `approx`, `zonebase`, ... The roles are listed in `datetime.rules` |
+| `time.recurrence` | `TIMEX3 period \| unit \| forms` | `P1W \| week \| weekly` |
+| `time.zone` | `forms \| offset minutes [\| z]` | `z` writes the zone as `Z` |
+| `time.holiday` | `forms \| rule \| regions` | See above |
+
+A malformed temporal row throws `RecognizerRulesException` with the line, like the others.
+
+### Limits
+
+- English only. Day-first order for slashes is by region and by the numbers (a first number above 12), not by learned usage.
+- No time zone database, no daylight saving, no calendars other than Gregorian, and no lunar holidays.
+- No fuzzy or vague quantities (`a couple of days`, `a few weeks`), no `end of the month`, `the weekend of March 21`, `Friday the 13th`, `every second Tuesday`, `twice a week`, or fiscal periods.
+- A bare weekday is the next one, even in past-tense text (`said on Tuesday` resolves forward); a bare month or season (`in March`, `in summer`) and `M/D` without a year are not reported, because they need context to mean one thing.
+- A bare four-digit number from 1000 to 2999 is read as a year (`2031`, `1969`) at confidence 0.8, so a count such as `2000 people` is also reported as a year; a measure or money amount of the same length wins when the number has a unit.
+- `in 45 minutes` is a time ahead, also in text such as `ran 5 miles in 45 minutes`.
+
 ## Rule data
 
 Rule files are UTF-8 text. `#` starts a comment. `[section]` starts a section; each other line is a rule whose fields are separated by `|`. A section may appear in several files; a language is a set of files (`Recognizers/Data/<code>/*.rules` embedded in the assembly, or files given to `Recognizer.FromFiles`).
@@ -168,4 +252,4 @@ Words and symbols (not numbers or dates) are what the rules recognize; the seque
 - `5 feet 3 inches` gives two measures, not one; there is no unit conversion.
 - Number words glued to digits (`5 hundred thousand`) read the first scale word only.
 - Phone-like detection will miss shapes outside the list above and will accept some number groups that are not phones: it is a guess, with confidence 0.7.
-- The engine takes a `RecognitionContext` with a reference date so that rules for relative dates (added later) use the same call; the rules here ignore it.
+- The engine takes a `RecognitionContext` with a reference date and region; the number, unit, currency and sequence rules ignore it, the date and time rules use it.

@@ -42,6 +42,11 @@ internal static class Program
         Check("sentences", Nlp.Sentences("Mr. Smith can't go. He's gone!").Count == 2);
 
         // Recognizers: rule data embedded in the assembly, numbers, money and sequences, and the pipeline component.
+        // Dates and times: vocabulary and holiday tables embedded as rule data, resolved against a reference date.
+        var reference = new DateTimeOffset(2026, 3, 18, 10, 30, 0, TimeSpan.Zero);
+        Check("dates", Nlp.Dates("Call me tomorrow at 3pm PST, or the first Monday after Easter 2027, spring 2021, every Monday.", reference)
+            .Select(d => d.Value).SequenceEqual(["2026-03-19T15:00-08:00", "2027-03-29", "2021-03-01/2021-06-01", "XXXX-WXX-1"]));
+        Check("parse-date", Nlp.ParseDate("next Friday", reference)?.Start == new DateTimeOffset(2026, 3, 27, 0, 0, 0, TimeSpan.Zero));
         Check("quantities", Nlp.Quantities("Pay $5m for 3 km by the twenty-first").Select(q => q.Text + "=" + q.Value).SequenceEqual(["$5m=5000000", "3 km=3", "twenty-first=21"]));
         Check("sequences", Nlp.Sequences("mail a@b.com or 10.0.0.1").Select(s => s.Kind).SequenceEqual([SequenceKind.Email, SequenceKind.IpAddress]));
         Check("recognizer component", Pipeline.Blank(Language.English).Add("recognizers").Process("It cost $5.").Ents.Count == 1);

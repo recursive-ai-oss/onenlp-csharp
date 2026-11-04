@@ -58,4 +58,26 @@ public static class Nlp
     /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     public static IEnumerable<SequenceMatch> Sequences(string text) => Recognizers.Recognizer.English.Recognize(text).OfType<SequenceMatch>();
+
+    /// <summary>
+    /// Finds dates, times, date and time ranges, durations and recurrences in English text and resolves each to a value:
+    /// <c>next Friday</c>, <c>spring 2021</c>, <c>from 3pm to 5pm</c>, <c>two weeks</c>, <c>every Monday at 9am</c>.
+    /// </summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <param name="reference">The moment relative expressions ("tomorrow", "last quarter") are resolved against; wall-clock expressions are read in its offset.</param>
+    /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>. Empty when there are none.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    public static IEnumerable<TemporalMatch> Dates(string text, DateTimeOffset reference) =>
+        Recognizers.Recognizer.English.Recognize(text, new RecognitionContext(reference)).OfType<TemporalMatch>();
+
+    /// <summary>
+    /// Resolves the first date, time or range in an English text to a stretch of time: <c>the first Monday after Easter 2027</c> is
+    /// that day, <c>spring 2021</c> is March to May 2021 (approximate), <c>3pm</c> is that hour on the reference day.
+    /// </summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <param name="reference">The moment relative expressions are resolved against; wall-clock expressions are read in its offset.</param>
+    /// <returns>The range (start inclusive, end exclusive), or <see langword="null"/> when the text holds no date or time. Durations and recurrences are not dates and are skipped; use <see cref="Dates"/> for them.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    public static DateRange? ParseDate(string text, DateTimeOffset reference) =>
+        Dates(text, reference).FirstOrDefault(d => d.Range is not null)?.Range;
 }

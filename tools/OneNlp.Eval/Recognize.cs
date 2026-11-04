@@ -24,6 +24,10 @@ internal static class RecognizeCommand
             ? Recognizer.FromFiles([.. files])
             : Recognizer.For(language);
 
+        DateTimeOffset? defaultReference = o.TryGetValue("reference", out List<string>? rf) && rf.Count > 0
+            ? DateTimeOffset.Parse(rf[0], System.Globalization.CultureInfo.InvariantCulture)
+            : null;
+        string? region = o.TryGetValue("region", out List<string>? rg) && rg.Count > 0 ? rg[0] : null;
         long chars = 0;
         int docs = 0;
         int results = 0;
@@ -39,15 +43,20 @@ internal static class RecognizeCommand
 
             string? id = null;
             string text = line;
+            DateTimeOffset? reference = defaultReference;
             if (line[0] == '{')
             {
                 using JsonDocument json = JsonDocument.Parse(line);
                 text = json.RootElement.GetProperty("text").GetString() ?? string.Empty;
                 id = json.RootElement.TryGetProperty("id", out JsonElement e) ? e.ToString() : null;
+                if (json.RootElement.TryGetProperty("reference", out JsonElement rj) && rj.GetString() is string rs)
+                {
+                    reference = new DateTimeOffset(DateTime.Parse(rs, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None), TimeSpan.Zero);
+                }
             }
 
             timer.Start();
-            IReadOnlyList<Recognition> found = recognizer.Recognize(text);
+            IReadOnlyList<Recognition> found = recognizer.Recognize(text, new RecognitionContext(reference) { Region = region });
             timer.Stop();
             chars += text.Length;
             docs++;
@@ -107,6 +116,16 @@ internal static class RecognizeCommand
                 case SequenceMatch s:
                     w.WriteString("kind", s.Kind.ToString());
                     w.WriteString("normalized", s.Normalized);
+                    break;
+                case TemporalMatch t:
+                    w.WriteString("kind", t.Kind.ToString());
+                    w.WriteString("value", t.Value);
+                    if (t.Granularity is Granularity g)
+                    {
+                        w.WriteString("grain", g.ToString().ToLowerInvariant());
+                    }
+
+                    w.WriteBoolean("approx", t.Approximate);
                     break;
             }
 

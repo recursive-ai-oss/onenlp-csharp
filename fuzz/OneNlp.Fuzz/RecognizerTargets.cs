@@ -17,6 +17,7 @@ internal static class RecognizerTargets
     {
         string text = (data.Length > 0 && (data[0] & 1) == 1) ? FromUnits(data[1..]) : Encoding.UTF8.GetString(data);
         Check(Recognizer.English, text);
+        Check(Recognizer.English, text, new RecognitionContext(new DateTimeOffset(2026, 3, 18, 10, 30, 0, TimeSpan.Zero)) { Region = "gb" });
         Doc doc = Pipe.Process(text);
         int previous = -1;
         foreach (Span e in doc.Ents)
@@ -40,6 +41,11 @@ internal static class RecognizerTargets
         }
 
         Check(recognizer, "twenty-one dollars, $5m, 3.5 km, 50%, 1st, a@b.com http://x.org 1,234.5 USD 20 two hundred and five");
+        Check(
+            recognizer,
+            "Meet tomorrow at 3pm PST, from Monday to Friday, the first Monday after Easter 2027, in 3 days, every 2 weeks, spring 2021, 2026-06-30T09:15:00Z, "
+            + "between 12 and 1 pm, Thanksgiving, 04/05/2026, two hours and 30 minutes, late March 2026, Q3 2025, the 1990s.",
+            new RecognitionContext(new DateTimeOffset(2026, 3, 18, 10, 30, 0, TimeSpan.Zero)));
     }
 
     internal static void SeedText(string dir)
@@ -47,6 +53,7 @@ internal static class RecognizerTargets
         File.WriteAllText(Path.Combine(dir, "seed-mixed"),
             "Pay $2.5 million or twenty-one euros by the 3rd; 12% of 3.5 km at 98.6\u00b0F, 10 GB, 5 years old. Mail Bob@Example.com, "
             + "see https://www.example.com/a_(b)?q=1#x or www.x.org, ping 10.0.0.1 or 2001:db8::1, call +1 (555) 123-4567, "
+            + "On Friday, March 27 at 3:30 pm EST or from 9am to 5pm, last night, in 45 minutes, every Monday at 9am, 2 hours and 30 minutes ago. "
             + "#tag @user 123e4567-e89b-12d3-a456-426614174000 and one and a half, three quarters, a dozen, minus 5.");
     }
 
@@ -61,15 +68,19 @@ internal static class RecognizerTargets
         }
     }
 
-    private static void Check(Recognizer recognizer, string text)
+    private static void Check(Recognizer recognizer, string text, RecognitionContext context = default)
     {
-        IReadOnlyList<Recognition> results = recognizer.Recognize(text);
+        IReadOnlyList<Recognition> results = recognizer.Recognize(text, context);
         int previousEnd = 0;
         foreach (Recognition r in results)
         {
             Require(r.Start >= previousEnd && r.End > r.Start && r.End <= text.Length, "result range and order");
             Require(r.Text == text.Substring(r.Start, r.End - r.Start), "result text");
             Require(r.Confidence is >= 0f and <= 1f && r.Label.Length > 0, "confidence and label");
+            if (r is TemporalMatch t)
+            {
+                Require(t.Value.Length > 0 && (t.Range is not { } range || range.End >= range.Start), "temporal value and range");
+            }
             previousEnd = r.End;
         }
     }

@@ -11,7 +11,7 @@ namespace RecursiveAI.OneNlp.Recognizers;
 /// <para>
 /// <b>Overlaps.</b> Rules propose results independently, and overlapping proposals are settled the same way every time: the longest
 /// wins; of equal length, the type listed first in this order: URL, EMAIL, MENTION, HASHTAG, GUID, IP_ADDRESS, PHONE_LIKE, MONEY,
-/// PERCENT, QUANTITY, ORDINAL, CARDINAL; then the earlier start. What is left does not overlap.
+/// PERCENT, QUANTITY, ORDINAL, CARDINAL (the dates and times, DATE, TIME, DATETIME, DURATION and SET, rank after IP_ADDRESS and before PHONE_LIKE); then the earlier start. What is left does not overlap.
 /// </para>
 /// <para>Instances are immutable and safe to use from several threads. The rule format is in <c>docs/recognizers.md</c>.</para>
 /// </remarks>
@@ -66,7 +66,7 @@ public sealed class Recognizer
 
     /// <summary>Finds everything the rules recognize in a text.</summary>
     /// <param name="text">The text; may be empty.</param>
-    /// <param name="context">Inputs beyond the text; none of the rules for numbers, units, currency and sequences uses them.</param>
+    /// <param name="context">Inputs beyond the text: the reference date and region for dates and times. Without a reference date, relative expressions ("tomorrow", "next Friday") are left out.</param>
     /// <returns>
     /// The results in text order, without overlaps (see the remarks of <see cref="Recognizer"/>). Each is a <see cref="Quantity"/> or a
     /// <see cref="SequenceMatch"/> with UTF-16 offsets into <paramref name="text"/>. Empty when nothing is found.
@@ -75,13 +75,12 @@ public sealed class Recognizer
     public IReadOnlyList<Recognition> Recognize(string text, RecognitionContext context = default)
     {
         ArgumentNullException.ThrowIfNull(text);
-        _ = context;
         if (text.Length == 0)
         {
             return [];
         }
 
-        var scan = new Scan(_data, text);
+        var scan = new Scan(_data, text, context);
         return scan.Run();
     }
 
@@ -116,6 +115,7 @@ internal sealed partial class Scan
         FindNumbers();
         EmitQuantities();
         FindSequences();
+        FindTemporal();
         return Resolve();
     }
 
@@ -127,12 +127,13 @@ internal sealed partial class Scan
         Labels.Hashtag => 3,
         Labels.Guid => 4,
         Labels.IpAddress => 5,
-        Labels.PhoneLike => 6,
-        Labels.Money => 7,
-        Labels.Percent => 8,
-        Labels.Quantity => 9,
-        Labels.Ordinal => 10,
-        _ => 11,
+        Labels.Date or Labels.Time or Labels.DateTime or Labels.Duration or Labels.Set => 6,
+        Labels.PhoneLike => 7,
+        Labels.Money => 8,
+        Labels.Percent => 9,
+        Labels.Quantity => 10,
+        Labels.Ordinal => 11,
+        _ => 12,
     };
 
     // Longest first, then by type order, then earlier start; a result is dropped when it overlaps one already taken.
