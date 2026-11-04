@@ -129,6 +129,58 @@ public class ModelGoldenTests
         Console.WriteLine(string.Join("\n", report));
     }
 
+    /// <summary>Indicative model-only speed on the words of the real-vocabulary goldens; runs only when ONENLP_REAL_GOLDENS names that directory and ONENLP_MODEL_SPEED is set.</summary>
+    [Fact]
+    public void IndicativeModelSpeed()
+    {
+        if (Environment.GetEnvironmentVariable("ONENLP_REAL_GOLDENS") is not { Length: > 0 } dir || Environment.GetEnvironmentVariable("ONENLP_MODEL_SPEED") is null)
+        {
+            return;
+        }
+
+        foreach (string file in Directory.GetFiles(dir, "real-*.jsonl").Order())
+        {
+            var words = new List<string>();
+            ITokenizerModel? model = null;
+            foreach (string line in File.ReadLines(file))
+            {
+                using JsonDocument doc = JsonDocument.Parse(line);
+                if (model is null)
+                {
+                    using JsonDocument tokenizerJson = JsonDocument.Parse(File.ReadAllBytes(doc.RootElement.GetProperty("tokenizer_json").GetString()!));
+                    model = StageRegistry.Default.CreateModel(new StageConfig(tokenizerJson.RootElement.GetProperty("model"), StageRegistry.Default));
+                }
+                else
+                {
+                    words.Add(doc.RootElement.GetProperty("t").GetString()!);
+                }
+            }
+
+            var output = new List<ModelToken>();
+            long tokens = 0;
+            foreach (string w in words)
+            {
+                output.Clear();
+                model!.Tokenize(w, output);
+            }
+
+            long start = System.Diagnostics.Stopwatch.GetTimestamp();
+            const int Passes = 5;
+            for (int pass = 0; pass < Passes; pass++)
+            {
+                foreach (string w in words)
+                {
+                    output.Clear();
+                    model!.Tokenize(w, output);
+                    tokens += output.Count;
+                }
+            }
+
+            double seconds = System.Diagnostics.Stopwatch.GetElapsedTime(start).TotalSeconds;
+            Console.WriteLine($"{Path.GetFileName(file)}: {words.Count * Passes / seconds:N0} words/s, {tokens / seconds:N0} tokens/s (model only, one thread)");
+        }
+    }
+
     private static string Format(IEnumerable<(int Id, string Value, int Start, int End)> tokens)
     {
         var sb = new StringBuilder();
