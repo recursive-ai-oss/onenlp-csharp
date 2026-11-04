@@ -93,6 +93,7 @@ internal static class Program
         MatchingSmoke.Run(Check);
 
         TrainSaveLoad();
+        FastTierSaveLoad();
         EntitySmoke(NerDecoding.Tagging);
         EntitySmoke(NerDecoding.Spans);
 
@@ -136,6 +137,48 @@ internal static class Program
         Doc s2 = loaded.Process("Mr. Li went home. He slept.");
         Check("saved tokenizer data and sentencizer", s1.Sentences.Count >= 2 && s2.Sentences.Count == s1.Sentences.Count && s1.Length == s2.Length);
         Check("hostile pipeline file", Throws<InvalidDataException>(() => PipelineFile.Load(new MemoryStream(new byte[] { 1, 2, 3 }))));
+    }
+
+    // The fast encoder with a tagger, a morphologizer and an edit-tree lemmatizer: train, save, load, predict, under NativeAOT.
+    private static void FastTierSaveLoad()
+    {
+        string[] stems = ["walk", "talk", "jump", "play"];
+        var conllu = new System.Text.StringBuilder();
+        for (int s = 0; s < 30; s++)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                int k = (s + i) % 3;
+                string stem = stems[(s * 3 + i) % stems.Length];
+                conllu.Append(i + 1).Append('\t').Append(stem).Append(k == 1 ? "s" : k == 2 ? "ing" : string.Empty).Append('\t').Append(stem)
+                    .Append("\tVERB\tV").Append(k).Append('\t').Append(k == 1 ? "Number=Sing" : "_").Append("\t0\troot\t_\t_\n");
+            }
+
+            conllu.Append('\n');
+        }
+
+        List<Example> examples = [.. ConllUReader.Read(new StringReader(conllu.ToString())).Select(x => Example.FromReference(x.Doc))];
+        var encoder = new FastEncoder(width: 16, depth: 2, normRows: 128, prefixRows: 32, suffixRows: 64, shapeRows: 32, seed: 2);
+        using Pipeline trained = Pipeline.Blank(Language.English)
+            .Add(new Tagger(encoder) { OwnsEncoder = true })
+            .Add(new Morphologizer(encoder))
+            .Add(new EditTreeLemmatizer(encoder));
+        TrainResult result = trained.Train(examples, new TrainOptions { Epochs = 8, BatchWords = 60, LearningRate = 0.02f, Seed = 3, Dropout = 0f });
+        Check("fast tier trains", result.Completed && result.Steps > 0);
+
+        using var buffer = new MemoryStream();
+        PipelineFile.Save(trained, buffer);
+        using Pipeline loaded = PipelineFile.Load(new MemoryStream(buffer.ToArray()));
+        Doc a = trained.Process("walks talking jump play");
+        Doc b = loaded.Process("walks talking jump play");
+        bool same = a.Length == 4 && b.Length == 4;
+        for (int i = 0; same && i < a.Length; i++)
+        {
+            same = a[i].Tag == b[i].Tag && a[i].Pos == b[i].Pos && a[i].Morph == b[i].Morph && a[i].Lemma == b[i].Lemma && a[i].Lemma.Length > 0;
+        }
+
+        Check("saved fast-tier pipeline reproduces predictions", same);
+        Check("fast tier lemmas", loaded.Process("walks talking")[1].Lemma == "talk");
     }
 
     // Trains a named entity recognizer from JSON Lines with custom labels, saves and loads it, under NativeAOT.
