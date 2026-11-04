@@ -104,7 +104,7 @@ internal sealed class PrecompiledNormalizer : INormalizer
                     // "e" + accent composed to one letter covers just the "e").
                     if (Replace(b, text, starts16[firstCp], starts16[firstCp + 1], offset) == 0 && b.Length == 0)
                     {
-                        leadingDeleted += starts16[next] - starts16[firstCp];
+                        leadingDeleted += next - firstCp;
                     }
 
                     continue;
@@ -118,7 +118,7 @@ internal sealed class PrecompiledNormalizer : INormalizer
                 {
                     if (Replace(b, text, starts16[i], starts16[i + 1], offset) == 0 && b.Length == 0)
                     {
-                        leadingDeleted += starts16[i + 1] - starts16[i];
+                        leadingDeleted++;
                     }
                 }
                 else
@@ -134,8 +134,31 @@ internal sealed class PrecompiledNormalizer : INormalizer
         // Observed in output of tokenizers 0.22.1: characters this map deletes at the very start of the text pull every offset after them
         // back by their number ('\u0016some' reports "some" at 0-4, not 1-5), although deletions later in the text shift nothing.
         // Offsets must equal the reference's, so the same shift is made.
-        b.ShiftOrigins(-leadingDeleted);
+        if (leadingDeleted > 0)
+        {
+            // The shift counts code points of the original, so an astral character's range shrinks by one unit per shifted code point
+            // (observed in output of tokenizers 0.22.1).
+            b.MapOrigins(o => ShiftByCodePoints(s, starts16, o, leadingDeleted));
+        }
+
         b.CopyTo(text);
+    }
+
+    private static int ShiftByCodePoints(string s, List<int> starts16, int unit, int codePoints)
+    {
+        if (unit > s.Length)
+        {
+            return Math.Max(0, unit - codePoints);
+        }
+
+        int cp = starts16.BinarySearch(unit);
+        if (cp < 0)
+        {
+            cp = ~cp - 1;
+        }
+
+        int target = Math.Max(0, cp - codePoints);
+        return starts16[target];
     }
 
     // Appends the pool string at the offset in place of the UTF-16 range [from, to) of the text.

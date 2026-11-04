@@ -143,16 +143,15 @@ internal sealed class NormalizedStringBuilder
 
     /// <summary>Moves every origin by a number of units, not below 0.</summary>
     /// <param name="by">The amount to add to the start and the end of each origin.</param>
-    internal void ShiftOrigins(int by)
-    {
-        if (by == 0)
-        {
-            return;
-        }
+    internal void ShiftOrigins(int by) => MapOrigins(o => Math.Max(0, o + by));
 
+    /// <summary>Replaces the start and the end of every origin by a function of it.</summary>
+    /// <param name="map">The function.</param>
+    internal void MapOrigins(Func<int, int> map)
+    {
         for (int i = 0; i < _alignment.Count; i++)
         {
-            _alignment[i] = new OffsetPair(Math.Max(0, _alignment[i].Start + by), Math.Max(0, _alignment[i].End + by));
+            _alignment[i] = new OffsetPair(map(_alignment[i].Start), map(_alignment[i].End));
         }
     }
 

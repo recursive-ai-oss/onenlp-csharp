@@ -184,10 +184,11 @@ internal sealed class BertNormalizer(bool cleanText, bool handleChineseChars, bo
         b.CopyTo(text);
     }
 
-    // The CJK Unified Ideograph blocks listed in the original BERT tokenization code.
+    // The CJK Unified Ideograph blocks the reference library spaces out. Observed in output of tokenizers 0.22.1 (every scalar value swept):
+    // it stops short of U+2B820..U+2B91F, which the original BERT list would include.
     private static bool IsCjk(int cp) =>
         cp is (>= 0x4E00 and <= 0x9FFF) or (>= 0x3400 and <= 0x4DBF) or (>= 0x20000 and <= 0x2A6DF) or (>= 0x2A700 and <= 0x2B73F)
-            or (>= 0x2B740 and <= 0x2B81F) or (>= 0x2B820 and <= 0x2CEAF) or (>= 0xF900 and <= 0xFAFF) or (>= 0x2F800 and <= 0x2FA1F);
+            or (>= 0x2B740 and <= 0x2B81F) or (>= 0x2B920 and <= 0x2CEAF) or (>= 0xF900 and <= 0xFAFF) or (>= 0x2F800 and <= 0x2FA1F);
 }
 
 /// <summary>NFC, NFD, NFKC or NFKD, keeping alignment: each run of a base character and its combining marks is normalized on its own.</summary>
