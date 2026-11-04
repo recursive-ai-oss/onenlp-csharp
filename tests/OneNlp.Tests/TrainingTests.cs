@@ -339,6 +339,34 @@ public class TrainingTests : IDisposable
     }
 
     [Fact]
+    public void AnEnglishPipelineKeepsItsTokenizerDataAndSentencizerThroughSaveAndLoad()
+    {
+        var encoder = new HashEmbeddingEncoder(width: 32, buckets: 1024, seed: 1);
+        using Pipeline trained = Pipeline.Blank(Language.English).Add("sentencizer").Add(new Tagger(encoder) { OwnsEncoder = true });
+        trained.Train(ToyExamples(30, 1), new TrainOptions { Epochs = 1, Seed = 1 });
+        using var ms = new MemoryStream();
+        PipelineFile.Save(trained, ms);
+        using Pipeline loaded = PipelineFile.Load(new MemoryStream(ms.ToArray()));
+
+        const string Text = "Mr. Smith doesn't know e-mail. He cannot go to the U.S. today!";
+        Doc a = trained.Process(Text);
+        Doc b = loaded.Process(Text);
+        Assert.Equal(a.Select(t => t.ToString()).ToArray(), b.Select(t => t.ToString()).ToArray());
+        Assert.Contains("n't", a.Select(t => t.ToString()));
+        Assert.Equal(a.Sentences.Select(x => x.Text.ToString()).ToArray(), b.Sentences.Select(x => x.Text.ToString()).ToArray());
+        Assert.Equal(2, b.Sentences.Count);
+        Assert.Equal(["sentencizer", "tagger"], loaded.Components.Select(c => c.Name).ToArray());
+
+        // A pipeline with other data keeps that data.
+        using Pipeline neutral = Pipeline.Blank(Language.German).Add("sentencizer");
+        using var ms2 = new MemoryStream();
+        PipelineFile.Save(neutral, ms2);
+        using Pipeline neutralLoaded = PipelineFile.Load(new MemoryStream(ms2.ToArray()));
+        Assert.Equal(neutral.Process(Text).Select(t => t.ToString()).ToArray(), neutralLoaded.Process(Text).Select(t => t.ToString()).ToArray());
+        Assert.Equal(Language.German, neutralLoaded.Language);
+    }
+
+    [Fact]
     public void ComponentsFollowTheRegistryWhenSaved()
     {
         using Pipeline pipeline = NewPipeline();

@@ -105,7 +105,7 @@ internal static class Program
         }
 
         List<Example> examples = [.. ConllUReader.Read(new StringReader(conllu.ToString())).Select(x => Example.FromReference(x.Doc))];
-        using Pipeline trained = Pipeline.Blank(Language.English).Add(new Tagger(new HashEmbeddingEncoder(16, 256, 1)) { OwnsEncoder = true });
+        using Pipeline trained = Pipeline.Blank(Language.English).Add("sentencizer").Add(new Tagger(new HashEmbeddingEncoder(16, 256, 1)) { OwnsEncoder = true });
         TrainResult result = trained.Train(examples, new TrainOptions { Epochs = 4, BatchWords = 60, LearningRate = 0.02f, Seed = 3 });
         Check("train", result.Completed && result.Steps > 0);
 
@@ -121,6 +121,9 @@ internal static class Program
         }
 
         Check("saved pipeline reproduces predictions", same);
+        Doc s1 = trained.Process("Mr. Li went home. He slept.");
+        Doc s2 = loaded.Process("Mr. Li went home. He slept.");
+        Check("saved tokenizer data and sentencizer", s1.Sentences.Count == 2 && s2.Sentences.Count == 2 && s1.Length == s2.Length);
         Check("hostile pipeline file", Throws<InvalidDataException>(() => PipelineFile.Load(new MemoryStream(new byte[] { 1, 2, 3 }))));
     }
 

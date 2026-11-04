@@ -4,6 +4,7 @@ using System.Text.Json;
 using RecursiveAI.OneModel.Training;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
+using RecursiveAI.OneNlp.Segmentation;
 
 namespace RecursiveAI.OneNlp.Neural;
 
@@ -18,9 +19,9 @@ namespace RecursiveAI.OneNlp.Neural;
 /// <c>encoder0</c>…, <c>head0</c>…). The file length must equal 32 plus the two lengths.
 /// </para>
 /// <para>
-/// <b>Config</b> (<c>docs/model-files.md</c>): <c>format</c>, <c>version</c>, <c>language</c>, <c>tokenizer</c> (only <c>rule</c> so far),
+/// <b>Config</b> (<c>docs/model-files.md</c>): <c>format</c>, <c>version</c>, <c>language</c>, <c>tokenizer</c> (<c>rule</c>, or <c>uax</c> with its <c>data</c> name),
 /// <c>encoders</c> (kind and settings), <c>components</c> in pipeline order, each a trainable head (kind, encoder index, config) or the name
-/// of a registered built-in component.
+/// of a registered built-in component with its string settings.
 /// </para>
 /// <para>
 /// <b>Reading is bounded.</b> The config is at most 16 MiB with nesting at most 32; the weights at most 1 GiB; counts of encoders
@@ -41,7 +42,7 @@ public static class PipelineFile
     private const string FormatName = "onenlp-pipeline";
 
     /// <summary>Saves a pipeline to a file, replacing it (written to a temporary name first, then renamed).</summary>
-    /// <param name="pipeline">The pipeline. Its trainable components must be initialized; its other components must be registered in <see cref="ComponentRegistry"/>; its tokenizer must be a <see cref="RuleWordTokenizer"/>.</param>
+    /// <param name="pipeline">The pipeline. Its trainable components must be initialized; its other components must be registered in <see cref="ComponentRegistry"/>; its tokenizer must be a <see cref="RuleWordTokenizer"/> or a <see cref="UaxWordTokenizer"/>.</param>
     /// <param name="path">The destination file.</param>
     /// <exception cref="NotSupportedException">The pipeline holds a tokenizer or component that cannot be saved.</exception>
     /// <exception cref="InvalidOperationException">A trainable component has no weights yet.</exception>
@@ -67,9 +68,9 @@ public static class PipelineFile
     {
         ArgumentNullException.ThrowIfNull(pipeline);
         ArgumentNullException.ThrowIfNull(stream);
-        if (pipeline.Tokenizer is not RuleWordTokenizer)
+        if (pipeline.Tokenizer is not (RuleWordTokenizer or UaxWordTokenizer))
         {
-            throw new NotSupportedException("Only a pipeline with the rule word tokenizer can be saved so far.");
+            throw new NotSupportedException("Only a pipeline with the rule word tokenizer or the UAX #29 word tokenizer can be saved so far.");
         }
 
         (List<ITrainableComponent> heads, List<IEncoder> encoders) = StateModule.Collect(pipeline);
@@ -178,10 +179,7 @@ public static class PipelineFile
         }
 
         Language language = Language.FromCode(JsonSettings.String(root, "language", 32));
-        if (JsonSettings.String(root, "tokenizer") != "rule")
-        {
-            throw new InvalidDataException("Unsupported tokenizer; only 'rule' is known.");
-        }
+        IWordTokenizer tokenizer = ReadTokenizer(JsonSettings.Property(root, "tokenizer"));
 
         JsonElement encodersJson = JsonSettings.Property(root, "encoders");
         JsonElement componentsJson = JsonSettings.Property(root, "components");
@@ -197,7 +195,7 @@ public static class PipelineFile
             encoders.Add(EncoderRegistry.Create(JsonSettings.String(e, "kind"), JsonSettings.Property(e, "settings")));
         }
 
-        var pipeline = new Pipeline(new RuleWordTokenizer(), language);
+        var pipeline = new Pipeline(tokenizer, language);
         try
         {
             foreach (JsonElement c in componentsJson.EnumerateArray())
@@ -210,7 +208,7 @@ public static class PipelineFile
                 }
                 else
                 {
-                    pipeline.Add(name);
+                    pipeline.Add(name, ReadSettings(c));
                 }
             }
 
@@ -228,6 +226,50 @@ public static class PipelineFile
         }
     }
 
+    private static IWordTokenizer ReadTokenizer(JsonElement e)
+    {
+        switch (JsonSettings.String(e, "kind", 16))
+        {
+            case "rule":
+                return new RuleWordTokenizer();
+            case "uax":
+                string data = JsonSettings.String(e, "data", 16);
+                return new UaxWordTokenizer(SegmentationData.ByName(data));
+            default:
+                throw new InvalidDataException("Unsupported tokenizer kind; known kinds are 'rule' and 'uax'.");
+        }
+    }
+
+    private const int MaxSettings = 64;
+
+    // A built-in component's settings: an optional object of short strings.
+    private static Dictionary<string, string>? ReadSettings(JsonElement component)
+    {
+        if (!component.TryGetProperty("settings", out JsonElement e))
+        {
+            return null;
+        }
+
+        if (e.ValueKind != JsonValueKind.Object)
+        {
+            throw new InvalidDataException("'settings' must be an object of strings.");
+        }
+
+        var result = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (JsonProperty p in e.EnumerateObject())
+        {
+            string? value = p.Value.ValueKind == JsonValueKind.String ? p.Value.GetString() : null;
+            if (value is null || value.Length > 256 || p.Name.Length > 256 || result.Count >= MaxSettings)
+            {
+                throw new InvalidDataException("'settings' must hold at most 64 short string values.");
+            }
+
+            result[p.Name] = value;
+        }
+
+        return result;
+    }
+
     private static byte[] WriteConfig(Pipeline pipeline, List<IEncoder> encoders)
     {
         using var buffer = new MemoryStream();
@@ -237,7 +279,18 @@ public static class PipelineFile
             w.WriteString("format", FormatName);
             w.WriteNumber("version", FormatVersion);
             w.WriteString("language", pipeline.Language.Code);
-            w.WriteString("tokenizer", "rule");
+            w.WriteStartObject("tokenizer");
+            if (pipeline.Tokenizer is UaxWordTokenizer uax)
+            {
+                w.WriteString("kind", "uax");
+                w.WriteString("data", uax.Data.Name);
+            }
+            else
+            {
+                w.WriteString("kind", "rule");
+            }
+
+            w.WriteEndObject();
             w.WriteStartArray("encoders");
             foreach (IEncoder encoder in encoders)
             {
@@ -267,6 +320,16 @@ public static class PipelineFile
                 else if (ComponentRegistry.Names.Contains(component.Name))
                 {
                     w.WriteString("type", "builtin");
+                    if (component is IConfigurableComponent configurable)
+                    {
+                        w.WriteStartObject("settings");
+                        foreach (KeyValuePair<string, string> setting in configurable.Settings.OrderBy(k => k.Key, StringComparer.Ordinal))
+                        {
+                            w.WriteString(setting.Key, setting.Value);
+                        }
+
+                        w.WriteEndObject();
+                    }
                 }
                 else
                 {

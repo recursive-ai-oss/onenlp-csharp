@@ -19,17 +19,18 @@ The file length is exactly `32 + C + W`.
 ## Config
 
 ```json
-{"format": "onenlp-pipeline", "version": 1, "language": "en", "tokenizer": "rule",
+{"format": "onenlp-pipeline", "version": 1, "language": "en", "tokenizer": {"kind": "uax", "data": "english"},
  "encoders": [{"kind": "hash-embedding", "settings": {"width": 64, "buckets": 16384, "seed": 1}}],
  "components": [{"name": "tagger", "type": "head", "kind": "tagger", "encoder": 0,
                  "config": {"column": "Tag", "labels": ["NN", "VB"]}},
-                {"name": "norm", "type": "builtin"}]}
+                {"name": "sentencizer", "type": "builtin", "settings": {"data": "english"}}]}
 ```
 
 - `encoders` are the distinct encoders the heads read, in order of first use. Each is rebuilt by `EncoderRegistry.Create(kind, settings)`.
 - `components` are in pipeline order. A `head` is rebuilt by `HeadRegistry.Create(kind, name, encoder, config)`; a `builtin` is created by name from `ComponentRegistry`. A component that is neither a trainable head nor registered cannot be saved.
 - Weights are named `encoder<i>.…` (encoders in order, those with weights) and `head<j>.…` (trainable heads in pipeline order). Loading checks every name, type and shape against the shapes the config implies.
-- Only the rule word tokenizer (`"tokenizer": "rule"`) is saved so far.
+- `tokenizer` is `{"kind": "rule"}` or `{"kind": "uax", "data": "none"|"neutral"|"english"}`, the segmentation data set the tokenizer uses. Other tokenizers cannot be saved yet.
+- A `builtin` component may carry `settings`, an object of at most 64 short strings, written by components that implement `IConfigurableComponent` and passed to `ComponentRegistry.Create` on load (the sentencizer writes `data`).
 
 ## Bounds on read
 
