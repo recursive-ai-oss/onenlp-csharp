@@ -1,0 +1,1 @@
+[{"label":"A","pattern":"cat"},{"label":"B","pattern":[{"MORPH":{"IS_SUBSET":["Number=Sing"]}},{"ENT_IOB":"O"},{"LENGTH":3}]}]

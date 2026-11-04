@@ -1,0 +1,2 @@
+{"label":"ORG","pattern":"Acme Corp","id":"acme"}
+{"label":"NUM","pattern":[{"LIKE_NUM":true},{"ORTH":{"REGEX":"^[a-z]+$"},"OP":"*"}]}

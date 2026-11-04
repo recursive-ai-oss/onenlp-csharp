@@ -61,6 +61,7 @@ public static class ComponentRegistry
         var table = new ConcurrentDictionary<string, ComponentFactory>(StringComparer.Ordinal)
         {
             [NormComponent.ComponentName] = _ => new NormComponent(),
+            [Matching.EntityRuler.ComponentName] = Matching.EntityRuler.FromSettings,
         };
         return table;
     }

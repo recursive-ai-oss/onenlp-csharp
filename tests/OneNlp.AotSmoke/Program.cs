@@ -46,6 +46,8 @@ internal static class Program
         Check("trim", tokenizer.TrimToTokenBudget("a b c", 2).SequenceEqual("a b"));
         Check("loader not yet supported", Throws<NotSupportedException>(() => Tokenizer.FromStream(new MemoryStream(), TokenizerFormat.WordPieceVocabulary)));
 
+        MatchingSmoke.Run(Check);
+
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
     }
