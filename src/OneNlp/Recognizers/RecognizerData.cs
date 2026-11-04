@@ -90,6 +90,8 @@ internal sealed class RecognizerData
 
     internal HashSet<string> Tlds { get; } = new(StringComparer.Ordinal);
 
+    internal TemporalData Temporal { get; } = new();
+
     internal HashSet<string> BareTlds { get; } = new(StringComparer.Ordinal);
 
     private readonly List<(string Canonical, string[] Forms)> _ageUnits = [];
@@ -196,7 +198,8 @@ internal sealed class RecognizerData
     {
         "number.digits", "number.cardinal", "number.ordinal", "number.fraction", "number.article", "number.connector", "number.negative",
         "number.point", "number.suffix", "number.ordinal-suffix", "percent", "unit", "age.unit", "age.suffix", "currency.symbol",
-        "currency.name", "currency.code", "url.scheme", "url.tld", "url.tld.bare",
+        "currency.name", "currency.code", "url.scheme", "url.tld", "url.tld.bare", "time.month", "time.weekday", "time.unit", "time.season",
+        "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday",
     };
 
     private void Apply(string section, string[] f)
@@ -366,6 +369,12 @@ internal sealed class RecognizerData
 
                 break;
             default:
+                if (section.StartsWith("time.", StringComparison.Ordinal))
+                {
+                    Temporal.Add(section, f);
+                    break;
+                }
+
                 throw new RecognizerRulesException($"Unknown section '{section}'.");
         }
     }

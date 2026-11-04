@@ -1,0 +1,152 @@
+# Date and time vocabulary, English.
+#
+# Every section is read by the date/time recognizer; the grammar that combines these words is code. A form starting with "=" is case-sensitive,
+# the others are matched without regard to case. Forms are separated by commas and may have several words ("from now").
+#
+# [time.month]       number 1-12 | forms
+# [time.weekday]     number 1 (Monday) to 7 | forms | plural forms (optional)
+# [time.unit]        name | forms | seconds in one (0 for months and longer) | months in one
+# [time.season]      name | forms | first month | length in months (meteorological, northern hemisphere)
+# [time.daypart]     name | forms | start hour | end hour (24 = midnight)
+# [time.meridiem]    am or pm | forms
+# [time.word]        role | forms. Roles: today, tomorrow, yesterday, tonight, noon, midnight, this, next, last, ago, later, in, at, on, of, and,
+#                    rangeto (connects the ends of a range), from, between, every, each, other, early, mid, late, after, before, half, quarter,
+#                    past (the past three days), article, the, oclock, approx (about, around), weekend,
+#                    zonebase (UTC, GMT: followed by an offset), quarterprefix (Q1), halfprefix (H1)
+# [time.recurrence]  TIMEX3 period | unit | forms (daily, weekly)
+# [time.zone]        forms | offset in minutes | "z" when the zone is written Z (UTC)
+
+[time.month]
+1 | January, =Jan, =Jan.
+2 | February, =Feb, =Feb.
+3 | March, =Mar, =Mar.
+4 | April, =Apr, =Apr.
+5 | =May
+6 | June, =Jun, =Jun.
+7 | July, =Jul, =Jul.
+8 | August, =Aug, =Aug.
+9 | September, =Sep, =Sept, =Sep., =Sept.
+10 | October, =Oct, =Oct.
+11 | November, =Nov, =Nov.
+12 | December, =Dec, =Dec.
+
+[time.weekday]
+1 | Monday, =Mon | Mondays
+2 | Tuesday, =Tue, =Tues | Tuesdays
+3 | Wednesday, =Wed | Wednesdays
+4 | Thursday, =Thu, =Thur, =Thurs | Thursdays
+5 | Friday, =Fri | Fridays
+6 | Saturday, =Sat | Saturdays
+7 | Sunday, =Sun | Sundays
+
+[time.unit]
+second | second, seconds, sec, secs | 1 | 0
+minute | minute, minutes, min, mins | 60 | 0
+hour | hour, hours, hr, hrs | 3600 | 0
+day | day, days | 86400 | 0
+week | week, weeks | 604800 | 0
+week | fortnight, fortnights | 1209600 | 0
+month | month, months | 0 | 1
+quarter | quarter, quarters | 0 | 3
+year | year, years, yr, yrs | 0 | 12
+decade | decade, decades | 0 | 120
+
+[time.season]
+spring | spring | 3 | 3
+summer | summer | 6 | 3
+fall | fall, autumn | 9 | 3
+winter | winter | 12 | 3
+
+[time.daypart]
+morning | morning | 6 | 12
+afternoon | afternoon | 12 | 18
+evening | evening | 18 | 24
+night | night | 20 | 24
+
+[time.meridiem]
+am | am, a.m., a.m
+pm | pm, p.m., p.m
+
+[time.word]
+today | today
+tomorrow | tomorrow
+yesterday | yesterday
+tonight | tonight
+noon | noon
+midnight | midnight
+this | this, current
+next | next, coming, upcoming
+last | last, previous
+ago | ago
+later | from now, hence
+in | in
+at | at, @
+on | on
+of | of
+and | and
+rangeto | to, until, till, through, thru, -, –, —
+from | from
+between | between
+every | every
+each | each
+other | other
+early | early
+mid | mid
+late | late
+after | after, from
+past | past
+before | before
+half | half
+quarter | quarter
+article | a, an
+the | the
+oclock | o'clock, oclock
+approx | about, around, approximately, roughly, circa
+weekend | weekend
+zonebase | =UTC, =GMT
+quarterprefix | =Q
+halfprefix | =H
+
+[time.recurrence]
+P1D | day | daily, nightly
+P1W | week | weekly
+P2W | week | biweekly, fortnightly
+P1M | month | monthly
+P3M | quarter | quarterly
+P1Y | year | yearly, annually
+PT1H | hour | hourly
+
+# Offsets of widely used abbreviations. Several are ambiguous in the world (CST is also China and Cuba, BST also Bangladesh); the reading here is the
+# one English text usually means. GMT and UTC are written Z.
+[time.zone]
+=UTC, =GMT | 0 | z
+=EST | -300
+=EDT | -240
+=CST | -360
+=CDT | -300
+=MST | -420
+=MDT | -360
+=PST | -480
+=PDT | -420
+=AKST | -540
+=AKDT | -480
+=HST | -600
+=WET | 0
+=WEST | 60
+=BST | 60
+=CET | 60
+=CEST | 120
+=EET | 120
+=EEST | 180
+=MSK | 180
+=PKT | 300
+=HKT | 480
+=SGT | 480
+=JST | 540
+=KST | 540
+=ACST | 570
+=AWST | 480
+=AEST | 600
+=AEDT | 660
+=NZST | 720
+=NZDT | 780

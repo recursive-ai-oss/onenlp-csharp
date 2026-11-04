@@ -35,7 +35,10 @@ internal static class Program
                [--json OUT.json] [--markdown OUT.md] [--errors OUT.tsv]
                scores recognizer predictions against a recognizer gold file (docs/recognizer-gold.md): exact-span and relaxed F1 and
                resolution accuracy per type, with bootstrap intervals over sentences. --errors lists the misses (development files only).
-          recognize --in X.jsonl --out Y.jsonl [--lang en] [--rules FILE ...]
+          recognize --gold GOLD.jsonl --out PRED.jsonl [--region us|gb]
+               recognizes every sentence of a recognizer gold file with its own reference time and writes predictions in the gold item shape
+               for 'recognizers'.
+          recognize --in X.jsonl --out Y.jsonl [--lang en] [--rules FILE ...] [--reference 2026-03-18T10:30:00+00:00] [--region us|gb]
                runs the recognizers (numbers, ordinals, percents, measures, money, e-mail, URL, IP, phone-like, hashtag, mention, GUID)
                over JSON lines {"id":..,"text":..} (or plain text lines) and writes one JSON line of results per input. Offsets are
                UTF-16 (start, end) and code points (cpStart, cpEnd). The time spent recognizing is printed to standard error.

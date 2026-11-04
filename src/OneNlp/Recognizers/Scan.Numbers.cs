@@ -24,7 +24,7 @@ internal sealed partial class Scan
     private readonly HashSet<string>.AlternateLookup<ReadOnlySpan<char>> _negatives;
     private readonly HashSet<string>.AlternateLookup<ReadOnlySpan<char>> _points;
 
-    internal Scan(RecognizerData data, string text)
+    internal Scan(RecognizerData data, string text, RecognitionContext context = default)
     {
         _d = data;
         _t = text;
@@ -36,6 +36,7 @@ internal sealed partial class Scan
         _negatives = data.NegativeWords.GetAlternateLookup<ReadOnlySpan<char>>();
         _points = data.PointWords.GetAlternateLookup<ReadOnlySpan<char>>();
         Lexer.Lex(text, _items);
+        InitTemporal(context);
     }
 
     /// <summary>A number found in the text, before it is paired with a unit, a currency or a percent sign.</summary>
@@ -1010,4 +1011,9 @@ internal static class Labels
     internal const string Hashtag = "HASHTAG";
     internal const string Mention = "MENTION";
     internal const string Guid = "GUID";
+    internal const string Date = "DATE";
+    internal const string Time = "TIME";
+    internal const string DateTime = "DATETIME";
+    internal const string Duration = "DURATION";
+    internal const string Set = "SET";
 }
