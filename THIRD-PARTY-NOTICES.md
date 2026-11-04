@@ -7,3 +7,7 @@ Packages depend on other Recursive AI libraries (`RecursiveAI.OneFont`, `Recursi
 ## Test data (not packed)
 
 `tests/testdata/unicode/WordBreakTest.txt` and `SentenceBreakTest.txt` are the Unicode 17.0.0 UAX #29 conformance files, © 2025 Unicode, Inc., redistributed under the Unicode License v3 (https://www.unicode.org/license.txt). They are used only by the test project and are not part of any package.
+
+## Test fixtures
+
+`tests/OneNlp.Tests/Matching/expected.json.gz` records the output of spaCy 3.8.18 (MIT licence, Copyright Explosion) on documents and patterns written for this repository. It is used only by tests.

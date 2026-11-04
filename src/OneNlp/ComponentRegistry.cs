@@ -64,6 +64,7 @@ public static class ComponentRegistry
             // Setting "language" (a language code, default none) picks the segmentation data.
             [Segmentation.SentencizerComponent.ComponentName] = settings => Segmentation.SentencizerComponent.For(
                 settings.TryGetValue("language", out string? code) ? Language.FromCode(code) : Language.Unknown),
+            [Matching.EntityRuler.ComponentName] = Matching.EntityRuler.FromSettings,
         };
         return table;
     }

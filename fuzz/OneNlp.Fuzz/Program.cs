@@ -26,6 +26,7 @@ internal static class Program
         ["docbin"] = SerializationTargets.Bin,
         ["vocab-txt"] = VocabularyReaderTargets.RunVocabTxt,
         ["sentencepiece-model"] = VocabularyReaderTargets.RunSentencePiece,
+        ["pattern-json"] = PatternJsonTarget.Run,
     };
 
     private static int Main(string[] args)

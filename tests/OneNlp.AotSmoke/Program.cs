@@ -80,6 +80,8 @@ internal static class Program
 
         Check("tiktoken ranks", TiktokenRoundTrip());
 
+        MatchingSmoke.Run(Check);
+
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
     }
