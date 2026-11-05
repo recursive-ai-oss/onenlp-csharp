@@ -76,7 +76,7 @@ public sealed partial class SegmentationData
         ArgumentNullException.ThrowIfNull(doc);
         count = 0;
         words = null;
-        if (MultiwordForms.Count == 0 || start < 0 || start + 1 >= doc.Length)
+        if ((MultiwordForms.Count == 0 && Enclitics.Count == 0) || start < 0 || start + 1 >= doc.Length)
         {
             return false;
         }
@@ -84,6 +84,15 @@ public sealed partial class SegmentationData
         // Every multiword token of the data has two words, and the pieces are consecutive slices of the surface.
         Token first = doc[start];
         Token second = doc[start + 1];
+        // Portuguese: a verb and the pronoun after its hyphen (trata + -se) are the words "trata" and "se".
+        if (Enclitics.Count > 0 && first.EndIdx == second.Idx && second.EndIdx - second.Idx > 1 && doc.Text[second.Idx] == '-'
+            && Enclitics.GetAlternateLookup<ReadOnlySpan<char>>().Contains(doc.Text.AsSpan(second.Idx + 1, second.EndIdx - second.Idx - 1)))
+        {
+            count = 2;
+            words = [doc.Text.Substring(first.Idx, first.EndIdx - first.Idx), doc.Text.Substring(second.Idx + 1, second.EndIdx - second.Idx - 1)];
+            return true;
+        }
+
         int length = second.EndIdx - first.Idx;
         if (first.EndIdx != second.Idx || length > 12
             || !MultiwordForms.TryGetValue(doc.Text.Substring(first.Idx, length), out string[]? forms))

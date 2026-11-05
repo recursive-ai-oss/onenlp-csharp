@@ -43,3 +43,16 @@ Written from the UD German guidelines and the German-GSD treebank; the choices b
 - Dates and numbers with `.` or `,` between digits (`24.12.2020`, `1.234,56`) stay whole by UAX #29.
 
 Development split of UD German-GSD, raw text (`recipes/de/fast segment`): tokens 99.81 [99.69, 99.91], words 99.81, sentences 94.64.
+
+## Portuguese data (`SegmentationData.Portuguese`, name `portuguese`)
+
+Written from the UD Portuguese guidelines and the Portuguese-Bosque treebank; the lists below were counted on its training and development files only.
+
+- **Contractions** of a preposition with an article, pronoun or demonstrative (`do`, `da`, `no`, `na`, `ao`, `pelo`, `nesse`, `dele`, `daquilo`, `num`, any case; 78 forms) are cut into two pieces. A form is listed when the treebank writes it as a multiword token far more often than as a single word. The pieces are cut as the CoNLL-U reader cuts the surface form of a multiword token (`docs/data-formats.md`): the words when they spell it (`ao` is `a`|`o`), else nearly equal lengths, longer first (`do` is `d`|`o`, `pelo` is `pe`|`lo`, `nesse` is `nes`|`se`). A consumer that needs UD words writes them back (`de` `o`); the recipe's `predict` does, from the table `Contractions`. `nos` is listed although the pronoun `nos` also occurs (29 of 308 in the training file).
+- **`à`** (`a` + `a`) is one character for two words, so it stays one token; the recipe trains on it as one word and writes the two words back.
+- **Hyphenated words** stay whole (`quinta-feira`, `norte-americano`), except that a pronoun after a verb's hyphen (`se`, `me`, `te`, `lhe`, `lhes`, `nos`, `vos`, `o`, `a`, `os`, `as`, `lo`, `la`, `los`, `las`) is split off with its hyphen: `trata-se` is `trata` `-se`, `dá-lo` is `dá` `-lo`. Every single-hyphen form ending in one of these is a two-word multiword token in the treebank (counted on the training and development files). Forms with two hyphens (`dar-lhe-á`) stay whole. The recipe writes `-lo` back as the word `lo` or `o`, as the training file spells it.
+- **Currency**: `US$`, `R$` and `CR$` are one token (`DollarWords`); the amount is the next token.
+- **Abbreviations** keep their full stop: the listed words (`Dr.`, `Sra.`, `art.`, `pág.`, `etc.`, `Av.`, `Cia.`), dotted initials (`J.F.K.`) and single letters except `a`, `e` and `o`. Sentences do not break after the titles and abbreviations that precede a name or a noun.
+- **Marks**: a run of one repeated mark is one token (`...`, `--`); `!` and `?` are single tokens. Decimal commas and thousands points stay inside the number (`5,50`, `2.200,00`).
+
+Development split of UD Portuguese-Bosque, raw text (`recipes/pt/fast segment`, rule sentencizer): tokens 99.89 [99.83, 99.94], words 99.81 [99.74, 99.87], sentences 80.55 [78.27, 82.61].
