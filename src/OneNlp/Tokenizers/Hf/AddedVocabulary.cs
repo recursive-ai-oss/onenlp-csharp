@@ -70,6 +70,8 @@ internal sealed class AddedVocabulary
     /// <param name="normalizer">The tokenizer's normalizer, or <see langword="null"/>.</param>
     internal void Prepare(INormalizer? normalizer)
     {
+        _preparedWith = normalizer;
+        _filtersBuilt = false;
         _original = new Matcher([.. _byId.Values.Where(t => !t.Normalized).Select(t => (t.Content, t))]);
         var normalized = new List<(string, AddedToken)>();
         foreach (AddedToken t in _byId.Values.Where(t => t.Normalized))
@@ -83,6 +85,91 @@ internal sealed class AddedVocabulary
         }
 
         _normalized = new Matcher(normalized);
+    }
+
+    private System.Buffers.SearchValues<string>? _exactContents;
+    private System.Buffers.SearchValues<string>? _foldedContents;
+    private System.Buffers.SearchValues<char>? _foldChars;
+    private bool _filtersBuilt;
+    private INormalizer? _preparedWith;
+
+    /// <summary>
+    /// Whether a text certainly holds no added token, so that the pass cutting them out can be skipped. It is conservative: "false" only
+    /// means "look". Tokens matched in the original text (or in a text no normalizer changes) are found by exact search. Tokens matched in
+    /// the normalized text are found by a case-blind search of the original, and any character that the normalizer removes or rewrites into
+    /// one of their characters (full-width forms, soft hyphens, controls) counts as a possible hit, as does any character outside the BMP.
+    /// </summary>
+    /// <param name="text">The caller's input.</param>
+    internal bool CannotMatchIn(ReadOnlySpan<char> text)
+    {
+        if (_byId.Count == 0)
+        {
+            return true;
+        }
+
+        if (!_filtersBuilt)
+        {
+            BuildFilters();
+        }
+
+        if (_exactContents is not null && text.IndexOfAny(_exactContents) >= 0)
+        {
+            return false;
+        }
+
+        if (_foldedContents is null)
+        {
+            return true;
+        }
+
+        return text.IndexOfAny(_foldedContents) < 0 && text.IndexOfAny(_foldChars!) < 0 && text.IndexOfAnyInRange('\uD800', '\uDFFF') < 0;
+    }
+
+    private void BuildFilters()
+    {
+        bool identity = _preparedWith is null;
+        var exact = new List<string>();
+        var folded = new List<string>();
+        foreach (AddedToken t in _byId.Values)
+        {
+            if (!t.Normalized || identity)
+            {
+                exact.Add(t.Content);
+                continue;
+            }
+
+            var s = new NormalizedString(t.Content);
+            _preparedWith!.Normalize(s);
+            if (s.Text.Length > 0)
+            {
+                folded.Add(s.Text);
+            }
+        }
+
+        var folds = new HashSet<char>();
+        if (folded.Count > 0)
+        {
+            char[] targets = [.. folded.SelectMany(f => f).SelectMany(c => new[] { c, char.ToLowerInvariant(c), char.ToUpperInvariant(c) }).Distinct()];
+            for (int c = 0; c <= 0xFFFF; c++)
+            {
+                if (c is (>= 0x20 and < 0x7F) or (>= 0xD800 and <= 0xDFFF))
+                {
+                    continue; // printable ASCII is searched for directly, surrogates are handled apart
+                }
+
+                var one = new NormalizedString(((char)c).ToString());
+                _preparedWith!.Normalize(one);
+                if (one.Text.Length == 0 || one.Text.AsSpan().IndexOfAny(targets) >= 0)
+                {
+                    folds.Add((char)c);
+                }
+            }
+        }
+
+        _exactContents = exact.Count > 0 ? System.Buffers.SearchValues.Create([.. exact], StringComparison.Ordinal) : null;
+        _foldedContents = folded.Count > 0 ? System.Buffers.SearchValues.Create([.. folded], StringComparison.OrdinalIgnoreCase) : null;
+        _foldChars = System.Buffers.SearchValues.Create([.. folds]);
+        _filtersBuilt = true;
     }
 
     /// <summary>Cuts added tokens out of an input and normalizes the text between them.</summary>
