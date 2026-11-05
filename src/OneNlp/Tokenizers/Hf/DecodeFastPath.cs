@@ -260,8 +260,18 @@ internal sealed class MetaspacePath(char marker, bool stripFirst) : DecodeFastPa
 /// <summary>WordPiece decoding: continuation prefixes removed, other tokens joined by a space, optional punctuation cleanup.</summary>
 internal sealed class WordPiecePath(string prefix, bool cleanup) : DecodeFastPath
 {
+    private const byte Continuation = 1; // the token starts with the prefix
+    private const byte RewriteFirst = 2; // the cleanup changes the token as the first one
+    private const byte RewriteContinued = 4; // the cleanup changes what is left of a continuation
+    private const byte RewriteSpaced = 8; // the cleanup changes a space and the token
+
+    // What the cleanup does to each token in each of its three positions, worked out once on first use, so that decoding is lookups and
+    // copies for the many tokens it leaves alone.
+    private byte[]? _flags;
+
     internal override string Decode(ReadOnlySpan<int> ids, bool skipSpecialTokens, TokenTable tokens)
     {
+        byte[] flags = _flags ??= Build(tokens);
         int bound = DecodeBuffer.Bound(ids, skipSpecialTokens, tokens, 1);
         char[]? rented = null;
         Span<char> buffer = bound <= DecodeBuffer.StackChars ? stackalloc char[DecodeBuffer.StackChars] : (rented = ArrayPool<char>.Shared.Rent(bound));
@@ -276,46 +286,48 @@ internal sealed class WordPiecePath(string prefix, bool cleanup) : DecodeFastPat
                     continue;
                 }
 
+                byte f = flags[id];
                 ReadOnlySpan<char> piece = token;
                 bool space = false;
-                if (!first)
+                bool rewrite;
+                if (first)
                 {
-                    if (token.StartsWith(prefix, StringComparison.Ordinal))
-                    {
-                        piece = token.AsSpan(prefix.Length);
-                    }
-                    else
-                    {
-                        space = true;
-                    }
+                    rewrite = (f & RewriteFirst) != 0;
                 }
-
-                first = false;
-                // The cleanup only rewrites a space followed by punctuation or a contraction, so most tokens are copied as they are.
-                if (cleanup && space && piece.Length == 1 && piece[0] is '.' or '?' or '!' or ',')
+                else if ((f & Continuation) != 0)
                 {
-                    // " ." " ?" " !" " ," are the first four rules of the cleanup, and nothing after them touches the result.
-                    buffer[n++] = piece[0];
-                    continue;
-                }
-
-                bool rewrite = cleanup && (WordPieceDecoder.CleanupMayChange(piece) || (space && piece.Length > 0 && WordPieceDecoder.CleanupMayChange([' ', piece[0]])));
-                if (rewrite)
-                {
-                    string cleaned = WordPieceDecoder.Cleanup(space ? " " + piece.ToString() : piece.ToString());
-                    cleaned.CopyTo(buffer[n..]);
-                    n += cleaned.Length;
+                    piece = token.AsSpan(prefix.Length);
+                    rewrite = (f & RewriteContinued) != 0;
                 }
                 else
                 {
-                    if (space)
+                    space = true;
+                    rewrite = (f & RewriteSpaced) != 0;
+                }
+
+                first = false;
+                if (rewrite)
+                {
+                    if (space && piece.Length == 1 && piece[0] is '.' or '?' or '!' or ',')
                     {
-                        buffer[n++] = ' ';
+                        // " ." " ?" " !" " ," are the first four rules of the cleanup, and nothing after them touches the result.
+                        buffer[n++] = piece[0];
+                        continue;
                     }
 
-                    piece.CopyTo(buffer[n..]);
-                    n += piece.Length;
+                    string cleaned = WordPieceDecoder.Cleanup(space ? " " + piece.ToString() : piece.ToString());
+                    cleaned.CopyTo(buffer[n..]);
+                    n += cleaned.Length;
+                    continue;
                 }
+
+                if (space)
+                {
+                    buffer[n++] = ' ';
+                }
+
+                piece.CopyTo(buffer[n..]);
+                n += piece.Length;
             }
 
             return new string(buffer[..n]);
@@ -327,6 +339,48 @@ internal sealed class WordPiecePath(string prefix, bool cleanup) : DecodeFastPat
                 ArrayPool<char>.Shared.Return(rented);
             }
         }
+    }
+
+    private byte[] Build(TokenTable tokens)
+    {
+        var flags = new byte[tokens.Length];
+        for (int id = 0; id < flags.Length; id++)
+        {
+            if (tokens.Raw(id) is not { } token)
+            {
+                continue;
+            }
+
+            byte f = 0;
+            bool continuation = token.StartsWith(prefix, StringComparison.Ordinal);
+            if (continuation)
+            {
+                f |= Continuation;
+            }
+
+            if (cleanup)
+            {
+                // The exact test: a change needs some rule to match the text as it stands.
+                if (WordPieceDecoder.CleanupRuleMatches(token))
+                {
+                    f |= RewriteFirst;
+                }
+
+                if (continuation && WordPieceDecoder.CleanupRuleMatches(token.AsSpan(prefix.Length)))
+                {
+                    f |= RewriteContinued;
+                }
+
+                if (WordPieceDecoder.CleanupRuleMatches(" " + token))
+                {
+                    f |= RewriteSpaced;
+                }
+            }
+
+            flags[id] = f;
+        }
+
+        return flags;
     }
 }
 

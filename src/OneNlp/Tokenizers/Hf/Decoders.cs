@@ -68,15 +68,18 @@ internal sealed class WordPieceDecoder(string prefix, bool cleanup) : ITokenDeco
         return result;
     }
 
-    /// <summary>
-    /// Whether <see cref="Cleanup"/> could change the text: every pattern it replaces starts with a space followed by one of these
-    /// characters, so a text without such a pair is unchanged and need not be rewritten.
-    /// </summary>
-    internal static bool CleanupMayChange(ReadOnlySpan<char> s)
+    private static readonly (string Pattern, string Replacement)[] CleanupRules =
+    [
+        (" .", "."), (" ?", "?"), (" !", "!"), (" ,", ","), (" ' ", "'"), (" n't", "n't"),
+        (" 'm", "'m"), (" do not", " don't"), (" 's", "'s"), (" 've", "'ve"), (" 're", "'re"),
+    ];
+
+    /// <summary>Whether any cleanup rule matches the text as it stands, which is what any change needs to start from.</summary>
+    internal static bool CleanupRuleMatches(ReadOnlySpan<char> s)
     {
-        for (int i = 0; i + 1 < s.Length; i++)
+        foreach ((string pattern, _) in CleanupRules)
         {
-            if (s[i] == ' ' && s[i + 1] is '.' or '?' or '!' or ',' or '\'' or 'n' or 'm' or 'd' or 's' or 'v' or 'r')
+            if (s.Length >= pattern.Length && s.Contains(pattern, StringComparison.Ordinal))
             {
                 return true;
             }
@@ -84,12 +87,6 @@ internal sealed class WordPieceDecoder(string prefix, bool cleanup) : ITokenDeco
 
         return false;
     }
-
-    private static readonly (string Pattern, string Replacement)[] CleanupRules =
-    [
-        (" .", "."), (" ?", "?"), (" !", "!"), (" ,", ","), (" ' ", "'"), (" n't", "n't"),
-        (" 'm", "'m"), (" do not", " don't"), (" 's", "'s"), (" 've", "'ve"), (" 're", "'re"),
-    ];
 
     /// <summary>Undoes the spaces a tokenizer put before punctuation and contractions.</summary>
     internal static string Cleanup(string s)
