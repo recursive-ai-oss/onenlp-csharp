@@ -81,6 +81,11 @@ public sealed partial class SegmentationData
             return TryMatchTokenGroup(doc, start, out count, out words);
         }
 
+        if (SuffixSplits.Count > 0)
+        {
+            return TryMatchSuffixSplit(this, doc, start, out count, out words);
+        }
+
         if ((MultiwordForms.Count == 0 && Enclitics.Count == 0) || start < 0 || start + 1 >= doc.Length)
         {
             return false;

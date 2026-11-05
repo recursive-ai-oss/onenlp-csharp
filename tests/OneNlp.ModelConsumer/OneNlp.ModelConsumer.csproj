@@ -13,13 +13,16 @@
     <IsAotCompatible>true</IsAotCompatible>
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
     <WithModel Condition="'$(WithModel)' == ''">true</WithModel>
+    <!-- The language package to consume: English (default), German, Portuguese or Dutch. -->
+    <ModelLang Condition="'$(ModelLang)' == ''">English</ModelLang>
     <DefineConstants Condition="'$(WithModel)' != 'true'">$(DefineConstants);NO_MODEL</DefineConstants>
+    <DefineConstants>$(DefineConstants);LANG_$(ModelLang.ToUpperInvariant());LANG_ENGLISH_CHECKS_$(ModelLang)</DefineConstants>
     <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ONENLP_CONSUMER_FEED)</RestoreAdditionalProjectSources>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="RecursiveAI.OneNlp" VersionOverride="$(Version)" />
-    <PackageReference Include="RecursiveAI.OneNlp.Models.English" VersionOverride="$(Version)" Condition="'$(WithModel)' == 'true'" />
+    <PackageReference Include="RecursiveAI.OneNlp.Models.$(ModelLang)" VersionOverride="$(Version)" Condition="'$(WithModel)' == 'true'" />
   </ItemGroup>
 
 </Project>

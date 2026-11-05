@@ -2,7 +2,7 @@
   <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
        To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
   <ItemGroup>
-    <PortugueseWeight Include="tagging.onenlp" Size="36696427" Sha256="a1c625a70b86bb487abfbde88b97b76012bb2c3d724a40568f0f0bbd5a8a5407"
+    <PortugueseWeight Include="tagging.onenlp" Size="36696933" Sha256="d9bfe33eb4080660cff562c9b9289933a83e3c009fabbec7e1e57c6a980442f5"
                   Recipe="recipes/pt/fast" Data="UD Portuguese-Bosque r2.18 (CC BY-SA 4.0)" Contents="sentencizer, morphologizer, lemmatizer" />
     <PortugueseWeight Include="parser.onenlp" Size="46033533" Sha256="277a4526586eb4233f552373923f2bccadb3495afc70956924ba8ca4a08566d4"
                   Recipe="recipes/pt/fast" Data="UD Portuguese-Bosque r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />

@@ -58,8 +58,9 @@ public sealed class Parser : TrainableHead
     /// <param name="recurrentSize">The hidden size per direction of a bidirectional LSTM run over each document after the window layers, 0 to 1024; 0 means none. Default 0.</param>
     /// <param name="recurrentLayers">The number of stacked LSTM layers, 1 to 8, when <paramref name="recurrentSize"/> is above 0. Default 1.</param>
     /// <param name="name">The component name, unique in its pipeline. Default <c>parser</c>.</param>
+    /// <param name="labelBilinear">Whether the label scorer has a matrix per label (the biaffine classifier of Dozat and Manning 2017), which costs <c>labelSize</c> times <c>labelSize</c> times the number of labels multiply-adds per token, about ten times the rest of the parser. When false the scorer is the linear map of the dependent and head vectors alone. Default true.</param>
     /// <exception cref="ArgumentOutOfRangeException">A size is out of range.</exception>
-    public Parser(IEncoder encoder, int arcSize = 256, int labelSize = 128, int contextLayers = 2, int recurrentSize = 0, int recurrentLayers = 1, string name = "parser")
+    public Parser(IEncoder encoder, int arcSize = 256, int labelSize = 128, int contextLayers = 2, int recurrentSize = 0, int recurrentLayers = 1, string name = "parser", bool labelBilinear = true)
         : base(name, encoder)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(arcSize, 1);
@@ -77,6 +78,7 @@ public sealed class Parser : TrainableHead
         ContextLayers = contextLayers;
         RecurrentSize = recurrentSize;
         RecurrentLayers = recurrentLayers;
+        LabelBilinear = labelBilinear;
     }
 
     /// <summary>The width of the arc scorer's vectors.</summary>
@@ -93,6 +95,9 @@ public sealed class Parser : TrainableHead
 
     /// <summary>The number of stacked LSTM layers.</summary>
     public int RecurrentLayers { get; }
+
+    /// <summary>Whether the label scorer has a matrix per label.</summary>
+    public bool LabelBilinear { get; }
 
     /// <summary>The dependency relations, in output order; empty until the parser is initialized.</summary>
     public IReadOnlyList<string> Labels => _labels;
@@ -344,6 +349,11 @@ public sealed class Parser : TrainableHead
         writer.WriteNumber("contextLayers", ContextLayers);
         writer.WriteNumber("recurrentSize", RecurrentSize);
         writer.WriteNumber("recurrentLayers", RecurrentLayers);
+        if (!LabelBilinear)
+        {
+            writer.WriteNumber("labelBilinear", 0);
+        }
+
         writer.WriteStartArray("labels");
         foreach (string label in _labels)
         {
@@ -379,7 +389,8 @@ public sealed class Parser : TrainableHead
             JsonSettings.Int(config, "contextLayers", 0, 16),
             config.TryGetProperty("recurrentSize", out _) ? JsonSettings.Int(config, "recurrentSize", 0, 1024) : 0,
             config.TryGetProperty("recurrentLayers", out _) ? JsonSettings.Int(config, "recurrentLayers", 1, 8) : 1,
-            name)
+            name,
+            JsonSettings.OptionalInt(config, "labelBilinear", 0, 1, 1) == 1)
         { OwnsEncoder = true };
         parser.Build(labels, new Generator(0));
         return parser;
@@ -415,7 +426,7 @@ public sealed class Parser : TrainableHead
         }
 
         _rootLabel = _labelIds.TryGetValue(RootLabel, out int root) ? root : -1;
-        _module = new ParserModule(Encoder.Width, ArcSize, LabelSize, ContextLayers, RecurrentSize, RecurrentLayers, labels.Length, generator);
+        _module = new ParserModule(Encoder.Width, ArcSize, LabelSize, ContextLayers, RecurrentSize, RecurrentLayers, labels.Length, LabelBilinear, generator);
     }
 
     /// <summary>The gold tree of an example on the predicted tokens, or null when the tokenizations differ.</summary>
@@ -452,6 +463,13 @@ public sealed class Parser : TrainableHead
 
             ReadOnlySpan<int> refHeads = reference.GetHeads();
             ReadOnlySpan<int> refDeps = reference.GetColumn(TokenColumn.Dep);
+            if (!refDeps.ContainsAnyExcept(0))
+            {
+                // No gold relation at all: the document carries other annotation (entities, say), and its unset heads (every token its own
+                // root) are not a tree to learn from.
+                return null;
+            }
+
             ReadOnlySpan<SentenceBoundary> marks = reference.GetSentenceBoundaries();
             var start = new bool[n];
             var sentences = new List<(int, int)>();
@@ -507,7 +525,7 @@ public sealed class Parser : TrainableHead
         private readonly Linear _arcHeadBias;
         private readonly Linear _relDep;
         private readonly Linear _relHead;
-        private readonly Linear _relBilinear;
+        private readonly Linear? _relBilinear;
         private readonly Linear _relPair;
         private readonly Linear _boundary;
         private readonly int _recurrentSize;
@@ -515,7 +533,7 @@ public sealed class Parser : TrainableHead
         private readonly Embedding _rootArc;
         private readonly Embedding _rootRel;
 
-        public ParserModule(int width, int arcSize, int labelSize, int contextLayers, int recurrentSize, int recurrentLayers, int labels, Generator generator)
+        public ParserModule(int width, int arcSize, int labelSize, int contextLayers, int recurrentSize, int recurrentLayers, int labels, bool labelBilinear, Generator generator)
         {
             _width = width;
             _labels = labels;
@@ -539,7 +557,11 @@ public sealed class Parser : TrainableHead
             _arcHeadBias = RegisterModule("arc_head_bias", new Linear(arcSize, 1, generator));
             _relDep = RegisterModule("rel_dep", new Linear(top, labelSize, generator));
             _relHead = RegisterModule("rel_head", new Linear(top, labelSize, generator));
-            _relBilinear = RegisterModule("rel_bilinear", new Linear(labelSize, labels * labelSize, generator, bias: false));
+            if (labelBilinear)
+            {
+                _relBilinear = RegisterModule("rel_bilinear", new Linear(labelSize, labels * labelSize, generator, bias: false));
+            }
+
             _relPair = RegisterModule("rel_pair", new Linear(2 * labelSize, labels, generator));
             _boundary = RegisterModule("boundary", new Linear(top, 2, generator));
             _rootArc = RegisterModule("root_arc", new Embedding(1, arcSize, generator));
@@ -655,8 +677,14 @@ public sealed class Parser : TrainableHead
             Tensor heads = Ops.Concat([p.RelHead, _rootRel.Forward(IntTensor([0]))], 0);
             Tensor d = Ops.Embedding(p.RelDep, IntTensor(depRows));
             Tensor h = Ops.Embedding(heads, IntTensor(headRows));
+            Tensor pair = _relPair.Forward(Ops.Concat([d, h], 1));
+            if (_relBilinear is null)
+            {
+                return pair;
+            }
+
             Tensor product = _relBilinear.Forward(d).Reshape(count, _labels, _labelSize) * h.Reshape(count, 1, _labelSize);
-            return Ops.Sum(product, 2) + _relPair.Forward(Ops.Concat([d, h], 1));
+            return Ops.Sum(product, 2) + pair;
         }
 
         private static Tensor IntTensor(int[] values)

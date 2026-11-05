@@ -9,7 +9,7 @@
 | `tokenizer-json-models` | the same, with the real WordPiece, BPE, Unigram and WordLevel models behind the stages | the same rules |
 | `code-point-regex` | a regular expression, a NUL byte, then a text | parsing raises only `InvalidDataException`; matching raises only `InvalidOperationException` (step budget or depth); matches are ordered non-empty ranges inside the text |
 | `charsmap` | bytes used as the data of a SentencePiece character map normalizer | construction raises only `InvalidDataException`; normalizing never throws |
-| `segmentation` | arbitrary bytes, as above | word tokenizer and sentencizer with no data, neutral, English and French data: offsets ascending and in range, every non-white-space character inside a token, sentences partition the tokens |
+| `segmentation` | arbitrary bytes, as above | word tokenizer and sentencizer with no data, neutral, English, French and Dutch data: offsets ascending and in range, every non-white-space character inside a token, sentences partition the tokens |
 | `doc-json` | arbitrary bytes | `Doc.FromJson`: only `InvalidDataException` may escape; a document that reads must write to binary and back to the same bytes, and to JSON and back (unless it holds an unpaired surrogate, which JSON cannot carry) |
 | `doc-binary` | byte 0 is a mode, the rest a serialized document (bit 0 rewrites the header's flags and length to fit the input, bit 1 also appends a valid checksum, so mutations reach the section decoders) | `Doc.FromBytes`: only `InvalidDataException`; a document that reads writes and reads back to the same bytes |
 | `docbin` | same framing, for a bin | `DocBin.FromBytes` and `DocBinReader`: only `InvalidDataException`; the streaming reader yields the same documents as the whole-bin reader |

@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Text;
 using System.Text.Json;
 using RecursiveAI.OneModel.Tensors;
@@ -31,17 +32,28 @@ public sealed class Morphologizer : TrainableHead
     private const int MaxLabels = 1 << 16;
     private const string PosPrefix = "POS=";
     private string[] _labels = [];
+    private StringStore? _idStore;
+    private (int Pos, int Morph)[]? _ids;
     private Dictionary<string, int> _labelIds = new(StringComparer.Ordinal);
     private (string Pos, string Morph)[] _parts = [];
-    private LabelModule? _module;
+    private FactoredOutput? _module;
+    private readonly int _headClasses;
 
     /// <summary>Creates an uninitialized morphologizer.</summary>
     /// <param name="encoder">The encoder it reads.</param>
     /// <param name="name">The component name, unique in its pipeline. Default <c>morphologizer</c>.</param>
-    public Morphologizer(IEncoder encoder, string name = "morphologizer")
+    /// <param name="headClasses">With a value above 0 the output layer is two-level (see <see cref="FactoredOutput"/>): the most frequent <paramref name="headClasses"/> labels are scored for every token and the rest only for tokens none of them suits, which cuts the work of the layer several-fold when a few labels cover nearly all tokens. 0 (the default) scores every label for every token.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="headClasses"/> is negative or above 4096.</exception>
+    public Morphologizer(IEncoder encoder, string name = "morphologizer", int headClasses = 0)
         : base(name, encoder)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(headClasses);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(headClasses, 4096);
+        _headClasses = headClasses;
     }
+
+    /// <summary>The number of labels scored for every token (0 when every label is).</summary>
+    public int HeadClasses => _headClasses;
 
     /// <summary>The joint labels, in output order; empty until initialized.</summary>
     public IReadOnlyList<string> Labels => _labels;
@@ -64,7 +76,7 @@ public sealed class Morphologizer : TrainableHead
             throw new InvalidOperationException($"The component '{Name}' is already initialized.");
         }
 
-        var seen = new SortedSet<string>(StringComparer.Ordinal);
+        var counts = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (Example example in examples)
         {
             Doc reference = example.Reference;
@@ -74,22 +86,28 @@ public sealed class Morphologizer : TrainableHead
             {
                 if (pos[t] != 0)
                 {
-                    seen.Add(Join(reference.Strings[pos[t]], morph[t] == 0 ? string.Empty : reference.Strings[morph[t]]));
+                    string label = Join(reference.Strings[pos[t]], morph[t] == 0 ? string.Empty : reference.Strings[morph[t]]);
+                    counts[label] = counts.GetValueOrDefault(label) + 1;
                 }
             }
         }
 
-        if (seen.Count == 0)
+        // Falling frequency when the output layer is two-level (its first classes are the frequent ones), alphabetical otherwise.
+        IEnumerable<string> ordered = _headClasses > 0
+            ? counts.OrderByDescending(kv => kv.Value).ThenBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => kv.Key)
+            : counts.Keys.Order(StringComparer.Ordinal);
+        string[] seen = [.. ordered];
+        if (seen.Length == 0)
         {
             throw new ArgumentException($"The training examples hold no gold part-of-speech values for the component '{Name}'.", nameof(examples));
         }
 
-        if (seen.Count > MaxLabels)
+        if (seen.Length > MaxLabels)
         {
             throw new ArgumentException($"The training examples hold more than {MaxLabels} distinct part-of-speech and feature combinations.", nameof(examples));
         }
 
-        Build([.. seen], new Generator(seed));
+        Build(seen, new Generator(seed));
     }
 
     /// <inheritdoc/>
@@ -97,7 +115,7 @@ public sealed class Morphologizer : TrainableHead
     {
         ArgumentNullException.ThrowIfNull(encoded);
         ArgumentNullException.ThrowIfNull(examples);
-        LabelModule module = _module ?? throw new InvalidOperationException($"The component '{Name}' is not initialized.");
+        FactoredOutput module = _module ?? throw new InvalidOperationException($"The component '{Name}' is not initialized.");
         if (examples.Count != encoded.DocCount)
         {
             throw new ArgumentException("The batch has a different number of documents than examples.", nameof(examples));
@@ -129,47 +147,57 @@ public sealed class Morphologizer : TrainableHead
             }
         }
 
-        Tensor targetTensor = Tensor.FromSpan<int>(targets, Shape.Create(targets.Length));
-        ActivationScope.Track(targetTensor);
-        return Losses.CrossEntropy(module.Forward(encoded.Vectors), targetTensor, 0f, IgnoreIndex, counted > 0);
+        return module.Loss(encoded.Vectors, targets, IgnoreIndex, counted);
     }
 
     /// <inheritdoc/>
     public override void Predict(EncodedBatch encoded, ReadOnlySpan<Doc> docs)
     {
         ArgumentNullException.ThrowIfNull(encoded);
-        LabelModule module = _module ?? throw new InvalidOperationException($"The component '{Name}' is not initialized.");
-        Tensor probabilities = Ops.Softmax(module.Forward(encoded.Vectors));
-        ReadOnlySpan<float> p = probabilities.Data<float>();
-        int classes = _labels.Length;
-        for (int d = 0; d < docs.Length; d++)
+        FactoredOutput module = _module ?? throw new InvalidOperationException($"The component '{Name}' is not initialized.");
+        int rows = encoded.TokenCount;
+        int[] best = ArrayPool<int>.Shared.Rent(rows);
+        float[] probability = ArrayPool<float>.Shared.Rent(rows);
+        try
         {
-            Doc doc = docs[d];
-            int start = encoded.Start(d);
-            var pos = new int[doc.Length];
-            var morph = new int[doc.Length];
-            var confidence = new float[doc.Length];
-            for (int t = 0; t < doc.Length; t++)
+            module.Decode(encoded.Vectors, best.AsSpan(0, rows), probability.AsSpan(0, rows));
+            for (int d = 0; d < docs.Length; d++)
             {
-                ReadOnlySpan<float> row = p.Slice((start + t) * classes, classes);
-                int best = 0;
-                for (int c = 1; c < classes; c++)
+                Doc doc = docs[d];
+                int start = encoded.Start(d);
+                var pos = new int[doc.Length];
+                var morph = new int[doc.Length];
+                var confidence = new float[doc.Length];
+                for (int t = 0; t < doc.Length; t++)
                 {
-                    if (row[c] > row[best])
+                    int label = best[start + t];
+                    if (_ids is null || !ReferenceEquals(_idStore, doc.Strings))
                     {
-                        best = c;
+                        // Label to string id: one table per string store, so a token costs an array read instead of two hash lookups.
+                        _idStore = doc.Strings;
+                        _ids = new (int Pos, int Morph)[_parts.Length];
+                        Array.Fill(_ids, (-1, -1));
                     }
+
+                    if (_ids[label].Pos < 0)
+                    {
+                        (string posValue, string morphValue) = _parts[label];
+                        _ids[label] = (doc.Strings.Add(posValue), morphValue.Length == 0 ? 0 : doc.Strings.Add(morphValue));
+                    }
+
+                    (pos[t], morph[t]) = _ids[label];
+                    confidence[t] = probability[start + t];
                 }
 
-                (string posValue, string morphValue) = _parts[best];
-                pos[t] = doc.Strings.Add(posValue);
-                morph[t] = morphValue.Length == 0 ? 0 : doc.Strings.Add(morphValue);
-                confidence[t] = float.IsNaN(row[best]) ? 0f : Math.Clamp(row[best], 0f, 1f);
+                doc.SetColumn(TokenColumn.Pos, pos);
+                doc.SetColumn(TokenColumn.Morph, morph);
+                doc.SetConfidences(confidence);
             }
-
-            doc.SetColumn(TokenColumn.Pos, pos);
-            doc.SetColumn(TokenColumn.Morph, morph);
-            doc.SetConfidences(confidence);
+        }
+        finally
+        {
+            ArrayPool<int>.Shared.Return(best);
+            ArrayPool<float>.Shared.Return(probability);
         }
     }
 
@@ -177,6 +205,11 @@ public sealed class Morphologizer : TrainableHead
     public override void WriteConfig(Utf8JsonWriter writer)
     {
         ArgumentNullException.ThrowIfNull(writer);
+        if (_module is { IsFactored: true })
+        {
+            writer.WriteNumber("headClasses", _module.HeadClasses);
+        }
+
         writer.WriteStartArray("labels");
         foreach (string label in _labels)
         {
@@ -213,7 +246,7 @@ public sealed class Morphologizer : TrainableHead
             }
         }
 
-        var head = new Morphologizer(encoder, name) { OwnsEncoder = true };
+        var head = new Morphologizer(encoder, name, JsonSettings.OptionalInt(config, "headClasses", 0, 4096, 0)) { OwnsEncoder = true };
         head.Build(labels, new Generator(0));
         return head;
     }
@@ -242,16 +275,6 @@ public sealed class Morphologizer : TrainableHead
             _parts[i] = bar < 0 ? (rest, string.Empty) : (rest[..bar], rest[(bar + 1)..]);
         }
 
-        _module = new LabelModule(Encoder.Width, labels.Length, generator);
-    }
-
-    private sealed class LabelModule : NnModule
-    {
-        private readonly Linear _output;
-
-        public LabelModule(int width, int labels, Generator generator) =>
-            _output = RegisterModule("output", new Linear(width, labels, generator));
-
-        public override Tensor Forward(Tensor input) => _output.Forward(input);
+        _module = new FactoredOutput(Encoder.Width, labels.Length, _headClasses, generator);
     }
 }
