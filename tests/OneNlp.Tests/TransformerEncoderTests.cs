@@ -296,4 +296,114 @@ public class TransformerEncoderTests
         Assert.Equal(16, again.Width);
         Assert.Throws<InvalidDataException>(() => ((TransformerEncoder)again).VerifyModelFile());
     }
+
+    // ---- The distilled-student layout: a random 2-layer encoder with a factorised embedding (width 16, rank 8), made by
+    // tools/distill/make_tiny_student_fixture.py; its reference hidden states come from PyTorch.
+
+    private static string StudentFile => Path.Combine(Dir, "tiny-student.onnx");
+
+    [Fact]
+    public void TheTrainableModulesReproduceThePyTorchStudent()
+    {
+        using JsonDocument reference = JsonDocument.Parse(File.ReadAllText(Path.Combine(Dir, "tiny-student.reference.json")));
+        JsonElement ids = reference.RootElement.GetProperty("input_ids");
+        JsonElement mask = reference.RootElement.GetProperty("attention_mask");
+        JsonElement hidden = reference.RootElement.GetProperty("hidden");
+        int rows = ids.GetArrayLength(), len = ids[0].GetArrayLength();
+        long[] x = [.. ids.EnumerateArray().SelectMany(r => r.EnumerateArray().Select(v => v.GetInt64()))];
+        long[] m = [.. mask.EnumerateArray().SelectMany(r => r.EnumerateArray().Select(v => v.GetInt64()))];
+        using BertStyleEncoder encoder = BertStyleEncoder.FromOnnx(StudentFile);
+        Assert.Equal(16, encoder.Width);
+        Assert.Equal(4, encoder.Heads);
+        Assert.Equal(2, encoder.LayerCount);
+        using var scope = new ActivationScope();
+        using Tensor tx = Tensor.FromSpan<long>(x, Shape.Create(rows, len));
+        using (GradMode.NoGrad())
+        {
+            Tensor h = encoder.Forward(tx, BertStyleEncoder.PaddingMask(m, rows, len));
+            ReadOnlySpan<float> got = h.Data<float>();
+            double max = 0;
+            for (int r = 0; r < rows; r++)
+            {
+                for (int t = 0; t < len; t++)
+                {
+                    if (m[(r * len) + t] == 0)
+                    {
+                        continue;
+                    }
+
+                    for (int j = 0; j < 16; j++)
+                    {
+                        max = Math.Max(max, Math.Abs(got[(((r * len) + t) * 16) + j] - hidden[r][t][j].GetSingle()));
+                    }
+                }
+            }
+
+            Assert.True(max < 1e-4, $"max abs difference {max}");
+        }
+    }
+
+    [Fact]
+    public void TheStudentGraphAndItsTrainableCopyGiveTheSameTokenVectors()
+    {
+        Doc doc = Words("the cat sat on unable mat");
+        foreach (SubwordPooling pooling in new[] { SubwordPooling.FirstPiece, SubwordPooling.Mean })
+        {
+            using var frozen = new TransformerEncoder(StudentFile, TokenizerFile, pooling, maxLength: 8);
+            using var tuned = new TransformerEncoder(StudentFile, TokenizerFile, pooling, maxLength: 8);
+            tuned.EnableFineTuning();
+            Assert.Null(frozen.Weights);
+            Assert.NotNull(tuned.Weights);
+            using var scope = new ActivationScope();
+            float[] a = frozen.Encode([doc]).Vectors.Data<float>().ToArray();
+            float[] b;
+            using (GradMode.NoGrad())
+            {
+                b = tuned.Encode([doc, Words("")]).Vectors.Data<float>().ToArray();
+            }
+
+            Assert.Equal(a.Length, b.Length);
+            for (int i = 0; i < a.Length; i++)
+            {
+                Assert.Equal(a[i], b[i], 1e-4f);
+            }
+        }
+    }
+
+    [Fact]
+    public void FineTuningThroughTrainUpdatesTheEncoderAndTheSavedPipelineReloadsIt()
+    {
+        List<Example> train = Toy(120, 1);
+        List<Example> test = Toy(30, 2);
+        using var encoder = new TransformerEncoder(StudentFile, TokenizerFile);
+        encoder.EnableFineTuning();
+        NnModule weights = encoder.Weights!;
+        float[] before = weights.Parameters().First().Data<float>().ToArray();
+        using Pipeline pipeline = Pipeline.Blank().Add(new Tagger(encoder, TokenColumn.Pos));
+        TrainResult result = pipeline.Train(train, new TrainOptions { Epochs = 12, BatchWords = 200, LearningRate = 0.01f, Dropout = 0f, Seed = 5, DevFraction = 0.1 });
+        Assert.True(result.Completed);
+        Assert.False(before.AsSpan().SequenceEqual(weights.Parameters().First().Data<float>()), "the encoder's weights did not change");
+        double accuracy = Accuracy(pipeline, test);
+        Assert.True(accuracy > 0.9, $"UPOS {accuracy}");
+
+        string path = Path.Combine(Path.GetTempPath(), "onenlp-finetune-" + Guid.NewGuid().ToString("N") + ".onenlp");
+        try
+        {
+            PipelineFile.Save(pipeline, path);
+            TransformerEncoder.ModelDirectory = Dir;
+            try
+            {
+                using Pipeline loaded = PipelineFile.Load(path);
+                Assert.Equal(accuracy, Accuracy(loaded, test));
+            }
+            finally
+            {
+                TransformerEncoder.ModelDirectory = null;
+            }
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
 }

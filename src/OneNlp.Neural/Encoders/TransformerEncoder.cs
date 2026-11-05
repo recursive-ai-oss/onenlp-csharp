@@ -26,9 +26,10 @@ public enum SubwordPooling
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>Frozen.</b> The imported graph is evaluated by OneModel's inference runtime and has no autodiff graph, so
-/// <see cref="Weights"/> is <see langword="null"/> and the encoder is never trained; heads train on its (constant) output. Outputs are
-/// cached per <see cref="Doc"/> instance, so repeated epochs over the same documents run the transformer once.
+/// <b>Frozen by default.</b> The imported graph is evaluated by OneModel's inference runtime and has no autodiff graph, so
+/// <see cref="Weights"/> is <see langword="null"/> and heads train on its (constant) output. Outputs are cached per <see cref="Doc"/>
+/// instance, so repeated epochs over the same documents run the transformer once. <see cref="EnableFineTuning"/> moves the weights of a
+/// distilled-student graph into a <see cref="BertStyleEncoder"/>, which <c>Train</c> then updates with the heads.
 /// </para>
 /// <para>
 /// <b>Pieces and tokens.</b> The text of the whole document is tokenized once, without special tokens, with offsets in UTF-16 units
@@ -64,6 +65,7 @@ public sealed class TransformerEncoder : IEncoder
     private readonly DType _idType;
     private readonly bool _hasMask;
     private readonly ConditionalWeakTable<Doc, CachedRows> _cache = new();
+    private BertStyleEncoder? _module;
 
     /// <summary>
     /// The directory a saved pipeline's relative model and tokenizer file names are looked up in. <see langword="null"/> (the default)
@@ -156,11 +158,39 @@ public sealed class TransformerEncoder : IEncoder
     public int WindowBatch { get; set; } = 8;
 
     /// <inheritdoc/>
-    /// <remarks>Always <see langword="null"/>: the imported graph is not trainable.</remarks>
-    public NnModule? Weights => null;
+    /// <remarks><see langword="null"/> while the encoder is frozen (the default: the imported graph has no autodiff). After <see cref="EnableFineTuning"/> it is the <see cref="BertStyleEncoder"/> that <see cref="Encode"/> runs.</remarks>
+    public NnModule? Weights => _module;
+
+    /// <summary>
+    /// Switches to a trainable copy of the encoder: the weights of the exported graph are moved into a <see cref="BertStyleEncoder"/>,
+    /// <see cref="Weights"/> returns it, and <see cref="Encode"/> runs it with the autodiff graph recording, so <c>Train</c> updates the
+    /// encoder together with the heads. Cached outputs are not used. Calling it again does nothing.
+    /// </summary>
+    /// <param name="heads">The attention head count, or <see langword="null"/> to read it from the <c>.config.json</c> beside the model.</param>
+    /// <exception cref="InvalidDataException">The graph is not a distilled-student encoder (see <see cref="BertStyleEncoder.FromOnnx"/>) or its width differs from the graph's output.</exception>
+    public void EnableFineTuning(int? heads = null)
+    {
+        if (_module is not null)
+        {
+            return;
+        }
+
+        BertStyleEncoder module = BertStyleEncoder.FromOnnx(_modelFile, heads);
+        if (module.Width != Width)
+        {
+            module.Dispose();
+            throw new InvalidDataException("The trainable copy has a different width than the graph's output.");
+        }
+
+        _module = module;
+    }
 
     /// <inheritdoc/>
-    public void Dispose() => _session.Dispose();
+    public void Dispose()
+    {
+        _module?.Dispose();
+        _session.Dispose();
+    }
 
     /// <summary>Checks the model file against the SHA-256 given at construction.</summary>
     /// <exception cref="InvalidDataException">No hash was given, or the file's hash differs.</exception>
@@ -182,6 +212,11 @@ public sealed class TransformerEncoder : IEncoder
     /// <inheritdoc/>
     public EncodedBatch Encode(ReadOnlySpan<Doc> docs)
     {
+        if (_module is not null)
+        {
+            return EncodeTrainable(docs, _module);
+        }
+
         var starts = new int[docs.Length + 1];
         for (int d = 0; d < docs.Length; d++)
         {
@@ -235,6 +270,10 @@ public sealed class TransformerEncoder : IEncoder
 
         writer.WriteString("pooling", Pooling == SubwordPooling.Mean ? "mean" : "first");
         writer.WriteNumber("maxLength", MaxLength);
+        if (_module is not null)
+        {
+            writer.WriteBoolean("fineTune", true);
+        }
     }
 
     internal static IEncoder FromSettings(JsonElement s)
@@ -248,12 +287,126 @@ public sealed class TransformerEncoder : IEncoder
         string? sha = s.TryGetProperty("modelSha256", out _) ? JsonSettings.String(s, "modelSha256", 64) : null;
         string model = Resolve(JsonSettings.String(s, "model", 1024));
         string tokenizer = Resolve(JsonSettings.String(s, "tokenizer", 1024));
-        return new TransformerEncoder(
+        var encoder = new TransformerEncoder(
             model,
             tokenizer,
             pooling == "mean" ? SubwordPooling.Mean : SubwordPooling.FirstPiece,
             JsonSettings.Int(s, "maxLength", 2, MaxLengthLimit),
             sha);
+        if (s.TryGetProperty("fineTune", out JsonElement fine) && fine.ValueKind == JsonValueKind.True)
+        {
+            encoder.EnableFineTuning();
+        }
+
+        return encoder;
+    }
+
+    // The same windows and pooling as Compute, but through the trainable module: every window's hidden states are rows of one table,
+    // and a token's vector is the (mean of the) table rows of the pieces it owns, gathered with Ops.Embedding so gradients flow back.
+    private EncodedBatch EncodeTrainable(ReadOnlySpan<Doc> docs, BertStyleEncoder module)
+    {
+        var starts = new int[docs.Length + 1];
+        var docIndexes = new List<int>();
+        for (int d = 0; d < docs.Length; d++)
+        {
+            starts[d + 1] = starts[d] + docs[d].Length;
+            if (docs[d].Length > 0)
+            {
+                docIndexes.Add(d);
+            }
+        }
+
+        int total = starts[^1];
+        if (total == 0)
+        {
+            Tensor empty = Tensor.Zeros(DType.F32, Shape.Create(0, Width));
+            ActivationScope.Track(empty);
+            return new EncodedBatch(empty, starts);
+        }
+
+        (List<Window> windows, Dictionary<int, DocPlan> plans) = PlanWindows(docs, docIndexes);
+        int[] order = [.. Enumerable.Range(0, windows.Count).OrderByDescending(i => windows[i].Count).ThenBy(i => i)];
+        int batchSize = Math.Max(1, WindowBatch);
+        var tables = new List<Tensor>();
+        var pairs = new List<(int Token, int Row)>();
+        var counts = new int[total];
+        int baseRow = 0;
+        for (int b = 0; b < order.Length; b += batchSize)
+        {
+            ReadOnlySpan<int> batch = order.AsSpan(b, Math.Min(batchSize, order.Length - b));
+            (long[] ids, long[] keep, int length) = BuildBatch(batch, windows, plans);
+            int rows = batch.Length;
+            // Tensors the backward pass reads stay alive until the surrounding activation scope ends.
+            Tensor idTensor = Tensor.FromSpan<long>(ids, Shape.Create(rows, length));
+            Tensor mask = BertStyleEncoder.PaddingMask(keep, rows, length);
+            ActivationScope.Track(idTensor);
+            ActivationScope.Track(mask);
+            tables.Add(module.Forward(idTensor, mask).Reshape(rows * length, Width));
+            for (int r = 0; r < rows; r++)
+            {
+                Window win = windows[batch[r]];
+                DocPlan plan = plans[win.Doc];
+                for (int i = win.OwnFrom; i < win.OwnTo; i++)
+                {
+                    int row = baseRow + (r * length) + _prefix.Length + (i - win.First);
+                    (int firstToken, int lastToken) = plan.PieceTokens[i];
+                    for (int t = firstToken; t <= lastToken && firstToken >= 0; t++)
+                    {
+                        if (Pooling == SubwordPooling.Mean || plan.FirstPiece(t, i))
+                        {
+                            int token = starts[win.Doc] + t;
+                            pairs.Add((token, row));
+                            counts[token]++;
+                        }
+                    }
+                }
+            }
+
+            baseRow += rows * length;
+        }
+
+        int zeroRow = baseRow;
+        Tensor zeros = Tensor.Zeros(DType.F32, Shape.Create(1, Width));
+        ActivationScope.Track(zeros);
+        tables.Add(zeros);
+        Tensor table = Ops.Concat(tables.ToArray(), 0);
+        int deepest = counts.Max();
+        var slots = new long[deepest][];
+        for (int k = 0; k < deepest; k++)
+        {
+            slots[k] = new long[total];
+            Array.Fill(slots[k], zeroRow);
+        }
+
+        var seen = new int[total];
+        foreach ((int token, int row) in pairs)
+        {
+            slots[seen[token]++][token] = row;
+        }
+
+        Tensor sum = deepest == 0 ? Tensor.Zeros(DType.F32, Shape.Create(total, Width)) : default;
+        for (int k = 0; k < deepest; k++)
+        {
+            Tensor index = Tensor.FromSpan<long>(slots[k], Shape.Create(total));
+            ActivationScope.Track(index);
+            Tensor part = Ops.Embedding(table, index, zeroRow);
+            sum = k == 0 ? part : Ops.Add(sum, part);
+        }
+
+        if (Pooling == SubwordPooling.Mean && deepest > 1)
+        {
+            var inverse = new float[total];
+            for (int t = 0; t < total; t++)
+            {
+                inverse[t] = 1f / Math.Max(1, counts[t]);
+            }
+
+            Tensor scale = Tensor.FromSpan<float>(inverse, Shape.Create(total, 1));
+            ActivationScope.Track(scale);
+            sum = Ops.Mul(sum, scale);
+        }
+
+        return new EncodedBatch(sum, starts);
     }
 
     private static string Resolve(string name) =>
@@ -284,6 +437,40 @@ public sealed class TransformerEncoder : IEncoder
     }
 
     private void Compute(ReadOnlySpan<Doc> docs, List<int> docIndexes, int[] starts, float[] data)
+    {
+        (List<Window> windows, Dictionary<int, DocPlan> plans) = PlanWindows(docs, docIndexes);
+
+        // Longest windows first so a batch pads little.
+        int[] order = [.. Enumerable.Range(0, windows.Count).OrderByDescending(i => windows[i].Count).ThenBy(i => i)];
+        int batchSize = Math.Max(1, WindowBatch);
+        for (int b = 0; b < order.Length; b += batchSize)
+        {
+            int count = Math.Min(batchSize, order.Length - b);
+            RunBatch(docs, order.AsSpan(b, count), windows, plans, starts, data);
+        }
+
+        if (Pooling == SubwordPooling.Mean)
+        {
+            foreach (int d in docIndexes)
+            {
+                int[] counts = plans[d].Counts!;
+                for (int t = 0; t < counts.Length; t++)
+                {
+                    if (counts[t] > 1)
+                    {
+                        float inv = 1f / counts[t];
+                        Span<float> row = data.AsSpan((starts[d] + t) * Width, Width);
+                        for (int j = 0; j < row.Length; j++)
+                        {
+                            row[j] *= inv;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private (List<Window> Windows, Dictionary<int, DocPlan> Plans) PlanWindows(ReadOnlySpan<Doc> docs, List<int> docIndexes)
     {
         int capacity = MaxLength - _prefix.Length - _suffix.Length;
         int step = Math.Max(1, capacity / 2);
@@ -334,40 +521,14 @@ public sealed class TransformerEncoder : IEncoder
             }
         }
 
-        // Longest windows first so a batch pads little.
-        int[] order = [.. Enumerable.Range(0, windows.Count).OrderByDescending(i => windows[i].Count).ThenBy(i => i)];
-        int batchSize = Math.Max(1, WindowBatch);
-        for (int b = 0; b < order.Length; b += batchSize)
-        {
-            int count = Math.Min(batchSize, order.Length - b);
-            RunBatch(docs, order.AsSpan(b, count), windows, plans, starts, data);
-        }
-
-        if (Pooling == SubwordPooling.Mean)
-        {
-            foreach (int d in docIndexes)
-            {
-                int[] counts = plans[d].Counts!;
-                for (int t = 0; t < counts.Length; t++)
-                {
-                    if (counts[t] > 1)
-                    {
-                        float inv = 1f / counts[t];
-                        Span<float> row = data.AsSpan((starts[d] + t) * Width, Width);
-                        for (int j = 0; j < row.Length; j++)
-                        {
-                            row[j] *= inv;
-                        }
-                    }
-                }
-            }
-        }
+        return (windows, plans);
     }
 
     // The window whose centre is nearer to a piece takes it: pieces from the boundary between two windows' centres on.
     private static int Midpoint(int firstA, int firstB, int capacity) => (firstA + firstB + capacity) / 2;
 
-    private void RunBatch(ReadOnlySpan<Doc> docs, ReadOnlySpan<int> batch, List<Window> windows, Dictionary<int, DocPlan> plans, int[] starts, float[] data)
+    // The ids and 0/1 mask of one batch of windows, padded on the right to the longest window.
+    private (long[] Ids, long[] Mask, int Length) BuildBatch(ReadOnlySpan<int> batch, List<Window> windows, Dictionary<int, DocPlan> plans)
     {
         int longest = 0;
         foreach (int w in batch)
@@ -403,6 +564,13 @@ public sealed class TransformerEncoder : IEncoder
             }
         }
 
+        return (ids, mask, length);
+    }
+
+    private void RunBatch(ReadOnlySpan<Doc> docs, ReadOnlySpan<int> batch, List<Window> windows, Dictionary<int, DocPlan> plans, int[] starts, float[] data)
+    {
+        (long[] ids, long[] mask, int length) = BuildBatch(batch, windows, plans);
+        int rows = batch.Length;
         using Tensor idTensor = MakeIds(ids, rows, length);
         using Tensor maskTensor = MakeIds(mask, rows, length);
         using SessionOutputs outputs = _session.Run(
