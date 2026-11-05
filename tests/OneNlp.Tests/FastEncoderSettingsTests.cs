@@ -83,11 +83,28 @@ public class FastEncoderSettingsTests
     [InlineData("\"casedRows\":-1")]
     [InlineData("\"embedWidth\":7")]
     [InlineData("\"plain\":2")]
+    [InlineData("\"turkicCase\":2")]
     [InlineData("\"hashes\":\"two\"")]
     public void OutOfRangeOptionalSettingsAreRejected(string extra)
     {
         string json = "{\"width\":16,\"depth\":1,\"normRows\":100,\"prefixRows\":100,\"suffixRows\":100,\"shapeRows\":100,\"seed\":0," + extra + "}";
         Assert.Throws<InvalidDataException>(() => Create(json));
+    }
+
+    [Fact]
+    public void TurkishCaseIsRecordedOnlyWhenOn()
+    {
+        // Files of other languages must not change: the key is absent unless the setting is on.
+        using FastEncoder plain = FastEncoder.English(3);
+        Assert.False(plain.TurkicCase);
+        Assert.DoesNotContain("turkicCase", Settings(plain), StringComparison.Ordinal);
+
+        using var turkish = new FastEncoder(width: 256, depth: 2, normRows: 32768, prefixRows: 32768, suffixRows: 32768, shapeRows: 32768, seed: 3, prefixLength: 3, suffixLength: 3, casedRows: 0, embedWidth: 64, plain: false, hashes: 1, turkicCase: true);
+        string json = Settings(turkish);
+        Assert.EndsWith(",\"turkicCase\":1}", json, StringComparison.Ordinal);
+        using IEncoder again = Create(json);
+        Assert.True(Assert.IsType<FastEncoder>(again).TurkicCase);
+        Assert.Equal(json, Settings(again));
     }
 
     [Fact]

@@ -87,9 +87,11 @@ public sealed class FastEncoder : IEncoder
     /// <param name="neighbourRows">Rows of four extra tables that hash the lower-cased text and the last <paramref name="suffixLength"/> characters of the previous and of the next token (the document edge hashes to a fixed row). They give every token its neighbours' words for the price of table lookups, where a window layer pays a matrix product. 0 (the default) leaves them out.</param>
     /// <param name="contextRows">Rows of four more tables that hash the lower-cased text of the token two before and two after, and the shape of the previous and of the next token: wider context for the price of table lookups. 0 (the default) leaves them out.</param>
     /// <param name="plain">Join the attributes with a ReLU and no layer normalization, as the original hash-embedding recipes do; the window layers keep theirs. Default false (GELU and layer normalization).</param>
+    /// <param name="turkicCase">Lower-case the norm attribute with the Turkish and Azeri rules (<c>I</c> to <c>ı</c>, <c>İ</c> to <c>i</c>) instead of the invariant ones. Default false; a file records the setting only when it is on, so other languages' files do not change.</param>
     /// <exception cref="ArgumentOutOfRangeException">A size is out of range; each table has 1 to 4,194,304 rows and the tables hold at most 33,554,432 values together.</exception>
-    public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0, int prefixLength = PrefixLength, int suffixLength = SuffixLength, int casedRows = 0, int embedWidth = 0, bool plain = false, int hashes = HashesPerToken, bool relu = false, int neighbourRows = 0, int bigramRows = 0, int contextRows = 0)
+    public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0, int prefixLength = PrefixLength, int suffixLength = SuffixLength, int casedRows = 0, int embedWidth = 0, bool plain = false, int hashes = HashesPerToken, bool relu = false, int neighbourRows = 0, int bigramRows = 0, int contextRows = 0, bool turkicCase = false)
     {
+        TurkicCase = turkicCase;
         ArgumentOutOfRangeException.ThrowIfNegative(contextRows);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(contextRows, MaxRows);
         ArgumentOutOfRangeException.ThrowIfNegative(neighbourRows);
@@ -218,6 +220,9 @@ public sealed class FastEncoder : IEncoder
     /// <summary>Characters hashed as the suffix.</summary>
     public int SuffixChars { get; }
 
+    /// <summary>Whether the norm attribute is lower-cased with the Turkish rules (<c>I</c> to <c>ı</c>, <c>İ</c> to <c>i</c>).</summary>
+    public bool TurkicCase { get; }
+
     /// <summary>Width of the embedding rows before the joining layer.</summary>
     public int EmbedWidth { get; }
 
@@ -325,6 +330,11 @@ public sealed class FastEncoder : IEncoder
         {
             writer.WriteNumber("contextRows", ContextRows);
         }
+
+        if (TurkicCase)
+        {
+            writer.WriteNumber("turkicCase", 1);
+        }
     }
 
     internal static IEncoder FromSettings(JsonElement s)
@@ -353,7 +363,8 @@ public sealed class FastEncoder : IEncoder
             JsonSettings.OptionalInt(s, "relu", 0, 1, 0) == 1,
             JsonSettings.OptionalInt(s, "neighbourRows", 0, MaxRows, 0),
             JsonSettings.OptionalInt(s, "bigramRows", 0, MaxRows, 0),
-            JsonSettings.OptionalInt(s, "contextRows", 0, MaxRows, 0));
+            JsonSettings.OptionalInt(s, "contextRows", 0, MaxRows, 0),
+            JsonSettings.OptionalInt(s, "turkicCase", 0, 1, 0) == 1);
     }
 
     private static ulong Mix(ulong h)
@@ -367,12 +378,13 @@ public sealed class FastEncoder : IEncoder
 
     private static ulong Fnv(ulong h, char c) => (h ^ c) * 1099511628211UL;
 
-    private static ulong NormHash(ReadOnlySpan<char> text)
+    private ulong NormHash(ReadOnlySpan<char> text)
     {
         ulong h = 14695981039346656037UL ^ AttributeSeeds[0];
         foreach (char c in text)
         {
-            h = Fnv(h, char.ToLowerInvariant(c));
+            // Turkish and Azeri keep the dotted and dotless i apart: I is ı and İ is i (Unicode SpecialCasing, tr and az).
+            h = Fnv(h, TurkicCase ? (c == 'I' ? '\u0131' : c == '\u0130' ? 'i' : char.ToLowerInvariant(c)) : char.ToLowerInvariant(c));
         }
 
         return Mix(h);

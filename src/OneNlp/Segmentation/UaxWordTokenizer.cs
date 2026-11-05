@@ -229,6 +229,13 @@ public sealed class UaxWordTokenizer : IWordTokenizer
                 continue;
             }
 
+            // Turkish: a suffix after a number is written with an apostrophe (1882'den) and the treebank keeps it in the token.
+            if (_data.NumberApostrophe && c is '\'' or '\u2019' && end + 1 < n && IsDigitBefore(text, end) && char.IsLetter(text[end + 1]))
+            {
+                end = NextBoundary(text, end + 1);
+                continue;
+            }
+
             if (end + 1 < n && Array.IndexOf(_data.DigitJoiners, c) >= 0 && IsDigitBefore(text, end) && IsDigitAt(text, end + 1))
             {
                 end = NextBoundary(text, end + 1);
@@ -401,6 +408,14 @@ public sealed class UaxWordTokenizer : IWordTokenizer
                 at += length;
             }
 
+            return;
+        }
+
+        // Turkish: a copula or "-ki" spelled onto its word is a syntactic word of its own (var|dır); the table of word endings decides.
+        if (_data.SuffixSplits.Count > 0 && _data.SuffixSplitLength(token) is > 0 and int suffixCut)
+        {
+            tokens.Add(new TokenBoundary(pos, token.Length - suffixCut));
+            tokens.Add(new TokenBoundary(pos + token.Length - suffixCut, suffixCut));
             return;
         }
 
