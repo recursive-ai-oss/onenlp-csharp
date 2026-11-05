@@ -69,7 +69,7 @@ internal sealed partial class Scan
             try
             {
                 ExpressionsAt(i, cands);
-                if (it.Kind == ItemKind.Word && Is(i, "determiner", out int dn) && i + dn < _items.Count && GapOk(_items[i + dn - 1].End, _items[i + dn].Start))
+                if (it.Kind == ItemKind.Word && !_td!.Flags.Contains("determiner-inside-only") && Is(i, "determiner", out int dn) && i + dn < _items.Count && GapOk(_items[i + dn - 1].End, _items[i + dn].Start))
                 {
                     // "le 20 mars", "la semaine prochaine", "den Muttertag": a determiner is part of the expression it introduces.
                     var inner = new List<Cand>();
@@ -753,7 +753,7 @@ internal sealed partial class Scan
             return;
         }
 
-        if (!colon && allowBare && h is >= 1 and <= 12 && (k >= _items.Count || !Tch(i, k) || _items[k].Kind == ItemKind.Other))
+        if (!colon && allowBare && (h is >= 1 and <= 12 || (h is >= 13 and <= 23 && _td!.Flags.Contains("bare-hour-24"))) && (k >= _items.Count || !Tch(i, k) || _items[k].Kind == ItemKind.Other))
         {
             TemporalValue t = TemporalValue.Clock(h, 0, 0, Granularity.Hour);
             t.Bare = true;

@@ -9,6 +9,8 @@ de
 [time.flag]
 daypart-direct
 no-lone-day
+bare-hour-24
+determiner-inside-only
 
 [time.month]
 1 | =Januar, =Jänner, =Jan, =Jan.
@@ -64,8 +66,6 @@ yesterday | gestern
 dayaftertomorrow | übermorgen
 daybeforeyesterday | vorgestern
 tonight | heute Abend, heute Nacht
-noon | =Mittag
-midnight | =Mitternacht
 this | diesen, dieser, diese, dieses, diesem, laufenden, laufende
 next | nächste, nächsten, nächstes, nächster, nächstem, kommende, kommenden, kommendes, kommender
 last | letzte, letzten, letztes, letzter, letztem, vergangene, vergangenen, vergangenes, vergangener
@@ -88,7 +88,7 @@ after | nach
 half | Halbjahr, Halbjahres, Halbjahre, Halbjahren, Semester, Semesters
 quarter | Quartal, Quartals, Quartale
 article | ein, eine, einen, einem, einer
-the | der, die, das, den, dem, des
+the | der, die, das, den, dem
 determiner | der, die, das, den, dem
 approx | etwa, ca., circa, ungefähr, rund, zirka, gegen
 weekend | Wochenende, Wochenendes

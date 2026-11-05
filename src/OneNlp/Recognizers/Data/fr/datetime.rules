@@ -60,8 +60,6 @@ yesterday | hier
 dayaftertomorrow | après-demain, apres-demain
 daybeforeyesterday | avant-hier
 tonight | ce soir, cette nuit
-noon | midi
-midnight | minuit
 this | ce, cet, cette
 nextpost | prochain, prochaine, suivant, suivante
 lastpost | dernier, dernière, derniere, passé, passée, précédent, précédente
@@ -162,3 +160,4 @@ Saint-Étienne | fixed 12-26 | fr
 
 [time.flag]
 no-lone-day
+bare-hour-24

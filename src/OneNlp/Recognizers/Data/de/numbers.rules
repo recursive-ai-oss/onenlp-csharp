@@ -136,7 +136,7 @@ Mrd. | 1000000000 | any
 
 # Words after a number and a dot that show the dot ends an ordinal even with a capital letter (5. Stock, 2. Platz, 3. Mal).
 [number.ordinal-dot-word]
-Stock, Platz, Mal, Klasse, Etage, Liga, Jahrhundert, Jahrtausend, Auflage, Geburtstag, Jahrestag, Todestag, Runde, Tag, Satz, Kapitel, Spieltag, Rang, Reihe, Woche, Quartal, Halbjahr, Semester, Advent, Weltkrieg, Mannschaft, Teil, Wahl, Platzierung, Versuch, Anlauf
+Stock, Platz, Sieg, Tor, Treffer, Jubiläum, Ausgabe, Spiel, Minute, Sekunde, Mal, Klasse, Etage, Liga, Jahrhundert, Jahrtausend, Auflage, Geburtstag, Jahrestag, Todestag, Runde, Tag, Satz, Kapitel, Spieltag, Rang, Reihe, Woche, Quartal, Halbjahr, Semester, Advent, Weltkrieg, Mannschaft, Teil, Wahl, Platzierung, Versuch, Anlauf
 
 [percent]
 %, Prozent, Prozente, Prozenten, v. H., vom Hundert, pct, ％
