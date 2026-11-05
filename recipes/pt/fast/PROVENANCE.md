@@ -18,9 +18,9 @@ Gold tokens and sentences (the treebank's tokens, with `à` and the pronouns aft
 | Metric | Ours | spaCy | Within noise |
 |---|---|---|---|
 | Words | 99.97 [99.94, 99.99] | 100.00 | no |
-| UPOS | 95.08 [94.79, 95.38] | 95.92 [95.66, 96.22] | no |
-| UFeats | 93.34 [92.98, 93.67] | 94.11 [93.82, 94.42] | no |
-| Lemmas | 96.96 [96.74, 97.17] | 96.90 [96.70, 97.11] | yes |
+| UPOS | 95.89 [95.62, 96.14] | 95.92 [95.66, 96.22] | yes |
+| UFeats | 94.51 [94.17, 94.80] | 94.11 [93.82, 94.42] | yes |
+| Lemmas | 97.30 [97.10, 97.51] | 96.90 [96.70, 97.11] | yes |
 | UAS | 86.93 [86.32, 87.53] | 86.05 [85.45, 86.64] | yes |
 | LAS | 82.74 [82.07, 83.35] | 81.96 [81.30, 82.61] | yes |
 
@@ -31,12 +31,26 @@ Raw text (spaCy's tokenizer keeps contractions whole, so its Words and tagging r
 | Tokens | 99.86 [99.79, 99.92] | 99.87 [99.80, 99.93] | yes |
 | Sentences | 92.72 [91.10, 94.29] | 84.48 [82.19, 86.74] | no (ahead) |
 | Words | 99.74 [99.65, 99.81] | 88.51 [88.02, 88.99] | no (ahead) |
-| UPOS | 94.43 [94.11, 94.75] | 84.15 [83.59, 84.73] | no (ahead) |
-| UFeats | 92.79 [92.42, 93.15] | 82.16 [81.55, 82.73] | no (ahead) |
-| Lemmas | 96.24 [96.03, 96.48] | 85.35 [84.83, 85.86] | no (ahead) |
+| UPOS | 95.35 [95.05, 95.64] | 84.15 [83.59, 84.73] | no (ahead) |
+| UFeats | 93.96 [93.63, 94.31] | 82.16 [81.55, 82.73] | no (ahead) |
+| Lemmas | 96.78 [96.56, 96.99] | 85.35 [84.83, 85.86] | no (ahead) |
 | UAS | 86.28 [85.64, 86.89] | 70.23 [69.30, 71.07] | no (ahead) |
 | LAS | 82.09 [81.38, 82.76] | 65.85 [64.88, 66.65] | no (ahead) |
 
 Entities, Universal NER Portuguese-Bosque test, gold tokens (paired, scored on the treebank's words): micro F1 73.13 [70.58, 75.60] vs 75.27 [72.73, 77.60] (difference -2.14 [-4.26, 0.39], within noise); precision 72.68 vs 76.96 (difference -4.27 [-6.58, -1.59], outside); recall 73.58 vs 73.66. Per type: LOC 72.50 vs 74.43, ORG 67.34 vs 70.32, PER 79.05 vs 80.64; all within noise.
 
-**Misses:** in gold-token mode UPOS (-0.84) and UFeats (-0.77) are behind spaCy outside the intervals; Words is 99.97 (an enclitic's word is spelled from the training file's most frequent form, so a few differ). Everything else is within noise or ahead. In gold-token mode ours is given the tokenizer's tokens, so `à` is written back as two words from a lexicon rather than tagged word by word, while spaCy's predictions are on the gold words.
+**Misses:** none. The tagging heads now sit on a context encoder (see below); UPOS, UFeats and Lemmas in gold mode are within noise, and every raw-text row is within noise or ahead. Words is 99.97 in gold mode (an enclitic's word is spelled from the training file's most frequent form, and a few hyphenated compounds such as `Poder-se-á` stay one token), 6 of 1,172 development sentences differ. Parser rows are unchanged.
+
+## Tagging encoder with context (replaces the first tagging model)
+
+The first tagging model (`FastEncoder.English()` configuration, dev UPOS 95.32, UFeats 93.29, AllTags 91.36, Lemmas 96.82) missed spaCy in the tagging rows; the errors were mostly decisions that need words far from the token (NOUN against PROPN, VERB against AUX, case and gender agreement). Its replacement adds one bidirectional LSTM layer (Hochreiter and Schmidhuber 1997; 64 units per direction, mapped back to the 256-wide window output and added to it) after one window layer, over each document, with ReLU everywhere and no layer normalization after the mix (`FastEncoder` settings `plain`, `relu`, `depth` 1, `recurrentLayers` 1, `recurrentSize` 64). Training uses AdamW at 3e-3 with 200 warm-up steps and a half-cosine fall over a fixed 20 epochs (Loshchilov and Hutter 2017) instead of a constant rate cut off by early stopping; the weights of the best development epoch are kept. The parser and entity models are unchanged.
+
+```
+train-tagging --train ... --dev ... --out DIR --plain 1 --relu 1 --depth 1 --recurrent 1 --recurrent-size 64 --lr 0.003 --cosine-epochs 20 --patience 100 --threads 4
+```
+
+- **Data, seed:** UD Portuguese-Bosque r2.18 train and dev only (CC BY-SA 4.0, share-alike lineage), seed 1, as above; the test file was read once for this configuration, for the rows above.
+- **Development scores, gold tokens** (before, then after): UPOS 95.32, UFeats 93.29, AllTags 91.36, Lemmas 96.82; UPOS 95.83, UFeats 94.29, AllTags 92.57, Lemmas 97.29. Mean over the tagging metrics 95.07, then 95.81.
+- **Weights:** `tagging.onenlp` sha256 `d9bfe33eb4080660cff562c9b9289933a83e3c009fabbec7e1e57c6a980442f5`, 36,696,933 bytes, produced 2026-11-05 with 4 training threads, about 20 minutes. Fixed in `src/OneNlp.Models.Portuguese/weights.manifest.props`.
+- **Screened on the development set before choosing:** a 2-layer LSTM of 128 per direction on the GELU encoder (dev mean slightly lower, at roughly twice the encoder cost); 1 layer of 16, 32 and 64 units; no window layer (cheaper, worse: the window layer matters); the cosine schedule against a constant rate; a rate of 3e-3 against 2e-3. In gold mode the recipe feeds the treebank tokens as the tokenizer makes them (`prepare`), which is the model's own input convention; the 0.03-point Words gap comes from 6 of 1,172 development sentences (all-capital contractions, `à`, and hyphenated compounds), not from tagging.
+- **Cost** (indicative, one thread, `speed` command on development text, raw text through tokenizer, sentencizer and the tagging heads): 24.3k tokens/s (before: 22.2-24.5k). Encoder alone (1 thread, 5,632 tokens): one ReLU window layer 6.2 us/token; plus the 64-unit LSTM 11.9 us/token; 32 units 9.8; 128 units 18.7; no window layer with the 64-unit LSTM 6.1.

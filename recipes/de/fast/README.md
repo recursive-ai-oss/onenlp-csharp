@@ -32,3 +32,5 @@ Encoder options (`--width --depth --norm-rows --prefix-rows --suffix-rows --shap
 ## Multiword tokens
 
 UD German writes `zum` as one multiword token of the words `zu` and `dem`. The tokenizer cuts such a surface form into two pieces (`zu`|`m`, `docs/segmentation.md`), the heads tag and parse the pieces, and `predict` writes the multiword-token line with the treebank's words (`zu` `dem`) from the table `Contractions` in `Ud.cs`, so that scoring sees UD words.
+
+`train-tagging` also takes `--cosine-epochs N` (a fixed budget of N epochs with the rate falling along a half cosine after the warm-up; use it with a large `--patience`). The shipped tagging model uses `--plain 1 --relu 1 --depth 1 --recurrent 1 --recurrent-size 64 --lr 0.003 --cosine-epochs 20 --patience 100` (see `PROVENANCE.md`): one bidirectional LSTM layer over each document lets a token see words beyond its window neighbours.
