@@ -252,7 +252,17 @@ public static class ConllUReader
                 }
 
                 int start = text.Length;
-                SplitSurface(surface, word, count, start, boundaries);
+                if (count > 1 && surface.Length < count)
+                {
+                    // The surface has fewer characters than the multiword token has words (Portuguese "à" = "a" + "a"), so the
+                    // words cannot each own a character of it. The text then spells the words, separated by a space, in its place.
+                    surface = SpellWords(word, count, start, boundaries);
+                }
+                else
+                {
+                    SplitSurface(surface, word, count, start, boundaries);
+                }
+
                 text.Append(surface);
                 word += count;
                 if (word < n && !HasSpaceAfterNo(misc))
@@ -405,6 +415,25 @@ public static class ConllUReader
             return false;
         }
 
+        // Lays the word forms out one after another, a space between, and returns that text.
+        private string SpellWords(int firstWord, int count, int start, TokenBoundary[] boundaries)
+        {
+            var spelled = new StringBuilder();
+            for (int k = 0; k < count; k++)
+            {
+                if (k > 0)
+                {
+                    spelled.Append(' ');
+                }
+
+                string w = _forms[firstWord + k];
+                boundaries[firstWord + k] = new TokenBoundary(start + spelled.Length, w.Length);
+                spelled.Append(w);
+            }
+
+            return spelled.ToString();
+        }
+
         // Places the words of a multiword token inside its surface form. When the word forms spell the surface form (English "don't"
         // as "do" + "n't" in a range, Arabic clitics) they get their own lengths; otherwise (Spanish "del" = "de" + "el") the
         // surface is cut into pieces of nearly equal length so each word still has characters of its own.
@@ -414,11 +443,6 @@ public static class ConllUReader
             {
                 boundaries[firstWord] = new TokenBoundary(start, surface.Length);
                 return;
-            }
-
-            if (surface.Length < count)
-            {
-                throw new DataFormatException(_mwtLines[^1], "a multiword token is shorter than its number of words");
             }
 
             int total = 0;

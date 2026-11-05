@@ -60,7 +60,7 @@ Spanish Sign Language (`LSE`) is not Spanish text and is not covered.
 | PUD | CC BY-SA 3.0 | CC BY-SA 3.0 | test | eval-only (fetched) |
 | PetroGold | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | go (oil and gas academic texts); not used |
 | Porttinari | CC BY 4.0 | CC BY 4.0 | train, dev, test | go on the authors' statement (newspaper text); not used |
-| DANTEStocks | CC BY 4.0 | CC BY 4.0 | train, dev, test | **hold**: tweets, platform terms apply to the text |
+| DANTEStocks | CC BY 4.0 | CC BY 4.0 | train, dev, test | **no-go** (ruled): tweets, platform terms apply to the text |
 | CINTIL | CC BY-NC-ND 4.0 | CC BY-NC-ND 4.0 | train, dev, test | **no-go** (NC, ND) |
 | DHBB | not in release 2.18 | none | none | not available |
 
@@ -70,7 +70,7 @@ Spanish Sign Language (`LSE`) is not Spanish text and is not covered.
 |---|---|---|---|---|
 | GSD | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | **go, chosen** |
 | PUD | CC BY-SA 3.0 | CC BY-SA 3.0 | test | eval-only (fetched) |
-| HDT | CC BY-SA 4.0 (annotation) | "The annotation of the treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0" | train (in parts), dev, test | **hold**: the README's licence section says "Heise gave permission to distribute the text for academic use", so the text is not cleared for commercial use; not used until resolved |
+| HDT | CC BY-SA 4.0 (annotation) | "The annotation of the treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0" | train (in parts), dev, test | **no-go** (ruled): the README's licence section says "Heise gave permission to distribute the text for academic use", so the text is not cleared for commercial use; not used until resolved |
 | LIT | CC BY-NC-SA 4.0 | CC BY-NC-SA 4.0 | test | **no-go** (NC) |
 
 ## Italian
@@ -85,7 +85,7 @@ Spanish Sign Language (`LSE`) is not Spanish text and is not covered.
 | ParlaMint | CC BY-SA 4.0 | CC BY-SA 4.0 | train (326 sentences), test (375) | **go, chosen** by default: modern text, but tiny and with no dev split |
 | MarkIT | CC BY 4.0 | CC BY 4.0 | train, dev, test | go (611 grammar-example sentences), used with ParlaMint |
 | Old | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | go; Dante's Comedy (Old Italian), not used: not modern text |
-| TWITTIRO | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | **hold**: ironic tweets, platform terms apply to the text |
+| TWITTIRO | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | **no-go** (ruled): ironic tweets, platform terms apply to the text |
 | Valico | CC BY-SA 4.0 | CC BY-SA 4.0 | test | eval-only (learner essays); not fetched |
 | PUD | CC BY-SA 3.0 | CC BY-SA 3.0 | test | eval-only (fetched) |
 
@@ -98,7 +98,7 @@ Spanish Sign Language (`LSE`) is not Spanish text and is not covered.
 | Tourism | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | go (customer reviews); not used |
 | FrameNet | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | go (grammar examples); not used |
 | Atis | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | go on the maintainers' licence; the sentences translate the English ATIS corpus; not used |
-| Penn | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | **hold**: a Turkish version of the Penn Treebank, whose source sentences are LDC-licensed; not used |
+| Penn | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | **no-go** (ruled): a Turkish version of the Penn Treebank, whose source sentences are LDC-licensed; not used |
 | GB | CC BY-SA 4.0 | CC BY-SA 4.0 | test | eval-only (grammar-book examples); not fetched |
 | PUD | CC BY-SA 3.0 | CC BY-SA 3.0 | test | eval-only (fetched) |
 | IMST | CC BY-NC-SA 4.0 | CC BY-NC-SA 4.0 | train, dev, test | **no-go** (NC). The standard Turkish treebank is not usable |
@@ -155,3 +155,12 @@ Terms read 2026-11-05 from the dataset's own page or card. "Chosen" means fetche
 | Smaller Turkish NER sets on the HF hub (e-commerce, clinical, privacy, synthetic) | tr | assorted (mit, cc-by-4.0, cc0-1.0, cc-by-sa-4.0) | not used: single narrow domains, not a general-purpose gold set |
 
 NER labels follow each corpus: the baselines map them to PER, ORG, LOC (and MISC where the corpus has it) as the manifests state; Turkish maps PERSON, ORG, GPE and LOC and drops the other types to O.
+
+## Rulings and data gaps (recorded 2026-11-05)
+
+Ruled by the build lead; open to the owner.
+
+- **No-go by rule:** German-HDT (text licensed for academic use only, i.e. research-only); Italian-TWITTIRO and Portuguese-DANTEStocks (tweet text, platform-restricted); Turkish-Penn (translated from an LDC corpus).
+- **Held, not used until ruled:** French Sequoia and FQB (LGPL-LR); WikiANN (no terms stated); the text provenance of Naamapadam; and the stale GNU sentence in the AnCora README. Until the last is ruled, AnCora is used under its `LICENSE.txt` and metadata (CC BY 4.0), and this note is the record that the README disagrees.
+- **Hindi has no UD baseline and no UD-trained model.** Its only sizeable treebank (HDTB) is non-commercial and Hindi-PUD is test-only. A Hindi tagger or parser waits for allowed data. Hindi NER trains on Naamapadam.
+- **Italian trains on 897 sentences** (ParlaMint train plus MarkIT), because ISDT, VIT and ParTUT are non-commercial. Italian rows are reported as they come and compared with spaCy trained on the same small set; they are not hidden or compared with systems trained on ISDT.

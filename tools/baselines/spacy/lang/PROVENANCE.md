@@ -23,7 +23,7 @@ None; trained from scratch (no vectors, no transformer).
 - **Chinese gold-token rows.** spaCy's default Chinese pipeline segments into single characters (`[nlp.tokenizer] segmenter = "char"`), and `spacy train` builds every training example by tokenizing the text with that tokenizer and aligning the gold annotation to it. A pipeline trained like that is evaluated on gold *words* at a disadvantage (UPOS 61.9, LAS 24.3 on GSDSimp). So Chinese was trained twice: once by default (its raw-text rows are the default-pipeline result: Tokens F1 39.4 because characters are not words) and once with `--corpora.train.gold_preproc true --corpora.dev.gold_preproc true` (a documented option of the training config), which trains and scores on gold words. The `gold_preproc` run is the reference for gold-token rows; it has no raw-text rows (a model trained on words cannot read the character tokens the default tokenizer produces).
 - **Multiword tokens.** `spacy convert` trains on syntactic words (French `du` = `de le`), while spaCy's tokenizers keep surface tokens, which costs it in raw-text rows (Words F1 below Tokens F1) in French, Spanish, Portuguese and German.
 - **XPOS** is `_` throughout some treebanks (Portuguese-Bosque and Portuguese-PUD have none); the XPOS and AllTags columns are then meaningless for that treebank (0.00 in the Portuguese tables).
-- **Portuguese has no intervals for its UD tables.** OneNlp.Eval's CoNLL-U reader rejects the gold files (`error: line 430: a multiword token is shorter than its number of words`): Bosque writes the contraction `à` as the words `a` + `a`, a one-character surface form with two words (also in Portuguese-PUD, line 197). The shared-task script scores them, so those rows are the script's F1 values without intervals. The entity rows are unaffected. Reported as a defect of the reader (`ConllUReader.SplitSurface`).
+- **Portuguese intervals.** OneNlp.Eval first rejected the Portuguese gold files (Bosque writes the contraction `à` as the words `a` + `a`, a one-character surface form with two words). The reader was fixed and the tables below carry 95% intervals; the point estimates equal the shared-task script's F1 values. Raw-text Words (88.5) is low because spaCy's tokenizer does not split contractions into their words.
 - **Italian** trains on 897 sentences and uses MarkIT (grammar examples) beside ParlaMint; indicative only.
 - **NER on silver corpora** (WikiNER, Naamapadam): scores measure agreement with automatically projected labels, not human judgement; they are comparable between systems on the same files only.
 
@@ -186,20 +186,19 @@ Seqeval micro F1 (conlleval-style) from `score_ner.py` and the CoNLL 2018 script
 | 83.35 [82.61, 84.15] | 83.98 [83.23, 84.77] | 82.72 [81.94, 83.53] |
 
 ### Portuguese
-
 **pt: UD r2.18 pt_bosque test**
 
 | Input | Tokens | Sentences | Words | UPOS | XPOS | UFeats | AllTags | Lemmas | UAS | LAS |
 |---|---|---|---|---|---|---|---|---|---|---|
-| raw text (script, no interval) | 99.87 | 84.48 | 88.51 | 84.15 | 0.00 | 82.16 | 0.00 | 85.35 | 70.23 | 65.85 |
-| gold tokens (script, no interval) | 100.00 | 100.00 | 100.00 | 95.92 | 0.00 | 94.11 | 0.00 | 96.90 | 86.05 | 81.96 |
+| raw text | 99.87 [99.80, 99.93] | 84.48 [81.84, 86.96] | 88.51 [88.05, 89.01] | 84.15 [83.64, 84.70] | 0.00 [0.00, 0.00] | 82.16 [81.62, 82.73] | 0.00 [0.00, 0.00] | 85.35 [84.84, 85.84] | 70.23 [69.37, 71.09] | 65.85 [64.97, 66.69] |
+| gold tokens | 100.00 [100.00, 100.00] | 100.00 [100.00, 100.00] | 100.00 [100.00, 100.00] | 95.92 [95.64, 96.20] | 0.00 [0.00, 0.00] | 94.11 [93.79, 94.42] | 0.00 [0.00, 0.00] | 96.90 [96.68, 97.13] | 86.05 [85.44, 86.70] | 81.96 [81.29, 82.68] |
 
 **pt: UD r2.18 pt_pud test**
 
 | Input | Tokens | Sentences | Words | UPOS | XPOS | UFeats | AllTags | Lemmas | UAS | LAS |
 |---|---|---|---|---|---|---|---|---|---|---|
-| raw text (script, no interval) | 99.37 | 83.93 | 89.52 | 79.52 | 0.11 | 56.10 | 0.11 | 85.83 | 68.96 | 61.85 |
-| gold tokens (script, no interval) | 100.00 | 100.00 | 100.00 | 90.31 | 0.11 | 62.26 | 0.11 | 96.40 | 82.24 | 75.46 |
+| raw text | 99.37 [99.20, 99.51] | 83.93 [81.28, 86.68] | 89.52 [89.05, 90.00] | 79.52 [78.87, 80.21] | 0.11 [0.06, 0.17] | 56.10 [55.45, 56.75] | 0.11 [0.06, 0.17] | 85.83 [85.22, 86.40] | 68.96 [68.08, 69.94] | 61.85 [60.97, 62.89] |
+| gold tokens | 100.00 [100.00, 100.00] | 100.00 [100.00, 100.00] | 100.00 [100.00, 100.00] | 90.31 [89.86, 90.79] | 0.11 [0.06, 0.17] | 62.26 [61.70, 62.83] | 0.11 [0.06, 0.17] | 96.40 [96.13, 96.70] | 82.24 [81.46, 83.00] | 75.46 [74.65, 76.31] |
 
 **pt: NER pt_bosque-ud test, gold tokens**
 
