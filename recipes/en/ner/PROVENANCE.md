@@ -1,10 +1,10 @@
 # Provenance: en-ner (tagging and spans)
 
-- **Model:** `en-ner-tagging`, version 0 (development); a named entity recognizer (PER, ORG, LOC) over the library fast encoder, English, fast tier. Format: `docs/provenance.md`.
-- **Recipe:** `recipes/en/ner/` (`Program.cs`, `run.sh`); defaults are the configuration: FastEncoder width 96 depth 4, head hidden 256, context 0, dropout 0.4, learning rate 0.003, batch 1000 words, patience 6, at most 40 epochs.
-- **Seed(s):** training, data order and initial weights 7 (`--seed`); the data splits are the official ones.
-- **Produced:** 2026-11-04; AMD Ryzen 9 7950X3D (16 cores, 32 threads) shared with other jobs, 4 threads; .NET SDK 10.0.403, runtime 10.0.14; RecursiveAI.OneModel 1.0.0 and OneModel.Training 1.0.0; wall time tagging 1:33, spans 7:05.
-- **Weights:** `model.onenlp` (pipeline file with encoder and head), 12,039,553 bytes, file sha256 `309abffd3229006dfe48ee3df01e02faf909e41b57b1e50e3ae5102aa24f0964`, weights hash reported by `Train` `83f8adcfcb775db79579b01478f94a0c62ce9ced5dbec433b36ad21475cf2e49`. Kept on the build machine under `models/en-fast/u16/`; not in git. Wall time 2:02.
+- **Model:** `en-ner-tagging`, version 0 (development); a named entity recognizer (PER, ORG, LOC) over the library fast encoder (`FastEncoder.English()`), English, fast tier. Format: `docs/provenance.md`.
+- **Recipe:** `recipes/en/ner/` (`Program.cs`, `run.sh`); defaults are the configuration: head hidden 256, context 0, dropout 0.4, learning rate 0.003, batch 1000 words, patience 6, at most 40 epochs.
+- **Seed(s):** training, data order, initial weights and encoder 7 (`--seed`); the data splits are the official ones.
+- **Produced:** 2026-11-05; AMD Ryzen 9 7950X3D (16 cores, 32 threads) shared with other jobs, 4 threads; .NET SDK 10.0.403, runtime 10.0.14; RecursiveAI.OneModel 1.0.0 and OneModel.Training 1.0.0; wall time 0:05:52.
+- **Weights:** `model.onenlp` (pipeline file with encoder and head), 35,677,809 bytes, file sha256 `fe3e09746b5fd5245d348760a779cbee0f2ec57e0201a5265a7b41a0399e9cce`, weights hash reported by `Train` `72756de883db4fa6621cb03f2ea50da7ef9ee52e3a749e47f35f902b5c5ac594`. Kept on the build machine; not in git. (Earlier versions: first FastEncoder 12,039,553 bytes `309abffd…0964`; stand-in encoder 9,978,133 bytes `59050e63…2519`.)
 - **SA lineage:** yes. UNER English-EWT is CC BY-SA 4.0 (and sits on UD English-EWT, also CC BY-SA 4.0). Credit: Universal NER (Mayhew et al. 2024) and Universal Dependencies English Web Treebank.
 - **Licence of the weights:** not released; development model.
 
@@ -33,7 +33,7 @@ None; trained from scratch (no vectors, no transformer).
 
 - Manifest: `tools/fetch/en/MANIFEST.md`, which lists the six files and their roles.
 - Text-level overlap of the test file with train and dev: 114 identical sentence texts (127 after case and whitespace folding), almost all one- and two-word fragments; the official split is kept (`tools/fetch/en/MANIFEST.md`).
-- The test file was not used for early stopping, model selection or hyperparameter choice: yes (not used). The design (tagging against spans, on the earlier stand-in encoder) and the settings (sweeps of context, encoder width and depth, dropout, learning rate, about twenty runs) were chosen on the dev split. The test split was read once for the final configuration, for both designs.
+- The test file was not used for early stopping, model selection or hyperparameter choice: yes (not used). The design (tagging against spans, on an earlier stand-in encoder) and the settings (sweeps of encoder shape, context, dropout and learning rate, about sixty runs) were chosen on the dev split. The test split was read once for each final model (the stand-in encoder with both designs; the first FastEncoder configuration; and the final one, read once).
 
 ## Results
 

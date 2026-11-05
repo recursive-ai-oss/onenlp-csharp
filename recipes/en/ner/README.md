@@ -20,9 +20,9 @@ pipeline.Train(JsonlReader.Read("train.jsonl").ToList(), new TrainOptions { DevE
 PipelineFile.Save(pipeline, "model.onenlp");
 ```
 
-The word encoder is the library's `FastEncoder` (width 96, 4 window layers), so the head adds no context of its own by default (`--context 0`).
+The word encoder is the library's `FastEncoder.English()` (the same configuration the tagging recipe uses), so the head adds no context of its own by default (`--context 0`). Any encoder option (`--width`, `--depth`, `--prefix`, `--hashes` ...) builds a `FastEncoder` of that shape instead.
 
-`torch_ner.py` is the PyTorch twin of the earlier tagging recipe (hashed features, window head) used for a training-time comparison; it does not model `FastEncoder`.
+`torch_ner.py` is the PyTorch twin of an earlier tagging recipe (hashed features, window head) used for a training-time comparison; it does not model `FastEncoder`.
 
 ## Design
 
@@ -37,24 +37,24 @@ Rules placed after it follow `EntityRuler.OverwriteEnts`. An entity's confidence
 
 ## Results (UNER English-EWT, test split, gold tokens)
 
-Tagging decoding, seed 7, `FastEncoder`. The reference is spaCy 3.8.18 trained on the same data with its default configuration (`tools/baselines/spacy/`).
+Tagging decoding, seed 7, `FastEncoder.English()`. The reference is spaCy 3.8.18 trained on the same data with its default configuration (`tools/baselines/spacy/`).
 Intervals are paired bootstrap 95% (1000 resamples over sentences, seed 20260101).
 
 | Row | Ours | spaCy | Difference |
 |---|---|---|---|
-| micro F1 | 58.92 [55.71, 62.02] | 62.32 [59.42, 65.33] | -3.40 [-6.01, -0.95] |
-| precision | 64.38 [60.69, 67.76] | 67.97 [64.80, 71.11] | -3.59 [-6.80, -0.47] |
-| recall | 54.32 [51.05, 57.65] | 57.54 [54.26, 60.91] | -3.22 [-5.97, -0.56] |
-| LOC F1 | 66.99 [61.96, 71.43] | 71.43 [66.56, 76.16] | -4.44 [-8.74, -0.22] |
-| ORG F1 | 42.63 [36.95, 48.31] | 44.33 [39.12, 49.82] | -1.70 [-6.77, 3.74] |
-| PER F1 | 63.99 [59.90, 67.85] | 68.05 [63.91, 71.83] | -4.06 [-7.57, -0.38] |
-| raw text, character spans, micro F1 (information) | 57.44 [54.37, 60.45] | | |
+| micro F1 | 61.52 [58.57, 64.31] | 62.32 [59.42, 65.33] | -0.80 [-3.48, 1.85] |
+| precision | 67.10 [64.08, 70.31] | 67.97 [64.80, 71.11] | -0.87 [-4.21, 2.12] |
+| recall | 56.80 [53.54, 59.91] | 57.54 [54.26, 60.91] | -0.74 [-3.63, 1.95] |
+| LOC F1 | 66.77 [61.91, 71.09] | 71.43 [66.56, 76.16] | -4.66 [-8.70, -0.76] |
+| ORG F1 | 46.02 [40.63, 51.01] | 44.33 [39.12, 49.82] | 1.69 [-3.58, 6.59] |
+| PER F1 | 68.65 [64.45, 72.54] | 68.05 [63.91, 71.83] | 0.60 [-3.51, 4.72] |
+| raw text, character spans, micro F1 (information) | 60.13 [57.08, 62.93] | | |
 
-The intervals of ours and spaCy's overlap on every row, but the paired difference excludes zero on micro F1, precision, recall, LOC and PER.
+The paired difference includes zero on micro F1, precision, recall, ORG and PER; only LOC is lower, by 4.7 points.
 
-Development F1 (selection set): 59.97 (seeds 7, 8, 9: 59.97, 59.12, 59.06). A dev sweep of context (0 to 2), encoder width (96 to 256), depth (2 to 6),
-norm-table rows, dropout and learning rate stayed between 57.4 and 60.1, within seed spread, so the defaults are the simplest setting at the top of the range.
-The earlier stand-in encoder (hashed lower-case, prefix, suffix and shape features joined and projected to 256, with a window of 2 in the head) reached 62.07 on dev
-and 66.24 [63.33, 69.35] on test, so the encoder, not the head, sets the level.
+Development F1 (selection set, three seeds 7, 8, 9): 59.1 to 62.1 for the chosen configuration, against 57.4 to 60.7 for the first encoder configuration.
+Settings were chosen on dev over about sixty runs: affix length 3 and wider, lower-collision tables mattered most (about +1.5 dev F1 each); case-preserving text as an extra
+attribute, a joining layer without layer normalization, more hash functions, and larger or smaller windows did not help beyond seed spread (about 1.5 points between seeds).
+The stand-in encoder that was used before reached 62.07 on dev and 66.24 on test; this encoder does not match it (the shared configuration also serves the tagging heads).
 
-Training: 122 s on 4 threads (11 epochs, early stop). Indicative inference on 2,077 test sentences (25,097 tokens), one thread: about 71,000 words/s.
+Training: 352 s on 4 threads (13 epochs, early stop; machine shared). Indicative inference on 2,077 test sentences (25,097 tokens), one thread: about 56,000 words/s.
