@@ -29,7 +29,7 @@ internal static partial class Program
 
     // UD Spanish writes the contractions del and al, and verbs with enclitic pronouns (dárselo), as multiword tokens. The tokenizer cuts
     // such a token into one piece per word (SegmentationData.Spanish); a piece such as "l" is not a word, so the words are written back
-    // here, from SegmentationData.SplitMultiwordToken, the rule the tokenizer used.
+    // here, from SegmentationData.TryMatchMultiword, the rule the tokenizer used.
     private static readonly SegmentationData Data = SegmentationData.Spanish;
 
     private static Pipeline NewTaggingPipeline(string[] args)
@@ -312,50 +312,26 @@ internal static partial class Program
         return doc.Length;
     }
 
-    // Raw text has no multiword token lines: they are found from the pieces, neighbouring tokens without a gap that together spell a
-    // contraction or a verb with enclitics, and whose words are as many as the pieces.
+    // Raw text has no multiword token lines: they are found from the pieces (SegmentationData.TryMatchMultiword).
     private static void WriteRawSentence(StringBuilder sb, Doc doc, int start, int end)
     {
         var groups = new List<(int First, int Last, string Form)>();
         var forms = new Dictionary<int, string>();
         for (int i = start; i + 1 < end; i++)
         {
-            for (int count = Math.Min(4, end - i); count >= 2; count--)
+            if (Data.TryMatchMultiword(doc, i, out int count, out string[]? words) && i + count <= end)
             {
-                if (!TryGroup(doc, i, count, out string surface, out IReadOnlyList<string>? words))
-                {
-                    continue;
-                }
-
-                groups.Add((i - start, i + count - 1 - start, surface));
+                groups.Add((i - start, i + count - 1 - start, doc.Text.Substring(doc[i].Idx, doc[i + count - 1].EndIdx - doc[i].Idx)));
                 for (int w = 0; w < count; w++)
                 {
-                    forms[i - start + w] = words![w];
+                    forms[i - start + w] = words[w];
                 }
 
                 i += count - 1;
-                break;
             }
         }
 
         WriteSentence(sb, doc, start, end, groups, i => forms.TryGetValue(i, out string? f) ? f : doc[start + i].ToString());
-    }
-
-    private static bool TryGroup(Doc doc, int first, int count, out string surface, out IReadOnlyList<string>? words)
-    {
-        surface = string.Empty;
-        words = null;
-        for (int k = 0; k + 1 < count; k++)
-        {
-            if (doc[first + k].EndIdx != doc[first + k + 1].Idx)
-            {
-                return false;
-            }
-        }
-
-        surface = doc.Text.Substring(doc[first].Idx, doc[first + count - 1].EndIdx - doc[first].Idx);
-        words = Data.SplitMultiwordToken(surface);
-        return words is not null && words.Count == count;
     }
 
     // Writes the words start..end of a document as one CoNLL-U sentence. HEAD and DEPREL are placeholders when no parser ran (the first

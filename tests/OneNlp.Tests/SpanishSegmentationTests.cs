@@ -49,15 +49,22 @@ public class SpanishSegmentationTests
     [InlineData("CONSEGUIRLO", new[] { "CONSEGUIR", "LO" })]
     public void MultiwordWords(string token, string[]? expected)
     {
-        IReadOnlyList<string>? words = SegmentationData.Spanish.SplitMultiwordToken(token);
-        Assert.Equal(expected, words?.ToArray());
+        Doc doc = Spanish.Process(token);
+        string[]? words = null;
+        if (SegmentationData.Spanish.TryMatchMultiword(doc, 0, out int count, out words))
+        {
+            Assert.Equal(doc.Length, count);
+        }
+
+        Assert.Equal(expected, words);
     }
 
     [Fact]
-    public void OtherDataSetsHaveNoMultiwordTokens()
+    public void OtherDataSetsHaveNoSpanishMultiwordTokens()
     {
-        Assert.Null(SegmentationData.English.SplitMultiwordToken("del"));
-        Assert.Null(SegmentationData.Neutral.SplitMultiwordToken("verlo"));
+        Doc doc = Spanish.Process("del verlo");
+        Assert.False(SegmentationData.English.TryMatchMultiword(doc, 0, out _, out _));
+        Assert.False(SegmentationData.Neutral.TryMatchMultiword(doc, 0, out _, out _));
     }
 
     [Fact]

@@ -18,6 +18,7 @@ internal static class Segment
         bool mwt = o.ContainsKey("mwt");
         using Pipeline pipeline = Pipeline.Blank(language).Add("sentencizer", new Dictionary<string, string> { ["language"] = language.Code });
         Doc doc = pipeline.Process(text);
+        Segmentation.SegmentationData data = Segmentation.SegmentationData.For(language);
         var sb = new StringBuilder();
         foreach (Span sentence in doc.Sentences)
         {
@@ -30,6 +31,21 @@ internal static class Segment
             for (int i = 0; i < tokens.Count; i++)
             {
                 int groupEnd = i;
+                if (mwt && data.TryMatchMultiword(doc, tokens[i].Index, out int pieces, out string[]? words))
+                {
+                    // The pieces of a contraction (French "d" + "u") are written as the words they stand for ("de", "le").
+                    sb.Append(i + 1).Append('-').Append(i + pieces).Append('\t')
+                        .Append(text, tokens[i].Idx, tokens[i + pieces - 1].EndIdx - tokens[i].Idx).Append("\t_\t_\t_\t_\t_\t_\t_\t_\n");
+                    for (int j = 0; j < pieces; j++)
+                    {
+                        sb.Append(i + j + 1).Append('\t').Append(words[j]).Append("\t_\t_\t_\t_\t")
+                            .Append(i + j == 0 ? "0\troot" : "1\tdep").Append("\t_\t_\n");
+                    }
+
+                    i += pieces - 1;
+                    continue;
+                }
+
                 if (mwt && i + 1 < tokens.Count && tokens[i].EndIdx == tokens[i + 1].Idx)
                 {
                     string second = tokens[i + 1].ToString();

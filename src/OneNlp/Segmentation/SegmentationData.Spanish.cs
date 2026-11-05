@@ -61,25 +61,40 @@ public sealed partial class SegmentationData
     /// <summary>Whether this data set has multiword tokens at all.</summary>
     internal bool HasMultiwordTokens => Contractions.Count > 0 || EncliticVerbs;
 
-    /// <summary>
-    /// Gives the syntactic words of a surface form that Universal Dependencies annotates as one multiword token: a contraction
-    /// (Spanish <c>del</c> is <c>de</c> + <c>el</c>) or a verb with enclitic pronouns (<c>dármelo</c> is <c>dar</c> + <c>me</c> + <c>lo</c>).
-    /// </summary>
-    /// <param name="token">One token of the document, as the tokenizer of this data set cuts it.</param>
-    /// <returns>
-    /// The words (the case of the surface form is copied: <c>Del</c> gives <c>De</c> and <c>el</c>), or <see langword="null"/> when the
-    /// token is not a multiword token or this data set has none. Never throws for any input.
-    /// </returns>
-    /// <remarks>
-    /// The rule for verbs: the word ends in one to three enclitic pronouns (<c>me te se lo la le nos les las los</c>), what is left is an
-    /// infinitive (<c>-ar -er -ir</c>) or a gerund (<c>-ando -iendo -yendo</c>) once an accent written for the stress is removed
-    /// (<c>situándose</c> is <c>situando</c> + <c>se</c>; <c>reírse</c> keeps its accent), and the word is not one the treebank writes whole
-    /// (<c>parte</c>, <c>fuerte</c>, <c>Carlos</c>). Imperative and subjunctive forms (<c>dámelo</c>) are not recognized.
-    /// </remarks>
-    public IReadOnlyList<string>? SplitMultiwordToken(string token)
+    // The words of a surface form that UD annotates as one multiword token: a contraction (del is de + el) or a verb with enclitic pronouns
+    // (dármelo is dar + me + lo; the stress accent goes). The rule for verbs: the word ends in one to three enclitic pronouns
+    // (me te se lo la le nos les las los), what is left is an infinitive (-ar -er -ir) or a gerund (-ando -iendo -yendo) once an accent
+    // written for the stress is removed (situándose is situando + se; reírse keeps its accent), and the word is not one the treebank writes
+    // whole (parte, fuerte, Carlos). Imperative and subjunctive forms (dámelo) are not recognized.
+
+    /// <summary>The pieces of a multiword token as the tokenizer cut them (TryMatchMultiword): two to four neighbouring tokens without a gap.</summary>
+    private bool TryMatchTokenGroup(Doc doc, int start, out int count, out string[]? words)
     {
-        ArgumentNullException.ThrowIfNull(token);
-        return TryMultiwordWords(token, out string[]? words) ? words : null;
+        count = 0;
+        words = null;
+        if (start < 0 || start + 1 >= doc.Length)
+        {
+            return false;
+        }
+
+        for (int pieces = Math.Min(4, doc.Length - start); pieces >= 2; pieces--)
+        {
+            bool joined = true;
+            for (int k = 0; joined && k + 1 < pieces; k++)
+            {
+                joined = doc[start + k].EndIdx == doc[start + k + 1].Idx;
+            }
+
+            int length = doc[start + pieces - 1].EndIdx - doc[start].Idx;
+            if (joined && length <= MaxMultiwordLength && TryMultiwordWords(doc.Text.AsSpan(doc[start].Idx, length), out string[] found) && found.Length == pieces)
+            {
+                count = pieces;
+                words = found;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     internal bool TryMultiwordWords(ReadOnlySpan<char> token, out string[] words)
