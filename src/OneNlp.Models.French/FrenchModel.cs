@@ -4,8 +4,8 @@ using RecursiveAI.OneNlp.Neural;
 namespace RecursiveAI.OneNlp.Models.French;
 
 /// <summary>
-/// The French fast-tier model: one pipeline that tokenizes, splits sentences, tags (UPOS, XPOS, morphology), lemmatizes, parses
-/// dependencies and finds named entities (PER, ORG, LOC), from weights packed inside this assembly.
+/// The French fast-tier model: one pipeline that tokenizes, splits sentences, tags (UPOS and morphology; the treebank has no XPOS), lemmatizes, parses
+/// dependencies and finds named entities (PER, ORG, LOC, MISC), from weights packed inside this assembly.
 /// </summary>
 /// <remarks>
 /// Referencing this package is all the <see cref="Nlp"/> verbs need: the package adds a module initializer to the project that references it, which

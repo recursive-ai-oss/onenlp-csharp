@@ -238,3 +238,7 @@ Pass/fail: every row is at or faster than its managed comparator, on both machin
 ## German fast tier
 
 UD German-GSD r2.18 test and GermEval 2014 test against spaCy 3.8.18 trained with its default configuration on the same data; the table, the settings and the weights are in `recipes/de/fast/PROVENANCE.md`. Raw text: every row within noise or ahead (tokens 99.91 vs 98.03, UPOS 92.87 vs 90.13, LAS 76.75 vs 70.77). Gold tokens: XPOS, lemmas, UAS, LAS and entities (66.28 vs 65.77) within noise; UPOS (93.46 vs 94.59), UFeats (82.67 vs 84.71) and AllTags (78.91 vs 81.29) behind. The package is 109 MB; the consumer app runs on JIT and NativeAOT.
+
+## French fast tier
+
+UD French-GSD r2.18 test and WikiNER French (wp3) test against spaCy 3.8.18 trained with its default configuration on the same data, paired bootstrap 95% CI over sentences (1,000 resamples, seed 1); the table, the settings and the weights are in `recipes/fr/PROVENANCE.md`. Gold tokens: UPOS (96.77 vs 97.07), UFeats (96.34 vs 96.41), lemmas (97.51 vs 97.49), UAS (90.22 vs 89.10) and LAS (86.69 vs 85.98) within noise. Raw text: every row ahead of spaCy, whose tokenizer keeps `du` and `au` as one token where the treebank has two words (tokens 99.88 vs 98.85, words 99.48 vs 94.64, UPOS 96.06 vs 91.80, LAS 85.97 vs 78.10); sentences 94.79 vs 91.82, within noise. Entities, gold tokens: micro F1 82.48 vs 75.50 (+6.97 [6.12, 7.78]) and each of LOC, MISC, ORG, PER ahead. French-GSD has no XPOS. The package is 95 MB.
