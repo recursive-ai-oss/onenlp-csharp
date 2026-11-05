@@ -87,12 +87,31 @@ public sealed class SentencizerComponent : IPipelineComponent, IConfigurableComp
                 break;
             }
 
-            if (token > 0 && !(_hasNonFinal && _nonFinal.Contains(doc[token - 1].Text)))
+            if (token > 0 && !(_hasNonFinal && _nonFinal.Contains(doc[token - 1].Text)) && !(Data.OrdinalDot && IsOrdinalToken(doc[token - 1].Text)))
             {
                 boundaries[token] = SentenceBoundary.Start;
             }
         }
 
         doc.SetSentenceBoundaries(boundaries);
+    }
+
+    // A token of digits and a full stop was joined by the tokenizer only because it is an ordinal; no sentence ends there.
+    private static bool IsOrdinalToken(ReadOnlySpan<char> text)
+    {
+        if (text.Length < 2 || text[^1] != '.')
+        {
+            return false;
+        }
+
+        for (int i = 0; i < text.Length - 1; i++)
+        {
+            if (!char.IsAsciiDigit(text[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

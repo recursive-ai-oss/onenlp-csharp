@@ -80,7 +80,9 @@ public static class ModelPackages
     {
         string add = language == Language.English
             ? $"RecursiveAI.OneNlp.Models.English (fast tier), or {MultilingualPackageId}"
-            : MultilingualPackageId;
+            : language == Language.German
+                ? $"RecursiveAI.OneNlp.Models.German (fast tier), or {MultilingualPackageId}"
+                : MultilingualPackageId;
         return $"No model is available for language '{(language == Language.Unknown ? "unknown" : language.Code)}'. Add the NuGet package {add}; "
             + "models are never downloaded.";
     }

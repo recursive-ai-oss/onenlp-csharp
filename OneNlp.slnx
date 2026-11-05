@@ -3,6 +3,7 @@
     <Project Path="src/OneNlp/OneNlp.csproj" />
     <Project Path="src/OneNlp.Neural/OneNlp.Neural.csproj" />
     <Project Path="src/OneNlp.Models.English/OneNlp.Models.English.csproj" />
+    <Project Path="src/OneNlp.Models.German/OneNlp.Models.German.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/OneNlp.Tests/OneNlp.Tests.csproj" />
@@ -25,6 +26,7 @@
     <Project Path="recipes/en/fast-tagging/EnglishFastTagging.csproj" />
     <Project Path="recipes/accurate/en-tagging/AccurateEnglishTagging.csproj" />
     <Project Path="recipes/en/ner/OneNlp.Recipes.EnNer.csproj" />
+    <Project Path="recipes/de/fast/OneNlp.Recipes.German.csproj" />
   </Folder>
   <Folder Name="/fuzz/">
     <Project Path="fuzz/OneNlp.Fuzz/OneNlp.Fuzz.csproj" />
