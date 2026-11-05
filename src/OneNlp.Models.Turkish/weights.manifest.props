@@ -1,0 +1,12 @@
+<Project>
+  <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
+       To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
+  <ItemGroup>
+    <TurkishWeight Include="tagging.onenlp" Size="64673771" Sha256="700d5a0c09fa6cba7ff05524ae313f23cc74167537ccb8ca1a2b8e9e14304c95"
+                  Recipe="recipes/tr/fast" Data="UD Turkish-BOUN r2.18 (CC BY-SA 4.0)" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
+    <TurkishWeight Include="parser.onenlp" Size="46299840" Sha256="3545c480763a571980a92dab1eaa5bdf69e473e5105562423333d90c5a1c8d59"
+                  Recipe="recipes/tr/fast" Data="UD Turkish-BOUN r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />
+    <TurkishWeight Include="ner.onenlp" Size="35677824" Sha256="66f600a4cb4ad6a63fef6cb41c64487aceac008d6da9c7598c997150531cdbf2"
+                  Recipe="recipes/tr/fast" Data="Turkish-WikiNER (CC BY-SA 4.0)" Contents="entity recognizer (PER, ORG, LOC)" />
+  </ItemGroup>
+</Project>
