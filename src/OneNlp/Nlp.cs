@@ -170,4 +170,26 @@ public static class Nlp
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     public static DateRange? ParseDate(string text, DateTimeOffset reference) =>
         Dates(text, reference).FirstOrDefault(d => d.Range is not null)?.Range;
+
+    /// <summary>Embeds a text as a sentence vector with the default embedding model.</summary>
+    /// <param name="text">The text; may be empty. Text beyond the model's maximum sequence length is cut off.</param>
+    /// <returns>A new array; the default model's vectors have unit length, so the dot product of two is their cosine similarity.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No embedding package is referenced; the message names <c>RecursiveAI.OneNlp.Models.Embeddings</c>.</exception>
+    public static float[] Embed(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        return EmbedderPackages.Get().Embed(text);
+    }
+
+    /// <summary>Embeds many texts with the default embedding model, lazily and in batches.</summary>
+    /// <param name="texts">The texts; enumerated once.</param>
+    /// <returns>One vector per text, in order.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="texts"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No embedding package is referenced; the message names <c>RecursiveAI.OneNlp.Models.Embeddings</c>.</exception>
+    public static IEnumerable<float[]> EmbedMany(IEnumerable<string> texts)
+    {
+        ArgumentNullException.ThrowIfNull(texts);
+        return EmbedderPackages.Get().EmbedMany(texts);
+    }
 }
