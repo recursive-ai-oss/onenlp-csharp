@@ -2,7 +2,7 @@
 
 OneNLP's own code is licensed `MIT OR Apache-2.0`, Copyright (c) Recursive AI, LLC.
 
-Packages depend on other Recursive AI libraries (`RecursiveAI.OneFont`, `RecursiveAI.OneModel`, `RecursiveAI.OneModel.Training`), which carry the same licence and their own notices. This preview ships no third-party models or weights; each addition will be listed here with its licence and provenance before it is packed. The data it does ship is listed under "Data packed with the library".
+Packages depend on other Recursive AI libraries (`RecursiveAI.OneFont`, `RecursiveAI.OneModel`, `RecursiveAI.OneModel.Training`), which carry the same licence and their own notices. `RecursiveAI.OneNlp.Models.English` ships weights we trained on CC BY-SA 4.0 treebank and NER data; its notices are in that package (`src/OneNlp.Models.English/THIRD-PARTY-NOTICES.md`). No other third-party models or weights ship; each addition will be listed here with its licence and provenance before it is packed. The data it does ship is listed under "Data packed with the library".
 
 ## Data packed with the library
 

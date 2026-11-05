@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Load time and throughput of the assembled English pipeline, for the rows next to the Catalyst oracle's `speed` mode. Build with
+       ONENLP_ENGLISH_WEIGHTS set. Information only; never shipped. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).ModelBench</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).ModelBench</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/OneNlp.Models.English/OneNlp.Models.English.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/OneNlp/OneNlp.csproj" />
     <Project Path="src/OneNlp.Neural/OneNlp.Neural.csproj" />
+    <Project Path="src/OneNlp.Models.English/OneNlp.Models.English.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/OneNlp.Tests/OneNlp.Tests.csproj" />
@@ -13,6 +14,7 @@
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/OneNlp.Toy/OneNlp.Toy.csproj" />
+    <Project Path="tools/OneNlp.ModelBench/OneNlp.ModelBench.csproj" />
     <Project Path="tools/OneNlp.Eval/OneNlp.Eval.csproj" />
     <Project Path="tools/OneNlp.Parity/OneNlp.Parity.csproj" />
   </Folder>
