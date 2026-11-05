@@ -4,8 +4,8 @@
 usage: parser_torch.py TRAIN.conllu [--epochs 3] [--threads 8] [--seed 7] [--sentences-per-doc 10] [--batch-words 1500]
 
 Same data grouping (ten sentences per document), same architecture and sizes as recipes/en/parser (one hashed token embedding with
-a linear layer and ReLU, two window layers, biaffine arcs and labels, sentence-start classifier), same batching by words, AdamW at
-0.002, dropout 0.2 on the encoder output. It only trains and reports seconds per epoch; it does not decode or score.
+a linear layer and ReLU, window layers, a bidirectional LSTM, biaffine arcs and labels, sentence-start classifier), same batching by words, AdamW at
+0.002, dropout 0.25 on the encoder output. It only trains and reports seconds per epoch; it does not decode or score.
 """
 import argparse
 import random
@@ -58,23 +58,25 @@ def read(path, per_doc):
 
 
 class Parser(nn.Module):
-    def __init__(self, labels, width=128, buckets=32768, arc=256, rel=128, context=2):
+    def __init__(self, labels, width=128, buckets=32768, arc=256, rel=128, context=0, lstm=192, lstm_layers=2):
         super().__init__()
         self.labels, self.rel = labels, rel
         self.buckets = buckets
         self.embed = nn.Embedding(buckets, width)
         self.project = nn.Linear(width, width)
         self.window = nn.ModuleList([nn.Linear(3 * width, width) for _ in range(context)])
-        self.arc_dep, self.arc_head = nn.Linear(width, arc), nn.Linear(width, arc)
+        self.lstm = nn.LSTM(width, lstm, num_layers=lstm_layers, bidirectional=True) if lstm else None
+        top = 2 * lstm if lstm else width
+        self.arc_dep, self.arc_head = nn.Linear(top, arc), nn.Linear(top, arc)
         self.arc_bilinear = nn.Linear(arc, arc, bias=False)
         self.arc_head_bias = nn.Linear(arc, 1)
-        self.rel_dep, self.rel_head = nn.Linear(width, rel), nn.Linear(width, rel)
+        self.rel_dep, self.rel_head = nn.Linear(top, rel), nn.Linear(top, rel)
         self.rel_bilinear = nn.Linear(rel, labels * rel, bias=False)
         self.rel_pair = nn.Linear(2 * rel, labels)
-        self.boundary = nn.Linear(width, 2)
+        self.boundary = nn.Linear(top, 2)
         self.root_arc = nn.Parameter(torch.randn(1, arc))
         self.root_rel = nn.Parameter(torch.randn(1, rel))
-        self.dropout = nn.Dropout(0.2)
+        self.dropout = nn.Dropout(0.25)
 
     def forward(self, ids, doc_bounds, sentences, rel_dep, rel_head, rel_target, boundary_target):
         x = F.relu(self.project(self.embed(ids)))
@@ -89,6 +91,12 @@ class Parser(nn.Module):
         for layer in self.window:
             padded = torch.cat([x, zero], 0)
             x = x + F.relu(layer(torch.cat([padded[prev], x, padded[nxt]], 1)))
+        if self.lstm is not None:
+            seqs = [x[a:b] for a, b in doc_bounds]
+            packed = nn.utils.rnn.pack_sequence(seqs, enforce_sorted=False)
+            out, _ = self.lstm(packed)
+            out, lens = nn.utils.rnn.pad_packed_sequence(out)
+            x = torch.cat([out[:int(l), i] for i, l in enumerate(lens)], 0)
         loss = F.cross_entropy(self.boundary(x), boundary_target, reduction="sum")
         ad, ah = F.relu(self.arc_dep(x)), F.relu(self.arc_head(x))
         rd, rh = F.relu(self.rel_dep(x)), F.relu(self.rel_head(x))
@@ -129,6 +137,9 @@ def main():
     p.add_argument("--seed", type=int, default=7)
     p.add_argument("--sentences-per-doc", type=int, default=10)
     p.add_argument("--batch-words", type=int, default=1500)
+    p.add_argument("--context", type=int, default=0)
+    p.add_argument("--lstm", type=int, default=192)
+    p.add_argument("--lstm-layers", type=int, default=2)
     a = p.parse_args()
     torch.set_num_threads(a.threads)
     torch.manual_seed(a.seed)
@@ -136,7 +147,7 @@ def main():
     docs = read(a.train, a.sentences_per_doc)
     labels = sorted({d for doc in docs for d in doc[2]})
     lid = {l: i for i, l in enumerate(labels)}
-    model = Parser(len(labels))
+    model = Parser(len(labels), context=a.context, lstm=a.lstm, lstm_layers=a.lstm_layers)
     opt = torch.optim.AdamW(model.parameters(), lr=0.002, weight_decay=0.01)
     for epoch in range(a.epochs):
         model.train()

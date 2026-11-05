@@ -18,6 +18,7 @@ dotnet run -c Release --project recipes/en/parser -- train --train en_ewt-ud-tra
   - `raw-sentencizer`: the same, with the rule-based sentencizer setting the boundaries first;
   - `gold`: gold tokens and sentences in, heads and relations out.
 - **Scoring.** `tools/OneNlp.Eval ud --gold G --pred P` (UAS, LAS, CLAS, Sentences), with `--ref-pred` for a reference system's predictions.
-- **PyTorch timing.** `tools/parser_torch.py` is the same model and batching in plain PyTorch; it reports seconds per epoch.
+- **Throughput.** `speed --model M --gold G --repeat 3` parses the raw test documents and prints tokens per second and allocation per token.
+- **PyTorch timing.** `tools/parser_torch.py` is the same model and batching in plain PyTorch; it reports seconds per epoch. For a like-for-like comparison run the C# recipe with `--encoder hash` (the one-token hashed embedding the script reproduces).
 
 `PROVENANCE.md` lists the data, hashes, seeds and the weights of the shipped run.

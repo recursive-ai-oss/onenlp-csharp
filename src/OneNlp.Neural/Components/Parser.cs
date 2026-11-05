@@ -55,9 +55,11 @@ public sealed class Parser : TrainableHead
     /// <param name="arcSize">The width of the vectors the arc scorer compares, 1 to 2048. Default 256.</param>
     /// <param name="labelSize">The width of the vectors the label scorer compares, 1 to 1024. Default 128.</param>
     /// <param name="contextLayers">The number of window layers the parser adds on top of the encoder, 0 to 16. Default 2.</param>
+    /// <param name="recurrentSize">The hidden size per direction of a bidirectional LSTM run over each document after the window layers, 0 to 1024; 0 means none. Default 0.</param>
+    /// <param name="recurrentLayers">The number of stacked LSTM layers, 1 to 8, when <paramref name="recurrentSize"/> is above 0. Default 1.</param>
     /// <param name="name">The component name, unique in its pipeline. Default <c>parser</c>.</param>
     /// <exception cref="ArgumentOutOfRangeException">A size is out of range.</exception>
-    public Parser(IEncoder encoder, int arcSize = 256, int labelSize = 128, int contextLayers = 2, string name = "parser")
+    public Parser(IEncoder encoder, int arcSize = 256, int labelSize = 128, int contextLayers = 2, int recurrentSize = 0, int recurrentLayers = 1, string name = "parser")
         : base(name, encoder)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(arcSize, 1);
@@ -68,7 +70,13 @@ public sealed class Parser : TrainableHead
         ArgumentOutOfRangeException.ThrowIfGreaterThan(contextLayers, 16);
         ArcSize = arcSize;
         LabelSize = labelSize;
+        ArgumentOutOfRangeException.ThrowIfLessThan(recurrentSize, 0);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(recurrentSize, 1024);
+        ArgumentOutOfRangeException.ThrowIfLessThan(recurrentLayers, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(recurrentLayers, 8);
         ContextLayers = contextLayers;
+        RecurrentSize = recurrentSize;
+        RecurrentLayers = recurrentLayers;
     }
 
     /// <summary>The width of the arc scorer's vectors.</summary>
@@ -79,6 +87,12 @@ public sealed class Parser : TrainableHead
 
     /// <summary>The number of window layers on top of the encoder.</summary>
     public int ContextLayers { get; }
+
+    /// <summary>The hidden size per direction of the LSTM over each document; 0 when there is none.</summary>
+    public int RecurrentSize { get; }
+
+    /// <summary>The number of stacked LSTM layers.</summary>
+    public int RecurrentLayers { get; }
 
     /// <summary>The dependency relations, in output order; empty until the parser is initialized.</summary>
     public IReadOnlyList<string> Labels => _labels;
@@ -328,6 +342,8 @@ public sealed class Parser : TrainableHead
         writer.WriteNumber("arcSize", ArcSize);
         writer.WriteNumber("labelSize", LabelSize);
         writer.WriteNumber("contextLayers", ContextLayers);
+        writer.WriteNumber("recurrentSize", RecurrentSize);
+        writer.WriteNumber("recurrentLayers", RecurrentLayers);
         writer.WriteStartArray("labels");
         foreach (string label in _labels)
         {
@@ -361,6 +377,8 @@ public sealed class Parser : TrainableHead
             JsonSettings.Int(config, "arcSize", 1, 2048),
             JsonSettings.Int(config, "labelSize", 1, 1024),
             JsonSettings.Int(config, "contextLayers", 0, 16),
+            config.TryGetProperty("recurrentSize", out _) ? JsonSettings.Int(config, "recurrentSize", 0, 1024) : 0,
+            config.TryGetProperty("recurrentLayers", out _) ? JsonSettings.Int(config, "recurrentLayers", 1, 8) : 1,
             name)
         { OwnsEncoder = true };
         parser.Build(labels, new Generator(0));
@@ -397,7 +415,7 @@ public sealed class Parser : TrainableHead
         }
 
         _rootLabel = _labelIds.TryGetValue(RootLabel, out int root) ? root : -1;
-        _module = new ParserModule(Encoder.Width, ArcSize, LabelSize, ContextLayers, labels.Length, generator);
+        _module = new ParserModule(Encoder.Width, ArcSize, LabelSize, ContextLayers, RecurrentSize, RecurrentLayers, labels.Length, generator);
     }
 
     /// <summary>The gold tree of an example on the predicted tokens, or null when the tokenizations differ.</summary>
@@ -492,29 +510,38 @@ public sealed class Parser : TrainableHead
         private readonly Linear _relBilinear;
         private readonly Linear _relPair;
         private readonly Linear _boundary;
+        private readonly int _recurrentSize;
+        private readonly Recurrent? _lstm;
         private readonly Embedding _rootArc;
         private readonly Embedding _rootRel;
 
-        public ParserModule(int width, int arcSize, int labelSize, int contextLayers, int labels, Generator generator)
+        public ParserModule(int width, int arcSize, int labelSize, int contextLayers, int recurrentSize, int recurrentLayers, int labels, Generator generator)
         {
             _width = width;
             _labels = labels;
             _labelSize = labelSize;
+            _recurrentSize = recurrentSize;
             _window = new Linear[contextLayers];
             for (int i = 0; i < contextLayers; i++)
             {
                 _window[i] = RegisterModule("window" + i, new Linear(3 * width, width, generator));
             }
 
-            _arcDep = RegisterModule("arc_dep", new Linear(width, arcSize, generator));
-            _arcHead = RegisterModule("arc_head", new Linear(width, arcSize, generator));
+            if (recurrentSize > 0)
+            {
+                _lstm = RegisterModule("lstm", new Recurrent(gru: false, width, recurrentSize, generator, recurrentLayers, bidirectional: true));
+            }
+
+            int top = recurrentSize > 0 ? 2 * recurrentSize : width;
+            _arcDep = RegisterModule("arc_dep", new Linear(top, arcSize, generator));
+            _arcHead = RegisterModule("arc_head", new Linear(top, arcSize, generator));
             _arcBilinear = RegisterModule("arc_bilinear", new Linear(arcSize, arcSize, generator, bias: false));
             _arcHeadBias = RegisterModule("arc_head_bias", new Linear(arcSize, 1, generator));
-            _relDep = RegisterModule("rel_dep", new Linear(width, labelSize, generator));
-            _relHead = RegisterModule("rel_head", new Linear(width, labelSize, generator));
+            _relDep = RegisterModule("rel_dep", new Linear(top, labelSize, generator));
+            _relHead = RegisterModule("rel_head", new Linear(top, labelSize, generator));
             _relBilinear = RegisterModule("rel_bilinear", new Linear(labelSize, labels * labelSize, generator, bias: false));
             _relPair = RegisterModule("rel_pair", new Linear(2 * labelSize, labels, generator));
-            _boundary = RegisterModule("boundary", new Linear(width, 2, generator));
+            _boundary = RegisterModule("boundary", new Linear(top, 2, generator));
             _rootArc = RegisterModule("root_arc", new Embedding(1, arcSize, generator));
             _rootRel = RegisterModule("root_rel", new Embedding(1, labelSize, generator));
         }
@@ -526,36 +553,70 @@ public sealed class Parser : TrainableHead
         {
             Tensor x = vectors;
             int n = x.Shape[0];
-            if (_window.Length == 0 || n == 0)
+            if (n == 0 || (_window.Length == 0 && _lstm is null))
             {
                 return x;
             }
 
-            var previous = new int[n];
-            var next = new int[n];
-            for (int d = 0; d < batch.DocCount; d++)
+            Tensor zero = Tensor.Zeros(DType.F32, Shape.Create(1, _width));
+            ActivationScope.Track(zero);
+            if (_window.Length > 0)
             {
-                int a = batch.Start(d);
-                int b = a + batch.Length(d);
-                for (int r = a; r < b; r++)
+                var previous = new int[n];
+                var next = new int[n];
+                for (int d = 0; d < batch.DocCount; d++)
                 {
-                    previous[r] = r > a ? r - 1 : n;
-                    next[r] = r + 1 < b ? r + 1 : n;
+                    int a = batch.Start(d);
+                    int b = a + batch.Length(d);
+                    for (int r = a; r < b; r++)
+                    {
+                        previous[r] = r > a ? r - 1 : n;
+                        next[r] = r + 1 < b ? r + 1 : n;
+                    }
+                }
+
+                Tensor previousIds = IntTensor(previous);
+                Tensor nextIds = IntTensor(next);
+                foreach (Linear layer in _window)
+                {
+                    Tensor padded = Ops.Concat([x, zero], 0);
+                    Tensor window = Ops.Concat([Ops.Embedding(padded, previousIds), x, Ops.Embedding(padded, nextIds)], 1);
+                    x = x + Ops.Relu(layer.Forward(window));
                 }
             }
 
-            Tensor previousIds = IntTensor(previous);
-            Tensor nextIds = IntTensor(next);
-            Tensor zero = Tensor.Zeros(DType.F32, Shape.Create(1, _width));
-            ActivationScope.Track(zero);
-            foreach (Linear layer in _window)
+            return _lstm is null ? x : Recurrence(x, batch, zero);
+        }
+
+        // The documents form one padded LSTM batch with their lengths, so a document's result does not depend on which others share
+        // the batch (packed-sequence semantics of Ops.Lstm: the reverse direction starts at the document's own end).
+        private Tensor Recurrence(Tensor x, EncodedBatch batch, Tensor zero)
+        {
+            int n = x.Shape[0];
+            int docs = batch.DocCount;
+            int longest = 0;
+            var lengths = new int[docs];
+            for (int d = 0; d < docs; d++)
             {
-                Tensor padded = Ops.Concat([x, zero], 0);
-                Tensor window = Ops.Concat([Ops.Embedding(padded, previousIds), x, Ops.Embedding(padded, nextIds)], 1);
-                x = x + Ops.Relu(layer.Forward(window));
+                lengths[d] = batch.Length(d);
+                longest = Math.Max(longest, lengths[d]);
             }
 
-            return x;
+            var gather = new int[longest * docs]; // [time, batch] -> row of x, or n for padding
+            var scatter = new int[n]; // row of x -> [time, batch] position
+            Array.Fill(gather, n);
+            for (int d = 0; d < docs; d++)
+            {
+                for (int t = 0; t < lengths[d]; t++)
+                {
+                    gather[(t * docs) + d] = batch.Start(d) + t;
+                    scatter[batch.Start(d) + t] = (t * docs) + d;
+                }
+            }
+
+            Tensor padded = Ops.Embedding(Ops.Concat([x, zero], 0), IntTensor(gather)).Reshape(longest, docs, _width);
+            Tensor outputs = _lstm!.Forward(padded, lengths).Reshape(longest * docs, 2 * _recurrentSize);
+            return Ops.Embedding(outputs, IntTensor(scatter));
         }
 
         public Tensor Boundary(Tensor x) => _boundary.Forward(x);

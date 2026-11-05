@@ -44,6 +44,7 @@ internal static class Program
             {
                 "train" => Train(o),
                 "predict" => Predict(o),
+                "speed" => Speed(o),
                 _ => 2,
             };
         }
@@ -68,14 +69,18 @@ internal static class Program
     private static int Int(Dictionary<string, string> o, string name, int fallback) =>
         o.TryGetValue(name, out string? v) ? int.Parse(v, CultureInfo.InvariantCulture) : fallback;
 
+    // The fast encoder of the English tagging recipe (hashed lower-case form, prefix, suffix and shape, four window layers).
+    // --encoder hash swaps in the one-token hashed embedding, which the PyTorch timing script reproduces exactly.
     private static Pipeline NewPipeline(Dictionary<string, string> o) =>
         Pipeline.Blank(Language.English).Add(new Parser(
-            o.GetValueOrDefault("encoder", "hash") == "fast"
-                ? new FastEncoder(Int(o, "width", 96), Int(o, "depth", 4))
-                : new HashEmbeddingEncoder(Int(o, "width", 128), Int(o, "buckets", 32768), seed: 1),
+            o.GetValueOrDefault("encoder", "fast") == "hash"
+                ? new HashEmbeddingEncoder(128, 32768, seed: 1)
+                : new FastEncoder(Int(o, "width", 96), Int(o, "depth", 4), normRows: 20000, prefixRows: 2000, suffixRows: 5000, shapeRows: 2500, seed: 1),
             arcSize: Int(o, "arc", 256),
             labelSize: Int(o, "label", 128),
-            contextLayers: Int(o, "context", 2))
+            contextLayers: Int(o, "context", 0),
+            recurrentSize: Int(o, "lstm", 192),
+            recurrentLayers: Int(o, "lstm-layers", 2))
         { OwnsEncoder = true });
 
     private static int Train(Dictionary<string, string> o)
@@ -107,7 +112,7 @@ internal static class Program
             BatchWords = Int(o, "batch-words", 1500),
             LearningRate = float.Parse(o.GetValueOrDefault("lr", "0.002"), CultureInfo.InvariantCulture),
             WarmupSteps = 100,
-            Dropout = float.Parse(o.GetValueOrDefault("dropout", "0.2"), CultureInfo.InvariantCulture),
+            Dropout = float.Parse(o.GetValueOrDefault("dropout", "0.25"), CultureInfo.InvariantCulture),
             Seed = ulong.Parse(o.GetValueOrDefault("seed", "7"), CultureInfo.InvariantCulture),
             DevExamples = dev,
             Score = DevScores.Ud("LAS"),
@@ -245,6 +250,34 @@ internal static class Program
         }
 
         Console.WriteLine($"{o["out"]}: {sentences} sentences, {tokens} tokens");
+        return 0;
+    }
+
+    // Indicative throughput: raw text through the tokenizer and the parser, in batches, after one untimed warm-up pass.
+    private static int Speed(Dictionary<string, string> o)
+    {
+        using Pipeline pipeline = PipelineFile.Load(o["model"]);
+        List<string> texts = [.. RawDocuments(o["gold"])];
+        int repeats = Int(o, "repeat", 3);
+        long tokens = 0;
+        foreach (Doc d in pipeline.ProcessMany(texts, 32))
+        {
+            tokens += d.Length;
+        }
+
+        for (int r = 0; r < repeats; r++)
+        {
+            long before = GC.GetAllocatedBytesForCurrentThread();
+            var clock = Stopwatch.StartNew();
+            foreach (Doc d in pipeline.ProcessMany(texts, 32))
+            {
+                _ = d.Length;
+            }
+
+            double seconds = clock.Elapsed.TotalSeconds;
+            Console.WriteLine($"run={r} documents={texts.Count} tokens={tokens} seconds={seconds.ToString("F2", CultureInfo.InvariantCulture)} tokens_per_second={(tokens / seconds).ToString("F0", CultureInfo.InvariantCulture)} managed_bytes_per_token={((GC.GetAllocatedBytesForCurrentThread() - before) / tokens).ToString(CultureInfo.InvariantCulture)} threads={TensorCompute.Threads}");
+        }
+
         return 0;
     }
 

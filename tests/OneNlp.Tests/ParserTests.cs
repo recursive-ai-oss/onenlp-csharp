@@ -160,6 +160,33 @@ public class ParserTests
     }
 
     [Fact]
+    public void RecurrentContextLearnsAndDoesNotDependOnTheBatch()
+    {
+        List<Example> train = Toy(300, 1);
+        List<Example> dev = Toy(60, 2);
+        using Pipeline pipeline = Pipeline.Blank().Add(new Parser(new HashEmbeddingEncoder(32, 512, seed: 1), arcSize: 32, labelSize: 16, contextLayers: 0, recurrentSize: 16) { OwnsEncoder = true });
+        TrainResult result = pipeline.Train(train, new TrainOptions
+        {
+            Epochs = 12,
+            BatchWords = 200,
+            LearningRate = 0.01f,
+            Dropout = 0.0f,
+            Seed = 3,
+            DevExamples = dev,
+            Score = DevScores.Ud("LAS"),
+        });
+        Assert.True(result.BestScore > 90, $"dev LAS {result.BestScore}");
+
+        string[] texts = [.. dev.Take(12).Select(e => e.Reference.Text)];
+        Doc[] together = [.. pipeline.ProcessMany(texts, batchSize: 12)];
+        for (int i = 0; i < texts.Length; i++)
+        {
+            Doc alone = pipeline.Process(texts[i]);
+            Assert.Equal(alone.GetHeads().ToArray(), together[i].GetHeads().ToArray());
+        }
+    }
+
+    [Fact]
     public void PredictsSentenceBoundariesInRunningText()
     {
         // Six sentences per document. In this toy language a sentence always begins with word type 0 and no other position holds one.
