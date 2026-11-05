@@ -11,6 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="../../testdata/accurate/**" Link="testdata/accurate/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../../src/OneNlp/OneNlp.csproj" />
     <ProjectReference Include="../../src/OneNlp.Neural/OneNlp.Neural.csproj" />
   </ItemGroup>

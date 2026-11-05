@@ -40,6 +40,7 @@ Encoder kinds (`encoders[i].kind`, with `settings`) and head kinds (`components[
 |---|---|---|
 | encoder `hash-embedding` | `width`, `buckets`, `seed` | `embed.weight` `[buckets, width]`; `project.weight`, `project.bias` |
 | encoder `fast` | `width` (8 to 2048), `depth` (0 to 32), `normRows`, `prefixRows`, `suffixRows`, `shapeRows` (each 1 to 4,194,304, and rows times width over the four tables at most 33,554,432 values together), `seed` | `embed_norm.weight`, `embed_prefix.weight`, `embed_suffix.weight`, `embed_shape.weight` (`[rows, width]`); `mix.weight` `[width, 4 * width]`, `mix.bias`, `mix_norm.weight`, `mix_norm.bias`; for each layer `i`: `window<i>.weight` `[width, 3 * width]`, `window<i>.bias`, `window_norm<i>.weight`, `window_norm<i>.bias` |
+| encoder `transformer` | `model`, `tokenizer` (file names of the exported ONNX encoder and its `tokenizer.json`, at most 1,024 characters each), `modelSha256` (optional, 64 hex characters), `pooling` (`first` or `mean`), `maxLength` (2 to 65,536) | none: the encoder is frozen and lives in its own files, which the pipeline file references and does not embed |
 | head `tagger` | `column` (`Tag`, `Pos` or `Morph`), `labels` | `output.weight` `[labels, width]`, `output.bias` |
 | head `morphologizer` | `labels`: joint labels, each `POS=<upos>` or `POS=<upos>\|<features>`, at most 65,536 | `output.weight`, `output.bias` as the tagger |
 | head `lemmatizer` | `labels`: classes, each `l` or `r` followed by a serialized edit tree, at most 262,144 | `output.weight`, `output.bias` as the tagger |
@@ -49,3 +50,5 @@ The `fast` encoder's hash is part of the format: FNV-1a over UTF-16 units, seede
 ## Bounds on read
 
 Config at most 16 MiB with JSON nesting at most 32; weights at most 1 GiB; at most 64 encoders and 1,024 components; label sets at most 1,048,576 entries of at most 4,096 characters; an embedding table at most 67,108,864 values and a head's output layer at most 67,108,864 weights. The declared lengths are compared with the real length of the data before anything is allocated. Any failure is an `InvalidDataException`.
+
+**Referenced encoder files.** A `transformer` encoder is a multi-hundred-megabyte ONNX file plus a `tokenizer.json`. A pipeline file stores their names (and optionally the model's SHA-256), not their bytes: the same encoder serves many pipelines, and a pipeline file stays a few kilobytes. A relative name is looked up in `TransformerEncoder.ModelDirectory` (the current directory when unset); an absolute name is used as is. Loading fails with the file's own `FileNotFoundException` when a file is missing, and `VerifyModelFile` checks the hash on request. The model packages put the encoder files next to the pipeline files they belong to.

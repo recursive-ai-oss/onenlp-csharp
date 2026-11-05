@@ -30,6 +30,9 @@ internal sealed partial class StageRegistry
 /// <summary>Applies normalizers one after the other.</summary>
 internal sealed class SequenceNormalizer(INormalizer[] steps) : INormalizer
 {
+    /// <summary>The steps, in order.</summary>
+    internal IReadOnlyList<INormalizer> Steps => steps;
+
     public void Normalize(NormalizedString text)
     {
         foreach (INormalizer step in steps)
@@ -102,6 +105,9 @@ internal static class NormalizerHelpers
 /// </summary>
 internal sealed class BertNormalizer(bool cleanText, bool handleChineseChars, bool? stripAccents, bool lowercase) : INormalizer
 {
+    /// <summary>Whether the text is lowercased.</summary>
+    internal bool Lowercase => lowercase;
+
     public void Normalize(NormalizedString text)
     {
         if (cleanText)
@@ -390,6 +396,15 @@ internal sealed class ReplaceNormalizer : INormalizer
     private readonly CodePointRegex? _regex;
     private readonly string _content;
 
+    /// <summary>Whether the pattern is a regular expression and not a literal string.</summary>
+    internal bool IsRegex => _regex is not null;
+
+    /// <summary>The literal string to replace (the pattern text for a regular expression).</summary>
+    internal string Pattern => _pattern;
+
+    /// <summary>The replacement text.</summary>
+    internal string Content => _content;
+
     internal ReplaceNormalizer(string pattern, bool isRegex, string content)
     {
         _pattern = pattern;
@@ -460,6 +475,9 @@ internal sealed class ReplaceNormalizer : INormalizer
 /// <summary>Puts a fixed string in front of the text.</summary>
 internal sealed class PrependNormalizer(string prefix) : INormalizer
 {
+    /// <summary>The string put in front of the text.</summary>
+    internal string Prefix => prefix;
+
     public void Normalize(NormalizedString text)
     {
         if (text.Length == 0 || prefix.Length == 0)

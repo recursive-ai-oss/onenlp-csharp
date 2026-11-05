@@ -118,6 +118,89 @@ internal sealed class WordPieceModel : Hf.ITokenizerModel
         }
     }
 
+    /// <inheritdoc/>
+    /// <exception cref="InvalidDataException">The word needs the unknown token and the vocabulary has none.</exception>
+    public void TokenizeIds(ReadOnlySpan<char> piece, Hf.IdBuffer output)
+    {
+        if (CountScalars(piece) > _maxInputChars)
+        {
+            AddUnknownId(output);
+            return;
+        }
+
+        int first = output.Count;
+        char[]? rented = null;
+        try
+        {
+            int start = 0;
+            while (start < piece.Length)
+            {
+                ReadOnlySpan<char> rest = piece[start..];
+                ReadOnlySpan<char> probe = rest;
+                int offset = 0;
+                if (start > 0 && _prefix.Length > 0)
+                {
+                    int needed = _prefix.Length + rest.Length;
+                    if (rented is null || rented.Length < needed)
+                    {
+                        if (rented is not null)
+                        {
+                            ArrayPool<char>.Shared.Return(rented);
+                        }
+
+                        // Bounded by the word: at most prefix length plus the piece length, which the caller already holds in memory.
+                        rented = ArrayPool<char>.Shared.Rent(needed);
+                    }
+
+                    _prefix.CopyTo(rented);
+                    rest.CopyTo(rented.AsSpan(_prefix.Length));
+                    probe = rented.AsSpan(0, needed);
+                    offset = _prefix.Length;
+                }
+
+                int end = rest.Length;
+                int id = -1;
+                while (end > 0)
+                {
+                    if (_vocab.TryGetId(probe[..(offset + end)], out id))
+                    {
+                        break;
+                    }
+
+                    end -= end >= 2 && char.IsLowSurrogate(rest[end - 1]) && char.IsHighSurrogate(rest[end - 2]) ? 2 : 1;
+                    id = -1;
+                }
+
+                if (end == 0)
+                {
+                    output.Truncate(first);
+                    AddUnknownId(output);
+                    return;
+                }
+
+                output.Add(id);
+                start += end;
+            }
+        }
+        finally
+        {
+            if (rented is not null)
+            {
+                ArrayPool<char>.Shared.Return(rented);
+            }
+        }
+    }
+
+    private void AddUnknownId(Hf.IdBuffer output)
+    {
+        if (_unkId is not { } id)
+        {
+            throw new InvalidDataException($"The unknown token '{_unkToken}' is not in the vocabulary, and a word needs it.");
+        }
+
+        output.Add(id);
+    }
+
     private static int CountScalars(ReadOnlySpan<char> text)
     {
         int n = 0;
