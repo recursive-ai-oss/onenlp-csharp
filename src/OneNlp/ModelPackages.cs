@@ -84,6 +84,8 @@ public static class ModelPackages
                 ? $"RecursiveAI.OneNlp.Models.German (fast tier), or {MultilingualPackageId}"
                 : language == Language.French
                     ? $"RecursiveAI.OneNlp.Models.French (fast tier), or {MultilingualPackageId}"
+                    : language == Language.Portuguese
+                        ? $"RecursiveAI.OneNlp.Models.Portuguese (fast tier), or {MultilingualPackageId}"
                     : language == Language.Dutch
                         ? $"RecursiveAI.OneNlp.Models.Dutch (fast tier), or {MultilingualPackageId}"
                         : MultilingualPackageId;
