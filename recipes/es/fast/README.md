@@ -12,7 +12,7 @@ Data comes from `tools/fetch/es/fetch.sh`; hashes are in `tools/fetch/es/MANIFES
 
 ```
 R="dotnet run -c Release --project recipes/es/fast --"
-$R train-tagging --train es_ancora-ud-train.conllu --dev es_ancora-ud-dev.conllu --out tagging-dir [encoder options] --threads 4
+$R train-tagging --train es_ancora-ud-train.conllu --dev es_ancora-ud-dev.conllu --out tagging-dir --plain 1 --relu 1 --depth 1 --recurrent 1 --recurrent-size 64 --lr 0.003 --cosine-epochs 20 --patience 100 --threads 4
 $R train-parser  --train es_ancora-ud-train.conllu --dev es_ancora-ud-dev.conllu --out parser-dir  [encoder options] --threads 4
 $R ner-convert wikiner-es-wp3-train.iob2 ner-train.jsonl --pieces       # likewise dev; test without --pieces (and with, for ner-eval below)
 $R ner-train ner-train.jsonl ner-dev.jsonl ner-dir [encoder options] --threads 4 --checkpoint-every 100
@@ -34,3 +34,5 @@ Encoder options (`--width --depth --norm-rows --prefix-rows --suffix-rows --shap
 UD Spanish writes `del` as one multiword token of the words `de` and `el`, and a verb with enclitic pronouns (`verlo`) as the verb and the pronouns. The tokenizer cuts such a surface form into pieces (`de`|`l`, `ver`|`lo`; `docs/segmentation.md`), the heads tag and parse the pieces, and `predict` writes the multiword-token line with the treebank's words from `SegmentationData.TryMatchMultiword`, so that scoring sees UD words.
 
 WikiNER keeps `del` whole. A model that reads raw text sees the pieces, so the entity recognizer is trained on `ner-convert --pieces` files (the first piece keeps the tag, later pieces continue the entity), and `ner-eval --pieces-file` gives the model the pieces and scores each original token with the tag of its first piece. Trained on whole tokens and run on pieces, the same architecture scored 81.71 against 83.35 for spaCy (a paired difference of -1.64, outside the interval).
+
+`train-tagging` also takes `--cosine-epochs N` (a fixed budget of N epochs with the rate falling along a half cosine after the warm-up; use it with a large `--patience`). The shipped tagging model uses the flags in the command above: one bidirectional LSTM layer over each document lets a token see words beyond its window neighbours. The parser and entity parts use the default encoder.

@@ -4,7 +4,7 @@ The package packs three saved pipelines (`weights.manifest.props` lists name, si
 
 | File | Components | Data | Seed |
 |---|---|---|---|
-| `tagging.onenlp` | sentencizer, tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, on a fast hash-embedding encoder (`FastEncoder.English()` configuration) | UD Spanish-AnCora r2.18, train and dev | 1 |
+| `tagging.onenlp` | sentencizer, tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, on a fast hash-embedding encoder with one window layer and one 64-unit bidirectional LSTM layer (ReLU, no layer normalization; `recipes/es/fast/PROVENANCE.md`) | UD Spanish-AnCora r2.18, train and dev | 1 |
 | `parser.onenlp` | biaffine dependency parser with sentence starts, fast encoder and a two-layer bidirectional LSTM | UD Spanish-AnCora r2.18, train and dev | 7 |
 | `ner.onenlp` | entity recognizer (BILUO tagging, constrained decoding; PER, LOC, ORG, MISC), fast encoder | WikiNER Spanish wp3, train and dev, `del`, `al` and verbs with enclitics cut into the tokenizer's pieces (`ner-convert --pieces`) | 7 |
 
