@@ -26,6 +26,10 @@ internal static class JsonSettings
         return value;
     }
 
+    // A setting added after the first file version: absent means the given default, present must be valid.
+    public static int OptionalInt(JsonElement obj, string name, int min, int max, int fallback) =>
+        obj.ValueKind == JsonValueKind.Object && obj.TryGetProperty(name, out _) ? Int(obj, name, min, max) : fallback;
+
     public static ulong ULong(JsonElement obj, string name)
     {
         JsonElement e = Property(obj, name);

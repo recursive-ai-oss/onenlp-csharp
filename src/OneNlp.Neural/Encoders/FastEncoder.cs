@@ -40,7 +40,7 @@ public sealed class FastEncoder : IEncoder
     /// <summary>The kind name used by <see cref="EncoderRegistry"/>: <c>fast</c>.</summary>
     public const string EncoderKind = "fast";
 
-    /// <summary>The number of hash functions per attribute.</summary>
+    /// <summary>The default number of hash functions per attribute.</summary>
     public const int HashesPerToken = 2;
 
     /// <summary>The number of leading characters hashed as the prefix attribute.</summary>
@@ -49,15 +49,18 @@ public sealed class FastEncoder : IEncoder
     /// <summary>The number of trailing characters hashed as the suffix attribute.</summary>
     public const int SuffixLength = 3;
 
-    private const int Attributes = 4;
+    private const int BaseAttributes = 4;
+    private const int MaxAffix = 8;
+    private const int MaxHashes = 4;
     private const int MaxWidth = 2048;
     private const int MaxDepth = 32;
     private const int MaxRows = 1 << 22;
     private const long MaxTableValues = 1L << 25;
     private const int ShapeRun = 4;
-    private static readonly ulong[] AttributeSeeds = [0x9E3779B97F4A7C15UL, 0xC2B2AE3D27D4EB4FUL, 0x165667B19E3779F9UL, 0x27D4EB2F165667C5UL];
+    private static readonly ulong[] AttributeSeeds = [0x9E3779B97F4A7C15UL, 0xC2B2AE3D27D4EB4FUL, 0x165667B19E3779F9UL, 0x27D4EB2F165667C5UL, 0x85EBCA77C2B2AE63UL];
 
     private readonly int[] _rows;
+    private readonly int _attributes;
     private readonly FastModule _module;
     private readonly ConditionalWeakTable<Doc, CachedRows> _cache = [];
 
@@ -69,20 +72,43 @@ public sealed class FastEncoder : IEncoder
     /// <param name="suffixRows">Rows of the table for the suffix. Default 5,000.</param>
     /// <param name="shapeRows">Rows of the table for the shape. Default 2,500.</param>
     /// <param name="seed">Seed of the initial weights. Default 0.</param>
-    /// <exception cref="ArgumentOutOfRangeException">A size is out of range; each table has 1 to 4,194,304 rows and the four tables hold at most 33,554,432 values together.</exception>
-    public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0)
+    /// <param name="prefixLength">Characters hashed as the prefix, 1 to 8. Default <see cref="PrefixLength"/>.</param>
+    /// <param name="suffixLength">Characters hashed as the suffix, 1 to 8. Default <see cref="SuffixLength"/>.</param>
+    /// <param name="casedRows">Rows of a fifth table for the case-preserving text; 0 (the default) leaves that attribute out.</param>
+    /// <param name="embedWidth">Width of the embedding rows, 8 to 2048; 0 (the default) means <paramref name="width"/>. The attributes are joined and a linear layer maps them to <paramref name="width"/>.</param>
+    /// <param name="hashes">Hash functions per attribute, 1 to 4: a token's vector for an attribute is the sum of that many rows. Default <see cref="HashesPerToken"/>.</param>
+    /// <param name="plain">Join the attributes with a ReLU and no layer normalization, as the original hash-embedding recipes do; the window layers keep theirs. Default false (GELU and layer normalization).</param>
+    /// <exception cref="ArgumentOutOfRangeException">A size is out of range; each table has 1 to 4,194,304 rows and the tables hold at most 33,554,432 values together.</exception>
+    public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0, int prefixLength = PrefixLength, int suffixLength = SuffixLength, int casedRows = 0, int embedWidth = 0, bool plain = false, int hashes = HashesPerToken)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(hashes, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(hashes, MaxHashes);
+        Hashes = hashes;
+        ArgumentOutOfRangeException.ThrowIfLessThan(prefixLength, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(prefixLength, MaxAffix);
+        ArgumentOutOfRangeException.ThrowIfLessThan(suffixLength, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(suffixLength, MaxAffix);
+        ArgumentOutOfRangeException.ThrowIfNegative(casedRows);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(casedRows, MaxRows);
+        if (embedWidth == 0)
+        {
+            embedWidth = width;
+        }
+
+        ArgumentOutOfRangeException.ThrowIfLessThan(embedWidth, 8);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(embedWidth, MaxWidth);
         ArgumentOutOfRangeException.ThrowIfLessThan(width, 8);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(width, MaxWidth);
         ArgumentOutOfRangeException.ThrowIfLessThan(depth, 0);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(depth, MaxDepth);
-        _rows = [normRows, prefixRows, suffixRows, shapeRows];
+        _rows = casedRows > 0 ? [normRows, prefixRows, suffixRows, shapeRows, casedRows] : [normRows, prefixRows, suffixRows, shapeRows];
+        _attributes = _rows.Length;
         long values = 0;
         foreach (int rows in _rows)
         {
             ArgumentOutOfRangeException.ThrowIfLessThan(rows, 1);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(rows, MaxRows);
-            values += (long)rows * width;
+            values += (long)rows * embedWidth;
         }
 
         // A settings object read from a file must not be able to ask for gigabytes before the weights are looked at.
@@ -94,8 +120,24 @@ public sealed class FastEncoder : IEncoder
         Width = width;
         Depth = depth;
         Seed = seed;
-        _module = new FastModule(width, depth, _rows, new Generator(seed));
+        PrefixChars = prefixLength;
+        SuffixChars = suffixLength;
+        EmbedWidth = embedWidth;
+        Plain = plain;
+        _module = new FastModule(width, embedWidth, depth, plain, hashes, _rows, new Generator(seed));
     }
+
+    /// <summary>
+    /// The configuration of the English fast tier, one encoder for every head: 64-wide hash embeddings (one hash function, 32,768 rows
+    /// per attribute) of the lower-cased form, the first three and last three characters and the shape, joined and mixed to 256, then
+    /// two window layers. Chosen on the development sets of UNER English-EWT (entities) and the tagging recipe, where a narrow,
+    /// low-collision hash table with three-character affixes did better than the first configuration (96 wide, one-character prefix,
+    /// small tables, four window layers).
+    /// </summary>
+    /// <param name="seed">Seed of the initial weights. Default 0.</param>
+    /// <returns>A new encoder.</returns>
+    public static FastEncoder English(ulong seed = 0) =>
+        new(width: 256, depth: 2, normRows: 32768, prefixRows: 32768, suffixRows: 32768, shapeRows: 32768, seed: seed, prefixLength: 3, suffixLength: 3, casedRows: 0, embedWidth: 64, plain: false, hashes: 1);
 
     /// <inheritdoc/>
     public string Kind => EncoderKind;
@@ -106,10 +148,25 @@ public sealed class FastEncoder : IEncoder
     /// <summary>The number of window layers.</summary>
     public int Depth { get; }
 
+    /// <summary>The number of hash functions per attribute.</summary>
+    public int Hashes { get; }
+
+    /// <summary>Whether the attributes are joined by a ReLU without layer normalization.</summary>
+    public bool Plain { get; }
+
+    /// <summary>Characters hashed as the prefix.</summary>
+    public int PrefixChars { get; }
+
+    /// <summary>Characters hashed as the suffix.</summary>
+    public int SuffixChars { get; }
+
+    /// <summary>Width of the embedding rows before the joining layer.</summary>
+    public int EmbedWidth { get; }
+
     /// <summary>The seed the initial weights were drawn from.</summary>
     public ulong Seed { get; }
 
-    /// <summary>The rows of the norm, prefix, suffix and shape tables.</summary>
+    /// <summary>The rows of the norm, prefix, suffix and shape tables, then the cased table when there is one.</summary>
     public IReadOnlyList<int> TableRows => _rows;
 
     /// <inheritdoc/>
@@ -153,17 +210,63 @@ public sealed class FastEncoder : IEncoder
         writer.WriteNumber("suffixRows", _rows[2]);
         writer.WriteNumber("shapeRows", _rows[3]);
         writer.WriteNumber("seed", Seed);
+
+        // Written only when they differ from the first file version, so an unchanged configuration saves the same bytes as before.
+        if (PrefixChars != PrefixLength)
+        {
+            writer.WriteNumber("prefixLength", PrefixChars);
+        }
+
+        if (SuffixChars != SuffixLength)
+        {
+            writer.WriteNumber("suffixLength", SuffixChars);
+        }
+
+        if (_attributes > BaseAttributes)
+        {
+            writer.WriteNumber("casedRows", _rows[4]);
+        }
+
+        if (Plain)
+        {
+            writer.WriteNumber("plain", 1);
+        }
+
+        if (Hashes != HashesPerToken)
+        {
+            writer.WriteNumber("hashes", Hashes);
+        }
+
+        if (EmbedWidth != Width)
+        {
+            writer.WriteNumber("embedWidth", EmbedWidth);
+        }
     }
 
-    internal static IEncoder FromSettings(JsonElement s) =>
-        new FastEncoder(
+    internal static IEncoder FromSettings(JsonElement s)
+    {
+        // 0 means "the same as width"; otherwise the same lower bound as width.
+        int embedWidth = JsonSettings.OptionalInt(s, "embedWidth", 0, MaxWidth, 0);
+        if (embedWidth is > 0 and < 8)
+        {
+            throw new InvalidDataException("'embedWidth' must be 0 or an integer from 8 to " + MaxWidth + ".");
+        }
+
+        return new FastEncoder(
             JsonSettings.Int(s, "width", 8, MaxWidth),
             JsonSettings.Int(s, "depth", 0, MaxDepth),
             JsonSettings.Int(s, "normRows", 1, MaxRows),
             JsonSettings.Int(s, "prefixRows", 1, MaxRows),
             JsonSettings.Int(s, "suffixRows", 1, MaxRows),
             JsonSettings.Int(s, "shapeRows", 1, MaxRows),
-            JsonSettings.ULong(s, "seed"));
+            JsonSettings.ULong(s, "seed"),
+            JsonSettings.OptionalInt(s, "prefixLength", 1, MaxAffix, PrefixLength),
+            JsonSettings.OptionalInt(s, "suffixLength", 1, MaxAffix, SuffixLength),
+            JsonSettings.OptionalInt(s, "casedRows", 0, MaxRows, 0),
+            embedWidth,
+            JsonSettings.OptionalInt(s, "plain", 0, 1, 0) == 1,
+            JsonSettings.OptionalInt(s, "hashes", 1, MaxHashes, HashesPerToken));
+    }
 
     private static ulong Mix(ulong h)
     {
@@ -217,16 +320,16 @@ public sealed class FastEncoder : IEncoder
         return Mix(h);
     }
 
-    private static ReadOnlySpan<char> Prefix(ReadOnlySpan<char> t) => t.Length <= PrefixLength ? t : t[..PrefixLength];
+    private ReadOnlySpan<char> Prefix(ReadOnlySpan<char> t) => t.Length <= PrefixChars ? t : t[..PrefixChars];
 
-    private static ReadOnlySpan<char> Suffix(ReadOnlySpan<char> t) => t.Length <= SuffixLength ? t : t[^SuffixLength..];
+    private ReadOnlySpan<char> Suffix(ReadOnlySpan<char> t) => t.Length <= SuffixChars ? t : t[^SuffixChars..];
 
     private Tensor Compute(ReadOnlySpan<Doc> docs, int[] starts)
     {
         int n = starts[^1];
 
-        // ids[(attribute * HashesPerToken + hash) * n + row]
-        var ids = new int[Attributes * HashesPerToken * n];
+        // ids[(attribute * Hashes + hash) * n + row]
+        var ids = new int[_attributes * Hashes * n];
         var prev = new int[n];
         var next = new int[n];
         int row = 0;
@@ -239,13 +342,18 @@ public sealed class FastEncoder : IEncoder
                 Put(ids, n, 1, row, SliceHash(Prefix(text), 1));
                 Put(ids, n, 2, row, SliceHash(Suffix(text), 2));
                 Put(ids, n, 3, row, ShapeHash(text));
+                if (_attributes > BaseAttributes)
+                {
+                    Put(ids, n, 4, row, SliceHash(text, 4));
+                }
+
                 prev[row] = t == 0 ? n : row - 1;
                 next[row] = t == doc.Length - 1 ? n : row + 1;
             }
 
         }
 
-        var idTensors = new Tensor[Attributes * HashesPerToken];
+        var idTensors = new Tensor[_attributes * Hashes];
         for (int k = 0; k < idTensors.Length; k++)
         {
             idTensors[k] = Tensor.FromSpan<int>(ids.AsSpan(k * n, n), Shape.Create(n));
@@ -264,8 +372,13 @@ public sealed class FastEncoder : IEncoder
     private void Put(int[] ids, int n, int attribute, int row, ulong hash)
     {
         uint rows = (uint)_rows[attribute];
-        ids[((attribute * HashesPerToken) * n) + row] = (int)((uint)hash % rows);
-        ids[(((attribute * HashesPerToken) + 1) * n) + row] = (int)((uint)(hash >> 32) % rows);
+        for (int h = 0; h < Hashes; h++)
+        {
+            // Hashes 0 and 1 are the low and high halves of the 64-bit hash; further ones come from a re-mixed hash.
+            ulong source = h < 2 ? hash : Mix(hash + (ulong)h);
+            uint part = h % 2 == 0 ? (uint)source : (uint)(source >> 32);
+            ids[(((attribute * Hashes) + h) * n) + row] = (int)(part % rows);
+        }
     }
 
     private EncodedBatch EncodeCached(ReadOnlySpan<Doc> docs, int[] starts)
@@ -318,21 +431,25 @@ public sealed class FastEncoder : IEncoder
     {
         private readonly Embedding[] _tables;
         private readonly Linear _mix;
-        private readonly LayerNorm _mixNorm;
+        private readonly LayerNorm? _mixNorm;
+        private readonly bool _plain;
+        private readonly int _hashes;
         private readonly Linear[] _windows;
         private readonly LayerNorm[] _norms;
 
-        public FastModule(int width, int depth, int[] rows, Generator generator)
+        public FastModule(int width, int embedWidth, int depth, bool plain, int hashes, int[] rows, Generator generator)
         {
-            _tables = new Embedding[Attributes];
-            string[] names = ["norm", "prefix", "suffix", "shape"];
-            for (int a = 0; a < Attributes; a++)
+            _plain = plain;
+            _hashes = hashes;
+            _tables = new Embedding[rows.Length];
+            string[] names = ["norm", "prefix", "suffix", "shape", "cased"];
+            for (int a = 0; a < rows.Length; a++)
             {
-                _tables[a] = RegisterModule("embed_" + names[a], new Embedding(rows[a], width, generator));
+                _tables[a] = RegisterModule("embed_" + names[a], new Embedding(rows[a], embedWidth, generator));
             }
 
-            _mix = RegisterModule("mix", new Linear(Attributes * width, width, generator));
-            _mixNorm = RegisterModule("mix_norm", new LayerNorm(width));
+            _mix = RegisterModule("mix", new Linear(rows.Length * embedWidth, width, generator));
+            _mixNorm = plain ? null : RegisterModule("mix_norm", new LayerNorm(width));
             _windows = new Linear[depth];
             _norms = new LayerNorm[depth];
             for (int i = 0; i < depth; i++)
@@ -347,19 +464,20 @@ public sealed class FastEncoder : IEncoder
         // ids: Int32 [n] per (attribute, hash); prev/next: Int32 [n] row of the neighbour, or n for the zero row.
         public Tensor Run(Tensor[] ids, Tensor prev, Tensor next, Tensor zero)
         {
-            var parts = new Tensor[Attributes];
-            for (int a = 0; a < Attributes; a++)
+            var parts = new Tensor[_tables.Length];
+            for (int a = 0; a < parts.Length; a++)
             {
-                Tensor sum = _tables[a].Forward(ids[a * HashesPerToken]);
-                for (int h = 1; h < HashesPerToken; h++)
+                Tensor sum = _tables[a].Forward(ids[a * _hashes]);
+                for (int h = 1; h < _hashes; h++)
                 {
-                    sum = Ops.Add(sum, _tables[a].Forward(ids[(a * HashesPerToken) + h]));
+                    sum = Ops.Add(sum, _tables[a].Forward(ids[(a * _hashes) + h]));
                 }
 
                 parts[a] = sum;
             }
 
-            Tensor x = _mixNorm.Forward(Ops.Gelu(_mix.Forward(Ops.Concat(parts, 1))));
+            Tensor joined = _mix.Forward(Ops.Concat(parts, 1));
+            Tensor x = _plain ? Ops.Relu(joined) : _mixNorm!.Forward(Ops.Gelu(joined));
             for (int i = 0; i < _windows.Length; i++)
             {
                 Tensor padded = Ops.Concat([x, zero], 0);

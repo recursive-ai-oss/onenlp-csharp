@@ -1,10 +1,10 @@
 # Provenance: en-ner (tagging and spans)
 
-- **Model:** `en-ner-tagging` and `en-ner-spans`, version 0 (development); a named entity recognizer (PER, ORG, LOC) over a hash-embedding word encoder, English, fast tier. Format: `docs/provenance.md`.
-- **Recipe:** `recipes/en/ner/` (`Program.cs`, `LexicalEncoder.cs`, `run.sh`); defaults are the configuration: width 256, hidden 256, context 2, dropout 0.4, learning rate 0.003, batch 1000 words, patience 6, at most 40 epochs.
-- **Seed(s):** training, data order and initial weights 7 (`--seed`); the data splits are the official ones. Seeds 8 and 9 were trained for the dev spread only.
-- **Produced:** 2026-11-04; AMD Ryzen 9 7950X3D (16 cores, 32 threads) shared with other jobs, 4 threads; .NET SDK 10.0.403, runtime 10.0.14; RecursiveAI.OneModel 1.0.0 and OneModel.Training 1.0.0; wall time tagging 1:33, spans 7:05.
-- **Weights:** `model.onenlp` (pipeline file with encoder and head). Tagging 9,978,133 bytes, file sha256 `59050e63939423e34ffd6910d99166d550dc1734fddfe9040d5bb87278222519`, weights hash reported by `Train` `dbfd2fca8edc12b5ba624a9e124bf8a5984498257ee2f508a1c6eae113981f10`. Spans 10,514,963 bytes, file sha256 `bc7f8b66333e343a6eebe49c7e0d9577f190c1c3e5099905ef728ba3256d7357`, weights hash `3e080b3b5e9fc197876fe2b9402745df1fc6fe30d68744e416434a4bb6e9fd37`. Kept on the build machine under `models/en-fast/u16/`; not in git. Retraining at the same seed gives the same weights hash (checked twice for tagging).
+- **Model:** `en-ner-tagging`, version 0 (development); a named entity recognizer (PER, ORG, LOC) over the library fast encoder (`FastEncoder.English()`), English, fast tier. Format: `docs/provenance.md`.
+- **Recipe:** `recipes/en/ner/` (`Program.cs`, `run.sh`); defaults are the configuration: head hidden 256, context 0, dropout 0.4, learning rate 0.003, batch 1000 words, patience 6, at most 40 epochs.
+- **Seed(s):** training, data order, initial weights and encoder 7 (`--seed`); the data splits are the official ones.
+- **Produced:** 2026-11-05; AMD Ryzen 9 7950X3D (16 cores, 32 threads) shared with other jobs, 4 threads; .NET SDK 10.0.403, runtime 10.0.14; RecursiveAI.OneModel 1.0.0 and OneModel.Training 1.0.0; wall time 0:05:52.
+- **Weights:** `model.onenlp` (pipeline file with encoder and head), 35,677,809 bytes, file sha256 `fe3e09746b5fd5245d348760a779cbee0f2ec57e0201a5265a7b41a0399e9cce`, weights hash reported by `Train` `72756de883db4fa6621cb03f2ea50da7ef9ee52e3a749e47f35f902b5c5ac594`. Kept on the build machine; not in git. (Earlier versions: first FastEncoder 12,039,553 bytes `309abffd…0964`; stand-in encoder 9,978,133 bytes `59050e63…2519`.)
 - **SA lineage:** yes. UNER English-EWT is CC BY-SA 4.0 (and sits on UD English-EWT, also CC BY-SA 4.0). Credit: Universal NER (Mayhew et al. 2024) and Universal Dependencies English Web Treebank.
 - **Licence of the weights:** not released; development model.
 
@@ -33,7 +33,7 @@ None; trained from scratch (no vectors, no transformer).
 
 - Manifest: `tools/fetch/en/MANIFEST.md`, which lists the six files and their roles.
 - Text-level overlap of the test file with train and dev: 114 identical sentence texts (127 after case and whitespace folding), almost all one- and two-word fragments; the official split is kept (`tools/fetch/en/MANIFEST.md`).
-- The test file was not used for early stopping, model selection or hyperparameter choice: yes (not used). The design (tagging against spans) and the settings (sweep of dropout, context, hidden and encoder width, six runs) were chosen on the dev split. The test split was read once for the final configuration, for both designs.
+- The test file was not used for early stopping, model selection or hyperparameter choice: yes (not used). The design (tagging against spans, on an earlier stand-in encoder) and the settings (sweeps of encoder shape, context, dropout and learning rate, about sixty runs) were chosen on the dev split. The test split was read once for each final model (the stand-in encoder with both designs; the first FastEncoder configuration; and the final one, read once).
 
 ## Results
 
@@ -41,5 +41,5 @@ Rows, intervals and the reference in `README.md` next to this file. Regenerate: 
 
 ## Notes
 
-- The encoder is the recipe's stand-in (`LexicalEncoder`); the rows are to be repeated on the library's fast encoder.
+- Seeds 8 and 9 were trained for the dev spread only. The spans design was measured only on the earlier stand-in encoder.
 - 114 test sentences also occur in train or dev (see above).
