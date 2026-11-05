@@ -64,7 +64,7 @@ internal static partial class Program
     // options below replaces one setting, which is how the German settings were chosen on the development set.
     private static FastEncoder MakeEncoder(string[] args, ulong seed)
     {
-        string[] options = ["width", "depth", "norm-rows", "prefix-rows", "suffix-rows", "shape-rows", "prefix", "suffix", "cased-rows", "embed-width", "hashes"];
+        string[] options = ["width", "depth", "norm-rows", "prefix-rows", "suffix-rows", "shape-rows", "prefix", "suffix", "cased-rows", "embed-width", "hashes", "recurrent", "recurrent-size", "plain"];
         if (!options.Any(o => args.Contains("--" + o)))
         {
             return FastEncoder.English(seed);
@@ -73,7 +73,7 @@ internal static partial class Program
         return new FastEncoder(
             width: Num(args, "width", 256), depth: Num(args, "depth", 2), normRows: Num(args, "norm-rows", 32768), prefixRows: Num(args, "prefix-rows", 32768),
             suffixRows: Num(args, "suffix-rows", 32768), shapeRows: Num(args, "shape-rows", 32768), seed: seed, prefixLength: Num(args, "prefix", 3),
-            suffixLength: Num(args, "suffix", 3), casedRows: Num(args, "cased-rows", 0), embedWidth: Num(args, "embed-width", 64), plain: false, hashes: Num(args, "hashes", 1));
+            suffixLength: Num(args, "suffix", 3), casedRows: Num(args, "cased-rows", 0), embedWidth: Num(args, "embed-width", 64), plain: Num(args, "plain", 0) == 1, hashes: Num(args, "hashes", 1), recurrentLayers: Num(args, "recurrent", 0), recurrentSize: Num(args, "recurrent-size", 0));
     }
 
     private sealed class Progress(Action<TrainProgress> handler) : IProgress<TrainProgress>

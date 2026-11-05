@@ -54,6 +54,7 @@ public sealed class FastEncoder : IEncoder
     private const int MaxHashes = 4;
     private const int MaxWidth = 2048;
     private const int MaxDepth = 32;
+    private const int MaxRecurrentLayers = 4;
     private const int MaxRows = 1 << 22;
     private const long MaxTableValues = 1L << 25;
     private const int ShapeRun = 4;
@@ -78,9 +79,22 @@ public sealed class FastEncoder : IEncoder
     /// <param name="embedWidth">Width of the embedding rows, 8 to 2048; 0 (the default) means <paramref name="width"/>. The attributes are joined and a linear layer maps them to <paramref name="width"/>.</param>
     /// <param name="hashes">Hash functions per attribute, 1 to 4: a token's vector for an attribute is the sum of that many rows. Default <see cref="HashesPerToken"/>.</param>
     /// <param name="plain">Join the attributes with a ReLU and no layer normalization, as the original hash-embedding recipes do; the window layers keep theirs. Default false (GELU and layer normalization).</param>
+    /// <param name="recurrentLayers">Layers of a bidirectional LSTM (Hochreiter and Schmidhuber 1997) run over each document after the window layers, 0 to 4; 0 (the default) means none. Its output (half the width per direction) is added to the window output, so every token sees the whole document; a window layer only sees its neighbours. The width must be even.</param>
+    /// <param name="recurrentSize">Hidden size of each LSTM direction, 0 to 2048; 0 (the default) means half the width. A smaller size is cheaper (the cost grows with its square and with the width) and a linear layer maps the two directions back to the width.</param>
     /// <exception cref="ArgumentOutOfRangeException">A size is out of range; each table has 1 to 4,194,304 rows and the tables hold at most 33,554,432 values together.</exception>
-    public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0, int prefixLength = PrefixLength, int suffixLength = SuffixLength, int casedRows = 0, int embedWidth = 0, bool plain = false, int hashes = HashesPerToken)
+    public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0, int prefixLength = PrefixLength, int suffixLength = SuffixLength, int casedRows = 0, int embedWidth = 0, bool plain = false, int hashes = HashesPerToken, int recurrentLayers = 0, int recurrentSize = 0)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(recurrentSize, 0);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(recurrentSize, MaxWidth);
+        RecurrentSize = recurrentSize;
+        ArgumentOutOfRangeException.ThrowIfLessThan(recurrentLayers, 0);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(recurrentLayers, MaxRecurrentLayers);
+        if (recurrentLayers > 0 && recurrentSize == 0 && width % 2 != 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(width), width, "A recurrent layer splits the width between its two directions, so the width must be even.");
+        }
+
+        RecurrentLayers = recurrentLayers;
         ArgumentOutOfRangeException.ThrowIfLessThan(hashes, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(hashes, MaxHashes);
         Hashes = hashes;
@@ -124,7 +138,7 @@ public sealed class FastEncoder : IEncoder
         SuffixChars = suffixLength;
         EmbedWidth = embedWidth;
         Plain = plain;
-        _module = new FastModule(width, embedWidth, depth, plain, hashes, _rows, new Generator(seed));
+        _module = new FastModule(width, embedWidth, depth, plain, hashes, _rows, recurrentLayers, recurrentSize, new Generator(seed));
     }
 
     /// <summary>
@@ -168,6 +182,12 @@ public sealed class FastEncoder : IEncoder
 
     /// <summary>The rows of the norm, prefix, suffix and shape tables, then the cased table when there is one.</summary>
     public IReadOnlyList<int> TableRows => _rows;
+
+    /// <summary>The number of bidirectional LSTM layers after the window layers; 0 when there are none.</summary>
+    public int RecurrentLayers { get; }
+
+    /// <summary>The hidden size per LSTM direction as given; 0 means half the width.</summary>
+    public int RecurrentSize { get; }
 
     /// <inheritdoc/>
     public NnModule? Weights => _module;
@@ -241,6 +261,15 @@ public sealed class FastEncoder : IEncoder
         {
             writer.WriteNumber("embedWidth", EmbedWidth);
         }
+
+        if (RecurrentLayers > 0)
+        {
+            writer.WriteNumber("recurrentLayers", RecurrentLayers);
+            if (RecurrentSize > 0)
+            {
+                writer.WriteNumber("recurrentSize", RecurrentSize);
+            }
+        }
     }
 
     internal static IEncoder FromSettings(JsonElement s)
@@ -265,7 +294,9 @@ public sealed class FastEncoder : IEncoder
             JsonSettings.OptionalInt(s, "casedRows", 0, MaxRows, 0),
             embedWidth,
             JsonSettings.OptionalInt(s, "plain", 0, 1, 0) == 1,
-            JsonSettings.OptionalInt(s, "hashes", 1, MaxHashes, HashesPerToken));
+            JsonSettings.OptionalInt(s, "hashes", 1, MaxHashes, HashesPerToken),
+            JsonSettings.OptionalInt(s, "recurrentLayers", 0, MaxRecurrentLayers, 0),
+            JsonSettings.OptionalInt(s, "recurrentSize", 0, MaxWidth, 0));
     }
 
     private static ulong Mix(ulong h)
@@ -366,7 +397,7 @@ public sealed class FastEncoder : IEncoder
         ActivationScope.Track(prevTensor);
         ActivationScope.Track(nextTensor);
         ActivationScope.Track(zero);
-        return _module.Run(idTensors, prevTensor, nextTensor, zero);
+        return _module.Run(idTensors, prevTensor, nextTensor, zero, starts);
     }
 
     private void Put(int[] ids, int n, int attribute, int row, ulong hash)
@@ -436,9 +467,14 @@ public sealed class FastEncoder : IEncoder
         private readonly int _hashes;
         private readonly Linear[] _windows;
         private readonly LayerNorm[] _norms;
+        private readonly Recurrent? _lstm;
+        private readonly int _width;
+        private readonly int _hidden;
+        private readonly Linear? _back;
 
-        public FastModule(int width, int embedWidth, int depth, bool plain, int hashes, int[] rows, Generator generator)
+        public FastModule(int width, int embedWidth, int depth, bool plain, int hashes, int[] rows, int recurrentLayers, int recurrentSize, Generator generator)
         {
+            _width = width;
             _plain = plain;
             _hashes = hashes;
             _tables = new Embedding[rows.Length];
@@ -457,12 +493,22 @@ public sealed class FastEncoder : IEncoder
                 _windows[i] = RegisterModule("window" + i, new Linear(3 * width, width, generator));
                 _norms[i] = RegisterModule("window_norm" + i, new LayerNorm(width));
             }
+
+            if (recurrentLayers > 0)
+            {
+                _hidden = recurrentSize > 0 ? recurrentSize : width / 2;
+                _lstm = RegisterModule("lstm", new Recurrent(gru: false, width, _hidden, generator, recurrentLayers, bidirectional: true));
+                if (2 * _hidden != width)
+                {
+                    _back = RegisterModule("lstm_out", new Linear(2 * _hidden, width, generator));
+                }
+            }
         }
 
         public override Tensor Forward(Tensor input) => throw new NotSupportedException("Call Run.");
 
         // ids: Int32 [n] per (attribute, hash); prev/next: Int32 [n] row of the neighbour, or n for the zero row.
-        public Tensor Run(Tensor[] ids, Tensor prev, Tensor next, Tensor zero)
+        public Tensor Run(Tensor[] ids, Tensor prev, Tensor next, Tensor zero, int[] starts)
         {
             var parts = new Tensor[_tables.Length];
             for (int a = 0; a < parts.Length; a++)
@@ -487,7 +533,43 @@ public sealed class FastEncoder : IEncoder
                 x = Ops.Add(x, _norms[i].Forward(Ops.Gelu(_windows[i].Forward(window))));
             }
 
-            return x;
+            return _lstm is null ? x : Ops.Add(x, Recurrence(x, zero, starts));
+        }
+
+        // The documents form one padded LSTM batch with their lengths, so a document's result does not depend on which others share the
+        // batch (packed-sequence semantics of Ops.Lstm: the reverse direction starts at the document's own end).
+        private Tensor Recurrence(Tensor x, Tensor zero, int[] starts)
+        {
+            int n = x.Shape[0];
+            int docs = starts.Length - 1;
+            int longest = 0;
+            var lengths = new int[docs];
+            for (int d = 0; d < docs; d++)
+            {
+                lengths[d] = starts[d + 1] - starts[d];
+                longest = Math.Max(longest, lengths[d]);
+            }
+
+            var gather = new int[longest * docs]; // [time, batch] -> row of x, or n for padding
+            var scatter = new int[n]; // row of x -> [time, batch] position
+            Array.Fill(gather, n);
+            for (int d = 0; d < docs; d++)
+            {
+                for (int t = 0; t < lengths[d]; t++)
+                {
+                    gather[(t * docs) + d] = starts[d] + t;
+                    scatter[starts[d] + t] = (t * docs) + d;
+                }
+            }
+
+            Tensor gatherIds = Tensor.FromSpan<int>(gather, Shape.Create(gather.Length));
+            Tensor scatterIds = Tensor.FromSpan<int>(scatter, Shape.Create(n));
+            ActivationScope.Track(gatherIds);
+            ActivationScope.Track(scatterIds);
+            Tensor padded = Ops.Embedding(Ops.Concat([x, zero], 0), gatherIds).Reshape(longest, docs, _width);
+            Tensor outputs = _lstm!.Forward(padded, lengths).Reshape(longest * docs, 2 * _hidden);
+            Tensor rows = Ops.Embedding(outputs, scatterIds);
+            return _back is null ? rows : _back.Forward(rows);
         }
     }
 }
