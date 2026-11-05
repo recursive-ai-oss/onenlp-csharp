@@ -1,0 +1,156 @@
+# Number rules for German (de-DE). Whole numbers below a million are one word (dreihundertvierundzwanzig): the recognizer cuts a word into the
+# parts listed in [number.cardinal] and [number.ordinal] (stems with a trailing "~"), and the connector "und".
+#
+# Format: [section] headers, then one rule per line, fields separated by "|". "#" starts a comment. Words are matched without regard to case.
+
+[number.digits]
+system | german
+ordinal-dot | yes
+decimal | ,
+group | .
+negative | -−
+
+[number.cardinal]
+null | unit | 0
+ein | unit | 1
+eins | unit | 1
+eine | unit | 1
+zwei | unit | 2
+zwo | unit | 2
+drei | unit | 3
+vier | unit | 4
+fünf | unit | 5
+fuenf | unit | 5
+sechs | unit | 6
+sieben | unit | 7
+acht | unit | 8
+neun | unit | 9
+zehn | teen | 10
+elf | teen | 11
+zwölf | teen | 12
+zwoelf | teen | 12
+dreizehn | teen | 13
+vierzehn | teen | 14
+fünfzehn | teen | 15
+fuenfzehn | teen | 15
+sechzehn | teen | 16
+siebzehn | teen | 17
+achtzehn | teen | 18
+neunzehn | teen | 19
+zwanzig | tens | 20
+dreißig | tens | 30
+dreissig | tens | 30
+vierzig | tens | 40
+fünfzig | tens | 50
+fuenfzig | tens | 50
+sechzig | tens | 60
+siebzig | tens | 70
+achtzig | tens | 80
+neunzig | tens | 90
+hundert | bare-scale | 100
+tausend | bare-scale | 1000
+million | scale | 1000000
+millionen | scale | 1000000
+milliarde | scale | 1000000000
+milliarden | scale | 1000000000
+billion | scale | 1000000000000
+billionen | scale | 1000000000000
+billiarde | scale | 1000000000000000
+billiarden | scale | 1000000000000000
+dutzend | multiplier | 12
+
+# Ordinal stems: a stem takes an ending from [number.ordinal-ending] (siebt + e = siebte). Whole words are listed without "~".
+[number.ordinal]
+erst~ | 1
+zweit~ | 2
+dritt~ | 3
+viert~ | 4
+fünft~ | 5
+fuenft~ | 5
+sechst~ | 6
+siebt~ | 7
+acht~ | 8
+neunt~ | 9
+zehnt~ | 10
+elft~ | 11
+zwölft~ | 12
+zwoelft~ | 12
+dreizehnt~ | 13
+vierzehnt~ | 14
+fünfzehnt~ | 15
+sechzehnt~ | 16
+siebzehnt~ | 17
+achtzehnt~ | 18
+neunzehnt~ | 19
+zwanzigst~ | 20
+dreißigst~ | 30
+dreissigst~ | 30
+vierzigst~ | 40
+fünfzigst~ | 50
+sechzigst~ | 60
+siebzigst~ | 70
+achtzigst~ | 80
+neunzigst~ | 90
+hundertst~ | 100
+tausendst~ | 1000
+millionst~ | 1000000
+milliardst~ | 1000000000
+
+[number.ordinal-ending]
+e, en, er, es, em
+
+# The denominator a fraction word stands for: "drei Viertel" is 3/4, "ein Halb" is 1/2.
+[number.fraction]
+halbe | 2
+halben | 2
+Drittel | 3
+Viertel | 4
+Fünftel | 5
+Sechstel | 6
+Siebtel | 7
+Achtel | 8
+Neuntel | 9
+Zehntel | 10
+Hundertstel | 100
+Tausendstel | 1000
+
+# "ein" and its forms count only inside a longer number ("einhundert", "eine Million"); alone they are the article.
+[number.lone-skip]
+ein, eine, einer, einem, einen, eines
+
+[number.connector]
+und
+
+[number.negative]
+minus
+
+[number.point]
+komma
+
+[number.suffix]
+k | 1000 | any
+Mio | 1000000 | any
+Mio. | 1000000 | any
+Mrd | 1000000000 | any
+Mrd. | 1000000000 | any
+
+# Words after a number and a dot that show the dot ends an ordinal even with a capital letter (5. Stock, 2. Platz, 3. Mal).
+[number.ordinal-dot-word]
+Stock, Platz, Mal, Klasse, Etage, Liga, Jahrhundert, Jahrtausend, Auflage, Geburtstag, Jahrestag, Todestag, Runde, Tag, Satz, Kapitel, Spieltag, Rang, Reihe, Woche, Quartal, Halbjahr, Semester, Advent, Weltkrieg, Mannschaft, Teil, Wahl, Platzierung, Versuch, Anlauf
+
+[percent]
+%, Prozent, Prozente, Prozenten, v. H., vom Hundert, pct, ％
+
+[age.unit]
+year | Jahr, Jahre, Jahren, Jahres
+month | Monat, Monate, Monaten
+week | Woche, Wochen
+day | Tag, Tage, Tagen
+
+[age.suffix]
+alt
+
+# "4-jährig" is an age without "alt": the unit is joined to the number.
+[age.word]
+year | jährig, jährige, jähriger, jähriges, jährigen, jährigem, jährigen
+month | monatig, monatige, monatiger, monatiges, monatigen, monatigem

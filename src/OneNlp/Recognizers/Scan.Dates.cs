@@ -531,7 +531,7 @@ internal sealed partial class Scan
                     r.Add(Day(i, me, NextOccurrence(m, d2, a), nr));
                 }
             }
-            else if (s0 > i && ord && _items[s0].Kind == ItemKind.Digits)
+            else if (s0 > i && ord && _items[s0].Kind == ItemKind.Digits && !_td!.Flags.Contains("no-lone-day"))
             {
                 // "the 25th": the next 25th.
                 DateTime cur = new(a.Year, a.Month, 1);

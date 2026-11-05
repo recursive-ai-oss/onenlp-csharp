@@ -69,7 +69,7 @@ internal sealed partial class Scan
             try
             {
                 ExpressionsAt(i, cands);
-                if (it.Kind == ItemKind.Word && Is(i, "determiner", out int dn) && i + dn < _items.Count && GapOk(it.End, _items[i + dn].Start))
+                if (it.Kind == ItemKind.Word && Is(i, "determiner", out int dn) && i + dn < _items.Count && GapOk(_items[i + dn - 1].End, _items[i + dn].Start))
                 {
                     // "le 20 mars", "la semaine prochaine", "den Muttertag": a determiner is part of the expression it introduces.
                     var inner = new List<Cand>();

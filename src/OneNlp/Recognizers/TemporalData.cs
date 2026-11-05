@@ -46,7 +46,7 @@ internal sealed class TemporalData
         "plus15", "plus30", "minus15", "minus", "halfbefore", "plusquarter", "minusquarter", "daypartprefix", "decadeprefix", "decadesuffix", "decadeword",
     };
 
-    private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct" };
+    private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct", "no-lone-day" };
 
     private static readonly string[] WeekdayCodes = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
@@ -59,7 +59,7 @@ internal sealed class TemporalData
 
     internal bool IsEmpty => Words.Count == 0;
 
-    /// <summary>Behaviours the rule data switches on (<c>time.flag</c>): <c>daypart-direct</c> lets a part of the day follow a clock hour without a preposition (German <c>5 Uhr nachmittags</c>).</summary>
+    /// <summary>Behaviours the rule data switches on (<c>time.flag</c>): <c>daypart-direct</c> lets a part of the day follow a clock hour without a preposition (German <c>5 Uhr nachmittags</c>); <c>no-lone-day</c> stops "the 25th" being the next 25th (French <c>la 2e place</c> is an ordinal).</summary>
     internal HashSet<string> Flags { get; } = new(StringComparer.Ordinal);
 
     /// <summary>The region whose conventions apply when the caller names none (<c>time.region</c>): 0 when the data does not say, which means <see cref="RegionUs"/>.</summary>

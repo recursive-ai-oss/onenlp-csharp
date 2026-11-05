@@ -1,0 +1,165 @@
+# Date and time vocabulary, German (de-DE). Same sections as the English file; the roles added for French and German are described in docs/recognizers.md.
+#
+# Dates are day first (am 3. März 2026; 03.04.2026 is 3 April). A form starting with "=" is case-sensitive, the others are matched without regard
+# to case. Nouns are written with a capital letter, so month and weekday names are case-sensitive where the lower-case word is something else.
+
+[time.region]
+de
+
+[time.flag]
+daypart-direct
+no-lone-day
+
+[time.month]
+1 | =Januar, =Jänner, =Jan, =Jan.
+2 | =Februar, =Feb, =Feb.
+3 | =März, =Maerz, =Mär, =Mär.
+4 | =April, =Apr, =Apr.
+5 | =Mai
+6 | =Juni, =Jun, =Jun.
+7 | =Juli, =Jul, =Jul.
+8 | =August, =Aug, =Aug.
+9 | =September, =Sep, =Sep., =Sept, =Sept.
+10 | =Oktober, =Okt, =Okt.
+11 | =November, =Nov, =Nov.
+12 | =Dezember, =Dez, =Dez.
+
+[time.weekday]
+1 | Montag, =Mo | Montage, montags
+2 | Dienstag, =Di | Dienstage, dienstags
+3 | Mittwoch, =Mi | Mittwoche, mittwochs
+4 | Donnerstag, =Do | Donnerstage, donnerstags
+5 | Freitag, =Fr | Freitage, freitags
+6 | Samstag, Sonnabend, =Sa | Samstage, samstags, sonnabends
+7 | Sonntag, =So | Sonntage, sonntags
+
+[time.unit]
+second | Sekunde, Sekunden, =Sek, =Sek. | 1 | 0
+minute | Minute, Minuten, =Min, =Min. | 60 | 0
+hour | Stunde, Stunden, =Std, =Std. | 3600 | 0
+day | Tag, Tage, Tagen, Tages | 86400 | 0
+week | Woche, Wochen | 604800 | 0
+week | Fortnight | 1209600 | 0
+month | Monat, Monate, Monaten, Monats | 0 | 1
+quarter | Quartal, Quartale, Quartalen, Quartals | 0 | 3
+year | Jahr, Jahre, Jahren, Jahres | 0 | 12
+decade | Jahrzehnt, Jahrzehnte, Jahrzehnten | 0 | 120
+business day | Werktag, Werktage, Werktagen, Arbeitstag, Arbeitstage, Arbeitstagen | 0 | 0
+
+[time.season]
+spring | Frühling, Frühjahr, Frühlings, Frühjahrs | 3 | 3
+summer | Sommer, Sommers | 6 | 3
+fall | Herbst, Herbstes | 9 | 3
+winter | Winter, Winters | 12 | 3
+
+[time.daypart]
+morning | morgens, vormittags, =Vormittag, früh, =Morgen | 6 | 12
+afternoon | nachmittags, =Nachmittag | 12 | 18
+evening | abends, =Abend | 18 | 24
+night | nachts, =Nacht | 20 | 24
+
+[time.word]
+today | heute
+tomorrow | =morgen
+yesterday | gestern
+dayaftertomorrow | übermorgen
+daybeforeyesterday | vorgestern
+tonight | heute Abend, heute Nacht
+noon | =Mittag
+midnight | =Mitternacht
+this | diesen, dieser, diese, dieses, diesem, laufenden, laufende
+next | nächste, nächsten, nächstes, nächster, nächstem, kommende, kommenden, kommendes, kommender
+last | letzte, letzten, letztes, letzter, letztem, vergangene, vergangenen, vergangenes, vergangener
+agoprefix | vor
+later | später
+in | in
+at | um
+on | am, an
+of | des, der, im
+and | und
+rangeto | bis, -, –, —
+from | von, vom, ab, seit
+between | zwischen
+every | jeden, jede, jedes, jeder, alle
+each | jeden, jede, jedes
+early | Anfang, Anfang des, Beginn
+mid | Mitte, Mitte des
+late | Ende, Ende des
+after | nach
+half | Halbjahr, Halbjahres, Halbjahre, Halbjahren, Semester, Semesters
+quarter | Quartal, Quartals, Quartale
+article | ein, eine, einen, einem, einer
+the | der, die, das, den, dem, des
+determiner | der, die, das, den, dem
+approx | etwa, ca., circa, ungefähr, rund, zirka, gegen
+weekend | Wochenende, Wochenendes
+zonebase | =UTC, =GMT
+quarterprefix | =Q
+halfprefix | =H
+hourmark | Uhr
+halfbefore | halb
+plusquarter | Viertel nach
+minusquarter | Viertel vor
+decadesuffix | er
+decadeword | Jahre, Jahren, Jahrzehnt, Jahrzehnte
+
+[time.recurrence]
+P1D | day | täglich
+P1W | week | wöchentlich
+P2W | week | zweiwöchentlich, vierzehntägig
+P1M | month | monatlich
+P3M | quarter | vierteljährlich, quartalsweise
+P1Y | year | jährlich
+PT1H | hour | stündlich
+
+[time.zone]
+=UTC, =GMT | 0 | z
+=WEZ | 0
+=WESZ | 60
+=MEZ, =CET | 60
+=MESZ, =CEST | 120
+=OEZ, =EET | 120
+=OESZ, =EEST | 180
+=MSK | 180
+=EST | -300
+=EDT | -240
+=CST | -360
+=CDT | -300
+=MST | -420
+=MDT | -360
+=PST | -480
+=PDT | -420
+
+# Sources: the national public holidays of Germany (Einigungsvertrag Art. 2 for the Day of German Unity; the Christian feasts follow Easter);
+# the other entries are customary dates. Regional holidays are listed without a region.
+[time.holiday]
+Neujahr, Neujahrstag | fixed 01-01 | de
+Heilige Drei Könige, Dreikönigstag | fixed 01-06 | de
+Valentinstag | fixed 02-14 | de
+Weiberfastnacht | easter -52 | de
+Rosenmontag | easter -48 | de
+Faschingsdienstag, Fastnacht, Fastnachtsdienstag | easter -47 | de
+Aschermittwoch | easter -46 | de
+Palmsonntag | easter -7 | de
+Gründonnerstag | easter -3 | de
+Karfreitag | easter -2 | de
+Karsamstag | easter -1 | de
+Ostersonntag, Ostern | easter 0 | de
+Ostermontag | easter 1 | de
+Tag der Arbeit, Maifeiertag | fixed 05-01 | de
+Christi Himmelfahrt, Himmelfahrt, Vatertag | easter 39 | de
+Pfingstsonntag, Pfingsten | easter 49 | de
+Pfingstmontag | easter 50 | de
+Fronleichnam | easter 60 | de
+Muttertag | nth 2 sun 5 | de
+Mariä Himmelfahrt | fixed 08-15 | de
+Tag der Deutschen Einheit | fixed 10-03 | de
+Halloween | fixed 10-31 | de
+Reformationstag | fixed 10-31 | de
+Allerheiligen | fixed 11-01 | de
+Martinstag, Sankt Martin | fixed 11-11 | de
+Nikolaus, Nikolaustag | fixed 12-06 | de
+Heiligabend, Heiliger Abend | fixed 12-24 | de
+Weihnachten, Weihnachtstag, erster Weihnachtsfeiertag, Erster Weihnachtsfeiertag | fixed 12-25 | de
+zweiter Weihnachtsfeiertag, Zweiter Weihnachtsfeiertag, Stephanstag | fixed 12-26 | de
+Silvester | fixed 12-31 | de

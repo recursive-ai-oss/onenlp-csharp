@@ -159,3 +159,6 @@ Armistice, Armistice 1918, jour de l'Armistice | fixed 11-11 | fr
 Réveillon de Noël, réveillon de Noel | fixed 12-24 | fr
 Noël, Noel | fixed 12-25 | fr
 Saint-Étienne | fixed 12-26 | fr
+
+[time.flag]
+no-lone-day
