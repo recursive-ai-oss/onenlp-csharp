@@ -89,6 +89,15 @@ internal static class Program
                 case "tokenizer-json" or "tokenizer-json-models" when args.Length == 4:
                     TokenizerJsonTarget.Seeds(args[2], args[3]);
                     break;
+                case "bpe-model":
+                    TokenizerSeeds.BpeModel(args[2]);
+                    break;
+                case "tiktoken-ranks":
+                    TokenizerSeeds.TiktokenRanks(args[2]);
+                    break;
+                case "vocab-txt":
+                    TokenizerSeeds.VocabTxt(args[2]);
+                    break;
                 case "code-point-regex":
                     CodePointRegexTarget.Seeds(args[2]);
                     break;
