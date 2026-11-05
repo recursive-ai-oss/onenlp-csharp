@@ -5,7 +5,7 @@ using RecursiveAI.OneNlp.Recognizers;
 namespace RecursiveAI.OneNlp.Fuzz;
 
 /// <summary>
-/// Feeds arbitrary text (UTF-8, or raw UTF-16 units when the first byte is odd) to the English recognizers and checks the results:
+/// Feeds arbitrary text (UTF-8, or raw UTF-16 units when the first byte is odd) to the English, French and German recognizers and checks the results:
 /// ordered, in range, without overlap, with the text they claim, a confidence from 0 to 1. The results also go through the pipeline
 /// component, which must accept them. Nothing may throw.
 /// </summary>
@@ -18,6 +18,9 @@ internal static class RecognizerTargets
         string text = (data.Length > 0 && (data[0] & 1) == 1) ? FromUnits(data[1..]) : Encoding.UTF8.GetString(data);
         Check(Recognizer.English, text);
         Check(Recognizer.English, text, new RecognitionContext(new DateTimeOffset(2026, 3, 18, 10, 30, 0, TimeSpan.Zero)) { Region = "gb" });
+        var reference = new RecognitionContext(new DateTimeOffset(2026, 3, 18, 10, 30, 0, TimeSpan.Zero));
+        Check(Recognizer.For(Language.French), text, reference);
+        Check(Recognizer.For(Language.German), text, reference);
         Doc doc = Pipe.Process(text);
         int previous = -1;
         foreach (Span e in doc.Ents)
@@ -51,6 +54,12 @@ internal static class RecognizerTargets
 
     internal static void SeedText(string dir)
     {
+        File.WriteAllText(Path.Combine(dir, "seed-fr"),
+            "Il a pay\u00e9 1\u202f234,56 \u20ac le 3 mars 2026 \u00e0 15h30, quatre-vingt-dix-sept euros, soixante et onze pour cent, la 2e place, "
+            + "il y a 10 jours, du 3 mars au 7 avril 2026, huit heures moins le quart, une demi-heure, tous les samedis, \u00e2g\u00e9 de 82 ans.");
+        File.WriteAllText(Path.Combine(dir, "seed-de"),
+            "Sie zahlte 1.234,56 \u20ac am 3. M\u00e4rz 2026 um 15:30 Uhr, dreihundertvierundzwanzig, zweitausendf\u00fcnfhundert, einundzwanzigste, "
+            + "vor zwei Jahren, vom 3. M\u00e4rz bis 7. April 2026, halb drei, Viertel nach drei, jeden Samstag, 82-j\u00e4hrig, in den 1990er Jahren.");
         File.WriteAllText(Path.Combine(dir, "seed-mixed"),
             "Pay $2.5 million or twenty-one euros by the 3rd; 12% of 3.5 km at 98.6\u00b0F, 10 GB, 5 years old. Mail Bob@Example.com, "
             + "see https://www.example.com/a_(b)?q=1#x or www.x.org, ping 10.0.0.1 or 2001:db8::1, call +1 (555) 123-4567, "
