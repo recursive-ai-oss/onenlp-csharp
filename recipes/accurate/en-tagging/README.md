@@ -18,3 +18,7 @@ dotnet run -c Release --project recipes/accurate/en-tagging -- predict \
 `train` checkpoints every 100 steps; `--budget-seconds` stops after that long, and running the same command again continues (`run-chunk.sh` is one chunk). `--pooling first` takes the first piece of each token instead of the mean. `encode` times the encoder alone over a file. Score predictions with `tools/OneNlp.Eval ud --metrics UPOS`.
 
 See `PROVENANCE.md` for data, seeds, hashes and results.
+
+## Fine-tuning the encoder
+
+`--finetune` trains the encoder with the head through `TrainableTransformerEncoder` (learning rate 5e-5, token table frozen unless `--train-embeddings`). `run-finetune-chunk.sh` runs one resumable chunk (`--budget-seconds`, checkpoint every 15 steps, development UPOS every 200 steps); a batch of 500 words takes about 6.6 s on 8 threads and the process needs about 11 GB. Running the same command again continues. Stopping early: resume with `--max-steps` at the number of steps done, which restores the best development checkpoint and writes `model.onenlp`.

@@ -256,11 +256,11 @@ public sealed class TransformerEncoder : IEncoder
             sha);
     }
 
-    private static string Resolve(string name) =>
+    internal static string Resolve(string name) =>
         Path.IsPathRooted(name) || ModelDirectory is null ? name : Path.Combine(ModelDirectory, name);
 
     /// <summary>The special tokens the tokenizer wraps one non-empty text in, found by encoding a probe text with and without them.</summary>
-    private static (int[] Prefix, int[] Suffix) SpecialTokenFrame(Tokenizer tokenizer)
+    internal static (int[] Prefix, int[] Suffix) SpecialTokenFrame(Tokenizer tokenizer)
     {
         TokenEncoding with = tokenizer.Encode("a", addSpecialTokens: true);
         int first = 0;
@@ -460,7 +460,7 @@ public sealed class TransformerEncoder : IEncoder
     }
 
     /// <summary>For every piece, the first and last token its character range overlaps, or (-1, -1) for a piece that covers no token.</summary>
-    private static (int First, int Last)[] MapPiecesToTokens(Doc doc, TokenEncoding enc)
+    internal static (int First, int Last)[] MapPiecesToTokens(Doc doc, TokenEncoding enc)
     {
         ReadOnlySpan<int> tokenStart = doc.GetStarts();
         ReadOnlySpan<int> tokenLength = doc.GetLengths();
