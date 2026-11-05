@@ -4,7 +4,7 @@
 - **Recipe:** `recipes/fr/fast-tagging`, `recipes/fr/parser`, `recipes/fr/ner` (adapted from the English recipes; README beside them).
 - **Seed(s):** tagging 1; parser 7; NER 7 (training and data order; encoder initial weights are drawn from the same seed). Dev sets are the official UD dev file and our WikiNER dev split, so there is no split seed other than the article-index rule in `tools/fetch/fr/MANIFEST.md`.
 - **Produced:** 2026-11-05; shared 32-core worker, 8 training threads; .NET SDK 10.0.403, RecursiveAI.OneModel 1.0.0 and OneModel.Training 1.0.0. Training time (excluding queue waits): tagging 20 epochs in 18.8 min (one chunk); parser 18 epochs in two chunks, about 40 min; NER 20 epochs in six chunks of at most 30 min, about 2.5 h. Early stopping with patience 6 on dev stopped all three; the best dev weights were restored.
-- **Weights:** `weights.manifest.props` of `src/OneNlp.Models.French` (tagging 36,881,404 bytes sha256 `412f2e57…`, parser 22,574,800 bytes `3d19adad…`, NER 35,681,975 bytes `08875648…`). Kept out of git; on the worker under `~/onenlp/models/fr-fast/u26/pack/`.
+- **Weights:** `weights.manifest.props` of `src/OneNlp.Models.French` (tagging 36,881,404 bytes sha256 `412f2e57…`, parser 22,574,800 bytes `3d19adad…`, NER 35,681,975 bytes `08875648…`). Kept out of git; rebuilt by the recipes.
 - **SA lineage:** yes; UD French-GSD (CC BY-SA 4.0) and WikiNER French (labels CC BY 4.0, text from Wikipedia, CC BY-SA). Credit is in the package's `THIRD-PARTY-NOTICES.md`.
 - **Licence of the weights:** MIT OR Apache-2.0.
 
