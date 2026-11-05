@@ -10,9 +10,9 @@ namespace RecursiveAI.OneNlp.Recipes.Spanish;
 //
 //   train-tagging --train F.conllu --dev F.conllu --out DIR [options]     tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer
 //   train-parser  --train F.conllu --dev F.conllu --out DIR [options]     biaffine dependency parser with sentence starts
-//   ner-convert IN.iob2 OUT.jsonl                                         WikiNER (wp3) to JSON Lines
+//   ner-convert IN.iob2 OUT.jsonl [--pieces]                              WikiNER (wp3) to JSON Lines; --pieces cuts del, al and verbs with enclitics
 //   ner-train TRAIN.jsonl DEV.jsonl OUT-DIR [options]                     entity recognizer
-//   ner-eval MODEL EVAL.jsonl OUT-DIR [--ref ref.tsv] [--raw]             entity F1 with bootstrap intervals, paired against a reference
+//   ner-eval MODEL EVAL.jsonl OUT-DIR [--ref ref.tsv] [--raw] [--pieces-file P.jsonl]  entity F1 with bootstrap intervals, paired against a reference
 //   predict --models DIR [--parts tagging,parser,ner] --gold F.conllu --mode raw|gold --out P.conllu
 //                                                                         CoNLL-U predictions of the pipeline of the parts found in DIR
 //   segment --gold F.conllu --out P.conllu                                tokens and sentences of the tokenizer and sentencizer alone
@@ -41,7 +41,7 @@ internal static partial class Program
             {
                 "train-tagging" => TrainTagging(args),
                 "train-parser" => TrainParser(args),
-                "ner-convert" when args.Length == 3 => NerConvert(args[1], args[2]),
+                "ner-convert" when args.Length >= 3 => NerConvert(args[1], args[2], args.Contains("--pieces")),
                 "ner-train" when args.Length >= 4 => NerTrain(args),
                 "ner-eval" when args.Length >= 4 => NerEval(args),
                 "predict" => Predict(args),

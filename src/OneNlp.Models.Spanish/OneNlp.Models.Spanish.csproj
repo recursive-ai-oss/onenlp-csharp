@@ -4,8 +4,8 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Models.Spanish</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Models.Spanish</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.Spanish</PackageId>
-    <Description>spaCy-class NLP for .NET: the Spanish fast-tier model. Tagging, morphology, lemmas, dependency parse and PER/LOC/ORG/MISC entities for the Nlp verbs, trained on Universal Dependencies Spanish-GSD (CC BY-SA 4.0) and GermEval 2014 (CC BY 4.0). No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
-    <PackageTags>$(PackageTags);english;model</PackageTags>
+    <Description>spaCy-class NLP for .NET: the Spanish fast-tier model. Tagging, morphology, lemmas, dependency parse and PER/LOC/ORG/MISC entities for the Nlp verbs, trained on Universal Dependencies Spanish-AnCora (CC BY 4.0) and WikiNER (CC BY 4.0). No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <PackageTags>$(PackageTags);spanish;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>

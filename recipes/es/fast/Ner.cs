@@ -8,6 +8,7 @@ using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
 using RecursiveAI.OneNlp.Neural.Training;
 using RecursiveAI.OneNlp.Scoring;
+using RecursiveAI.OneNlp.Segmentation;
 using RecursiveAI.OneModel.Tensors;
 
 namespace RecursiveAI.OneNlp.Recipes.Spanish;
@@ -36,8 +37,43 @@ internal static partial class Program
         return tag[2..] is "PER" or "LOC" or "ORG" or "MISC" ? tag : "O";
     }
 
+    private static readonly UaxWordTokenizer PieceTokenizer = new(SegmentationData.Spanish);
+
+    // The pipeline's tokenizer cuts del, al and verbs with enclitics into pieces (SegmentationData.Spanish); WikiNER keeps them whole. A model that
+    // reads raw text must have seen the pieces, so with --pieces every letters-only token is cut the way the tokenizer cuts it. The first piece
+    // keeps the tag, and the later pieces continue the entity (I-) or stay outside.
+    private static void SplitContractions(List<string> forms, List<string> tags)
+    {
+        for (int i = 0; i < forms.Count; i++)
+        {
+            string form = forms[i];
+            if (form.Length < 2 || !form.All(char.IsLetter))
+            {
+                continue;
+            }
+
+            IReadOnlyList<TokenBoundary> cut = PieceTokenizer.Segment(form);
+            if (cut.Count < 2)
+            {
+                continue;
+            }
+
+            string tag = tags[i];
+            string rest = tag == "O" ? "O" : "I-" + tag[2..];
+            forms.RemoveAt(i);
+            tags.RemoveAt(i);
+            for (int k = 0; k < cut.Count; k++)
+            {
+                forms.Insert(i + k, form.Substring(cut[k].Start, cut[k].Length));
+                tags.Insert(i + k, k == 0 ? tag : rest);
+            }
+
+            i += cut.Count - 1;
+        }
+    }
+
     // WikiNER .iob2 (converted by the fetch script): '# text = ...' comment, then one token per line (id, form, BIO tag, ...), blank line between sentences.
-    private static int NerConvert(string input, string output)
+    private static int NerConvert(string input, string output, bool pieces)
     {
         using var writerStream = new FileStream(output, FileMode.Create);
         int sentences = 0;
@@ -50,6 +86,11 @@ internal static partial class Program
             if (forms.Count == 0)
             {
                 return;
+            }
+
+            if (pieces)
+            {
+                SplitContractions(forms, tags);
             }
 
             WriteJsonlLine(writerStream, text, forms, tags);
@@ -229,6 +270,7 @@ internal static partial class Program
         string? refPath = Opt(args, "ref", string.Empty) is { Length: > 0 } r ? r : null;
         bool raw = args.Contains("--raw");
         using Pipeline pipeline = PipelineFile.Load(args[1]);
+        List<Example>? pieceExamples = Opt(args, "pieces-file", string.Empty) is { Length: > 0 } pf ? [.. JsonlReader.Read(pf)] : null;
 
         var gold = new List<IReadOnlyCollection<LabeledSpan>>();
         var predicted = new List<IReadOnlyCollection<LabeledSpan>>();
@@ -248,9 +290,27 @@ internal static partial class Program
             }
 
             Doc blank = Example.Blank(e.Reference);
-            pipeline.Process(blank);
             List<string> g = IobTags(e.Reference);
-            List<string> p = IobTags(blank);
+            List<string> p;
+            if (pieceExamples is null)
+            {
+                pipeline.Process(blank);
+                p = IobTags(blank);
+            }
+            else
+            {
+                // The model reads the pieces (del is de + l); each token of the evaluation file gets the tag of its first piece.
+                Doc pieces = Example.Blank(pieceExamples[goldTags.Count].Reference);
+                pipeline.Process(pieces);
+                List<string> pieceTags = IobTags(pieces);
+                var firstPiece = new Dictionary<int, int>();
+                for (int k = 0; k < pieces.Length; k++)
+                {
+                    firstPiece.TryAdd(pieces[k].Idx, k);
+                }
+
+                p = [.. Enumerable.Range(0, blank.Length).Select(t => pieceTags[firstPiece[blank[t].Idx]])];
+            }
             goldTags.Add(g);
             predictedTags.Add(p);
             for (int t = 0; t < blank.Length; t++)
