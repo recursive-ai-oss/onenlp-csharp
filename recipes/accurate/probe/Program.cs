@@ -28,6 +28,8 @@ namespace RecursiveAI.OneNlp.Recipes.AccurateProbe;
 //           gold tokens in, UPOS out as CoNLL-U for the OneNlp.Eval tool.
 //   predict-ner  --model M.onenlp --gold F.jsonl --out PREFIX [--model-dir D]
 //           gold tokens in; writes PREFIX.gold.iob2 and PREFIX.pred.iob2 (one token per line, tag last) for 'OneNlp.Eval span'.
+//   speed --model M.onenlp --gold F.conllu [--model-dir D] [--threads N] [--reps N] [--batch N]
+//           times the trained components over the gold tokens of a file, in batches of --batch (default 32) documents, and prints tokens per second.
 //   convert --in F.iob2 --out F.jsonl
 //           UNER-style .iob2 to the JSON Lines the ner command reads (gold tokens, character offsets).
 //
@@ -57,6 +59,7 @@ internal static class Program
                 "ner" => Train(o, ner: true),
                 "predict-upos" => PredictUpos(o),
                 "predict-ner" => PredictNer(o),
+                "speed" => Speed(o),
                 "convert" => Convert(Required(o, "in"), Required(o, "out")),
                 _ => 2,
             };
@@ -173,6 +176,42 @@ internal static class Program
         }
 
         File.WriteAllText(Required(o, "out"), sb.ToString(), new UTF8Encoding(false));
+        return 0;
+    }
+
+    private static int Speed(Dictionary<string, string> o)
+    {
+        TransformerEncoder.ModelDirectory = o.GetValueOrDefault("model-dir");
+        int reps = o.TryGetValue("reps", out string? r) ? int.Parse(r, CultureInfo.InvariantCulture) : 3;
+        int batch = o.TryGetValue("batch", out string? b) ? int.Parse(b, CultureInfo.InvariantCulture) : 32;
+        using Pipeline pipeline = PipelineFile.Load(Required(o, "model"));
+        IPipelineComponent[] components = [.. pipeline.Components.Where(c => c is ITrainableComponent)];
+        string[] names = [.. components.Select(c => c.GetType().Name)];
+        List<Example> examples = [.. ConllUReader.ReadExamples(Required(o, "gold"))];
+        long tokens = examples.Sum(e => (long)e.Reference.Length);
+        var rates = new List<double>();
+        for (int rep = 0; rep <= reps; rep++)
+        {
+            // Fresh documents each time: the frozen encoder caches by document, which would hide its cost.
+            Doc[] docs = [.. examples.Select(e => Example.Blank(e.Reference))];
+            var clock = Stopwatch.StartNew();
+            using var scope = new ActivationScope();
+            for (int i = 0; i < docs.Length; i += batch)
+            {
+                foreach (IPipelineComponent c in components)
+                {
+                    c.ProcessBatch(docs.AsSpan(i, Math.Min(batch, docs.Length - i)));
+                }
+            }
+
+            if (rep > 0)
+            {
+                rates.Add(tokens / clock.Elapsed.TotalSeconds);
+            }
+        }
+
+        rates.Sort();
+        Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"components={string.Join('+', names)} tokens={tokens} threads={TensorCompute.Threads} batch={batch} tok_per_s_median={rates[rates.Count / 2]:F0} min={rates[0]:F0} max={rates[^1]:F0}"));
         return 0;
     }
 
