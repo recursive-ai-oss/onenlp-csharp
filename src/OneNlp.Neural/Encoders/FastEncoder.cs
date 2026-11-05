@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Text.Json;
 using RecursiveAI.OneModel.Tensors;
 using RecursiveAI.OneModel.Training;
+using RecursiveAI.OneNlp.Neural.Components;
 
 namespace RecursiveAI.OneNlp.Neural.Encoders;
 
@@ -672,6 +673,7 @@ public sealed class FastEncoder : IEncoder
         private readonly int _hidden;
         private readonly Recurrent? _lstm;
         private readonly Linear? _back;
+        private readonly int _recurrentLayers;
         private Tensor[]? _watched;
         private volatile Derived? _derived;
         private readonly object _deriveLock = new();
@@ -721,6 +723,7 @@ public sealed class FastEncoder : IEncoder
             }
 
             // Registered last, so the state order of a file without it is unchanged.
+            _recurrentLayers = recurrentLayers;
             if (recurrentLayers > 0)
             {
                 _hidden = recurrentSize > 0 ? recurrentSize : width / 2;
@@ -816,8 +819,10 @@ public sealed class FastEncoder : IEncoder
             return _back is null ? rows : _back.Forward(rows);
         }
 
-        private sealed class Derived(long stamp, float[][] tables, Tensor[] windows)
+        private sealed class Derived(long stamp, float[][] tables, Tensor[] windows, LstmInference? lstm, RowClassifier? back)
         {
+            public readonly LstmInference? Lstm = lstm;
+            public readonly RowClassifier? Back = back;
             public readonly long Stamp = stamp;
             public readonly float[][] Tables = tables;
             public readonly Tensor[] Windows = windows;
@@ -897,7 +902,8 @@ public sealed class FastEncoder : IEncoder
                     windows[l] = Tensor.FromSpan<float>(cat, Shape.Create(3 * w, w));
                 }
 
-                d = new Derived(stamp, tables, windows);
+                LstmInference? lstm = _lstm is null ? null : LstmInference.Create(_lstm.NamedParameters(), _hidden, _recurrentLayers, stamp);
+                d = new Derived(stamp, tables, windows, lstm, _back is null ? null : new RowClassifier(_back, stamp));
                 _derived = d;
                 return d;
             }
@@ -909,7 +915,7 @@ public sealed class FastEncoder : IEncoder
             Derived d = GetDerived();
             int w = _width;
             float[] x = ArrayPool<float>.Shared.Rent(n * w);
-            float[] z = ArrayPool<float>.Shared.Rent(w);
+            float[] z = ArrayPool<float>.Shared.Rent(w + 4);
             try
             {
                 ReadOnlySpan<float> mixBias = _mix.Bias.Data<float>();
@@ -975,16 +981,30 @@ public sealed class FastEncoder : IEncoder
                     }
                 }
 
-                if (_lstm is not null)
+                if (d.Lstm is not null)
                 {
-                    // The recurrent layers run on OneModel's graph ops; their output is added to the window output.
-                    using var scope = new ActivationScope();
-                    Tensor xt = Tensor.FromSpan<float>(x.AsSpan(0, n * w), Shape.Create(n, w));
-                    Tensor zero = Tensor.Zeros(DType.F32, Shape.Create(1, w));
-                    ReadOnlySpan<float> extra = Recurrence(xt, zero, starts).Data<float>();
-                    RowKernels.Add(x.AsSpan(0, n * w), extra);
-                    xt.Dispose();
-                    zero.Dispose();
+                    // The recurrent layers walk each document without tensor operations (see LstmInference); their output is added to the window output.
+                    int docs = starts.Length - 1;
+                    var docLengths = new int[docs];
+                    for (int doc = 0; doc < docs; doc++)
+                    {
+                        docLengths[doc] = starts[doc + 1] - starts[doc];
+                    }
+
+                    float[] hidden = d.Lstm.Run(x.AsSpan(0, n * w), n, starts.AsSpan(0, docs), docLengths);
+                    if (d.Back is null)
+                    {
+                        RowKernels.Add(x.AsSpan(0, n * w), hidden.AsSpan(0, n * w));
+                    }
+                    else
+                    {
+                        int h2 = d.Lstm.OutputWidth;
+                        for (int r = 0; r < n; r++)
+                        {
+                            d.Back.Logits(hidden.AsSpan(r * h2, h2), z.AsSpan(0, d.Back.Stride));
+                            RowKernels.Add(x.AsSpan(r * w, w), zs);
+                        }
+                    }
                 }
 
                 return Tensor.FromSpan<float>(x.AsSpan(0, n * w), Shape.Create(n, w));
