@@ -153,6 +153,14 @@ internal static partial class Program
         using Pipeline pipeline = Pipeline.Blank(Language.Dutch)
             .Add(new EntityRecognizer(encoder, decoding, Num(args, "context", 0), Num(args, "hidden", 256)) { OwnsEncoder = true });
 
+        // --seconds S stops cleanly after about S seconds; run the same command again to resume from the last checkpoint.
+        double budget = Opt(args, "seconds", string.Empty) is { Length: > 0 } b ? double.Parse(b, CultureInfo.InvariantCulture) : double.PositiveInfinity;
+        using var cts = new CancellationTokenSource();
+        if (!double.IsPositiveInfinity(budget))
+        {
+            cts.CancelAfter(TimeSpan.FromSeconds(budget));
+        }
+
         var clock = Stopwatch.StartNew();
         var progress = new Progress(p =>
         {
@@ -173,9 +181,9 @@ internal static partial class Program
             Score = DevScores.Entities(),
             Patience = Num(args, "patience", 6),
             CheckpointDirectory = outDir,
-            CheckpointEvery = Num(args, "checkpoint-every", 0),
+            CheckpointEvery = Num(args, "checkpoint-every", 500),
             Progress = progress,
-        });
+        }, cts.Token);
 
         Console.WriteLine($"steps={result.Steps} epochs={result.Epochs} completed={result.Completed} stopped_early={result.StoppedEarly} best_dev_f1={result.BestScore.ToString("F3", CultureInfo.InvariantCulture)} best_step={result.BestStep}");
         Console.WriteLine($"weights_sha256={result.WeightsSha256}");
