@@ -98,3 +98,28 @@ Pieces become tokens as in `TransformerEncoder` (same tokenizer, windows and `Me
 
 `tests/OneNlp.Tests/TrainableTransformerTests.cs` uses two random tiny encoders exported from PyTorch (`tools/accurate/make_tiny_fixture.py`, `make_tiny_modernbert_fixture.py`; the second has alternating global and local layers with a window of 8, two rotary bases and padding): modules against PyTorch's hidden states (max abs below 2e-5), padded batches against single sequences, token vectors against `TransformerEncoder`'s for both poolings and with windowing, finite-difference gradients through rotary, the gated feed-forward and the window mask, a tagger trained through `Train` and reloaded from a saved pipeline, and a resumed run reproducing an uninterrupted one bit for bit.
 
+### Measured
+
+Forward parity of the trainable modules (one text per run, fast mode, the same 200 texts as above; `tools/OneNlp.Accurate trainable-parity`). "Graph runtime" is `TransformerEncoder`'s inference path on the exported file.
+
+| Model | Tokens | Comparison | max abs | mean abs | min cosine |
+|---|---:|---|---:|---:|---:|
+| mmBERT-base (`ModernBert`) | 5,255 | trainable vs PyTorch | 1.0e-3 (2.6e-5 of the largest value, 40.7) | 2.2e-6 | 1.00000000 |
+| | | trainable vs graph runtime | 4.6e-3 | 1.9e-6 | 0.99999993 |
+| | | graph runtime vs PyTorch | 3.5e-3 | 2.3e-6 | 0.99999996 |
+| xlm-roberta-base (`PostNorm`) | 4,764 | trainable vs PyTorch | 7.3e-5 | 2.7e-7 | 1.00000000 |
+| | | trainable vs graph runtime | 4.0e-5 | 2.1e-7 | 1.00000000 |
+| | | graph runtime vs PyTorch | 6.3e-5 | 2.9e-7 | 1.00000000 |
+
+Batches of 8 right-padded sequences gave exactly the rows of the sequences run alone. The trainable module is closer to PyTorch than the imported graph is.
+
+One fine-tuning step (24 sequences of 32 pieces, 8 threads, 110,344,721 trainable parameters, frozen token table, AdamW, gradient clipping), C# against plain PyTorch 2.15.0 CPU on the same batch (`step-time` and `tools/accurate/torch_step_time.py`; indicative, shared host at load average about 25, steady-state steps 1 to 3):
+
+| | forward | backward | clip | AdamW | total |
+|---|---:|---:|---:|---:|---:|
+| OneModel | 0.70 s | 1.27 s | 0.33 s | 0.34 s | 2.62 s |
+| PyTorch | 0.47 s | 0.80 s | 0.06 s | 0.20 s | 1.52 s |
+
+The C# step takes 1.7 times the PyTorch step, inside the 3x rule. Gradient clipping (about 6 times) and the AdamW update (1.7 times) are the slowest parts relative to PyTorch. The full recipe ran at about 6.6 s per step on batches of 500 words (about 700 pieces), peak resident memory 11 GB.
+
+Fine-tuning proof (`recipes/accurate/en-tagging`, `--finetune`; `PROVENANCE.md`): one 26-minute chunk, 236 steps (0.58 epoch of UD English-EWT r2.18 train), development UPOS 96.894 at step 200 (the frozen encoder reached 96.39 on development), test UPOS 97.07 [96.79, 97.35], 0.84 [0.62, 1.07] above the frozen encoder's 96.23 and 2.78 [2.44, 3.16] above spaCy's 94.29.
