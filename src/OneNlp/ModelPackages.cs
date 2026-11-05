@@ -86,7 +86,11 @@ public static class ModelPackages
                     ? $"RecursiveAI.OneNlp.Models.French (fast tier), or {MultilingualPackageId}"
                     : language == Language.Portuguese
                         ? $"RecursiveAI.OneNlp.Models.Portuguese (fast tier), or {MultilingualPackageId}"
-                    : MultilingualPackageId;
+                    : language == Language.Dutch
+                        ? $"RecursiveAI.OneNlp.Models.Dutch (fast tier), or {MultilingualPackageId}"
+                        : language == Language.Turkish
+                            ? $"RecursiveAI.OneNlp.Models.Turkish (fast tier), or {MultilingualPackageId}"
+                            : MultilingualPackageId;
         return $"No model is available for language '{(language == Language.Unknown ? "unknown" : language.Code)}'. Add the NuGet package {add}; "
             + "models are never downloaded.";
     }
