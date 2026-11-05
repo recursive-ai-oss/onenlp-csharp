@@ -256,6 +256,18 @@ public sealed class UaxWordTokenizer : IWordTokenizer
     private void Split(string text, int pos, int end, List<TokenBoundary> tokens)
     {
         ReadOnlySpan<char> token = text.AsSpan(pos, end - pos);
+        if (_data.HasMultiwordTokens && _data.TryMultiwordWords(token, out string[] words) && SegmentationData.PieceLengths(token, words) is { } pieceLengths)
+        {
+            int from = pos;
+            foreach (int length in pieceLengths)
+            {
+                tokens.Add(new TokenBoundary(from, length));
+                from += length;
+            }
+
+            return;
+        }
+
         if (_data.SpecialCases.Count > 0 && _specialCases.TryGetValue(token, out int[]? pieces))
         {
             int at = pos;
