@@ -29,15 +29,19 @@ internal static class Program
             options[args[i]] = args[i + 1];
         }
 
-        if (!options.TryGetValue("--models", out string? models) || !options.TryGetValue("--tatoeba", out string? tatoeba))
+        if (!options.TryGetValue("--models", out string? models) || (!options.TryGetValue("--tatoeba", out string? tatoeba) && !options.ContainsKey("--inputs")))
         {
-            Console.Error.WriteLine("usage: --models DIR --tatoeba FILE [--filter TEXT] [--out FILE] [--dump-inputs DIR] [--budget-ms N]");
+            Console.Error.WriteLine("usage: --models DIR (--tatoeba FILE | --inputs DIR) [--filter TEXT] [--out FILE] [--dump-inputs DIR] [--budget-ms N]");
             return 2;
         }
 
         int budgetMs = options.TryGetValue("--budget-ms", out string? b) ? int.Parse(b, CultureInfo.InvariantCulture) : 1000;
         string? filter = options.GetValueOrDefault("--filter");
-        Dictionary<string, string> inputs = Corpus.Build(tatoeba);
+        // --inputs names a directory holding short.txt, medium.txt and long.txt as a previous run dumped them, so that two machines
+        // time exactly the same text.
+        Dictionary<string, string> inputs = options.TryGetValue("--inputs", out string? inputDir)
+            ? Sizes.ToDictionary(size => size, size => File.ReadAllText(Path.Combine(inputDir, size + ".txt"), new UTF8Encoding(false)), StringComparer.Ordinal)
+            : Corpus.Build(tatoeba!);
         if (options.TryGetValue("--dump-inputs", out string? dump))
         {
             Directory.CreateDirectory(dump);
