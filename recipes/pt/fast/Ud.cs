@@ -63,11 +63,20 @@ internal static partial class Program
         List<Example> train = [.. ConllUReader.ReadExamples(Required(args, "train"))];
         List<Example> dev = [.. ConllUReader.ReadExamples(Required(args, "dev"))];
         using Pipeline pipeline = NewTaggingPipeline(args);
+        int batchWords = Num(args, "batch-words", 1000);
+        float lr = Flt(args, "lr", 0.002f);
+
+        // --cosine-epochs N: a fixed budget of N epochs with the rate falling along a half cosine after the warm-up (Loshchilov and Hutter 2017),
+        // instead of a constant rate that early stopping has to cut off.
+        int cosineEpochs = Num(args, "cosine-epochs", 0);
+        long stepsPerEpoch = Math.Max(1, train.Sum(e => (long)e.Predicted.Length) / batchWords);
+        RecursiveAI.OneModel.Training.LrSchedule? schedule = cosineEpochs > 0 ? new RecursiveAI.OneModel.Training.WarmupCosineLr(lr, 200, cosineEpochs * stepsPerEpoch) : null;
         return RunTraining(pipeline, train, new TrainOptions
         {
-            Epochs = Num(args, "epochs", 40),
-            BatchWords = Num(args, "batch-words", 1000),
-            LearningRate = Flt(args, "lr", 0.002f),
+            Epochs = cosineEpochs > 0 ? cosineEpochs : Num(args, "epochs", 40),
+            BatchWords = batchWords,
+            LearningRate = lr,
+            Schedule = schedule,
             WarmupSteps = 200,
             Dropout = Flt(args, "dropout", 0.1f),
             Seed = (ulong)Num(args, "seed", 1),

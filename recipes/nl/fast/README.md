@@ -32,3 +32,5 @@ Encoder options (`--width --depth --norm-rows --prefix-rows --suffix-rows --shap
 ## Multiword tokens
 
 UD Dutch-Alpino has one multiword token in its training and development files, so the tokenizer cuts none and `predict` writes no multiword-token lines.
+
+`train-tagging` also takes `--cosine-epochs N` (a fixed budget of N epochs with the rate falling along a half cosine after the warm-up; use it with a large `--patience`). The shipped tagging model uses `--plain 1 --relu 1 --depth 1 --recurrent 1 --recurrent-size 64 --lr 0.003 --cosine-epochs 20 --patience 100` (see `PROVENANCE.md`): one bidirectional LSTM layer over each document lets a token see words beyond its window neighbours.
