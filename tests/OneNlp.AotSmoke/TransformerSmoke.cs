@@ -35,5 +35,31 @@ internal static class TransformerSmoke
         TransformerEncoder.ModelDirectory = null;
         using IEncoder again = EncoderRegistry.Create("transformer", settings.RootElement);
         check("transformer registry", again.Width == encoder.Width && again.Weights is null);
+
+        // The trainable twins: load both families from their exported graphs, encode with the autodiff graph on, and backpropagate.
+        foreach ((string file, TrainableTransformerOptions options) in new[]
+        {
+            ("tiny-bert.onnx", new TrainableTransformerOptions { Heads = 2, PositionOffset = 0, MaxLength = 16 }),
+            ("tiny-modernbert.onnx", new TrainableTransformerOptions { Heads = 2, GlobalEvery = 2, LocalWindow = 8, GlobalRopeTheta = 160000f, LocalRopeTheta = 10000f, MaxLength = 16 }),
+        })
+        {
+            using TrainableTransformerEncoder trainable = TrainableTransformerEncoder.LoadOnnx(Path.Combine(dir, file), tokenizer, options);
+            using var trainScope = new ActivationScope();
+            Tensor vectors = trainable.Encode([doc]).Vectors;
+            check(file + " trainable encode", vectors.Shape[0] == 5 && vectors.RequiresGrad);
+            Ops.Sum(vectors).Backward();
+            check(file + " trainable gradients", trainable.Weights!.Parameters().Any(p => !p.Grad.IsEmpty));
+            using var settingsStream = new MemoryStream();
+            using (var w = new Utf8JsonWriter(settingsStream))
+            {
+                w.WriteStartObject();
+                trainable.WriteSettings(w);
+                w.WriteEndObject();
+            }
+
+            using JsonDocument saved = JsonDocument.Parse(settingsStream.ToArray());
+            using IEncoder rebuilt = EncoderRegistry.Create(TrainableTransformerEncoder.EncoderKind, saved.RootElement);
+            check(file + " trainable registry", rebuilt.Width == trainable.Width && rebuilt.Weights is not null);
+        }
     }
 }

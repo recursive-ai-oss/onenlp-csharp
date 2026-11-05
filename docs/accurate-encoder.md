@@ -59,9 +59,42 @@ The encoder is **frozen**: `Weights` is `null`, `Train` leaves it alone, and hea
 
 ## Fine-tuning the encoder
 
-The graph runtime and the autodiff tensor layer are separate: `Session.Run` returns tensors with `RequiresGrad == false`, so an imported graph cannot be backpropagated. What does work for BERT-style models is moving the weights into OneModel.Training's own modules. `tools/OneNlp.Accurate` (`finetune-probe`) builds `Embedding` + `LayerNorm` + 12 `TransformerEncoderLayer` for XLM-R from the ONNX initializers (the bias and norm initializers keep their PyTorch names; each linear layer's weight is the unnamed initializer of the `MatMul` node with the matching path), and measures:
+The graph runtime and the autodiff tensor layer are separate: `Session.Run` returns tensors with `RequiresGrad == false`, so an imported graph cannot be backpropagated. `TrainableTransformerEncoder` therefore rebuilds the encoder from the exported file's weights in modules written on OneModel's tensor ops, so `Train` updates the encoder together with the head. `TransformerEncoder` (above) stays the frozen, cached inference path.
 
-- output of the modules against the graph runtime: max abs difference 1.4e-5;
-- five AdamW steps (learning rate 2e-5) on one 26-token sequence with an eight-way linear head: loss 2.392, 2.287, 2.209, 2.091, 1.947, nonzero gradients in layer 0, 2.1 to 2.7 s per step on 8 threads (277,057,536 parameters).
+```csharp
+using var encoder = TrainableTransformerEncoder.LoadOnnx("mmbert-base.onnx", "tokenizer.json");   // family detected from the weights
+using var pipeline = Pipeline.Blank(Language.English).Add(new Tagger(encoder, TokenColumn.Pos));
+pipeline.Train(examples, new TrainOptions { LearningRate = 5e-5f, WarmupSteps = 40, BatchWords = 500 });
+PipelineFile.Save(pipeline, "tagger.onenlp");   // kind "transformer-trainable": settings plus the layers' weights
+```
 
-mmBERT (ModernBERT: pre-norm, bias-free norms, rotary positions, gated-GELU feed-forward, alternating local and global attention) has no module in `OneModel.Training.Layers`; the tensor ops it needs exist. It was not built. What it needs: a pre-norm encoder layer, bias-free norm and linear layers, rotary position embedding, a gated-GELU feed-forward block, and sliding-window masks.
+### Encoder kinds in a saved pipeline
+
+| Kind | Class | Trains | Weights in the pipeline file |
+|---|---|---|---|
+| `transformer` | `TransformerEncoder` | no (frozen ONNX graph) | none; file names and hash only |
+| `transformer-trainable` | `TrainableTransformerEncoder` | yes | the layers (not the frozen token table) |
+
+Both reference the exported model and tokenizer by name (`TransformerEncoder.ModelDirectory`). The trainable kind reads the token table from the exported model again on load and overwrites the layers from the checkpoint, so the model file must still be there.
+
+### Families
+
+The family is read from the weight names (`TransformerFamily.Auto`) or given. Weights come from graphs written by the PyTorch exporter without dynamo (`torch.onnx.export(..., dynamo=False)`), where each linear layer's weight is the constant of the `MatMul` node named after the module; other graphs are rejected with a message.
+
+- **`ModernBert`** (mmBERT, ModernBERT; `ModernBertModule`). Warner et al. 2024 (arXiv 2412.13663) §2 and the mmBERT paper (arXiv 2509.06888): token embedding, layer norm, then pre-norm layers `x = x + Wo(attention(rotary(Wqkv(norm(x)))))` and `x = x + Wo2(gelu(a) * b)` with `[a, b] = Wi(norm(x))` (GeGLU, Shazeer 2020, arXiv 2002.05202), a final norm. No biases, norms without shift, epsilon 1e-5; the first layer has no attention norm. Layer `i` is global when `i % 3 == 0`; the others see tokens at most 64 positions away (a 128-token window). Rotary embeddings (Su et al. 2021, arXiv 2104.09864) pair coordinate `i` with `i + d/2`, base 160,000 in mmBERT's global and local layers (ModernBERT: 160,000 and 10,000). Details the papers leave open were settled against the exported graph of mmBERT-base and checked against PyTorch: `Wqkv` is laid out `[3, heads, d]`, the first half of `Wi` goes through GELU, the window test is `|i - j| <= 64`, attention scale `1/sqrt(d)`.
+- **`PostNorm`** (XLM-R, RoBERTa, BERT; `PostNormModule`). Token and learned position embeddings (the single token-type vector is added into every position row), layer norm, and post-norm layers with exact GELU. XLM-R starts positions at 2 (`PositionOffset`), BERT at 0; epsilon is read from the graph (1e-5 and 1e-12).
+
+The head count is not in the weights: it defaults to width / 64 (set `Heads` otherwise). A graph with two different rotary bases does not say which table is the global one, so `GlobalRopeTheta` and `LocalRopeTheta` must be given for it (the loader refuses to guess); a graph with one base uses it for both.
+
+### Pooling and the embedding table
+
+Pieces become tokens as in `TransformerEncoder` (same tokenizer, windows and `Mean`/`FirstPiece`), but as a differentiable gather: each token's vector is the sum of the rows of its pieces, scaled by `1/count`, so gradients reach every piece. Windows of up to `MaxBatchPieces` padded pieces (default 8,192) run together; padding keys are masked.
+
+`FreezeEmbeddings` (default `true`) keeps the 256,000 x 768 token table (197 million values in mmBERT) out of training and out of the saved weights. Fine-tuning a tagger barely moves it, and dense AdamW over it would add two moment tensors and a 786 MB gradient to every step. With `false` the table trains, and a pipeline holding it cannot be saved (the pipeline file's weights are capped at 1 GiB, and `WriteSettings` says so).
+
+`Train` has one learning rate for the encoder and the head. 5e-5 with a short warm-up is what the recipe uses.
+
+### Tests
+
+`tests/OneNlp.Tests/TrainableTransformerTests.cs` uses two random tiny encoders exported from PyTorch (`tools/accurate/make_tiny_fixture.py`, `make_tiny_modernbert_fixture.py`; the second has alternating global and local layers with a window of 8, two rotary bases and padding): modules against PyTorch's hidden states (max abs below 2e-5), padded batches against single sequences, token vectors against `TransformerEncoder`'s for both poolings and with windowing, finite-difference gradients through rotary, the gated feed-forward and the window mask, a tagger trained through `Train` and reloaded from a saved pipeline, and a resumed run reproducing an uninterrupted one bit for bit.
+
