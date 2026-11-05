@@ -77,25 +77,34 @@ internal static class Program
     {
         string[] lines = File.ReadAllLines(path);
         DateTime reference = DateTime.Parse(referenceText, System.Globalization.CultureInfo.InvariantCulture);
+        var load = System.Diagnostics.Stopwatch.StartNew();
+        RunModels(lines[0], reference, withDateTime);
+        load.Stop();
+        Console.WriteLine($"load {load.Elapsed.TotalMilliseconds:F1} ms");
         for (int i = 0; i < Math.Min(200, lines.Length); i++)
         {
             RunModels(lines[i], reference, withDateTime);
         }
 
-        long chars = 0;
-        long results = 0;
-        long allocated = GC.GetAllocatedBytesForCurrentThread();
-        var timer = System.Diagnostics.Stopwatch.StartNew();
-        foreach (string line in lines)
+        for (int rep = 1; rep <= 3; rep++)
         {
-            results += RunModels(line, reference, withDateTime);
-            chars += line.Length;
+            long chars = 0;
+            long results = 0;
+            long allocated = GC.GetAllocatedBytesForCurrentThread();
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            foreach (string line in lines)
+            {
+                results += RunModels(line, reference, withDateTime);
+                chars += line.Length;
+            }
+
+            timer.Stop();
+            allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+            double seconds = timer.Elapsed.TotalSeconds;
+            Console.WriteLine($"rep {rep}: {lines.Length} texts, {chars} chars, {results} results; recognition time {seconds:F3} s ({chars / seconds / 1e6:F2} M chars/s); allocated {allocated / 1e6:F1} MB");
         }
 
-        timer.Stop();
-        allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
-        double seconds = timer.Elapsed.TotalSeconds;
-        Console.WriteLine($"{lines.Length} texts, {chars} chars, {results} results; recognition time {seconds:F3} s ({chars / seconds / 1e6:F2} M chars/s); allocated {allocated / 1e6:F1} MB");
+        Console.WriteLine($"peak working set {System.Diagnostics.Process.GetCurrentProcess().PeakWorkingSet64 / 1048576.0:F0} MB");
         return 0;
     }
 

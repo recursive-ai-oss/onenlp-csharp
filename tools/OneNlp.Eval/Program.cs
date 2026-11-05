@@ -42,6 +42,8 @@ internal static class Program
                runs the recognizers (numbers, ordinals, percents, measures, money, e-mail, URL, IP, phone-like, hashtag, mention, GUID, and dates, times, durations and recurrences)
                over JSON lines {"id":..,"text":..[,"reference":..]} (or plain text lines; a line's reference time, read as UTC, overrides --reference) and writes one JSON line of results per input. Offsets are
                UTF-16 (start, end) and code points (cpStart, cpEnd). The time spent recognizing is printed to standard error.
+          recognize-bench --in X.txt [--rules FILE ...] [--reference ISO] [--reps 3]
+               single-thread throughput of the recognizers over text lines: load time, then per repetition time, characters per second and bytes allocated.
           dump-ud   --gold G.conllu --pred P1.conllu [P2.conllu ...] --json OUT.json    (all counts, no bootstrap)
           dump-span --gold G.iob2 --pred P1.iob2 [P2.iob2 ...] --json OUT.json
 
@@ -71,6 +73,8 @@ internal static class Program
                     return Recognizers.Run(options);
                 case "recognize":
                     return RecognizeCommand.Run(options);
+                case "recognize-bench":
+                    return RecognizeBenchCommand.Run(options);
                 case "dump-ud":
                     return DumpUd(options);
                 case "dump-span":

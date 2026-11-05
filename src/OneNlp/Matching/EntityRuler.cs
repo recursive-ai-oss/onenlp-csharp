@@ -351,13 +351,20 @@ public sealed class EntityRuler : IPipelineComponent
                     phraseGroups[key] = group = [];
                 }
 
-                group.Add(rule.Phrase!);
+                // A phrase with no tokens (white space only) can never match; leaving it out keeps one such rule from breaking the others.
+                if (phrases.HasTokens(rule.Phrase!))
+                {
+                    group.Add(rule.Phrase!);
+                }
             }
         }
 
         foreach ((string key, List<string> group) in phraseGroups)
         {
-            phrases.Add(key, group);
+            if (group.Count > 0)
+            {
+                phrases.Add(key, group);
+            }
         }
 
         return new Snapshot { TokenMatcher = matcher, Phrases = phrases, Entities = [.. entities], KeyToEntity = keyToEntity };

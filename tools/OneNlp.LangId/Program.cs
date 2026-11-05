@@ -13,6 +13,8 @@ namespace RecursiveAI.OneNlp.LangIdTool;
 ///           writes DIR/NAME.SET.BUCKET.txt, one predicted code per line, for words, pairs and sentences
 ///   score   --eval DIR --set NAME --pred DIR --systems a,b,c --ref a [--per-language]
 ///           accuracy per bucket with bootstrap 95% intervals, paired differences against the reference system(s)
+///   bench   --model model.bin --eval DIR --set main|tatoeba
+///           single-thread latency per bucket: load time, texts/s, microseconds and bytes allocated per text, peak working set
 ///   spans   --model model.bin --eval DIR --out FILE
 ///           mixed-language check on synthetic concatenations
 /// </summary>
@@ -69,6 +71,9 @@ internal static class Program
             case "score":
                 Scorer.Run(opt);
                 return 0;
+            case "bench":
+                Bench(opt);
+                return 0;
             case "spans":
                 MixedCheck.Run(opt);
                 return 0;
@@ -76,6 +81,40 @@ internal static class Program
                 Console.Error.WriteLine("unknown command");
                 return 2;
         }
+    }
+
+    /// <summary>Single-thread latency: load time, then three timed passes per bucket after a warm-up pass, with bytes allocated on the calling thread.</summary>
+    private static void Bench(Dictionary<string, string> opt)
+    {
+        var load = System.Diagnostics.Stopwatch.StartNew();
+        using FileStream fs = File.OpenRead(opt["model"]);
+        LanguageDetector d = LanguageDetector.Load(fs);
+        load.Stop();
+        Console.WriteLine($"load {load.Elapsed.TotalMilliseconds:F1} ms");
+        foreach (string b in Buckets)
+        {
+            string[] texts = [.. File.ReadAllLines(Path.Combine(opt["eval"], opt["set"], b + ".tsv"), Encoding.UTF8).Select(l => l[(l.IndexOf('\t', StringComparison.Ordinal) + 1)..])];
+            foreach (string t in texts.Take(200))
+            {
+                _ = d.Detect(t);
+            }
+
+            for (int rep = 1; rep <= 3; rep++)
+            {
+                long allocated = GC.GetAllocatedBytesForCurrentThread();
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                foreach (string t in texts)
+                {
+                    _ = d.Detect(t);
+                }
+
+                sw.Stop();
+                allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+                Console.WriteLine($"{b} rep {rep}: {texts.Length} texts, {sw.Elapsed.TotalMilliseconds:F1} ms, {texts.Length / sw.Elapsed.TotalSeconds:F0} texts/s, {sw.Elapsed.TotalMilliseconds * 1000 / texts.Length:F2} us/text, {allocated / texts.Length} B/text");
+            }
+        }
+
+        Console.WriteLine($"peak working set {System.Diagnostics.Process.GetCurrentProcess().PeakWorkingSet64 / 1048576.0:F0} MB");
     }
 
     private static void Predict(Dictionary<string, string> opt)
