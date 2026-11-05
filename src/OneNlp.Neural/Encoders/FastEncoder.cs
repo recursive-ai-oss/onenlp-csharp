@@ -242,7 +242,7 @@ public sealed class FastEncoder : IEncoder
         {
             // The weights are about to change, so whatever was kept for inference is out of date.
             Interlocked.Increment(ref _epoch);
-            return new EncodedBatch(Compute(docs, starts), starts);
+            return new EncodedBatch(Compute(docs, starts, false), starts);
         }
 
         return EncodeShared(docs, starts);
@@ -391,7 +391,8 @@ public sealed class FastEncoder : IEncoder
 
     private ReadOnlySpan<char> Suffix(ReadOnlySpan<char> t) => t.Length <= SuffixChars ? t : t[^SuffixChars..];
 
-    private Tensor Compute(ReadOnlySpan<Doc> docs, int[] starts)
+    // inference: return a tensor the caller owns, computed by the table-lookup path when the encoder uses ReLU (see FastModule.RunInference).
+    private Tensor Compute(ReadOnlySpan<Doc> docs, int[] starts, bool inference)
     {
         int n = starts[^1];
 
@@ -465,6 +466,11 @@ public sealed class FastEncoder : IEncoder
                 }
             }
 
+            if (inference && _module.CanRunInference)
+            {
+                return _module.RunInference(ids, n, prev, next);
+            }
+
             var idTensors = new Tensor[_attributes * Hashes];
             for (int k = 0; k < idTensors.Length; k++)
             {
@@ -522,9 +528,14 @@ public sealed class FastEncoder : IEncoder
         }
 
         Tensor owned;
-        using (var scope = new ActivationScope())
+        if (_module.CanRunInference)
         {
-            owned = Compute(docs, starts).Clone();
+            owned = Compute(docs, starts, true);
+        }
+        else
+        {
+            using var scope = new ActivationScope();
+            owned = Compute(docs, starts, false).Clone();
         }
 
         if (slot is not null && !slot.Batch.Vectors.IsReleased)
@@ -568,12 +579,19 @@ public sealed class FastEncoder : IEncoder
         private readonly int _hashes;
         private readonly Linear[] _windows;
         private readonly LayerNorm[] _norms;
+        private readonly int _width;
+        private readonly int _embedWidth;
+        private Tensor[]? _watched;
+        private volatile Derived? _derived;
+        private readonly object _deriveLock = new();
 
         public FastModule(int width, int embedWidth, int depth, bool plain, bool relu, int hashes, int[] rows, bool cased, bool neighbours, bool bigrams, Generator generator)
         {
             _plain = plain;
             _relu = relu;
             _hashes = hashes;
+            _width = width;
+            _embedWidth = embedWidth;
             _tables = new Embedding[rows.Length];
             var names = new List<string> { "norm", "prefix", "suffix", "shape" };
             if (cased)
@@ -609,6 +627,10 @@ public sealed class FastEncoder : IEncoder
 
         public override Tensor Forward(Tensor input) => throw new NotSupportedException("Call Run.");
 
+        // The table-lookup inference path needs ReLU: the exact GELU is an error function per value.
+        public bool CanRunInference => _relu;
+
+
         private Tensor Activate(Tensor x) => _relu ? Ops.Relu(x) : Ops.Gelu(x);
 
         // ids: Int32 [n] per (attribute, hash); prev/next: Int32 [n] row of the neighbour, or n for the zero row.
@@ -638,6 +660,164 @@ public sealed class FastEncoder : IEncoder
             }
 
             return x;
+        }
+
+        private sealed class Derived(long stamp, float[][] tables, Tensor[] windows)
+        {
+            public readonly long Stamp = stamp;
+            public readonly float[][] Tables = tables;
+            public readonly Tensor[] Windows = windows;
+        }
+
+        private long Stamp()
+        {
+            Tensor[] watched = _watched ??= Parameters();
+            long sum = 0;
+            foreach (Tensor t in watched)
+            {
+                sum += t.Version;
+            }
+
+            return sum;
+        }
+
+        // Inference tables. The joining layer is linear in the concatenated embedding rows, so  mix([e_a1, ..., e_aK]) = sum_a (e_a W_a)
+        // and each table can be multiplied by its slice of the joining weights once: a token then costs one row lookup per attribute
+        // and a sum, where the product of a K*embedWidth vector by the joining matrix was the largest cost of the encoder. Likewise a
+        // window layer applies one weight block to each of the three vectors, so it is one product x * [B_left | B_self | B_right]
+        // and a shifted sum. Rebuilt when any weight changes (the storage version counters tell).
+        private Derived GetDerived()
+        {
+            long stamp = Stamp();
+            Derived? d = _derived;
+            if (d is not null && d.Stamp == stamp)
+            {
+                return d;
+            }
+
+            lock (_deriveLock)
+            {
+                d = _derived;
+                stamp = Stamp();
+                if (d is not null && d.Stamp == stamp)
+                {
+                    return d;
+                }
+
+                int w = _width, ew = _embedWidth, attrs = _tables.Length;
+                ReadOnlySpan<float> mixW = _mix.Weight.Data<float>();
+                var tables = new float[attrs][];
+                using (var scope = new ActivationScope())
+                {
+                    float[] slice = new float[ew * w];
+                    for (int a = 0; a < attrs; a++)
+                    {
+                        for (int i = 0; i < ew; i++)
+                        {
+                            for (int j = 0; j < w; j++)
+                            {
+                                slice[(i * w) + j] = mixW[(j * attrs * ew) + (a * ew) + i];
+                            }
+                        }
+
+                        Tensor sliceT = Tensor.FromSpan<float>(slice, Shape.Create(ew, w));
+                        Tensor product = Ops.MatMul(_tables[a].Weight, sliceT);
+                        tables[a] = product.Data<float>().ToArray();
+                        sliceT.Dispose();
+                    }
+                }
+
+                var windows = new Tensor[_windows.Length];
+                for (int l = 0; l < windows.Length; l++)
+                {
+                    ReadOnlySpan<float> ww = _windows[l].Weight.Data<float>();
+                    float[] cat = new float[3 * w * w];
+                    for (int k = 0; k < 3; k++)
+                    {
+                        for (int j = 0; j < w; j++)
+                        {
+                            ww.Slice((j * 3 * w) + (k * w), w).CopyTo(cat.AsSpan(((k * w) + j) * w, w));
+                        }
+                    }
+
+                    windows[l] = Tensor.FromSpan<float>(cat, Shape.Create(3 * w, w));
+                }
+
+                d = new Derived(stamp, tables, windows);
+                _derived = d;
+                return d;
+            }
+        }
+
+        // ids: Int32 [attribute * hashes + hash][n] flattened; prev/next as in Run. Returns [n, width] owned by the caller.
+        public Tensor RunInference(int[] ids, int n, int[] prev, int[] next)
+        {
+            Derived d = GetDerived();
+            int w = _width;
+            float[] x = ArrayPool<float>.Shared.Rent(n * w);
+            float[] z = ArrayPool<float>.Shared.Rent(w);
+            try
+            {
+                ReadOnlySpan<float> mixBias = _mix.Bias.Data<float>();
+                for (int r = 0; r < n; r++)
+                {
+                    Span<float> row = x.AsSpan(r * w, w);
+                    mixBias.CopyTo(row);
+                    for (int a = 0; a < _tables.Length; a++)
+                    {
+                        float[] table = d.Tables[a];
+                        for (int h = 0; h < _hashes; h++)
+                        {
+                            int id = ids[(((a * _hashes) + h) * n) + r];
+                            RowKernels.Add(row, table.AsSpan(id * w, w));
+                        }
+                    }
+
+                    RowKernels.Relu(row);
+                    if (!_plain)
+                    {
+                        RowKernels.LayerNorm(row, _mixNorm!.Weight.Data<float>(), _mixNorm.Bias.Data<float>(), row);
+                    }
+                }
+
+                Span<float> zs = z.AsSpan(0, w);
+                for (int l = 0; l < _windows.Length; l++)
+                {
+                    using var scope = new ActivationScope();
+                    Tensor xt = Tensor.FromSpan<float>(x.AsSpan(0, n * w), Shape.Create(n, w));
+                    Tensor yt = Ops.Linear(xt, d.Windows[l]);
+                    xt.Dispose();
+                    ReadOnlySpan<float> y = yt.Data<float>();
+                    ReadOnlySpan<float> bias = _windows[l].Bias.Data<float>();
+                    ReadOnlySpan<float> gamma = _norms[l].Weight.Data<float>();
+                    ReadOnlySpan<float> beta = _norms[l].Bias.Data<float>();
+                    int stride = 3 * w;
+                    for (int r = 0; r < n; r++)
+                    {
+                        bias.CopyTo(zs);
+                        if (prev[r] != n)
+                        {
+                            RowKernels.Add(zs, y.Slice((r - 1) * stride, w));
+                        }
+
+                        RowKernels.Add(zs, y.Slice((r * stride) + w, w));
+                        if (next[r] != n)
+                        {
+                            RowKernels.Add(zs, y.Slice(((r + 1) * stride) + (2 * w), w));
+                        }
+
+                        RowKernels.Relu(zs);
+                        RowKernels.LayerNormAdd(zs, gamma, beta, x.AsSpan(r * w, w));
+                    }
+                }
+
+                return Tensor.FromSpan<float>(x.AsSpan(0, n * w), Shape.Create(n, w));
+            }
+            finally
+            {
+                ArrayPool<float>.Shared.Return(x);
+                ArrayPool<float>.Shared.Return(z);
+            }
         }
     }
 }

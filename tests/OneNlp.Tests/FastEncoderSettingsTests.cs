@@ -51,7 +51,8 @@ public class FastEncoderSettingsTests
         Assert.True(fast.Relu);
         Assert.Equal(48, fast.NeighbourRows);
         Assert.Equal(24, fast.BigramRows);
-        Assert.Equal(new[] { 64, 16, 32, 16, 48, 48, 48, 48, 24, 24 }, fast.TableRows);
+        int[] expectedRows = [64, 16, 32, 16, 48, 48, 48, 48, 24, 24];
+        Assert.Equal(expectedRows, fast.TableRows);
     }
 
     [Fact]

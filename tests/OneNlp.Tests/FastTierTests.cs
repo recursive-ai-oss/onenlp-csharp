@@ -250,6 +250,48 @@ public class FastTierTests
         Assert.NotSame(kept, encoder.Encode(docs));
     }
 
+    [Theory]
+    [InlineData(false, 1)]
+    [InlineData(false, 2)]
+    [InlineData(true, 2)]
+    public void TableLookupInferenceMatchesTheTensorPath(bool plain, int hashes)
+    {
+        // The ReLU inference path folds the joining layer into the embedding tables and the window layers into one product each; it must
+        // give what the tensor operations give, also after the weights change.
+        using var encoder = new FastEncoder(width: 24, depth: 2, normRows: 64, prefixRows: 16, suffixRows: 32, shapeRows: 16, seed: 3, embedWidth: 12, plain: plain, hashes: hashes, relu: true, neighbourRows: 40);
+        Doc[] docs = [.. Toy(5, 6).Select(e => e.Predicted)];
+        for (int round = 0; round < 2; round++)
+        {
+            encoder.Weights!.Eval();
+            float[] fast;
+            using (var scope = new ActivationScope())
+            using (GradMode.NoGrad())
+            {
+                fast = encoder.Encode(docs).Vectors.Data<float>().ToArray();
+            }
+
+            encoder.Weights.Train(true);
+            float[] reference;
+            using (var scope = new ActivationScope())
+            {
+                reference = encoder.Encode(docs).Vectors.Data<float>().ToArray();
+            }
+
+            Assert.Equal(reference.Length, fast.Length);
+            for (int i = 0; i < fast.Length; i++)
+            {
+                Assert.True(Math.Abs(fast[i] - reference[i]) < 1e-4f, $"round {round} value {i}: {fast[i]} vs {reference[i]}");
+            }
+
+            // change a weight in place: the derived tables must follow
+            Span<float> w = encoder.Weights.Parameters()[0].MutableData<float>();
+            for (int i = 0; i < w.Length; i += 3)
+            {
+                w[i] += 0.05f;
+            }
+        }
+    }
+
     private static (double Tag, double Pos, double Morph, double Lemma) Score(Pipeline pipeline, List<Example> test)
     {
         int tag = 0, pos = 0, morph = 0, lemma = 0, total = 0;
