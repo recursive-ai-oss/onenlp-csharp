@@ -30,6 +30,8 @@ public sealed class UaxWordTokenizer : IWordTokenizer
     private readonly FrozenSet<string>.AlternateLookup<ReadOnlySpan<char>> _abbreviations;
     private readonly FrozenSet<string>.AlternateLookup<ReadOnlySpan<char>> _clitics;
     private readonly FrozenSet<string>.AlternateLookup<ReadOnlySpan<char>>? _hyphenPrefixes;
+    private readonly FrozenSet<string>.AlternateLookup<ReadOnlySpan<char>> _dollarWords;
+    private readonly FrozenSet<string>.AlternateLookup<ReadOnlySpan<char>> _enclitics;
     private readonly bool _adjust;
 
     /// <summary>Creates a tokenizer.</summary>
@@ -41,6 +43,8 @@ public sealed class UaxWordTokenizer : IWordTokenizer
         _specialCases = _data.SpecialCases.GetAlternateLookup<ReadOnlySpan<char>>();
         _abbreviations = _data.Abbreviations.GetAlternateLookup<ReadOnlySpan<char>>();
         _clitics = _data.Clitics.GetAlternateLookup<ReadOnlySpan<char>>();
+        _enclitics = _data.Enclitics.GetAlternateLookup<ReadOnlySpan<char>>();
+        _dollarWords = _data.DollarWords.GetAlternateLookup<ReadOnlySpan<char>>();
         _hyphenPrefixes = _data.HyphenPrefixes?.GetAlternateLookup<ReadOnlySpan<char>>();
     }
 
@@ -152,6 +156,12 @@ public sealed class UaxWordTokenizer : IWordTokenizer
         while (end < n)
         {
             char c = text[end];
+            // Portuguese US$ and R$: the dollar sign closes a currency word (UD Portuguese keeps the symbol as one token).
+            if (c == '$' && _data.DollarWords.Count > 0 && _dollarWords.Contains(text.AsSpan(pos, end - pos)))
+            {
+                return end + 1;
+            }
+
             if (c == '.' && (IsAbbreviation(text.AsSpan(pos, end - pos)) || (_data.OrdinalDot && IsOrdinal(text, pos, end))))
             {
                 return end + 1;
@@ -266,6 +276,18 @@ public sealed class UaxWordTokenizer : IWordTokenizer
             }
 
             return;
+        }
+
+        // Portuguese "trata-se": the pronoun after the verb's hyphen is a word of its own in UD, written with its hyphen ("-se").
+        if (_data.Enclitics.Count > 0)
+        {
+            int hyphen = token.IndexOf('-');
+            if (hyphen > 0 && hyphen == token.LastIndexOf('-') && hyphen < token.Length - 1 && char.IsLetter(token[hyphen - 1]) && _enclitics.Contains(token[(hyphen + 1)..]))
+            {
+                tokens.Add(new TokenBoundary(pos, hyphen));
+                tokens.Add(new TokenBoundary(pos + hyphen, token.Length - hyphen));
+                return;
+            }
         }
 
         int apostrophe = token.LastIndexOfAny('\'', '\u2019');
