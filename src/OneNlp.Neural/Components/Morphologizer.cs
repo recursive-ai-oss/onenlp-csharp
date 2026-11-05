@@ -32,6 +32,8 @@ public sealed class Morphologizer : TrainableHead
     private const int MaxLabels = 1 << 16;
     private const string PosPrefix = "POS=";
     private string[] _labels = [];
+    private StringStore? _idStore;
+    private (int Pos, int Morph)[]? _ids;
     private Dictionary<string, int> _labelIds = new(StringComparer.Ordinal);
     private (string Pos, string Morph)[] _parts = [];
     private FactoredOutput? _module;
@@ -168,9 +170,22 @@ public sealed class Morphologizer : TrainableHead
                 var confidence = new float[doc.Length];
                 for (int t = 0; t < doc.Length; t++)
                 {
-                    (string posValue, string morphValue) = _parts[best[start + t]];
-                    pos[t] = doc.Strings.Add(posValue);
-                    morph[t] = morphValue.Length == 0 ? 0 : doc.Strings.Add(morphValue);
+                    int label = best[start + t];
+                    if (_ids is null || !ReferenceEquals(_idStore, doc.Strings))
+                    {
+                        // Label to string id: one table per string store, so a token costs an array read instead of two hash lookups.
+                        _idStore = doc.Strings;
+                        _ids = new (int Pos, int Morph)[_parts.Length];
+                        Array.Fill(_ids, (-1, -1));
+                    }
+
+                    if (_ids[label].Pos < 0)
+                    {
+                        (string posValue, string morphValue) = _parts[label];
+                        _ids[label] = (doc.Strings.Add(posValue), morphValue.Length == 0 ? 0 : doc.Strings.Add(morphValue));
+                    }
+
+                    (pos[t], morph[t]) = _ids[label];
                     confidence[t] = probability[start + t];
                 }
 

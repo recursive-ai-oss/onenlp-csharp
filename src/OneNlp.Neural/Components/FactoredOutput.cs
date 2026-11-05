@@ -1,5 +1,7 @@
 using RecursiveAI.OneModel.Tensors;
 using RecursiveAI.OneModel.Training;
+using RecursiveAI.OneNlp.Neural.Encoders;
+using System.Buffers;
 
 namespace RecursiveAI.OneNlp.Neural.Components;
 
@@ -19,6 +21,9 @@ internal sealed class FactoredOutput : NnModule
     private readonly Linear? _flat;
     private readonly Linear? _head;
     private readonly Linear? _tail;
+    private readonly FrozenLinear? _flatFast;
+    private readonly FrozenLinear? _headFast;
+    private readonly FrozenLinear? _tailFast;
 
     public FactoredOutput(int width, int classes, int headClasses, Generator generator)
     {
@@ -27,11 +32,14 @@ internal sealed class FactoredOutput : NnModule
         if (HeadClasses == 0)
         {
             _flat = RegisterModule("output", new Linear(width, classes, generator));
+            _flatFast = new FrozenLinear(_flat);
         }
         else
         {
             _head = RegisterModule("head", new Linear(width, HeadClasses + 1, generator));
             _tail = RegisterModule("tail", new Linear(width, classes - HeadClasses, generator));
+            _headFast = new FrozenLinear(_head);
+            _tailFast = new FrozenLinear(_tail);
         }
     }
 
@@ -43,6 +51,15 @@ internal sealed class FactoredOutput : NnModule
     public bool IsFactored => HeadClasses > 0;
 
     public override Tensor Forward(Tensor input) => throw new NotSupportedException("Use Loss, Decode or the level methods.");
+
+    /// <summary>Inference copy of the plain softmax layer (not factored).</summary>
+    internal RowClassifier FlatFast => _flatFast!.Get();
+
+    /// <summary>Inference copy of the first level (factored).</summary>
+    internal RowClassifier HeadFast => _headFast!.Get();
+
+    /// <summary>Inference copy of the second level (factored).</summary>
+    internal RowClassifier TailFast => _tailFast!.Get();
 
     /// <summary>Plain softmax logits [rows, classes].</summary>
     public Tensor Logits(Tensor vectors) => _flat!.Forward(vectors);
@@ -96,6 +113,12 @@ internal sealed class FactoredOutput : NnModule
     /// <summary>The most probable class of every row and its probability.</summary>
     public void Decode(Tensor vectors, Span<int> best, Span<float> confidence)
     {
+        if (!GradMode.IsEnabled)
+        {
+            DecodeFast(vectors.Data<float>(), best, confidence);
+            return;
+        }
+
         if (!IsFactored)
         {
             ReadOnlySpan<float> p = Ops.Softmax(Logits(vectors)).Data<float>();
@@ -109,7 +132,8 @@ internal sealed class FactoredOutput : NnModule
 
         int k = HeadClasses;
         int width = k + 1;
-        ReadOnlySpan<float> first = Ops.Softmax(HeadLogits(vectors)).Data<float>();
+        Tensor hl = HeadLogits(vectors);
+        ReadOnlySpan<float> first = Ops.Softmax(hl).Data<float>();
         var tailRows = new List<int>();
         for (int r = 0; r < best.Length; r++)
         {
@@ -124,7 +148,6 @@ internal sealed class FactoredOutput : NnModule
                 tailRows.Add(r);
             }
         }
-
         if (tailRows.Count == 0)
         {
             return;
@@ -138,6 +161,52 @@ internal sealed class FactoredOutput : NnModule
             (int c, float p) = Top(second.Slice(i * tailWidth, tailWidth));
             best[r] = k + c;
             confidence[r] = Math.Clamp(first[(r * width) + k] * p, 0f, 1f);
+        }
+    }
+
+    // Inference without tensor operations: the same two-level decision from row-wise kernels (see RowKernels.Dense). The probability
+    // of the winner is 1 / sum(exp(logit - largest logit)); of a second-level winner, that times the first level's probability of "other".
+    private void DecodeFast(ReadOnlySpan<float> vectors, Span<int> best, Span<float> confidence)
+    {
+        RowClassifier first = IsFactored ? HeadFast : FlatFast;
+        RowClassifier? second = IsFactored ? TailFast : null;
+        int width = first.Inputs;
+        if (vectors.Length < (long)best.Length * width)
+        {
+            throw new ArgumentException("The vectors do not cover every row.");
+        }
+
+        float[] logits = ArrayPool<float>.Shared.Rent(first.Stride);
+        float[]? tailLogits = second is null ? null : ArrayPool<float>.Shared.Rent(second.Stride);
+        try
+        {
+            for (int r = 0; r < best.Length; r++)
+            {
+                ReadOnlySpan<float> x = vectors.Slice(r * width, width);
+                first.Logits(x, logits);
+                (int c, float top) = RowKernels.ArgMax(logits, first.Classes);
+                float p = 1f / RowKernels.ExpSum(logits, first.Classes, top);
+                if (second is null || c < HeadClasses)
+                {
+                    best[r] = c;
+                    confidence[r] = float.IsNaN(p) ? 0f : Math.Clamp(p, 0f, 1f);
+                    continue;
+                }
+
+                second.Logits(x, tailLogits!);
+                (int c2, float top2) = RowKernels.ArgMax(tailLogits!, second.Classes);
+                float p2 = p / RowKernels.ExpSum(tailLogits!, second.Classes, top2);
+                best[r] = HeadClasses + c2;
+                confidence[r] = float.IsNaN(p2) ? 0f : Math.Clamp(p2, 0f, 1f);
+            }
+        }
+        finally
+        {
+            ArrayPool<float>.Shared.Return(logits);
+            if (tailLogits is not null)
+            {
+                ArrayPool<float>.Shared.Return(tailLogits);
+            }
         }
     }
 

@@ -164,47 +164,56 @@ public sealed class EditTreeLemmatizer : TrainableHead
         int rows = encoded.TokenCount;
         int k = module.HeadClasses;
         bool factored = module.IsFactored;
-        ReadOnlySpan<float> first = factored ? module.HeadLogits(encoded.Vectors).Data<float>() : module.Logits(encoded.Vectors).Data<float>();
-        int firstWidth = factored ? k + 1 : classes;
 
-        // Two-level layer: the rows for which "other" wins get second-level scores, and tailAt maps a row to its position among them.
-        int[]? tailAt = null;
-        ReadOnlySpan<float> second = default;
+        // Scores of every row from the first level (the whole layer when it is not two-level); a two-level layer's second level is
+        // scored only for the rows where "other" wins, and tailAt maps a row to its position among them. All without tensor operations.
+        RowClassifier firstLevel = factored ? module.HeadFast : module.FlatFast;
+        RowClassifier? tailLevel = factored ? module.TailFast : null;
+        int firstWidth = firstLevel.Stride;
+        int tailStride = tailLevel?.Stride ?? 0;
         int tailWidth = classes - k;
-        if (factored)
-        {
-            tailAt = ArrayPool<int>.Shared.Rent(rows);
-            var tailRows = new List<int>();
-            for (int r = 0; r < rows; r++)
-            {
-                ReadOnlySpan<float> row = first.Slice(r * firstWidth, firstWidth);
-                int best = 0;
-                float top = row[0];
-                for (int c = 1; c < row.Length; c++)
-                {
-                    float v = row[c];
-                    if (v > top)
-                    {
-                        top = v;
-                        best = c;
-                    }
-                }
-
-                tailAt[r] = best == k ? tailRows.Count : -1;
-                if (best == k)
-                {
-                    tailRows.Add(r);
-                }
-            }
-
-            if (tailRows.Count > 0)
-            {
-                second = module.TailLogits(encoded.Vectors, [.. tailRows]).Data<float>();
-            }
-        }
-
+        ReadOnlySpan<float> vectors = encoded.Vectors.Data<float>();
+        float[] first = ArrayPool<float>.Shared.Rent(rows * firstWidth);
+        int[]? tailAt = factored ? ArrayPool<int>.Shared.Rent(rows) : null;
+        float[]? second = null;
+        int tailCount = 0;
         try
         {
+            int inputs = firstLevel.Inputs;
+            for (int r = 0; r < rows; r++)
+            {
+                ReadOnlySpan<float> x = vectors.Slice(r * inputs, inputs);
+                Span<float> row = first.AsSpan(r * firstWidth, firstWidth);
+                firstLevel.Logits(x, row);
+                if (tailLevel is null)
+                {
+                    continue;
+                }
+
+                (int best, _) = RowKernels.ArgMax(row, firstLevel.Classes);
+                if (best != k)
+                {
+                    tailAt![r] = -1;
+                    continue;
+                }
+
+                tailAt![r] = tailCount;
+                if (second is null || (tailCount + 1) * tailStride > second.Length)
+                {
+                    float[] grown = ArrayPool<float>.Shared.Rent(Math.Max(16, tailCount * 2) * tailStride);
+                    second?.AsSpan(0, tailCount * tailStride).CopyTo(grown);
+                    if (second is not null)
+                    {
+                        ArrayPool<float>.Shared.Return(second);
+                    }
+
+                    second = grown;
+                }
+
+                tailLevel.Logits(x, second.AsSpan(tailCount * tailStride, tailStride));
+                tailCount++;
+            }
+
             Span<int> tried = stackalloc int[2 * Candidates]; // bounded by the constant above
             Span<char> lowered = stackalloc char[LowerBuffer]; // forms up to LowerBuffer characters are lower-cased here; longer ones get a string
             for (int d = 0; d < docs.Length; d++)
@@ -227,7 +236,7 @@ public sealed class EditTreeLemmatizer : TrainableHead
                         lower = form.ToString().ToLowerInvariant();
                     }
 
-                    ReadOnlySpan<float> firstRow = first.Slice(r * firstWidth, firstWidth);
+                    ReadOnlySpan<float> firstRow = first.AsSpan(r * firstWidth, firstWidth);
                     string? lemma = null;
                     int used = 0;
 
@@ -235,7 +244,7 @@ public sealed class EditTreeLemmatizer : TrainableHead
                     // The best class alone fits almost every token, so the loops usually end at once.
                     if (factored && tailAt![r] >= 0)
                     {
-                        lemma = TryRanked(second.Slice(tailAt[r] * tailWidth, tailWidth), tailWidth, k, tried, ref used, form, lower);
+                        lemma = TryRanked(second.AsSpan(tailAt[r] * tailStride, tailStride), tailWidth, k, tried, ref used, form, lower);
                     }
 
                     if (lemma is null)
@@ -251,6 +260,12 @@ public sealed class EditTreeLemmatizer : TrainableHead
         }
         finally
         {
+            ArrayPool<float>.Shared.Return(first);
+            if (second is not null)
+            {
+                ArrayPool<float>.Shared.Return(second);
+            }
+
             if (tailAt is not null)
             {
                 ArrayPool<int>.Shared.Return(tailAt);

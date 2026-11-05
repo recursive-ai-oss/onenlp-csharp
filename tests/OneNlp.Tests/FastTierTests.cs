@@ -258,7 +258,7 @@ public class FastTierTests
     {
         // The ReLU inference path folds the joining layer into the embedding tables and the window layers into one product each; it must
         // give what the tensor operations give, also after the weights change.
-        using var encoder = new FastEncoder(width: 24, depth: 2, normRows: 64, prefixRows: 16, suffixRows: 32, shapeRows: 16, seed: 3, embedWidth: 12, plain: plain, hashes: hashes, relu: true, neighbourRows: 40);
+        using var encoder = new FastEncoder(width: 24, depth: 2, normRows: 64, prefixRows: 16, suffixRows: 32, shapeRows: 16, seed: 3, embedWidth: 12, plain: plain, hashes: hashes, relu: true, neighbourRows: 40, contextRows: 24);
         Doc[] docs = [.. Toy(5, 6).Select(e => e.Predicted)];
         for (int round = 0; round < 2; round++)
         {

@@ -329,7 +329,7 @@ internal static class Program
             long t0 = Stopwatch.GetTimestamp();
             tokens = Pass(pipeline, texts, workers);
             double s = Stopwatch.GetElapsedTime(t0).TotalSeconds;
-            Console.WriteLine($"{name}: threads {workers} run {r}: {tokens / s:F0} tokens/s, {chars / s / 1e6:F2} M chars/s, {(GC.GetTotalAllocatedBytes(precise: true) - alloc) / (double)tokens:F0} B/token ({tokens} tokens, {s:F2} s)");
+            Console.WriteLine($"{name}: threads {workers} batch {Environment.GetEnvironmentVariable("ONENLP_BENCH_BATCH") ?? "1"} run {r}: {tokens / s:F0} tokens/s, {chars / s / 1e6:F2} M chars/s, {(GC.GetTotalAllocatedBytes(precise: true) - alloc) / (double)tokens:F0} B/token ({tokens} tokens, {s:F2} s)");
         }
     }
 
@@ -344,9 +344,27 @@ internal static class Program
             threads[w] = new Thread(() =>
             {
                 long tokens = 0;
-                for (int i = worker; i < texts.Count; i += workers)
+                int batch = int.Parse(Environment.GetEnvironmentVariable("ONENLP_BENCH_BATCH") ?? "1", CultureInfo.InvariantCulture);
+                if (batch > 1)
                 {
-                    tokens += pipeline.Process(texts[i]).Length;
+                    // The documented batch path: a worker's documents go through ProcessMany in batches.
+                    var mine = new List<string>();
+                    for (int i = worker; i < texts.Count; i += workers)
+                    {
+                        mine.Add(texts[i]);
+                    }
+
+                    foreach (Doc doc in pipeline.ProcessMany(mine, batch))
+                    {
+                        tokens += doc.Length;
+                    }
+                }
+                else
+                {
+                    for (int i = worker; i < texts.Count; i += workers)
+                    {
+                        tokens += pipeline.Process(texts[i]).Length;
+                    }
                 }
 
                 Interlocked.Add(ref total, tokens);

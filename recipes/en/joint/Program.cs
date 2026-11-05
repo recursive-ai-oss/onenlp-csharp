@@ -29,7 +29,7 @@ namespace RecursiveAI.OneNlp.Recipes.EnglishJoint;
 // The NER JSONL files are written from the UNER .iob2 files by `recipes/en/ner convert`; entity scores come from `recipes/en/ner eval`.
 //
 // Options (train): --epochs N (40) --seed N (1) --threads N --budget-seconds S --patience N (8) --lr X --dropout X --batch-words N
-//   encoder: --width --embed-width --depth --norm-rows --prefix-rows --suffix-rows --shape-rows --prefix --suffix --hashes --relu --neighbour-rows
+//   encoder: --width --embed-width --depth --norm-rows --prefix-rows --suffix-rows --shape-rows --prefix --suffix --hashes --relu --neighbour-rows --context-rows --bigram-rows
 //   heads:   --heads all|tagging  --min-class-count N  --arc N --label N --context N --lstm N --lstm-layers N --ner-hidden N
 internal static class Program
 {
@@ -108,7 +108,8 @@ internal static class Program
             hashes: Int(o, "hashes", 1),
             relu: !o.ContainsKey("gelu"),
             neighbourRows: Int(o, "neighbour-rows", 16384),
-            bigramRows: Int(o, "bigram-rows", 0));
+            bigramRows: Int(o, "bigram-rows", 0),
+            contextRows: Int(o, "context-rows", 0));
 
     private static Pipeline NewPipeline(Dictionary<string, string> o, ulong seed)
     {

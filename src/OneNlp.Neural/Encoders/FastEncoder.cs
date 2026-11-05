@@ -63,6 +63,7 @@ public sealed class FastEncoder : IEncoder
     private readonly int[] _rows;
     private readonly int _attributes;
     private readonly int _neighbourStart;
+    private readonly int _contextStart;
     private readonly int _bigramStart;
     private readonly FastModule _module;
     private readonly ThreadLocal<InferenceSlot?> _slot = new();
@@ -84,10 +85,13 @@ public sealed class FastEncoder : IEncoder
     /// <param name="relu">Use ReLU instead of GELU in the joining layer and the window layers. ReLU is a comparison; GELU needs an error function per value and costs several times more than the matrix products around it on small widths. Default false.</param>
     /// <param name="bigramRows">Rows of two more tables that hash the lower-cased text of a token together with the previous token, and with the next token: word pairs, the features a perceptron tagger is built on, at the price of a table lookup each. 0 (the default) leaves them out.</param>
     /// <param name="neighbourRows">Rows of four extra tables that hash the lower-cased text and the last <paramref name="suffixLength"/> characters of the previous and of the next token (the document edge hashes to a fixed row). They give every token its neighbours' words for the price of table lookups, where a window layer pays a matrix product. 0 (the default) leaves them out.</param>
+    /// <param name="contextRows">Rows of four more tables that hash the lower-cased text of the token two before and two after, and the shape of the previous and of the next token: wider context for the price of table lookups. 0 (the default) leaves them out.</param>
     /// <param name="plain">Join the attributes with a ReLU and no layer normalization, as the original hash-embedding recipes do; the window layers keep theirs. Default false (GELU and layer normalization).</param>
     /// <exception cref="ArgumentOutOfRangeException">A size is out of range; each table has 1 to 4,194,304 rows and the tables hold at most 33,554,432 values together.</exception>
-    public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0, int prefixLength = PrefixLength, int suffixLength = SuffixLength, int casedRows = 0, int embedWidth = 0, bool plain = false, int hashes = HashesPerToken, bool relu = false, int neighbourRows = 0, int bigramRows = 0)
+    public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0, int prefixLength = PrefixLength, int suffixLength = SuffixLength, int casedRows = 0, int embedWidth = 0, bool plain = false, int hashes = HashesPerToken, bool relu = false, int neighbourRows = 0, int bigramRows = 0, int contextRows = 0)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(contextRows);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(contextRows, MaxRows);
         ArgumentOutOfRangeException.ThrowIfNegative(neighbourRows);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(neighbourRows, MaxRows);
         ArgumentOutOfRangeException.ThrowIfNegative(bigramRows);
@@ -125,6 +129,13 @@ public sealed class FastEncoder : IEncoder
             rowList.AddRange([neighbourRows, neighbourRows, neighbourRows, neighbourRows]);
         }
 
+        _contextStart = rowList.Count;
+        if (contextRows > 0)
+        {
+            // lower-cased text two tokens before and two after, and the shape of the previous and of the next token
+            rowList.AddRange([contextRows, contextRows, contextRows, contextRows]);
+        }
+
         _bigramStart = rowList.Count;
         if (bigramRows > 0)
         {
@@ -158,7 +169,8 @@ public sealed class FastEncoder : IEncoder
         Relu = relu;
         NeighbourRows = neighbourRows;
         BigramRows = bigramRows;
-        _module = new FastModule(width, embedWidth, depth, plain, relu, hashes, _rows, casedRows > 0, neighbourRows > 0, bigramRows > 0, new Generator(seed));
+        ContextRows = contextRows;
+        _module = new FastModule(width, embedWidth, depth, plain, relu, hashes, _rows, casedRows > 0, neighbourRows > 0, contextRows > 0, bigramRows > 0, new Generator(seed));
     }
 
     /// <summary>
@@ -193,6 +205,9 @@ public sealed class FastEncoder : IEncoder
 
     /// <summary>Rows of each of the four neighbour tables; 0 when there are none.</summary>
     public int NeighbourRows { get; }
+
+    /// <summary>Rows of each of the four wider-context tables (text two tokens away, shape of the neighbours); 0 when there are none.</summary>
+    public int ContextRows { get; }
 
     /// <summary>Rows of each of the two word-pair tables; 0 when there are none.</summary>
     public int BigramRows { get; }
@@ -305,6 +320,11 @@ public sealed class FastEncoder : IEncoder
         {
             writer.WriteNumber("bigramRows", BigramRows);
         }
+
+        if (ContextRows > 0)
+        {
+            writer.WriteNumber("contextRows", ContextRows);
+        }
     }
 
     internal static IEncoder FromSettings(JsonElement s)
@@ -332,7 +352,8 @@ public sealed class FastEncoder : IEncoder
             JsonSettings.OptionalInt(s, "hashes", 1, MaxHashes, HashesPerToken),
             JsonSettings.OptionalInt(s, "relu", 0, 1, 0) == 1,
             JsonSettings.OptionalInt(s, "neighbourRows", 0, MaxRows, 0),
-            JsonSettings.OptionalInt(s, "bigramRows", 0, MaxRows, 0));
+            JsonSettings.OptionalInt(s, "bigramRows", 0, MaxRows, 0),
+            JsonSettings.OptionalInt(s, "contextRows", 0, MaxRows, 0));
     }
 
     private static ulong Mix(ulong h)
@@ -405,6 +426,12 @@ public sealed class FastEncoder : IEncoder
         bool bigrams = BigramRows > 0;
         ulong[]? normHashes = neighbours || bigrams ? ArrayPool<ulong>.Shared.Rent(n) : null;
         ulong[]? suffixHashes = neighbours ? ArrayPool<ulong>.Shared.Rent(n) : null;
+        bool context = ContextRows > 0;
+        ulong[]? shapeHashes = context ? ArrayPool<ulong>.Shared.Rent(n) : null;
+        if (context && normHashes is null)
+        {
+            normHashes = ArrayPool<ulong>.Shared.Rent(n);
+        }
         try
         {
             int row = 0;
@@ -418,7 +445,12 @@ public sealed class FastEncoder : IEncoder
                     Put(ids, n, 0, row, norm);
                     Put(ids, n, 1, row, SliceHash(Prefix(text), 1));
                     Put(ids, n, 2, row, suffix);
-                    Put(ids, n, 3, row, ShapeHash(text));
+                    ulong shape = ShapeHash(text);
+                    Put(ids, n, 3, row, shape);
+                    if (shapeHashes is not null)
+                    {
+                        shapeHashes[row] = shape;
+                    }
                     if (_neighbourStart > BaseAttributes)
                     {
                         Put(ids, n, 4, row, SliceHash(text, 4));
@@ -451,6 +483,23 @@ public sealed class FastEncoder : IEncoder
                     Put(ids, n, _neighbourStart + 1, r, last ? EdgeHash : normHashes![r + 1]);
                     Put(ids, n, _neighbourStart + 2, r, first ? EdgeHash : suffixHashes![r - 1]);
                     Put(ids, n, _neighbourStart + 3, r, last ? EdgeHash : suffixHashes![r + 1]);
+                }
+            }
+
+            if (context)
+            {
+                // Attributes _contextStart + 0..3: text two before, text two after, shape before, shape after. A neighbour beyond the
+                // document's edge hashes to EdgeHash.
+                for (int r = 0; r < n; r++)
+                {
+                    bool first = prev[r] == n;
+                    bool last = next[r] == n;
+                    bool first2 = first || prev[r - 1] == n;
+                    bool last2 = last || next[r + 1] == n;
+                    Put(ids, n, _contextStart, r, first2 ? EdgeHash : normHashes![r - 2]);
+                    Put(ids, n, _contextStart + 1, r, last2 ? EdgeHash : normHashes![r + 2]);
+                    Put(ids, n, _contextStart + 2, r, first ? EdgeHash : shapeHashes![r - 1]);
+                    Put(ids, n, _contextStart + 3, r, last ? EdgeHash : shapeHashes![r + 1]);
                 }
             }
 
@@ -499,6 +548,11 @@ public sealed class FastEncoder : IEncoder
             if (suffixHashes is not null)
             {
                 ArrayPool<ulong>.Shared.Return(suffixHashes);
+            }
+
+            if (shapeHashes is not null)
+            {
+                ArrayPool<ulong>.Shared.Return(shapeHashes);
             }
         }
     }
@@ -585,7 +639,7 @@ public sealed class FastEncoder : IEncoder
         private volatile Derived? _derived;
         private readonly object _deriveLock = new();
 
-        public FastModule(int width, int embedWidth, int depth, bool plain, bool relu, int hashes, int[] rows, bool cased, bool neighbours, bool bigrams, Generator generator)
+        public FastModule(int width, int embedWidth, int depth, bool plain, bool relu, int hashes, int[] rows, bool cased, bool neighbours, bool context, bool bigrams, Generator generator)
         {
             _plain = plain;
             _relu = relu;
@@ -602,6 +656,11 @@ public sealed class FastEncoder : IEncoder
             if (neighbours)
             {
                 names.AddRange(["prev_norm", "next_norm", "prev_suffix", "next_suffix"]);
+            }
+
+            if (context)
+            {
+                names.AddRange(["prev2_norm", "next2_norm", "prev_shape", "next_shape"]);
             }
 
             if (bigrams)
@@ -759,6 +818,8 @@ public sealed class FastEncoder : IEncoder
             try
             {
                 ReadOnlySpan<float> mixBias = _mix.Bias.Data<float>();
+                ReadOnlySpan<float> mixGamma = _plain ? default : _mixNorm!.Weight.Data<float>();
+                ReadOnlySpan<float> mixBeta = _plain ? default : _mixNorm!.Bias.Data<float>();
                 for (int r = 0; r < n; r++)
                 {
                     Span<float> row = x.AsSpan(r * w, w);
@@ -776,7 +837,7 @@ public sealed class FastEncoder : IEncoder
                     RowKernels.Relu(row);
                     if (!_plain)
                     {
-                        RowKernels.LayerNorm(row, _mixNorm!.Weight.Data<float>(), _mixNorm.Bias.Data<float>(), row);
+                        RowKernels.LayerNorm(row, mixGamma, mixBeta, row);
                     }
                 }
 
