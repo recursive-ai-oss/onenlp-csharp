@@ -20,7 +20,8 @@ string dir = args[1];
 string modelFile = Option("--model") ?? "model.onnx";
 string prefix = Option("--prefix") ?? "";
 int batch = int.TryParse(Option("--batch"), out int b) ? b : 32;
-using SentenceEmbedder embedder = SentenceEmbedder.Load(dir, modelFile, prefix);
+int threads = int.TryParse(Option("--threads"), out int th) ? th : 0;
+using SentenceEmbedder embedder = SentenceEmbedder.Load(dir, modelFile, prefix, new RecursiveAI.OneModel.Graph.ModelOptions { IntraOpThreads = threads });
 embedder.BatchSize = batch;
 
 if (command == "tokens")

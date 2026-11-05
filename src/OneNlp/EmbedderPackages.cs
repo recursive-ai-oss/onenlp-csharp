@@ -1,5 +1,3 @@
-using System.Threading;
-
 namespace RecursiveAI.OneNlp;
 
 /// <summary>
@@ -13,40 +11,34 @@ public static class EmbedderPackages
     public const string DefaultPackageId = "RecursiveAI.OneNlp.Models.Embeddings";
 
     private static readonly Lock Gate = new();
-    private static string? _packageId;
-    private static Lazy<IEmbedder>? _embedder;
+    private static readonly List<Entry> Entries = [];
 
-    /// <summary>Registers the default embedder. A second call from the same package is ignored.</summary>
+    /// <summary>Registers an embedding model package. A second call from the same package is ignored.</summary>
     /// <param name="packageId">The NuGet package id, named in messages.</param>
     /// <param name="create">Builds the embedder; called at most once, on first use. The embedder lives for the rest of the process and must be safe to call from any thread.</param>
+    /// <param name="priority">Which registered package <see cref="Get"/> returns when several are referenced: the highest priority wins, the first registered among equals. The English package uses 0 and the multilingual package 1.</param>
     /// <exception cref="ArgumentException"><paramref name="packageId"/> is empty.</exception>
-    /// <exception cref="InvalidOperationException">A different package is already registered.</exception>
-    public static void Register(string packageId, Func<IEmbedder> create)
+    public static void Register(string packageId, Func<IEmbedder> create, int priority = 0)
     {
         ArgumentException.ThrowIfNullOrEmpty(packageId);
         ArgumentNullException.ThrowIfNull(create);
         lock (Gate)
         {
-            if (_packageId is null)
+            if (!Entries.Exists(e => string.Equals(e.PackageId, packageId, StringComparison.Ordinal)))
             {
-                _packageId = packageId;
-                _embedder = new Lazy<IEmbedder>(create, LazyThreadSafetyMode.ExecutionAndPublication);
-            }
-            else if (!string.Equals(_packageId, packageId, StringComparison.Ordinal))
-            {
-                throw new InvalidOperationException($"The package '{_packageId}' is already registered as the default embedder; '{packageId}' cannot be registered as well.");
+                Entries.Add(new Entry(packageId, priority, new Lazy<IEmbedder>(create, LazyThreadSafetyMode.ExecutionAndPublication)));
             }
         }
     }
 
-    /// <summary>Whether a default embedder is registered.</summary>
+    /// <summary>Whether an embedding package is registered.</summary>
     public static bool IsRegistered
     {
         get
         {
             lock (Gate)
             {
-                return _embedder is not null;
+                return Entries.Count > 0;
             }
         }
     }
@@ -56,13 +48,23 @@ public static class EmbedderPackages
     /// <exception cref="InvalidOperationException">No package is registered. The message names the package to add; models are never downloaded.</exception>
     public static IEmbedder Get()
     {
-        Lazy<IEmbedder>? embedder;
+        Lazy<IEmbedder>? best = null;
+        int bestPriority = int.MinValue;
         lock (Gate)
         {
-            embedder = _embedder;
+            foreach (Entry e in Entries)
+            {
+                if (e.Priority > bestPriority)
+                {
+                    best = e.Embedder;
+                    bestPriority = e.Priority;
+                }
+            }
         }
 
-        return embedder?.Value
+        return best?.Value
             ?? throw new InvalidOperationException($"No embedding model is available. Add the NuGet package {DefaultPackageId}; models are never downloaded.");
     }
+
+    private sealed record Entry(string PackageId, int Priority, Lazy<IEmbedder> Embedder);
 }
