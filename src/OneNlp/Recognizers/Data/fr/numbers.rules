@@ -1,0 +1,185 @@
+# Number rules for French (fr-FR; Belgian and Swiss counting is included: septante, huitante, octante, nonante).
+#
+# Format: [section] headers, then one rule per line, fields separated by "|". "#" starts a comment.
+# Words are matched without regard to case. Hyphens between number words are read as spaces: quatre-vingt-dix-sept.
+
+[number.digits]
+system | french
+decimal | ,
+group | space nbsp nnbsp .
+negative | -−
+
+[number.cardinal]
+zéro | unit | 0
+zero | unit | 0
+un | unit | 1
+une | unit | 1
+deux | unit | 2
+trois | unit | 3
+quatre | unit | 4
+cinq | unit | 5
+six | unit | 6
+sept | unit | 7
+huit | unit | 8
+neuf | unit | 9
+dix | teen | 10
+onze | teen | 11
+douze | teen | 12
+treize | teen | 13
+quatorze | teen | 14
+quinze | teen | 15
+seize | teen | 16
+vingt | tens | 20
+vingts | tens | 20
+trente | tens | 30
+quarante | tens | 40
+cinquante | tens | 50
+soixante | tens | 60
+septante | tens | 70
+huitante | tens | 80
+octante | tens | 80
+nonante | tens | 90
+cent | bare-scale | 100
+cents | bare-scale | 100
+mille | bare-scale | 1000
+milles | bare-scale | 1000
+million | scale | 1000000
+millions | scale | 1000000
+milliard | scale | 1000000000
+milliards | scale | 1000000000
+billion | scale | 1000000000000
+billions | scale | 1000000000000
+billiard | scale | 1000000000000000
+billiards | scale | 1000000000000000
+
+[number.ordinal]
+premier | 1
+première | 1
+premiere | 1
+second | 2 | not-after-number
+seconde | 2 | not-after-number
+secondes | 2 | not-after-number
+unième | 1
+unieme | 1
+deuxième | 2
+deuxieme | 2
+troisième | 3
+troisieme | 3
+quatrième | 4
+quatrieme | 4
+cinquième | 5
+cinquieme | 5
+sixième | 6
+sixieme | 6
+septième | 7
+septieme | 7
+huitième | 8
+huitieme | 8
+neuvième | 9
+neuvieme | 9
+dixième | 10
+dixieme | 10
+onzième | 11
+onzieme | 11
+douzième | 12
+douzieme | 12
+treizième | 13
+treizieme | 13
+quatorzième | 14
+quatorzieme | 14
+quinzième | 15
+quinzieme | 15
+seizième | 16
+seizieme | 16
+vingtième | 20
+vingtieme | 20
+trentième | 30
+trentieme | 30
+quarantième | 40
+quarantieme | 40
+cinquantième | 50
+cinquantieme | 50
+soixantième | 60
+soixantieme | 60
+septantième | 70
+septantieme | 70
+huitantième | 80
+huitantieme | 80
+octantième | 80
+octantieme | 80
+nonantième | 90
+nonantieme | 90
+centième | 100
+centieme | 100
+millième | 1000
+millieme | 1000
+millionième | 1000000
+millionieme | 1000000
+milliardième | 1000000000
+milliardieme | 1000000000
+
+# The denominator a fraction word stands for: "trois quarts" is 3/4, "un demi" is 1/2.
+[number.fraction]
+demi | 2
+demie | 2
+demis | 2
+demies | 2
+tiers | 3
+quart | 4
+quarts | 4
+cinquième | 5
+cinquièmes | 5
+sixième | 6
+sixièmes | 6
+huitième | 8
+huitièmes | 8
+dixième | 10
+dixièmes | 10
+centième | 100
+centièmes | 100
+millième | 1000
+millièmes | 1000
+
+# "un" and "une" count only inside a longer number ("vingt et un", "un million"); alone they are the article.
+[number.lone-skip]
+un, une
+
+[number.connector]
+et
+
+[number.negative]
+moins
+
+[number.point]
+virgule
+
+[number.suffix]
+k | 1000 | any
+M | 1000000 | money
+Md | 1000000000 | money
+Mrd | 1000000000 | money
+
+# A number written with an ending: 1er 1re 1ère 2e 2ème 2nd 2nde 21e.
+[number.ordinal-suffix]
+er | 1 | not-teen
+re | 1 | not-teen
+ère | 1 | not-teen
+ere | 1 | not-teen
+e | 0123456789 | any
+ème | 0123456789 | any
+eme | 0123456789 | any
+nd | 2 | not-teen
+nde | 2 | not-teen
+
+[percent]
+%, pour cent, pourcent, pour cents, pct, ％
+
+[age.unit]
+year | an, ans, années, année
+month | mois
+week | semaine, semaines
+day | jour, jours
+
+# The words before a number that make a length of time an age: "âgé de 82 ans" is an age, "82 ans" alone is not.
+[age.prefix]
+âgé de, âgée de, âgés de, âgées de, age de, agé de, agée de, ages de

@@ -1327,6 +1327,7 @@ internal sealed partial class Scan
 
             EmitPrefixMoney(c);
             EmitSuffixed(c);
+            EmitAgePrefixed(c);
         }
 
         _doubt = false;
@@ -1368,6 +1369,55 @@ internal sealed partial class Scan
             PrefixEntry e = entries[0];
             _found.Add(MakeQuantity(start, c.End, QuantityKind.Money, value, null, null, e.Iso, e.Confidence));
             return;
+        }
+    }
+
+    /// <summary>French "âgé de 11 mois": words before the number say it is an age, and the span includes them.</summary>
+    private void EmitAgePrefixed(NumberCandidate c)
+    {
+        if (c.Attached || c.MoneyOnly || _d.AgePrefixes.Count == 0 || _d.AgeUnitsBare.Count == 0)
+        {
+            return;
+        }
+
+        int k = ItemIndexAt(c.Start);
+        if (k <= 0 || !GapOk(_items[k - 1].End, c.Start))
+        {
+            return;
+        }
+
+        int first = -1;
+        for (int n = Math.Min(_d.AgePrefixes.MaxItems, k); n >= 1 && first < 0; n--)
+        {
+            _sb.Clear();
+            Lexer.AppendKey(_sb, _t, _items, k - n, n);
+            if (_d.AgePrefixes.TryGet(_sb.ToString(), out _))
+            {
+                first = k - n;
+            }
+        }
+
+        int j = ItemIndexAt(c.End);
+        if (first < 0 || j >= _items.Count || !GapOk(c.End, _items[j].Start))
+        {
+            return;
+        }
+
+        for (int n = Math.Min(_d.AgeUnitsBare.MaxItems, _items.Count - j); n >= 1; n--)
+        {
+            int after = j + n;
+            if (after < _items.Count && _items[after].Start == _items[after - 1].End && _items[after].Kind != ItemKind.Other)
+            {
+                continue;
+            }
+
+            _sb.Clear();
+            Lexer.AppendKey(_sb, _t, _items, j, n);
+            if (_d.AgeUnitsBare.TryGet(_sb.ToString(), out List<string>? units))
+            {
+                _found.Add(MakeQuantity(_items[first].Start, _items[after - 1].End, QuantityKind.Measure, c.Value, units[0], "age", null, 1f));
+                return;
+            }
         }
     }
 

@@ -1,0 +1,59 @@
+# Currency rules, French. Same format as the English file (see there); the code list is shared in spirit and repeated for the language.
+#
+# [currency.symbol]: form | ISO 4217 code | prefix, suffix or both | confidence (optional).
+# [currency.name]:   forms, comma-separated | ISO 4217 code | value of one in the currency (optional) | confidence (optional).
+# The French form of a name after "de" is written with the elided preposition: "d'euros" (the apostrophe may be straight or curly).
+
+[currency.symbol]
+$ | USD | both | 0.9
+US$ | USD | prefix
+A$ | AUD | prefix
+C$ | CAD | prefix
+CA$ | CAD | prefix
+€ | EUR | both
+£ | GBP | both
+¥ | JPY | both | 0.7
+￥ | JPY | both | 0.7
+₹ | INR | both
+₩ | KRW | both
+₽ | RUB | both
+₺ | TRY | both
+₪ | ILS | both
+
+[currency.name]
+euro, euros, d'euros, d'euro | EUR | 1 | 0.95
+centime, centimes | EUR | 0.01 | 0.7
+eurocent, eurocents | EUR | 0.01
+dollar, dollars, de dollars, dollar américain, dollars américains, dollar us, dollars us | USD | 1 | 0.9
+dollar canadien, dollars canadiens | CAD
+dollar australien, dollars australiens | AUD
+dollar néo-zélandais, dollars néo-zélandais | NZD
+franc suisse, francs suisses, de francs suisses | CHF
+livre sterling, livres sterling, de livres sterling | GBP
+penny, pence | GBP | 0.01 | 0.7
+yen, yens | JPY
+yuan, yuans, renminbi | CNY
+roupie, roupies | INR
+rouble, roubles | RUB
+won, wons | KRW
+peso mexicain, pesos mexicains | MXN
+rand, rands | ZAR
+réal, reais, réal brésilien | BRL
+lire turque, livres turques | TRY
+couronne suédoise, couronnes suédoises | SEK
+couronne norvégienne, couronnes norvégiennes | NOK
+couronne danoise, couronnes danoises | DKK
+shekel, shekels | ILS
+baht, bahts | THB
+dirham, dirhams | AED | 1 | 0.8
+zloty, zlotys | PLN
+forint, forints | HUF
+
+[currency.code]
+AED, AFN, ALL, AMD, ANG, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYN, BZD
+CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, FKP, GBP, GEL
+GHS, GIP, GMD, GNF, GTQ, GYD, HKD, HNL, HTG, HUF, IDR, ILS, INR, IQD, IRR, ISK, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD
+KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MXV, MYR, MZN, NAD, NGN, NIO
+NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SHP, SLE, SOS, SRD
+SSP, STN, SVC, SYP, SZL, THB, TJS, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, UYI, UYU, UYW, UZS, VED, VES, VND, VUV
+WST, XAD, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XCG, XDR, XOF, XPD, XPF, XPT, XSU, XUA, YER, ZAR, ZMW, ZWG
