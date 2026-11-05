@@ -51,7 +51,7 @@ public class GermanSegmentationTests
         Assert.Same(SegmentationData.German, SegmentationData.ByName("german"));
         Assert.Equal("german", SegmentationData.For(Language.German).Name);
         Assert.Equal("english", SegmentationData.For(Language.English).Name);
-        Assert.Equal("neutral", SegmentationData.For(Language.French).Name);
+        Assert.Equal("neutral", SegmentationData.For(Language.FromCode("sw")).Name);
     }
 
     [Fact]
