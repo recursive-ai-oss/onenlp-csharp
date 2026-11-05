@@ -9,6 +9,8 @@ Packages depend on other Recursive AI libraries (`RecursiveAI.OneFont`, `Recursi
 - `src/OneNlp/Recognizers/Data/en/sequence.rules` lists the domain endings (top-level domains) of the IANA Root Zone Database, `tlds-alpha-by-domain.txt` version 2026110304 (https://data.iana.org/TLD/tlds-alpha-by-domain.txt). IANA dedicates its registry data to the public domain under CC0 1.0 (https://www.iana.org/help/licensing-terms).
 - `src/OneNlp/Recognizers/Data/en/currency.rules` lists the alphabetic currency codes of ISO 4217. The codes are facts of the published standard; the file carries no text of the standard.
 
+- `src/OneNlp/Tokenizers/Hf/NormalizationData.g.cs`, `ScriptData.g.cs` and `BertCleanData.g.cs` are generated from the Unicode Character Database 17.0.0 (`UnicodeData.txt`, `DerivedNormalizationProps.txt`, `DerivedAge.txt`, `Scripts.txt`), © Unicode, Inc., under the Unicode License v3 (https://www.unicode.org/license.txt): permission to deal in the Data Files without restriction, provided the copyright and permission notice appear with them.
+
 ## Test data (not packed)
 
 `tests/testdata/unicode/WordBreakTest.txt` and `SentenceBreakTest.txt` are the Unicode 17.0.0 UAX #29 conformance files, © 2025 Unicode, Inc., redistributed under the Unicode License v3 (https://www.unicode.org/license.txt). They are used only by the test project and are not part of any package.
