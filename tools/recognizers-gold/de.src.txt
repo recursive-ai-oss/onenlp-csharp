@@ -416,3 +416,173 @@ Dieses Buch erzählt die Geschichte eines alten Seemanns.
 Das Schaufenster der Buchhandlung ist sehr schön.
 Wir suchen eine einfache und dauerhafte Lösung.
 Der Wind weht stark über den Hügel.
+
+# ================================ development split ================================
+
+@split dev
+@ref 2026-03-18T10:30:00
+
+# ---- numbers
+Der Laden hat [[drei|number|3]] Räder und [[zwei|number|2]] Helme verkauft.
+Der Saal fasst [[2.400|number|2400]] nummerierte Sitze.
+Die Summe beträgt für die ganze Region [[1.250.000|number|1250000]].
+Sie las vor dem Schlafen [[einhundertfünfundvierzig|number|145]] Seiten.
+Er zahlte [[0,75|number|0.75]] mehr als geplant.
+Wir erwarten [[zweitausendfünfhundert|number|2500]] Besucher.
+[[Einundneunzig|number|91]] Kandidaten haben den Test gemacht.
+Der Roboter schafft [[6,02|number|6.02]] Umdrehungen pro Sekunde.
+Sie zählten [[fünfundsiebzig|number|75]] Stufen auf der Treppe.
+Er verlor in der Rangliste [[-3,5|number|-3.5]] Punkte.
+In der Region leben [[drei Millionen|number|3000000]] Menschen.
+Legen Sie [[zwölf|number|12]] Eier in die Schüssel.
+Sie schenkte der Bücherei [[vierhundert|number|400]] Bücher.
+Bei der letzten Inventur waren es [[eintausendzweihundert|number|1200]].
+Auf der Liste steht davor die Zahl [[dreiunddreißig|number|33]] in Rot.
+
+# ---- ordinals
+Das ist das [[siebte|ordinal|7]] Kapitel des Buches.
+Er wurde in der Gesamtwertung [[Erster|ordinal|1]] und strahlte.
+Sie belegt den [[2.|ordinal|2]] Platz auf dem Podest.
+Das Geschäft liegt im [[3.|ordinal|3]] Stock.
+Wir feiern das [[fünfzigste|ordinal|50]] Jubiläum des Vereins.
+Es war das [[zwölfte|ordinal|12]] Mal, dass wir kamen.
+Sie waren [[siebzigste|ordinal|70]] in der Wertung.
+Die [[1.|ordinal|1]] Reihe ist für Gäste reserviert.
+Er kam als [[zwanzigster|ordinal|20]] ins Ziel.
+Ihr [[99.|ordinal|99]] Sieg wurde gefeiert.
+
+# ---- percentages
+Die Erfolgsquote erreicht diesmal [[87 %|percentage|87]] insgesamt.
+Die Preise sind in der Zone um [[2,5 %|percentage|2.5]] gesunken.
+[[Dreißig Prozent|percentage|30]] der Schüler fehlten.
+Der Marktanteil beträgt insgesamt [[18 Prozent|percentage|18]].
+Die Mischung enthält [[0,3 %|percentage|0.3]] Salz.
+Die Abstimmung ergab [[51%|percentage|51]] der Stimmen.
+Es wird ein Satz von [[sechs Prozent|percentage|6]] angewandt.
+Das Update ist im Moment zu [[45{nbsp}%|percentage|45]] installiert.
+
+# ---- dimensions
+Die Straße bis zum Dorf ist [[30 km|dimension|30 kilometer]] lang.
+Die Mauer ist [[2,4 Meter|dimension|2.4 meter]] hoch.
+Die Tasche wiegt mit den Büchern [[12 Kilogramm|dimension|12 kilogram]].
+Für das Rezept braucht man [[1,5 Liter|dimension|1.5 liter]] Wasser.
+Der Garten misst insgesamt [[250 m²|dimension|250 square meter]].
+Der Zug fährt in der Spitze [[160 km/h|dimension|160 kilometer per hour]].
+Die Flasche enthält [[75 cl|dimension|75 centiliter]] Wein.
+Die Festplatte bietet [[500 GB|dimension|500 gigabyte]] freien Platz.
+Der Heizkessel verbraucht im Winter [[20 kW|dimension|20 kilowatt]].
+Er ist ohne Pause [[10 Kilometer|dimension|10 kilometer]] gelaufen.
+
+# ---- temperatures
+Im Saal herrschen [[18 °C|temperature|18 celsius]].
+Auf dem Gipfel zeigt das Thermometer [[-3 °C|temperature|-3 celsius]].
+In Hamburg werden es [[30 Grad|temperature|30 degree]].
+Erhitzen Sie das Wasser nur auf [[60 Grad Celsius|temperature|60 celsius]].
+Der Patient hat [[39 °C|temperature|39 celsius]] Fieber.
+Der Boden hat laut Sonde [[50°F|temperature|50 fahrenheit]].
+
+# ---- ages
+Ein [[82-jähriger|age|82 year]] Patient wurde in die Notaufnahme gebracht.
+Ein [[4-jähriges|age|4 year]] Mädchen wartet auf seine Mutter.
+Eine Katze ist [[11 Monate alt|age|11 month]] und wurde gefunden.
+Die Schülerin ist [[16 Jahre alt|age|16 year]] und hat gewonnen.
+
+# ---- money
+Das kostet insgesamt [[45 €|currency|45 EUR]].
+Die Fahrkarte kostet nur [[39,90 €|currency|39.9 EUR]].
+Sie gewann bei der Ziehung [[2.500.000 €|currency|2500000 EUR]].
+Er verkaufte die Uhr für [[300 Euro|currency|300 EUR]] ohne Zögern.
+Der Kaffee an der Bar kostet [[1,20 Euro|currency|1.2 EUR]].
+Die Rechnung für zwei Personen beträgt [[75 Dollar|currency|75 USD]].
+Der Kaufpreis der Wohnung liegt bei [[250.000 EUR|currency|250000 EUR]] netto.
+Sie erhielten [[zehntausend Euro|currency|10000 EUR]] Zuschuss.
+Die Fahrt vom Bahnhof kostet [[€8|currency|8 EUR]].
+Das Gericht steht für [[12,50 CHF|currency|12.5 CHF]] auf der Karte.
+
+# ---- sequences
+Schreiben Sie an [[clara.meier@beispiel.de|email]] für eine Antwort.
+Kontaktieren Sie [[kundendienst@laden.beispiel.com|email]] vor Monatsende.
+Unsere Seite ist [[https://www.beispiel.org/start|url]] und sehr ausführlich.
+Lesen Sie [[beispiel.com/hilfe/faq|url]] für die Antworten.
+Pingen Sie [[10.1.2.3|ip]] vom Arbeitsplatz aus an.
+Der Server [[2001:db8:0:1::5|ip]] ist erreichbar.
+Rufen Sie vor Mittag die [[030 555 0145|phone]] an.
+Die Nummer lautet [[+49 30 555 0145|phone]] für den Support.
+Machen Sie mit bei [[#Kaffeepause|hashtag]] und tauschen Sie sich aus.
+Danke [[@clara_m|mention]] für den Rat.
+Die Konto-Kennung ist [[c56a4180-65aa-42ec-a945-5fd21dec0538|guid]] auf dem Server.
+
+# ---- dates
+Das Konzert ist am [[12. September 2026|date|2026-09-12|day]] in Hamburg geplant.
+Die Anmeldung endet am [[30.06.2026|date|2026-06-30|day]] um Mitternacht.
+Er kam am [[2. Januar 2020|date|2020-01-02|day]] sehr spät an.
+Das Treffen ist auf [[Dienstag, den 24. März|date|2026-03-24|day]] verschoben.
+Wir ziehen am [[1. September|date|2026-09-01|day]] um.
+Das Gesetz tritt am [[31. Mai 2027|date|2027-05-31|day]] im ganzen Land in Kraft.
+Ich schreibe dir [[morgen|date|2026-03-19|day]] vom Bahnhof aus.
+Sie kam [[gestern|date|2026-03-17|day]] sehr müde zurück.
+Die Kontrolle findet [[nächsten Samstag|date|2026-03-28|day|alt=2026-03-21]] in der Schule statt.
+Die Verhandlung fand [[letzten Dienstag|date|2026-03-17|day|alt=2026-03-10]] vor Gericht statt.
+Wir sehen es [[in 5 Tagen|date|2026-03-23|day]] im Büro.
+Sie ist [[vor 10 Tagen|date|2026-03-08|day]] verreist.
+Die Lieferung ist [[in einem Monat|date|2026-04-18|day]] beim Kunden geplant.
+Die Kinder sind [[vor zwei Jahren|date|2024-03-18|day]] nach Deutschland gezogen.
+Die Ferien beginnen zu [[Weihnachten 2026|date|2026-12-25|day]] für die Schulen.
+Die Messe findet am [[Ostersonntag|date|2026-04-05|day]] im Dom statt.
+Das Feuerwerk gibt es am [[Heiligabend|date|2026-12-24|day]] wie immer.
+
+# ---- date ranges
+Die Messe findet [[nächste Woche|daterange|2026-03-23/2026-03-30|week]] in Berlin statt.
+Die Preise sinken [[nächsten Monat|daterange|2026-04-01/2026-05-01|month]] überall.
+Das Museum wurde [[2018|daterange|2018-01-01/2019-01-01|year]] im Zentrum eröffnet.
+Sie wurde im [[April 1987|daterange|1987-04-01/1987-05-01|month]] in Bremen geboren.
+Sie reisen [[vom 12. bis 20. August|daterange|2026-08-12/2026-08-21|day]] an die Ostsee.
+Die Baustelle dauert [[vom 2. Juni bis 30. Juni|daterange|2026-06-02/2026-07-01|day]] auf dem Platz.
+Der Unterricht endet [[nächsten Sommer|daterange|2026-06-01/2026-09-01|season|approx]] für alle.
+Der Unterricht beginnt im [[April 2026|daterange|2026-04-01/2026-05-01|month]] laut Kalender.
+Die Ergebnisse des [[ersten Halbjahres 2026|daterange|2026-01-01/2026-07-01|half]] sind gut.
+Die Gruppe wurde in den [[1980er Jahren|daterange|1980-01-01/1990-01-01|decade]] in Hamburg gegründet.
+Sie waren [[letztes Wochenende|daterange|2026-03-14/2026-03-16|day]] mit dem Auto am Meer.
+
+# ---- times
+Der Film beginnt um [[20:30 Uhr|time|T20:30|minute]] genau.
+Der Bus fährt um [[6:45 Uhr|time|T06:45|minute]] an der Schule vorbei.
+Der Laden schließt um [[19 Uhr|time|T19:00|hour]] an Werktagen.
+Der Termin ist um [[14:30|time|T14:30|minute]] vor dem Bahnhof.
+Wir essen meistens um [[13 Uhr|time|T13:00|hour]] zu Mittag.
+Das Spiel beginnt um [[21:00 MEZ|time|T21:00+01:00|minute]] live.
+Die Sitzung ist um [[zehn Uhr|time|T10:00|hour]] im blauen Saal.
+Das Abendessen gibt es um [[acht Uhr abends|time|T20:00|hour]] im Restaurant.
+
+# ---- datetimes
+Die Konferenz findet [[morgen um 14:30 Uhr|datetime|2026-03-19T14:30|minute]] im Theater statt.
+Die Abfahrt ist [[Samstag um 7 Uhr|datetime|2026-03-21T07:00|hour]] vor der Schule.
+Wir liefern am [[30. März um 16 Uhr|datetime|2026-03-30T16:00|hour]] zu Ihnen.
+Der Test beginnt [[2026-05-04 08:15|datetime|2026-05-04T08:15|minute]] auf dem Cluster.
+
+# ---- time ranges and date-time ranges
+Das Büro ist [[von 8 bis 12 Uhr|timerange|T08:00/T12:00|hour]] im Erdgeschoss geöffnet.
+Die Kinder spielen [[von 16 bis 18:30 Uhr|timerange|T16:00/T18:30|minute]] im Hof.
+Wir haben [[zwischen 12 und 14 Uhr|timerange|T12:00/T14:00|hour]] zum Mittagessen geöffnet.
+Ich bin [[morgen Abend|datetimerange|2026-03-19T18:00/2026-03-20T00:00|hour|approx]] für das Treffen frei.
+Der Besuch findet [[Donnerstag von 10 bis 12 Uhr|datetimerange|2026-03-19T10:00/2026-03-19T12:00|hour]] vor Ort statt.
+
+# ---- durations
+Das Stück dauert mit der Pause [[drei Stunden|duration|10800]].
+Die Reise mit dem Schiff dauert [[6 Tage|duration|518400]].
+Der Vertrag gilt [[2 Jahre|duration|P2Y]] ab Unterschrift.
+Er arbeitete [[4 Monate|duration|P4M]] für diese Firma.
+Planen Sie [[15 Minuten|duration|900]] für die Vorbereitung ein.
+Sie schwamm [[1 Stunde und 15 Minuten|duration|4500]] ohne Halt.
+
+# ---- sets
+Der Markt findet [[jeden Samstag|set|XXXX-WXX-6|day]] auf dem Platz statt.
+Die Besprechung ist [[jeden Dienstag um 10 Uhr|set|XXXX-WXX-2T10:00|hour]] per Video.
+Die Tabelle wird [[alle 2 Stunden|set|PT2H|hour]] vom System aktualisiert.
+Der Bus fährt [[jeden Tag|set|P1D|day]] am Rathaus vorbei.
+
+# ---- nothing
+Die Katze schläft in der Sonne auf dem Fensterbrett.
+Wir haben eine Gemüsesuppe für das Abendessen gekocht.
+Der Gärtner schneidet geduldig die Rosen.
+Diese Geschichte hat mich sehr berührt.
