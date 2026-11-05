@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Recursive AI libraries, from nuget.org. -->
-    <PackageVersion Include="RecursiveAI.OneFont" Version="1.4.0-preview.1" />
+    <PackageVersion Include="RecursiveAI.OneFont" Version="1.4.0" />
     <PackageVersion Include="RecursiveAI.OneModel" Version="1.0.0" />
     <PackageVersion Include="RecursiveAI.OneModel.Training" Version="1.0.0" />
     <!-- Test, benchmark and fuzz projects only. -->
