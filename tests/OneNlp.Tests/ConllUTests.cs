@@ -112,6 +112,32 @@ public class ConllUTests
         Assert.Equal("B", s[1].Doc.Text);
     }
 
+    [Fact]
+    public void AMultiwordTokenShorterThanItsWordsSpellsTheWordsInTheText()
+    {
+        // Synthetic: one character standing for two words, then a one-character token for three words (as in Portuguese contractions).
+        const string Text =
+            "1-2\t\u00e0\t_\t_\t_\t_\t_\t_\t_\t_\n"
+            + "1\ta\ta\tADP\t_\t_\t3\tcase\t_\t_\n"
+            + "2\ta\ta\tDET\t_\t_\t3\tdet\t_\t_\n"
+            + "3\tcasa\tcasa\tNOUN\t_\t_\t0\troot\t_\t_\n\n";
+        ConllUSentence s = Parse(Text)[0];
+        Doc d = s.Doc;
+        Assert.Equal(3, d.Length);
+        Assert.Equal("a a casa", d.Text);
+        Assert.Equal((0, 1), (d[0].Idx, d[0].EndIdx));
+        Assert.Equal((2, 3), (d[1].Idx, d[1].EndIdx));
+        Assert.Equal((4, 8), (d[2].Idx, d[2].EndIdx));
+        Assert.Equal(new MultiwordToken(0, 1, "\u00e0", string.Empty), s.MultiwordTokens[0]);
+        var sb = new StringBuilder();
+        using (var w = new StringWriter(sb))
+        {
+            ConllUWriter.Write(w, s);
+        }
+
+        Assert.StartsWith("1-2\t\u00e0\t", sb.ToString(), StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData("1\tA\ta\tX\t_\t_\t0\troot\t_\n", 1, "10 tab-separated columns")]
     [InlineData("1\tA\ta\tX\t_\t_\t0\troot\t_\t_\n3\tB\tb\tX\t_\t_\t1\tdep\t_\t_\n", 2, "out of sequence")]

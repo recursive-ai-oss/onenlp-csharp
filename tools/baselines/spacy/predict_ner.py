@@ -2,13 +2,25 @@
 """Runs a trained spaCy NER pipeline over a UNER .iob2 file (gold tokens, one sentence at a time)
 and writes 'token<TAB>gold<TAB>predicted' lines with a blank line between sentences.
 
-usage: predict_ner.py <model-dir> <gold.iob2> <out.tsv>
+usage: predict_ner.py <model-dir> <gold.iob2> <out.tsv> [<TYPE=LABEL,...>]
+
+The optional map renames the gold entity types and turns unlisted types into O, as prepare_ner.py did for training.
 """
 import sys
 
 import spacy
 from spacy.tokens import Doc
 
+
+
+TYPE_MAP = None
+
+
+def relabel(tag):
+    if TYPE_MAP is None or tag == "O":
+        return tag
+    prefix, typ = tag.split("-", 1)
+    return f"{prefix}-{TYPE_MAP[typ]}" if typ in TYPE_MAP else "O"
 
 
 def read_sentences(path):
@@ -26,7 +38,7 @@ def read_sentences(path):
                 text, rows = None, []
             else:
                 cols = line.split("\t")
-                rows.append((cols[1], cols[2]))
+                rows.append((cols[1], relabel(cols[2])))
     if rows:
         yield text, rows
 
@@ -43,7 +55,10 @@ def spaces_for(text, words):
 
 
 def main():
+    global TYPE_MAP
     model, gold, dst = sys.argv[1:4]
+    if len(sys.argv) > 4:
+        TYPE_MAP = dict(kv.split("=") for kv in sys.argv[4].split(","))
     nlp = spacy.load(model)
     n = 0
     with open(dst, "w", encoding="utf-8") as out:
