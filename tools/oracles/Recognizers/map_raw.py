@@ -17,12 +17,20 @@ import sys
 from decimal import Decimal
 
 CURRENCY = {
+    "Franc Suisse": "CHF", "Livre": "GBP",
     "Dollar": "USD", "United States dollar": "USD", "Euro": "EUR", "Pound": "GBP", "British pound": "GBP", "Yen": "JPY",
     "Japanese yen": "JPY", "Indian rupee": "INR", "Rupee": "INR", "Swiss franc": "CHF", "Canadian dollar": "CAD",
     "Australian dollar": "AUD",
 }
-TEMPERATURE = {"c": "celsius", "f": "fahrenheit", "k": "kelvin", "degree": "degree", "celsius": "celsius", "fahrenheit": "fahrenheit",
+TEMPERATURE = {"c": "celsius", "f": "fahrenheit", "k": "kelvin", "degree": "degree", "degré": "degree", "celsius": "celsius", "fahrenheit": "fahrenheit",
                "kelvin": "kelvin"}
+# French unit names the comparator reports in the culture's language, mapped to the English names the gold values use.
+UNIT_NAMES = {
+    "ans": "year", "jour": "day", "jours": "day", "mois": "month", "semaines": "week", "semaine": "week", "centilitre": "centiliter",
+    "kilogramme": "kilogram", "kilomètre par heure": "kilometer per hour", "kilomètres": "kilometer", "kilomètre": "kilometer",
+    "litre": "liter", "mètre carré": "square meter", "mètres": "meter", "mètre": "meter", "degré": "degree", "gigaoctet": "gigabyte",
+    "giga-octet": "gigabyte", "kilowatt": "kilowatt",
+}
 SEQUENCE = {"email", "url", "ip", "phone", "hashtag", "mention", "guid"}
 
 
@@ -161,12 +169,12 @@ def map_result(r, ref_date):
         iso = res.get("isoCurrency") or CURRENCY.get(res.get("unit", ""), res.get("unit", "").upper())
         out.update(type="currency", value=f"{canon(res['value'])} {iso}")
     elif model == "dimension":
-        out.update(type="dimension", value=f"{canon(res['value'])} {res['unit'].lower()}")
+        out.update(type="dimension", value=f"{canon(res['value'])} {UNIT_NAMES.get(res['unit'].lower(), res['unit'].lower())}")
     elif model == "temperature":
         u = res.get("unit", "Degree")
         out.update(type="temperature", value=f"{canon(res['value'])} {TEMPERATURE.get(u.lower(), u.lower())}")
     elif model == "age":
-        out.update(type="age", value=f"{canon(res['value'])} {res['unit'].lower()}")
+        out.update(type="age", value=f"{canon(res['value'])} {UNIT_NAMES.get(res['unit'].lower(), res['unit'].lower())}")
     elif model in SEQUENCE:
         out.update(type=model)
     elif model == "datetime":
