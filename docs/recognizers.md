@@ -268,8 +268,51 @@ Words and symbols (not numbers or dates) are what the rules recognize; the seque
 
 - Compound measures cover pairs in the data only (two terms); `1 yard 2 feet 3 inches` gives the first pair and a separate `3 inches`.
 - A number whose exponent leaves the range of a `decimal` (`9.1×10⁻³¹`) is not reported.
-- Locale-aware separators (`18.000 EUR` as eighteen thousand) are not read; the English rules take `.` as the decimal point.
+- Separators are per language: English takes `.` as the decimal point and `,` as the group separator; French and German read `18.000 EUR` as eighteen thousand and `3,5` as three and a half.
 - Business-day arithmetic ignores public holidays.
 - Number words glued to digits (`5 hundred thousand`) read the first scale word only.
 - Phone-like detection will miss shapes outside the list above and will accept some number groups that are not phones: it is a guess, with confidence 0.7.
 - The engine takes a `RecognitionContext` with a reference date and region; the number, unit, currency and sequence rules ignore it, the date and time rules use it.
+
+## French and German
+
+French (`fr-FR`) and German (`de-DE`) are data sets on the same engine: `Data/<lang>/{numbers,units,currency,datetime,holidays}.rules`, with the language-neutral sequence rules in `Data/shared/`. Use `Recognizer.For(Language.French)`, or `Nlp.Quantities`, `Numbers`, `Sequences`, `Dates` and `ParseDate` with a `Language` argument. English results are unchanged.
+
+### Numbers
+
+- `number.digits` also takes `system` (`english`, `french`, `german`) and `ordinal-dot` (`yes` makes `3.` an ordinal). `group` takes several separators by name or character: `space nbsp nnbsp .` for French (space, no-break space, narrow no-break space, dot), `.` for German. A group separator counts only between groups of exactly three digits, so `3.5` stays a decimal in English and `2 400` is 2400 in French.
+- **French** counting is the `french` system: `quatre-vingt-dix-sept` (four twenties and seventeen), `soixante et onze`, `vingt et un`, `septante`, `huitante`, `octante` and `nonante` as plain tens, hundreds with a plural `cents`, `mille` without a count. Cardinals of kind `bare-scale` (`cent`, `mille`, `hundert`, `tausend`) may stand for one of themselves.
+- **German** counting is the `german` system: a whole number below a million is one word. The word is cut into the parts listed in `number.cardinal` (units, teens, tens, `hundert`, `tausend`) and the connector `und`, in the order units before tens (`dreihundertvierundzwanzig`). Ordinals are stems (`number.ordinal` rows whose word ends in `~`, as `dritt~`) plus the endings of `number.ordinal-ending`; `einundzwanzigste` is 21. `number.ordinal-dot-word` lists capitalized nouns that make the dot after a number an ordinal (`5. Stock`); a month name or a lower-case word does it already.
+- `number.lone-skip` lists words that count only inside a longer number (`un`, `ein`), so the article is not a number but `vingt et un` is.
+- `number.ordinal-suffix` rows serve French endings (`1er`, `1re`, `2e`, `2nd`).
+- `age.prefix` (French `âgé de`) puts words before the number into the span of an age; `age.word` (German `jährig`, `4-jähriges`) is an age unit that needs no `alt`.
+
+### Dates and times
+
+Dates are day first wherever `time.region` is not `us`. The extra word roles of `time.word`:
+
+| Role | Meaning |
+|---|---|
+| `determiner` | an article that belongs to the expression when it starts it: `le 3 mars`, `la semaine prochaine` |
+| `agoprefix` | the word before an amount that means "ago": `il y a`, `vor` |
+| `dayaftertomorrow`, `daybeforeyesterday` | `après-demain`, `übermorgen`, `avant-hier`, `vorgestern` |
+| `nextpost`, `lastpost` | `next` and `last` after the noun: `samedi prochain`, `mardi dernier` |
+| `hourmark`, `hourword` | the mark of the 24-hour clock: `15h30`, `15 Uhr` (strong), and `heures` (weak: also a length of time, a time only after an at-word or `clockcue`, with minutes or a part of the day, or with a clock tail) |
+| `clockcue` | a word before an hour that makes it a time: `il est huit heures` |
+| `plus15`, `plus30`, `minus15`, `minus` | the tail of an hour: `et quart`, `et demie`, `moins le quart`, `moins dix` |
+| `halfbefore`, `plusquarter`, `minusquarter` | words before an hour: `halb drei` (2:30), `Viertel nach drei`, `Viertel vor drei` |
+| `andhalf` | `et demi` after a unit: `trois jours et demi` |
+| `daypartprefix` | words between an hour and a part of the day: `huit heures du soir` |
+| `decadeprefix`, `decadesuffix`, `decadeword` | `les années 1990`, `1990er Jahre` |
+
+`half` also covers `demi-heure` and `eine halbe Stunde` as 30 minutes. `time.flag` switches on behaviours: `daypart-direct` (German `acht Uhr abends`), `no-lone-day` (`la 2e place` is an ordinal, not the next 2nd), `bare-hour-24` (`von 16 bis 18:30 Uhr`), `determiner-inside-only` (German: a determiner stays out of the span except in `Dienstag, den 24. März`). `time.region` names the default region (`fr`, `de`).
+
+Holidays: `fr` is the French public holidays of the Code du travail L3133-1 (1 January, Easter Monday, 1 May, 8 May, Ascension, Whit Monday, 14 July, 15 August, 1 November, 11 November, 25 December) with Easter itself and the customary feasts; `de` is the nationwide German holidays (New Year, Good Friday, Easter Monday, 1 May, Ascension, Whit Monday, 3 October, Christmas Day and Boxing Day) with the customary and regional feasts (Rosenmontag, Fronleichnam, Allerheiligen, Reformationstag) listed without regional limits.
+
+### Limits (French and German)
+
+- Written-out numbers glued to an age word (`sechsjährig`) and `zweieinhalb`, `anderthalb`, `une quinzaine` are not read.
+- `midi`, `Mittag`, `minuit` and `Mitternacht` are not times on their own; the gold sets do not label them.
+- `ce mois-ci` is not read.
+- Belgian and Swiss counting (`septante`, `nonante`, `huitante`) is read; Swiss `Franken` are francs.
+- The French and German unit tables are shorter than the English one.
