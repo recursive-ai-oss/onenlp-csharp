@@ -145,6 +145,25 @@ public sealed class UaxWordTokenizer : IWordTokenizer
             return NextBoundary(text, end);
         }
 
+        // Dutch short forms that start with an apostrophe ('t, 's, 'n, 'm) and years without their century ('69): the apostrophe and the
+        // word after it are one token, whatever UAX #29 says about a mark at the start of a word.
+        if (end - pos == 1 && text[pos] is '\'' or '’' && end < n && (_data.LeadingApostropheWords.Count > 0 || _data.ApostropheYears)
+            && (pos == 0 || !char.IsLetterOrDigit(text[pos - 1])))
+        {
+            int run = end;
+            while (run < n && char.IsLetterOrDigit(text[run]))
+            {
+                run++;
+            }
+
+            ReadOnlySpan<char> word = text.AsSpan(end, run - end);
+            if (run > end && (_data.LeadingApostropheWords.GetAlternateLookup<ReadOnlySpan<char>>().Contains(word)
+                || (_data.ApostropheYears && word.Length == 2 && char.IsAsciiDigit(word[0]) && char.IsAsciiDigit(word[1]))))
+            {
+                end = run;
+            }
+        }
+
         if (end - pos == 1 && Array.IndexOf(_data.MarkRuns, text[pos]) >= 0)
         {
             // A run of marks ("...", "--", "?!", "$$$") is one token.
@@ -171,6 +190,13 @@ public sealed class UaxWordTokenizer : IWordTokenizer
             if (c == '.' && (IsAbbreviation(text.AsSpan(pos, end - pos)) || IsInitial(text, pos, end) || (_data.OrdinalDot && IsOrdinal(text, pos, end))))
             {
                 return end + 1;
+            }
+
+            // Dutch amounts in whole guilders end in a dash: "5,-", "130.000,-".
+            if (_data.DashAmounts && c is ',' or '.' && end + 1 < n && text[end + 1] == '-' && IsDigitBefore(text, end)
+                && (end + 2 >= n || !char.IsLetterOrDigit(text[end + 2])))
+            {
+                return end + 2;
             }
 
             // "n\u00b0 12": the numero sign stays with its letter.
