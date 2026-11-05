@@ -87,7 +87,7 @@ internal sealed class RecognizerData
     /// <summary>Pairs of units written one after the other as one length ("5 feet 3 inches"): key "larger|smaller", value smaller units in one larger.</summary>
     internal Dictionary<string, decimal> Compounds { get; } = new(StringComparer.Ordinal);
 
-    internal Dictionary<string, AmbiguousMoney> AmbiguousMoney { get; } = new(StringComparer.Ordinal);
+    internal Dictionary<string, AmbiguousMoney> AmbiguousMoney { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     internal FormTable<ScaleSuffix> ScaleSuffixes { get; } = new();
 

@@ -154,13 +154,13 @@ internal sealed partial class Scan
     /// </summary>
     private bool IsNotNumber(int i, ReadOnlySpan<char> word)
     {
-        if (!_d.NotNumbers.TryGetValue(word.ToString(), out NotNumberRule? rule))
+        if (!_d.NotNumbers.GetAlternateLookup<ReadOnlySpan<char>>().TryGetValue(word, out NotNumberRule? rule))
         {
             return false;
         }
 
         if (i > 0 && _items[i - 1].Kind == ItemKind.Word && GapOk(_items[i - 1].End, _items[i].Start)
-            && rule.Before.Contains(_t.Substring(_items[i - 1].Start, _items[i - 1].End - _items[i - 1].Start)))
+            && rule.Before.GetAlternateLookup<ReadOnlySpan<char>>().Contains(Span(i - 1)))
         {
             return true;
         }
@@ -173,7 +173,7 @@ internal sealed partial class Scan
         Item nx = _items[i + 1];
         if (nx.Kind == ItemKind.Word && GapOk(_items[i].End, nx.Start))
         {
-            return rule.After.Contains(_t.Substring(nx.Start, nx.End - nx.Start));
+            return rule.After.GetAlternateLookup<ReadOnlySpan<char>>().Contains(Span(i + 1));
         }
 
         // "one's": an apostrophe and an s touching the word.
@@ -1091,13 +1091,14 @@ internal sealed partial class Scan
 
             _sb.Clear();
             Lexer.AppendKey(_sb, _t, _items, j, n);
-            if (!_d.Suffixes.TryGet(_sb.ToString(), out List<SuffixEntry>? entries))
+            string suffixKey = _sb.ToString();
+            if (!_d.Suffixes.TryGet(suffixKey, out List<SuffixEntry>? entries))
             {
                 continue;
             }
 
             int end = _items[after - 1].End;
-            if (_d.AmbiguousMoney.Count > 0 && _d.AmbiguousMoney.TryGetValue(_sb.ToString().ToLowerInvariant(), out AmbiguousMoney? money)
+            if (_d.AmbiguousMoney.Count > 0 && _d.AmbiguousMoney.TryGetValue(suffixKey, out AmbiguousMoney? money)
                 && IsMoneyContext(c, after, money) && TryMultiply(c.Value, money.Factor, out decimal amount))
             {
                 _found.Add(MakeQuantity(c.Start, end, QuantityKind.Money, amount, null, null, money.Iso, 0.8f));
@@ -1206,33 +1207,14 @@ internal sealed partial class Scan
         }
     }
 
-    private Dictionary<int, List<Quantity>> QuantitiesByStart()
-    {
-        var byStart = new Dictionary<int, List<Quantity>>();
-        foreach (Recognition r in _found)
-        {
-            if (r is Quantity q)
-            {
-                if (!byStart.TryGetValue(q.Start, out List<Quantity>? list))
-                {
-                    byStart[q.Start] = list = [];
-                }
-
-                list.Add(q);
-            }
-        }
-
-        return byStart;
-    }
-
     /// <summary>"five thousand dollars ($5,000)", "fifty percent (50%)": the same as <see cref="MergeParentheticals"/> for amounts with a unit.</summary>
     private void MergeParentheticalResults()
     {
-        Dictionary<int, List<Quantity>>? byStart = null;
         int count = _found.Count;
         for (int k = 0; k < count; k++)
         {
-            if (_found[k] is not Quantity q || q.Kind == QuantityKind.Ordinal || q.Kind == QuantityKind.Cardinal || !char.IsLetter(q.Text[0]))
+            if (_found[k] is not Quantity q || q.Kind == QuantityKind.Ordinal || q.Kind == QuantityKind.Cardinal || !char.IsLetter(q.Text[0])
+                || !OpenBracketAfter(q.End))
             {
                 continue;
             }
@@ -1243,14 +1225,13 @@ internal sealed partial class Scan
                 continue;
             }
 
-            byStart ??= QuantitiesByStart();
-            if (!byStart.TryGetValue(_items[j].End, out List<Quantity>? inner))
+            for (int m = 0; m < count; m++)
             {
-                continue;
-            }
+                if (_found[m] is not Quantity p || p.Start != _items[j].End)
+                {
+                    continue;
+                }
 
-            foreach (Quantity p in inner)
-            {
                 bool closed = p.End < _t.Length && _t[p.End] == ')';
                 bool same = p.Kind == q.Kind && p.Currency == q.Currency && p.Unit == q.Unit;
                 bool plain = p.Kind == QuantityKind.Cardinal && q.Kind is QuantityKind.Money or QuantityKind.Measure;
@@ -1273,6 +1254,18 @@ internal sealed partial class Scan
         }
     }
 
+    /// <summary>A cheap test before the item search: an opening bracket follows after at most two white-space characters.</summary>
+    private bool OpenBracketAfter(int pos)
+    {
+        int p = pos;
+        while (p < _t.Length && p - pos < 2 && _t[p] == ' ')
+        {
+            p++;
+        }
+
+        return p < _t.Length && _t[p] == '(';
+    }
+
     /// <summary>"5 feet 3 inches" is one length: two measures of one dimension that the compound rules pair, joined by white space, a comma or "and".</summary>
     private void MergeCompounds()
     {
@@ -1281,7 +1274,7 @@ internal sealed partial class Scan
             return;
         }
 
-        Dictionary<int, List<Quantity>>? byStart = null;
+        var connectors = _connectors;
         int count = _found.Count;
         for (int k = 0; k < count; k++)
         {
@@ -1290,14 +1283,13 @@ internal sealed partial class Scan
                 continue;
             }
 
-            int j = ItemIndexAt(a.End);
-            int next = j;
+            int next = ItemIndexAt(a.End);
             if (next < _items.Count && Ch(next, ',') && _items[next].Start == a.End)
             {
                 next++;
             }
 
-            if (next < _items.Count && _items[next].Kind == ItemKind.Word && string.Equals(Span(next).ToString(), "and", StringComparison.OrdinalIgnoreCase))
+            if (next < _items.Count && _items[next].Kind == ItemKind.Word && connectors.Contains(Span(next)))
             {
                 next++;
             }
@@ -1307,16 +1299,10 @@ internal sealed partial class Scan
                 continue;
             }
 
-            byStart ??= QuantitiesByStart();
-            if (!byStart.TryGetValue(_items[next].Start, out List<Quantity>? seconds))
+            for (int m = 0; m < count; m++)
             {
-                continue;
-            }
-
-            foreach (Quantity b in seconds)
-            {
-                if (b.Kind == QuantityKind.Measure && a.Unit is not null && b.Unit is not null && b.Value >= 0
-                    && _d.Compounds.TryGetValue(a.Unit + "|" + b.Unit, out decimal factor) && b.Value < factor)
+                if (_found[m] is Quantity b && b.Start == _items[next].Start && b.Kind == QuantityKind.Measure && a.Unit is not null && b.Unit is not null
+                    && b.Value >= 0 && _d.Compounds.TryGetValue(a.Unit + "|" + b.Unit, out decimal factor) && b.Value < factor)
                 {
                     _found.Add(MakeQuantity(a.Start, b.End, QuantityKind.Measure, (a.Value * factor) + b.Value, b.Unit, b.Dimension, null, Math.Min(a.Confidence, b.Confidence)));
                     break;
