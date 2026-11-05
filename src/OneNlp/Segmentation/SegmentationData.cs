@@ -20,11 +20,11 @@ public sealed partial class SegmentationData
     private static readonly char[] GermanMarkRunChars = ['.', '-', '*', '=', '_', '~', '<', '>', '#', '$', '+', '/', '\\', '`', '\''];
     private static readonly string[] CommonEmoticons = [":-)", ":)", ":-(", ":(", ";-)", ";)", ":-D", ":D", ":-P", ":P", ":'(", ":-/", ":/", ":-O", ":O", "<3", "=)", "=D", "^_^"];
 
-    /// <summary>The name of the built-in data set: <c>none</c>, <c>neutral</c>, <c>english</c>, <c>french</c>, <c>german</c>, <c>portuguese</c>, <c>dutch</c> or <c>turkish</c>. Saved pipelines record it.</summary>
+    /// <summary>The name of the built-in data set: <c>none</c>, <c>neutral</c>, <c>english</c>, <c>french</c>, <c>german</c>, <c>portuguese</c>, <c>dutch</c>, <c>turkish</c> or <c>spanish</c> or <c>spanish</c>. Saved pipelines record it.</summary>
     public string Name { get; private init; } = string.Empty;
 
     /// <summary>Finds a built-in data set by its <see cref="Name"/>.</summary>
-    /// <param name="name"><c>none</c>, <c>neutral</c>, <c>english</c>, <c>french</c>, <c>german</c>, <c>portuguese</c>, <c>dutch</c> or <c>turkish</c>.</param>
+    /// <param name="name"><c>none</c>, <c>neutral</c>, <c>english</c>, <c>french</c>, <c>german</c>, <c>portuguese</c>, <c>dutch</c>, <c>turkish</c> or <c>spanish</c> or <c>spanish</c>.</param>
     /// <returns>The data set.</returns>
     /// <exception cref="ArgumentException">There is no such data set.</exception>
     public static SegmentationData ByName(string name) => name switch
@@ -37,7 +37,8 @@ public sealed partial class SegmentationData
         "portuguese" => Portuguese,
         "dutch" => Dutch,
         "turkish" => Turkish,
-        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral, english, french, german, portuguese, dutch or turkish.", nameof(name)),
+        "spanish" => Spanish,
+        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral, english, french, german, portuguese, dutch, turkish or spanish.", nameof(name)),
     };
 
     /// <summary>No adjustments: tokens are the UAX #29 word segments that are not white space.</summary>
@@ -131,6 +132,14 @@ public sealed partial class SegmentationData
             "quartal", "jahrhundert", "jahrtausend", "weltkrieg", "platz", "liga", "bundesliga", "stock", "og", "klasse", "mal", "auflage", "runde", "etappe", "spieltag", "tag" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase),
     };
 
+    /// <summary>
+    /// Spanish: the neutral defaults plus UD Spanish tokenization. The contractions <c>del</c> and <c>al</c> and verbs with enclitic
+    /// pronouns (<c>dárselo</c>, <c>conseguirlo</c>, <c>situándose</c>) are cut into one piece for each word of the multiword token the treebank
+    /// annotates (<c>de</c> + <c>el</c>, <c>dar</c> + <c>se</c> + <c>lo</c>); a few abbreviations keep their full stop (<c>Sr.</c>, <c>fig.</c>, <c>EE.UU.</c>,
+    /// single capital letters). <see cref="TryMatchMultiword"/> gives the words of such a token.
+    /// </summary>
+    public static SegmentationData Spanish { get; } = CreateSpanish();
+
     private SegmentationData(
         bool keepUrlsAndEmails, bool joinHyphenated, string[]? hyphenPrefixes, char[] digitJoiners, char[] markRuns, string[] emoticons, Dictionary<string, int[]> specialCases,
         string[] abbreviations, string[] clitics, bool nTSuffix, string[] nonFinalAbbreviations)
@@ -191,10 +200,10 @@ public sealed partial class SegmentationData
     /// <summary>Tokens (with the full stop) after which the sentencizer never starts a sentence.</summary>
     internal FrozenSet<string> NonFinalAbbreviations { get; }
 
-    /// <summary>Picks the data for a language: English, French, German, Portuguese, Dutch and Turkish have their own; every other language gets the neutral defaults.</summary>
+    /// <summary>Picks the data for a language: English, French, German, Portuguese, Dutch, Turkish and Spanish have their own; every other language gets the neutral defaults.</summary>
     /// <param name="language">The language.</param>
     /// <returns>The data; never <see langword="null"/>.</returns>
     public static SegmentationData For(Language language) =>
         language == Language.English ? English : language == Language.French ? French : language == Language.German ? German
-        : language == Language.Portuguese ? Portuguese : language == Language.Dutch ? Dutch : language == Language.Turkish ? Turkish : Neutral;
+        : language == Language.Portuguese ? Portuguese : language == Language.Dutch ? Dutch : language == Language.Turkish ? Turkish : language == Language.Spanish ? Spanish : Neutral;
 }
