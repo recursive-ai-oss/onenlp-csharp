@@ -13,6 +13,7 @@
 #                    rangeto (connects the ends of a range), from, between, every, each, other, early, mid, late, after, before, half, quarter,
 #                    past (the past three days), article, the, oclock, approx (about, around), weekend,
 #                    zonebase (UTC, GMT: followed by an offset), quarterprefix (Q1), halfprefix (H1)
+# Role secondfollow: words that, after "a second", make it a length of time ("wait a second to see", "a second ago").
 # [time.recurrence]  TIMEX3 period | unit | forms (daily, weekly)
 # [time.zone]        forms | offset in minutes | "z" when the zone is written Z (UTC)
 
@@ -50,6 +51,14 @@ month | month, months | 0 | 1
 quarter | quarter, quarters | 0 | 3
 year | year, years, yr, yrs | 0 | 12
 decade | decade, decades | 0 | 120
+# Business units have no fixed length (no seconds, no months): they are counted, never converted.
+business day | business day, business days, working day, working days, work day, work days, workday, workdays | 0 | 0
+business hour | business hour, business hours, working hour, working hours | 0 | 0
+# Calendar units say the count is of plain days, weeks, months or years.
+day | calendar day, calendar days | 86400 | 0
+week | calendar week, calendar weeks | 604800 | 0
+month | calendar month, calendar months | 0 | 1
+year | calendar year, calendar years | 0 | 12
 
 [time.season]
 spring | spring | 3 | 3
@@ -95,6 +104,7 @@ mid | mid
 late | late
 after | after, from
 past | past
+secondfollow | ago, later, or, to, please, before, after, while, then, until
 before | before
 half | half
 quarter | quarter

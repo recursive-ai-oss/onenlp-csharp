@@ -53,6 +53,8 @@ A result overlapping one already taken is dropped. So `$5 million` (money) beats
 ### Digits
 
 - Integer and decimal numbers with `.` as the decimal separator and `,` as the group separator (set in the rule data). A group is exactly three digits after a first run of one to three digits: `1,234,567.89` is one number; `1,2345` is two; `12,34` is two.
+- Indian digit grouping is read too: a first run of one or two digits, then groups of two digits, then a last group of three (`1,00,000`, `12,34,567`, `1,23,45,678`). `1,23,45` has no three-digit group at the end, so it is three numbers.
+- Scientific notation: a mantissa followed by `e` or `E` and a signed exponent of up to three digits (`6.02e23`, `2E-3`), or by a times sign (`×`, `x`, `X`, `*`) and `10` with the exponent after `^` or `**` (`6.02 × 10^23`, `1.5×10^3`) or in superscript digits (`2.5×10³`). The exponent must not run into a letter or digit (`7e5x` is no number). A value that does not fit a `decimal`, or underflows to zero (`9.1×10⁻³¹`), is not reported. `3 x 10 apples` is two numbers: a times sign counts only with an exponent.
 - A leading decimal point is a number: `.5` is 0.5.
 - A dotted run of more than one decimal point (`1.2.3`, `25.12.2020`) is not a number: it is a version or a date.
 - A sign: `-5` is negative when the hyphen follows white space, an opening bracket, a quote, `:`, `;`, `=`, `<`, `>`, `~`, `,` or a currency sign, or starts the text. After a digit it is a range (`3-5` is 3 and 5). After a letter it is part of a name (`COVID-19`, `B-52`: no number). `−` (U+2212) is treated like `-`. `minus` and `negative` before a number also negate it.
@@ -71,10 +73,20 @@ A result overlapping one already taken is dropped. So `$5 million` (money) beats
 - Fractions: `three quarters` (0.75), `a half`, `two thirds`; a fraction word needs a numerator, so `half` alone is not a number. Mixed numbers: `two and three quarters`, `one and a half`.
 - Decimals: `three point one four` is 3.14: every word after `point` is one digit. A scale word may follow a decimal or a mixed number: `two and a half million`.
 - The longest well-formed prefix wins: `one two` is two numbers; `one hundred hundred` is 100 followed by an unread `hundred`.
+- A lone word that is also a pronoun or an idiom is not a number when a neighbour says so (`number.not-number`): `no one`, `the one`, `which one`, `one of them`, `one another`, `one's own`, and a word ordinal before `time` (`for the first time`, `for the second time`). `one apple` and `I have one` stay numbers; `one hundred and one` is untouched, since only a word standing alone is judged.
+
+### Numerals repeated in brackets
+
+Drafted text repeats an amount: `sixty (60) days`, `five thousand dollars ($5,000)`, `fifty percent (50%)`, `ten (10) business days`.
+
+- A number written in words followed (one white-space character at most) by a bracketed number written in digits with the same value is one number: `sixty (60)` is a CARDINAL of 60, and it takes the unit that follows it (`sixty (60) days` is a duration of 60 days).
+- When an amount with a unit, a currency or a percent sign is followed by a bracketed result of the same kind and unit or currency (or by a plain number), and the values agree, the result grows to include the brackets (`five thousand dollars ($5,000)`).
+- When the values disagree (`sixty (90) days`, `five thousand dollars ($4,000)`), the words' value stands, its confidence is multiplied by 0.6, and nothing is merged: the bracketed number is reported by itself.
+- Only a number written in words starts this; `60 (sixty) days` is not merged.
 
 ### Ordinals
 
-- Digits with an ending that fits the number: `1st`, `2nd`, `3rd`, `4th`, `11th`, `12th`, `13th`, `21st`, `22nd`. A wrong ending (`21th`) is not an ordinal and not a number either.
+- Digits with an ending that fits the number: `1st`, `2nd`, `3rd`, `4th`, `11th`, `12th`, `13th`, `21st`, `22nd`, and grouped integers (`1,000th`). A wrong ending (`21th`) is not an ordinal and not a number either.
 - Words: `first` to `nineteenth`, `twentieth` to `ninetieth`, `hundredth`, `thousandth`, ..., and compounds `twenty-third`, `one hundred and first`.
 - `second` is also a unit of time, so on its own right after a number it is not an ordinal (`one second` is the number one); after tens it is (`twenty second` is 22nd).
 
@@ -88,6 +100,8 @@ A number, then (touching it, after one white-space character, or after one hyphe
 
 Unit forms are matched without regard to case unless the data marks them case-sensitive (`MB` is megabytes, `Mb` megabits, `m` metres). Short forms that are everyday words (`in`, `a`, `at`, `min`) are not units.
 
+**Compound measures.** Two measures of related units written one after the other are one: `5 feet 3 inches`, `5 feet and 3 inches`, `6 pounds, 4 ounces`, `3 miles 200 yards`. The pairs and their ratios are data (`unit.compound`: `foot | inch | 12`). The result is in the smaller unit (`5 feet 3 inches` is 63 inches), the first number must be a whole number and the second below the ratio, so `5 feet 15 inches` stays two measures.
+
 **Age** is a number and a time unit followed by `old`: `5 years old`, `a 3-year-old boy` (Unit `year`, Dimension `age`). A bare duration (`5 years`) is not recognized here.
 
 ## Money
@@ -97,7 +111,8 @@ Unit forms are matched without regard to case unless the data marks them case-se
 - Currency names may have several words (`new zealand dollars`). A name may carry a factor: `cents` is 0.01 of its currency.
 - Codes are the alphabetic codes of ISO 4217 in capitals. Lower-case `usd` is not read because many codes are English words (`ALL`, `TRY`, `TOP`).
 - Ambiguous signs get the common reading and a confidence below 1: `$` is USD (0.9), `¥` is JPY (0.7), `dollars` is USD (0.9). Signs that pin down a currency (`US$`, `A$`, `CA$`, `€`, `£`) have confidence 1.
-- `pounds` is a unit of mass; `pound sterling` and `pounds sterling` are currency.
+- `pounds` is a unit of mass; `pound sterling` and `pounds sterling` are currency. A name that is both (`currency.context`) after a number is money, at confidence 0.8, when a money word (`fine`, `cost`, `paid`, `price`, ...) stands in the clause within five words before the number or four after the name and no weight word (`weighs`, `lost`, `of`, ...) does; otherwise it is the unit. The window stops at the clause end and at another number. So `The fine was 1,000 pounds` is GBP, `He weighs 180 pounds` and `10 pounds of flour` are mass.
+- The alphabetic codes were checked on 2026-11-05 against List One of ISO 4217 as published by SIX, the maintenance agency (dated 2026-09-17, 178 codes). All are present except `XTS` (reserved for testing) and `XXX` (no currency). `ANG` and `BGN`, no longer on List One, are kept because older text uses them.
 - A multiplier touching the number counts next to a currency: `$5m` is 5,000,000; `$1.2 billion`; `5m dollars`.
 
 ## Sequences
@@ -147,7 +162,7 @@ Not accepted: dates (`2020-01-15`, `15.01.2020`), decimals (`3.14159265`), plain
 
 ### Result
 
-`TemporalMatch` has the `Kind` (below), a `Value` string, a `Granularity` (null for durations), an `Approximate` flag, the `UtcOffset` the text names, and a `Range` (`DateRange`: `Start` inclusive, `End` exclusive, `Granularity`, `Approximate`) on the calendar. A day runs from its midnight to the next; an instant such as `3pm` runs for its precision (an hour; `3:05pm` a minute). A time of day with no date is placed on the reference day; with no reference date its `Range` is null. Durations and sets have no `Range`; a fixed-length duration has `Amount` as a `TimeSpan`.
+`TemporalMatch` has the `Kind` (below), a `Value` string, a `Granularity` (null for durations), an `Approximate` flag, the `UtcOffset` the text names, and a `Range` (`DateRange`: `Start` inclusive, `End` exclusive, `Granularity`, `Approximate`) on the calendar. A day runs from its midnight to the next; an instant such as `3pm` runs for its precision (an hour; `3:05pm` a minute). A time of day with no date is placed on the reference day; with no reference date its `Range` is null. Durations and sets have no `Range`; a fixed-length duration has `Amount` as a `TimeSpan`. A duration also has `Count` and `Unit` (a `DurationUnit`): `60 days` is 60 `Day`, `18 months` is 18 `Month`, `ten business days` is 10 `BusinessDay`. One term keeps its unit as written, with a quarter as three months, a decade as ten years and a fortnight as two weeks, and `1.5 hours` is 1.5 `Hour`. Several terms are counted in the smallest unit when they are all clock and day units or all month and year units (`2 hours and 30 minutes` is 150 `Minute`, `1 year and 6 months` is 18 `Month`); `1 year and 3 days` cannot be added, so its `Unit` and `Count` are null, as they are for every other kind.
 
 | Kind | Examples | `Value` |
 |---|---|---|
@@ -157,7 +172,7 @@ Not accepted: dates (`2020-01-15`, `15.01.2020`), decimals (`3.14159265`), plain
 | `DateRange` | `next week`, `last winter`, `the first quarter of 2026`, `late 2023`, `the 1990s`, `from April 6 to April 10`, `May 4-8`, `1990-2000`, `the past three days` | `2026-03-23/2026-03-30` |
 | `TimeRange` | `9am-5pm`, `from 6 pm until 9 pm`, `between 12 and 1 pm` | `T09:00/T17:00` |
 | `DateTimeRange` | `tomorrow morning`, `Saturday evening`, `Monday from 9am to 11am`, `from Monday 8am to Monday 6pm` | `2026-03-23T09:00/2026-03-23T11:00` |
-| `Duration` | `two weeks`, `45 seconds`, `an hour and a half`, `2 hours and 30 minutes` | seconds as an integer (`1209600`); ISO 8601 `P1Y6M` when it names months or years |
+| `Duration` | `two weeks`, `45 seconds`, `an hour and a half`, `2 hours and 30 minutes`, `sixty (60) days`, `ten business days` | seconds as an integer (`1209600`); ISO 8601 `P1Y6M` when it names months or years; `P10BD` for business days and `PT8BH` for business hours (not ISO 8601; they have no length in seconds) |
 | `Set` | `every Monday`, `every Monday at 9am`, `daily`, `every 3 hours`, `every other day`, `every day at noon` | TIMEX3: `XXXX-WXX-1`, `XXXX-WXX-1T09:00`, `P1D`, `PT3H`, `P2D`, `T12:00` |
 
 `Granularity` is the unit the expression is stated in: for an instant its precision (`Second`, `Minute`, `Hour`, `Day`); for a range the kind of period (`Week`, `Month`, `Quarter`, `Half`, `Season`, `Year`, `Decade`, or `Day` for explicit day ranges and weekends, `Hour` or `Minute` for ranges of times); for a set the recurrence unit. This is the gold-set convention (`docs/recognizer-gold.md`).
@@ -177,7 +192,8 @@ Not accepted: dates (`2020-01-15`, `15.01.2020`), decimals (`3.14159265`), plain
 - **Parts of a day** are approximate ranges: morning 06:00-12:00, afternoon 12:00-18:00, evening 18:00-24:00, night 20:00-24:00. `tonight` is the night of today, `last night` the night of yesterday, `this morning` the morning of today.
 - **Periods.** Weeks run Monday to Sunday; `this weekend` is Saturday and Sunday of the current week and `next weekend` those of the next week. Seasons are meteorological, northern hemisphere (spring March-May, summer June-August, fall September-November, winter December-February), approximate, and `winter 2024` starts in December 2024. `early`, `mid` and `late` split a year into January-April, May-August and September-December and a month into days 1-10, 11-20 and 21-end, approximate. `H1`/`Q3` and `the second half of ...` give halves and quarters; with no year they are in the reference year. `last winter` is the latest season that has ended; `this summer` the one that contains today or comes next.
 - **Offsets.** `in 3 days`, `3 days ago`, `a year from now`, `the day after tomorrow`, `two days before Christmas`, `the third Thursday of April`, `the first Monday after Easter 2027`. Units of a day or more give a date; hours, minutes and seconds give a date-time at that precision.
-- **Durations** are an amount and a unit (`two weeks`, `a day`, `half an hour`, `1.5 hours`, `an hour and a half`); several terms join with `and` or a comma when each is smaller than the one before (`2 hours and 30 minutes`; `seven days a week` is not one duration). `a second` alone is not a duration.
+- **Durations** are an amount and a unit (`two weeks`, `a day`, `half an hour`, `1.5 hours`, `an hour and a half`); several terms join with `and` or a comma when each is smaller than the one before (`2 hours and 30 minutes`; `seven days a week` is not one duration). `a second` is a duration of one second only when what follows cannot be the thing that is second: the end of the text, punctuation, or a word listed as `secondfollow` (`wait a second, please`, `a second ago`, `give me a second to think`); otherwise it is an ordinal (`a second opinion`). `the second floor`, `second place` and `the second half of 2026` are ordinals and a half-year, as before.
+- **Business and calendar units.** `business day(s)`, `working day(s)`, `work day(s)`, `workday(s)` and `business hour(s)` are units with no length in seconds: a duration of business days stands alone (it does not add to other terms) and its `Value` is `P10BD` or `PT8BH`. `calendar day(s)`, `week(s)`, `month(s)` and `year(s)` are the plain units. `in 3 business days` and `5 business days ago` are dates, counting Monday to Friday and skipping Saturdays and Sundays; public holidays are not considered. Counting from a weekend day starts from the weekday on the other side of the weekend (Saturday plus one business day is Monday).
 - **Sets** are `daily`, `weekly`, `monthly`, `quarterly`, `yearly`, `every`/`each` with a weekday or an optional count and a unit, and `every other`. With a time (`every Monday at 9am`, `daily at noon`) the value carries it.
 
 ### Holidays
@@ -235,6 +251,9 @@ In a list of forms, forms are separated by commas, and may have several words. A
 | `number.ordinal-suffix` | `ending \| last digits \| any, teen or not-teen` | `st \| 1 \| not-teen`: `1st`, not `11st` |
 | `percent` | `forms` | `%`, `percent`, `per cent` |
 | `unit` | `canonical \| dimension \| forms [\| confidence]` | |
+| `unit.compound` | `larger \| smaller \| ratio` | `foot \| inch \| 12`: `5 feet 3 inches` is one length |
+| `number.not-number` | `word \| before or after \| words` | Words that, next to the lone `word`, show it is no number: `one \| before \| no, the, which` |
+| `currency.context` | `forms \| ISO code \| value of one \| money words \| weight words` | `pounds` is money or mass by its neighbours |
 | `age.unit`, `age.suffix` | `canonical \| forms`; `forms` | Combined as `5 years old` and `5-year-old` |
 | `currency.symbol` | `form \| ISO code \| prefix, suffix or both [\| confidence]` | |
 | `currency.name` | `forms \| ISO code [\| factor [\| confidence]]` | |
@@ -247,9 +266,10 @@ Words and symbols (not numbers or dates) are what the rules recognize; the seque
 
 ## Limits and decisions
 
-- Grouping in the Indian style (`12,34,567`) is not read as one number.
-- Scientific notation (`1e5`) is not read.
-- `5 feet 3 inches` gives two measures, not one; there is no unit conversion.
+- Compound measures cover pairs in the data only (two terms); `1 yard 2 feet 3 inches` gives the first pair and a separate `3 inches`.
+- A number whose exponent leaves the range of a `decimal` (`9.1×10⁻³¹`) is not reported.
+- Locale-aware separators (`18.000 EUR` as eighteen thousand) are not read; the English rules take `.` as the decimal point.
+- Business-day arithmetic ignores public holidays.
 - Number words glued to digits (`5 hundred thousand`) read the first scale word only.
 - Phone-like detection will miss shapes outside the list above and will accept some number groups that are not phones: it is a guess, with confidence 0.7.
 - The engine takes a `RecognitionContext` with a reference date and region; the number, unit, currency and sequence rules ignore it, the date and time rules use it.

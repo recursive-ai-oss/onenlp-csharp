@@ -74,10 +74,10 @@ public class RecognizerTests
     [InlineData("13th and 11th and 12th", "13th|ORDINAL|13 ; 11th|ORDINAL|11 ; 12th|ORDINAL|12")]
     [InlineData("21st 103rd", "21st|ORDINAL|21 ; 103rd|ORDINAL|103")]
     [InlineData("21th", "")]
-    [InlineData("the first time", "first|ORDINAL|1")]
+    [InlineData("the first time", "")]
     [InlineData("twenty-third", "twenty-third|ORDINAL|23")]
     [InlineData("one hundred and first", "one hundred and first|ORDINAL|101")]
-    [InlineData("the second time", "second|ORDINAL|2")]
+    [InlineData("the second time", "")]
     [InlineData("one second", "one|CARDINAL|1")]
     [InlineData("twenty second", "twenty second|ORDINAL|22")]
     public void Ordinals(string text, string expected) => Assert.Equal(expected, Run(text));

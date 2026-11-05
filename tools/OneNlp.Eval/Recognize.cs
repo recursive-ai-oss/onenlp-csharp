@@ -126,6 +126,12 @@ internal static class RecognizeCommand
                     }
 
                     w.WriteBoolean("approx", t.Approximate);
+                    if (t.Unit is DurationUnit du && t.Count is decimal count)
+                    {
+                        w.WriteString("durationUnit", du.ToString());
+                        w.WriteString("count", count.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+
                     break;
             }
 

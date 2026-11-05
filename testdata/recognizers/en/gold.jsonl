@@ -1,4 +1,5 @@
 {"id":"010a93bbf306","text":"The score swung by -7 points after the review.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":21,"type":"number","text":"-7","value":"-7"}]}
+{"id":"029d44d5e2c3","text":"She was fined 2,000 pounds for the delay.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":26,"type":"currency","text":"2,000 pounds","value":"2000 GBP"}]}
 {"id":"02d059dfac23","text":"Submit the form by 2026-04-15 please.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":29,"type":"date","text":"2026-04-15","value":"2026-04-15","grain":"day"}]}
 {"id":"02d32933ab35","text":"I'll call you tomorrow about the plan.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":22,"type":"date","text":"tomorrow","value":"2026-03-19","grain":"day"}]}
 {"id":"0440d87ca98d","text":"The shop opens 9am-5pm in the old town.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":22,"type":"timerange","text":"9am-5pm","value":"T09:00/T17:00","grain":"hour"}]}
@@ -7,11 +8,13 @@
 {"id":"06998fb97ff1","text":"The party is on Christmas Day 2027 at our place.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":34,"type":"date","text":"Christmas Day 2027","value":"2027-12-25","grain":"day"}]}
 {"id":"070317153626","text":"Please call me back as soon as you can.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"096530c98051","text":"The new tariff starts next month in the south.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":22,"end":32,"type":"daterange","text":"next month","value":"2026-04-01/2026-05-01","grain":"month"}]}
+{"id":"0967c6bbdb6d","text":"The term is sixty (90) days.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":12,"end":17,"type":"number","text":"sixty","value":"60"},{"start":19,"end":21,"type":"number","text":"90","value":"90"}]}
 {"id":"096b785ce316","text":"The lease ends on December 1st, 2026 sharp.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":18,"end":36,"type":"date","text":"December 1st, 2026","value":"2026-12-01","grain":"day"}]}
 {"id":"0a060522201f","text":"Let's meet on the 25th if that works.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":22,"type":"date","text":"the 25th","value":"2026-03-25","grain":"day"}]}
 {"id":"0d225c6e901a","text":"Open https://www.example.com/ in a browser.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":29,"type":"url","text":"https://www.example.com/"}]}
 {"id":"0d4a378c4583","text":"The holiday ended yesterday for most of us.","reference":"2026-01-05T08:00:00","timezone":"UTC","items":[{"start":18,"end":27,"type":"date","text":"yesterday","value":"2026-01-04","grain":"day"}]}
 {"id":"0d86aa1a16bd","text":"The market closes for Memorial Day as usual.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":22,"end":34,"type":"date","text":"Memorial Day","value":"2026-05-25","grain":"day"}]}
+{"id":"0df5f5b200bd","text":"Twelve (12) hours of notice are required.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":17,"type":"duration","text":"Twelve (12) hours","value":"43200"}]}
 {"id":"0f423fbb83be","text":"My alarm rings at 7:05 AM in the flat.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":18,"end":25,"type":"time","text":"7:05 AM","value":"T07:05","grain":"minute"}]}
 {"id":"0f42d610d032","text":"Reset the node at 10.1.2.3 and wait.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":18,"end":26,"type":"ip","text":"10.1.2.3"}]}
 {"id":"0f8362b58594","text":"Nobody knew where the keys had gone.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
@@ -29,7 +32,9 @@
 {"id":"15e5d4d35033","text":"The flight leaves on May 5, 2026 at 8:00 AM from gate B.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":21,"end":43,"type":"datetime","text":"May 5, 2026 at 8:00 AM","value":"2026-05-05T08:00","grain":"minute"}]}
 {"id":"163656684178","text":"We should talk about it over a cup of tea.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"16b9e101a684","text":"The host 2001:db8::ff00:42:8329 is the IPv6 peer.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":31,"type":"ip","text":"2001:db8::ff00:42:8329"}]}
+{"id":"179a658f9ed8","text":"The bond lasts two (2) years from issue.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":28,"type":"duration","text":"two (2) years","value":"P2Y"}]}
 {"id":"17fcc84a0e92","text":"Her new address is a.b_c-d@sub.example.co.uk soon.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":44,"type":"email","text":"a.b_c-d@sub.example.co.uk"}]}
+{"id":"19c2de530199","text":"A refund is due within 14 calendar days of purchase.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":23,"end":39,"type":"duration","text":"14 calendar days","value":"1209600"}]}
 {"id":"1fb4713c068c","text":"The train reached 90 km/h on the bridge.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":18,"end":25,"type":"dimension","text":"90 km/h","value":"90 kilometer per hour"}]}
 {"id":"1fcabe99138b","text":"Seventeen students passed the exam.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":9,"type":"number","text":"Seventeen","value":"17"}]}
 {"id":"20195997813d","text":"The index fell 3% in a single session.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":17,"type":"percentage","text":"3%","value":"3"}]}
@@ -80,6 +85,7 @@
 {"id":"4580364cc267","text":"The deadline is March 20, 2026 for everyone.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":30,"type":"date","text":"March 20, 2026","value":"2026-03-20","grain":"day"}]}
 {"id":"45a84b3e74b8","text":"Mail press@example.com for the kit.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":22,"type":"email","text":"press@example.com"}]}
 {"id":"46ce64cf6fa8","text":"We meet next Friday for lunch.","reference":"2026-01-05T08:00:00","timezone":"UTC","items":[{"start":8,"end":19,"type":"date","text":"next Friday","value":"2026-01-16","grain":"day","alt":["2026-01-09"]}]}
+{"id":"470de04158e4","text":"The supplier has ten business days to reply.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":17,"end":34,"type":"duration","text":"ten business days","value":"P10BD"}]}
 {"id":"47391ab5a0ec","text":"She counted forty birds on the lake.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":12,"end":17,"type":"number","text":"forty","value":"40"}]}
 {"id":"47b5459f0c36","text":"He worked abroad for 1 year and 6 months before returning.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":21,"end":40,"type":"duration","text":"1 year and 6 months","value":"P1Y6M"}]}
 {"id":"492e99f5b492","text":"Yesterday was cold and wet.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":9,"type":"date","text":"Yesterday","value":"2026-03-17","grain":"day"}]}
@@ -89,6 +95,7 @@
 {"id":"4b880f2299c4","text":"The treaty was signed in 1969 after long talks.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":25,"end":29,"type":"daterange","text":"1969","value":"1969-01-01/1970-01-01","grain":"year"}]}
 {"id":"4dbe4f75ce2c","text":"Ring (212) 555-0147 and ask for Sam.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":19,"type":"phone","text":"(212) 555-0147"}]}
 {"id":"4ddd578e1cd0","text":"I last saw her last Monday near the library.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":26,"type":"date","text":"last Monday","value":"2026-03-16","grain":"day","alt":["2026-03-09"]}]}
+{"id":"4f4934b2c171","text":"The helpdesk answers within 48 business hours of the call.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":28,"end":45,"type":"duration","text":"48 business hours","value":"PT48BH"}]}
 {"id":"4f7e126a727f","text":"Cut the board to 3 inches exactly.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":17,"end":25,"type":"dimension","text":"3 inches","value":"3 inch"}]}
 {"id":"51e83bec6f60","text":"They played Beethoven's Ninth Symphony at the concert.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":24,"end":29,"type":"ordinal","text":"Ninth","value":"9"}]}
 {"id":"52625f63153e","text":"The exam runs Monday from 9am to 11am in the hall.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":37,"type":"datetimerange","text":"Monday from 9am to 11am","value":"2026-03-23T09:00/2026-03-23T11:00","grain":"hour"}]}
@@ -109,6 +116,7 @@
 {"id":"5dddf55b4fd6","text":"I scored ninety-nine on the test.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":20,"type":"number","text":"ninety-nine","value":"99"}]}
 {"id":"5e386fce01d7","text":"He came fourth in the heat.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":14,"type":"ordinal","text":"fourth","value":"4"}]}
 {"id":"5e682c993a78","text":"The train leaves at 15:45 from the main platform.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":20,"end":25,"type":"time","text":"15:45","value":"T15:45","grain":"minute"}]}
+{"id":"5eb8e9d3bae3","text":"Please pay five thousand dollars ($5,000) on signing.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":11,"end":41,"type":"currency","text":"five thousand dollars ($5,000)","value":"5000 USD"}]}
 {"id":"5fbed788733d","text":"The sweets cost ₹500 in the market.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":20,"type":"currency","text":"₹500","value":"500 INR"}]}
 {"id":"600d414195d8","text":"They built a small wooden boat by the river.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"6068e3df4732","text":"Pour in 250 ml of milk.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":14,"type":"dimension","text":"250 ml","value":"250 milliliter"}]}
@@ -133,6 +141,7 @@
 {"id":"71ee2a53ddad","text":"The lecture is at 9am JST on the stream.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":18,"end":25,"type":"time","text":"9am JST","value":"T09:00+09:00","grain":"hour"}]}
 {"id":"728d3dcf813d","text":"Maintenance happens between 13:00 and 14:30 on the line.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":20,"end":43,"type":"timerange","text":"between 13:00 and 14:30","value":"T13:00/T14:30","grain":"minute"}]}
 {"id":"7415ce01c6ff","text":"Thanks @code_wizard for the review.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":19,"type":"mention","text":"@code_wizard"}]}
+{"id":"76883bb55c30","text":"For the first time, the team won away.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"78003f39d992","text":"The newsletter goes out weekly on the list.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":24,"end":30,"type":"set","text":"weekly","value":"P1W","grain":"week"}]}
 {"id":"7815ce3039b7","text":"Lunch is between 12 and 1 pm in the canteen.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":28,"type":"timerange","text":"between 12 and 1 pm","value":"T12:00/T13:00","grain":"hour"}]}
 {"id":"794068ac6a8e","text":"The London desk is +44 20 7946 0958 during the week.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":35,"type":"phone","text":"+44 20 7946 0958"}]}
@@ -166,6 +175,7 @@
 {"id":"8cbe578d24e3","text":"The bins are collected daily downtown.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":23,"end":28,"type":"set","text":"daily","value":"P1D","grain":"day"}]}
 {"id":"8e061fd7f3c5","text":"The plant produces 300 kilowatts at peak.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":32,"type":"dimension","text":"300 kilowatts","value":"300 kilowatt"}]}
 {"id":"912a2ce05493","text":"The alarm went off 30 minutes ago as planned.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":33,"type":"datetime","text":"30 minutes ago","value":"2026-03-18T10:00","grain":"minute"}]}
+{"id":"918ea4be01df","text":"Payment is due within sixty (60) days of receipt.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":22,"end":37,"type":"duration","text":"sixty (60) days","value":"5184000"}]}
 {"id":"9250b5a16939","text":"The shop is on 5th Avenue near the park.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":18,"type":"ordinal","text":"5th","value":"5"}]}
 {"id":"9272c203eaa5","text":"The move is the day after tomorrow if the van is free.","reference":"2028-02-28T09:00:00","timezone":"UTC","items":[{"start":12,"end":34,"type":"date","text":"the day after tomorrow","value":"2028-03-01","grain":"day"}]}
 {"id":"95af7dff3921","text":"Call +1 (415) 555-0132 for support.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":22,"type":"phone","text":"+1 (415) 555-0132"}]}
@@ -174,10 +184,12 @@
 {"id":"996f354d55db","text":"The call is at 3pm PST on the bridge line.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":22,"type":"time","text":"3pm PST","value":"T15:00-08:00","grain":"hour"}]}
 {"id":"997f4ffc469a","text":"She was the 1,000th customer of the store.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":12,"end":19,"type":"ordinal","text":"1,000th","value":"1000"}]}
 {"id":"9bb7f7a17961","text":"He needs minus twelve to balance the books.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":21,"type":"number","text":"minus twelve","value":"-12"}]}
+{"id":"9db5a49a952e","text":"The term of the loan is eighteen (18) months.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":24,"end":44,"type":"duration","text":"eighteen (18) months","value":"P18M"}]}
 {"id":"9e645f95a7ce","text":"The shop opens from Monday 8am to Monday 6pm for the sale.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":44,"type":"datetimerange","text":"from Monday 8am to Monday 6pm","value":"2026-03-23T08:00/2026-03-23T18:00","grain":"hour"}]}
 {"id":"a0e95b2fa898","text":"Use team@example.com for questions.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":20,"type":"email","text":"team@example.com"}]}
 {"id":"a22665d279f2","text":"The cleaners come every Thursday to the office.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":18,"end":32,"type":"set","text":"every Thursday","value":"XXXX-WXX-4","grain":"day"}]}
 {"id":"a30842458f64","text":"The probe hit 203.0.113.99 twice.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":26,"type":"ip","text":"203.0.113.99"}]}
+{"id":"a3aeb33f2152","text":"The deposit is fifty percent (50%) of the price.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":34,"type":"percentage","text":"fifty percent (50%)","value":"50"}]}
 {"id":"a43be0990639","text":"The office is closed on Good Friday again.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":24,"end":35,"type":"date","text":"Good Friday","value":"2026-04-03","grain":"day"}]}
 {"id":"a5c45dd42a5b","text":"Wait for an hour and try again.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":16,"type":"duration","text":"an hour","value":"3600"}]}
 {"id":"a821e4995d61","text":"The site www.example.org is down for repairs.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":24,"type":"url","text":"www.example.org"}]}
@@ -186,6 +198,7 @@
 {"id":"ab3f60f05f76","text":"The book comes out in March 2026 from the press.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":22,"end":32,"type":"daterange","text":"March 2026","value":"2026-03-01/2026-04-01","grain":"month"}]}
 {"id":"ad4a21b3bd1e","text":"The bus runs from 5:30 to 22:00 in town.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":13,"end":31,"type":"timerange","text":"from 5:30 to 22:00","value":"T05:30/T22:00","grain":"minute"}]}
 {"id":"ae7605f8d72a","text":"Their son is twenty years old and studies law.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":13,"end":29,"type":"age","text":"twenty years old","value":"20 year"}]}
+{"id":"af7abbfc7394","text":"The trust holds 12,34,567 rupees in cash.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":32,"type":"currency","text":"12,34,567 rupees","value":"1234567 INR"}]}
 {"id":"b096fe1fad82","text":"We usually eat at 5 in the afternoon at home.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":18,"end":36,"type":"time","text":"5 in the afternoon","value":"T17:00","grain":"hour"}]}
 {"id":"b39377b8233c","text":"Revenue was higher last month than expected.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":29,"type":"daterange","text":"last month","value":"2026-02-01/2026-03-01","grain":"month"}]}
 {"id":"b4afefaf5dc7","text":"The job id is b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e in the queue.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":50,"type":"guid","text":"b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e"}]}
@@ -196,6 +209,7 @@
 {"id":"b892cf607713","text":"The team is off next week for training.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":25,"type":"daterange","text":"next week","value":"2026-03-23/2026-03-30","grain":"week"}]}
 {"id":"b8e609e023ff","text":"The clinic is open from 3pm to 5pm at the north site.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":34,"type":"timerange","text":"from 3pm to 5pm","value":"T15:00/T17:00","grain":"hour"}]}
 {"id":"b93bd18cbe8c","text":"The call is this Friday after lunch.","reference":"2028-02-28T09:00:00","timezone":"UTC","items":[{"start":12,"end":23,"type":"date","text":"this Friday","value":"2028-03-03","grain":"day"}]}
+{"id":"ba0a7cc36077","text":"The fee is one hundred dollars (USD 100) per filing.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":11,"end":40,"type":"currency","text":"one hundred dollars (USD 100)","value":"100 USD"}]}
 {"id":"bb00b749b2c3","text":"The show begins at 7pm CST in the hall.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":26,"type":"time","text":"7pm CST","value":"T19:00-06:00","grain":"hour"}]}
 {"id":"bb62c6ebc589","text":"The tank holds 5 gallons of fuel.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":24,"type":"dimension","text":"5 gallons","value":"5 gallon"}]}
 {"id":"bc99020d7bbc","text":"Water boils at 100 °C at sea level.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":21,"type":"temperature","text":"100 °C","value":"100 celsius"}]}
@@ -203,6 +217,7 @@
 {"id":"c0ab738dc965","text":"Growth was slow in the first quarter of 2026 overall.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":44,"type":"daterange","text":"the first quarter of 2026","value":"2026-01-01/2026-04-01","grain":"quarter"}]}
 {"id":"c2f5ea73228d","text":"The webinar starts at 9am EST sharp.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":22,"end":29,"type":"time","text":"9am EST","value":"T09:00-05:00","grain":"hour"}]}
 {"id":"c4af1a1711e5","text":"Buy a dozen eggs and some milk.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":11,"type":"number","text":"a dozen","value":"12"}]}
+{"id":"c9f3ae35c408","text":"Avogadro's number is 6.02e23.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":21,"end":28,"type":"number","text":"6.02e23","value":"602000000000000000000000"}]}
 {"id":"cab3878a69b2","text":"The seminar is Friday 2pm-4pm in the annex.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":29,"type":"datetimerange","text":"Friday 2pm-4pm","value":"2026-03-20T14:00/2026-03-20T16:00","grain":"hour"}]}
 {"id":"cadad5286988","text":"Add 500 grams of flour to the bowl.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":13,"type":"dimension","text":"500 grams","value":"500 gram"}]}
 {"id":"cb1fc207bb0b","text":"Let's meet next Friday to sign it.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":11,"end":22,"type":"date","text":"next Friday","value":"2026-03-27","grain":"day","alt":["2026-03-20"]}]}
@@ -215,15 +230,20 @@
 {"id":"d4e795b91a77","text":"Let's talk Thursday 3pm-5pm about it.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":11,"end":27,"type":"datetimerange","text":"Thursday 3pm-5pm","value":"2026-03-19T15:00/2026-03-19T17:00","grain":"hour"}]}
 {"id":"d6a617e00d2d","text":"She is 9 years old and rides a bike.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":18,"type":"age","text":"9 years old","value":"9 year"}]}
 {"id":"d8145c0ffee2","text":"Dr. Smith's office is on Mars Street.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
+{"id":"d96251d52470","text":"Hold on, I need a second to think.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":24,"type":"duration","text":"a second","value":"1"}]}
 {"id":"d97d72c01903","text":"The lab is kept at 25 degrees Celsius in the vault.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":37,"type":"temperature","text":"25 degrees Celsius","value":"25 celsius"}]}
+{"id":"d9e5aec7d5c8","text":"He is 5 feet 3 inches tall.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":21,"type":"dimension","text":"5 feet 3 inches","value":"63 inch"}]}
 {"id":"db410184edb8","text":"The firm was founded in spring 2021 by friends.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":24,"end":35,"type":"daterange","text":"spring 2021","value":"2021-03-01/2021-06-01","grain":"season","approx":true}]}
 {"id":"dbc69d3f7ef2","text":"The plan runs next month for the first time.","reference":"2026-12-31T23:30:00","timezone":"UTC","items":[{"start":14,"end":24,"type":"daterange","text":"next month","value":"2027-01-01/2027-02-01","grain":"month"}]}
+{"id":"ddad62ee7c1b","text":"Deliver within five (5) working days of the order.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":36,"type":"duration","text":"five (5) working days","value":"P5BD"}]}
 {"id":"e5748fc54497","text":"Ninety percent of the files were fine.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":14,"type":"percentage","text":"Ninety percent","value":"90"}]}
 {"id":"e611592a8ea0","text":"She tagged the post #TBT and moved on.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":20,"end":24,"type":"hashtag","text":"#TBT"}]}
 {"id":"e72e8e4a4dc4","text":"He was twenty-third in line at the shop.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":19,"type":"ordinal","text":"twenty-third","value":"23"}]}
 {"id":"e8bd1eb869f7","text":"Lookup key 9b2d5c7e-1a4f-4e6b-8c3d-7f0a5e2b1c94 failed twice.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":11,"end":47,"type":"guid","text":"9b2d5c7e-1a4f-4e6b-8c3d-7f0a5e2b1c94"}]}
 {"id":"ebec788f6c85","text":"The reserve covers 4 hectares of forest.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":29,"type":"dimension","text":"4 hectares","value":"4 hectare"}]}
 {"id":"ebf217921f84","text":"The Paris office is +33 1 23 45 67 89 on the card.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":20,"end":37,"type":"phone","text":"+33 1 23 45 67 89"}]}
+{"id":"edbaf188bee9","text":"The baby weighed 6 pounds, 4 ounces at birth.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":17,"end":35,"type":"dimension","text":"6 pounds, 4 ounces","value":"100 ounce"}]}
+{"id":"eea2f78d8478","text":"The notice period is ten (10) business days.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":21,"end":43,"type":"duration","text":"ten (10) business days","value":"P10BD"}]}
 {"id":"efdb501a05bd","text":"We plan to travel at Easter 2027 with the family.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":21,"end":32,"type":"date","text":"Easter 2027","value":"2027-03-28","grain":"day"}]}
 {"id":"f268af962fc4","text":"The sale runs from Friday 8am to Sunday 8pm online.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":43,"type":"datetimerange","text":"from Friday 8am to Sunday 8pm","value":"2026-03-20T08:00/2026-03-22T20:00","grain":"hour"}]}
 {"id":"f2aab55fcbf3","text":"The crew will arrive this afternoon to start work.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":21,"end":35,"type":"datetimerange","text":"this afternoon","value":"2026-03-18T12:00/2026-03-18T18:00","grain":"hour","approx":true}]}
@@ -235,7 +255,9 @@
 {"id":"f55b04448298","text":"The report is published yearly in the spring.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":24,"end":30,"type":"set","text":"yearly","value":"P1Y","grain":"year"}]}
 {"id":"f874c84f2d05","text":"The pump cycles every 3 hours through the night.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":29,"type":"set","text":"every 3 hours","value":"PT3H","grain":"hour"}]}
 {"id":"f8f695241ff8","text":"The cat slept on the warm windowsill by the door.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
+{"id":"f98fe59f26a2","text":"No one answered the phone.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"fa508b2f0466","text":"The band plays Saturday evening in the square.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":31,"type":"datetimerange","text":"Saturday evening","value":"2026-03-21T18:00/2026-03-22T00:00","grain":"hour","approx":true}]}
+{"id":"fc263850e935","text":"One of them left before the end.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"fc8c6fc5ce7c","text":"Visit https://example.com/docs/start?lang=en to begin.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":44,"type":"url","text":"https://example.com/docs/start?lang=en"}]}
 {"id":"fcde6b96ae3e","text":"The inspection is the first Monday after Easter 2027 as scheduled.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":18,"end":52,"type":"date","text":"the first Monday after Easter 2027","value":"2027-03-29","grain":"day"}]}
 {"id":"fe0bc5364cae","text":"Mix at 40 degrees Celsius for ten minutes.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":25,"type":"temperature","text":"40 degrees Celsius","value":"40 celsius"}]}
@@ -243,3 +265,4 @@
 {"id":"fe746e261956","text":"Fees are billed every month by the bank.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":27,"type":"set","text":"every month","value":"P1M","grain":"month"}]}
 {"id":"feb2d19d3387","text":"Row 6f9619ff-8b86-d011-b42d-00c04fc964ff was removed.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":40,"type":"guid","text":"6f9619ff-8b86-d011-b42d-00c04fc964ff"}]}
 {"id":"ffb4ebeb418f","text":"Use #nlp and #dotnet when you share.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":8,"type":"hashtag","text":"#nlp"},{"start":13,"end":20,"type":"hashtag","text":"#dotnet"}]}
+{"id":"ffc839a036d8","text":"The goods must arrive in 3 business days at the latest.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":22,"end":40,"type":"date","text":"in 3 business days","value":"2026-03-23","grain":"day"}]}
