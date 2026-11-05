@@ -58,6 +58,9 @@ internal static class Program
             .Select(d => d.Value).SequenceEqual(["2026-03-19T15:00-08:00", "2027-03-29", "2021-03-01/2021-06-01", "XXXX-WXX-1"]));
         Check("parse-date", Nlp.ParseDate("next Friday", reference)?.Start == new DateTimeOffset(2026, 3, 27, 0, 0, 0, TimeSpan.Zero));
         Check("quantities", Nlp.Quantities("Pay $5m for 3 km by the twenty-first").Select(q => q.Text + "=" + q.Value).SequenceEqual(["$5m=5000000", "3 km=3", "twenty-first=21"]));
+        Check("durations", Nlp.Dates("Reply within sixty (60) days or ten business days.", reference)
+            .Select(d => d.Value + "/" + d.Count + d.Unit).SequenceEqual(["5184000/60Day", "P10BD/10BusinessDay"]));
+        Check("compound", Nlp.Quantities("He is 5 feet 3 inches, 1,00,000 or 6.02e23.").Select(q => q.Value).SequenceEqual([63m, 100000m, 602000000000000000000000m]));
         Check("sequences", Nlp.Sequences("mail a@b.com or 10.0.0.1").Select(s => s.Kind).SequenceEqual([SequenceKind.Email, SequenceKind.IpAddress]));
         Check("recognizer component", Pipeline.Blank(Language.English).Add("recognizers").Process("It cost $5.").Ents.Count == 1);
 

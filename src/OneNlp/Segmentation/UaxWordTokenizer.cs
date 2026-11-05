@@ -148,7 +148,7 @@ public sealed class UaxWordTokenizer : IWordTokenizer
         if (end - pos == 1 && Array.IndexOf(_data.MarkRuns, text[pos]) >= 0)
         {
             // A run of marks ("...", "--", "?!", "$$$") is one token.
-            while (end < n && Array.IndexOf(_data.MarkRuns, text[end]) >= 0)
+            while (end < n && Array.IndexOf(_data.MarkRuns, text[end]) >= 0 && (!_data.SameMarkRuns || text[end] == text[pos]))
             {
                 end++;
             }
@@ -168,7 +168,7 @@ public sealed class UaxWordTokenizer : IWordTokenizer
         while (end < n)
         {
             char c = text[end];
-            if (c == '.' && (IsAbbreviation(text.AsSpan(pos, end - pos)) || IsInitial(text, pos, end)))
+            if (c == '.' && (IsAbbreviation(text.AsSpan(pos, end - pos)) || IsInitial(text, pos, end) || (_data.OrdinalDot && IsOrdinal(text, pos, end))))
             {
                 return end + 1;
             }
@@ -251,6 +251,44 @@ public sealed class UaxWordTokenizer : IWordTokenizer
     {
         int next = TextSegmentation.GetNextWordBoundary(text, from);
         return next > from ? next : from + 1;
+    }
+
+    // An ordinal such as German "3. Oktober": one to four digits, the full stop, then a lower-case word or one of the language's listed
+    // words. A full stop that ends a sentence ("im Jahr 2010. Danach") stays a token of its own.
+    private bool IsOrdinal(string text, int pos, int dot)
+    {
+        int digits = dot - pos;
+        if (digits is < 1 or > 4)
+        {
+            return false;
+        }
+
+        for (int i = pos; i < dot; i++)
+        {
+            if (!char.IsAsciiDigit(text[i]))
+            {
+                return false;
+            }
+        }
+
+        int next = dot + 1;
+        if (next >= text.Length || text[next] != ' ')
+        {
+            return false;
+        }
+
+        while (next < text.Length && text[next] == ' ')
+        {
+            next++;
+        }
+
+        int wordEnd = next;
+        while (wordEnd < text.Length && char.IsLetter(text[wordEnd]))
+        {
+            wordEnd++;
+        }
+
+        return wordEnd > next && (char.IsLower(text[next]) || _data.OrdinalFollowers.GetAlternateLookup<ReadOnlySpan<char>>().Contains(text.AsSpan(next, wordEnd - next)));
     }
 
     private bool IsAbbreviation(ReadOnlySpan<char> word)

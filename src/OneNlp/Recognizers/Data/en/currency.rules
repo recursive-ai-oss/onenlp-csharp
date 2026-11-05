@@ -4,6 +4,9 @@
 # [currency.name]: forms, comma-separated | ISO 4217 code | value of one in the currency (optional, 0.01 for cents) | confidence (optional).
 # [currency.code]: the alphabetic codes of the ISO 4217 list of currencies, in capitals, as
 #                  "USD 5" or "5 USD". Lower-case "usd" is not read: several codes are English words (ALL, TRY, TOP, PEN).
+#                  Checked on 2026-11-05 against ISO 4217 List One as published by SIX (the maintenance agency), dated 2026-09-17:
+#                  every code of that list is here except XTS (testing) and XXX (no currency), which are not money. ANG and BGN have left
+#                  List One (replaced by XCG and the euro) and stay because older texts still use them.
 
 [currency.symbol]
 $ | USD | both | 0.9
@@ -76,6 +79,11 @@ forint | HUF
 dong | VND
 naira | NGN
 
+# [currency.context]: a name that is both a currency and a unit. Fields: forms | ISO 4217 code | value of one | money words | weight words.
+# After a number it is money when a money word stands within five words before the number or four after the name, and no weight word does.
+[currency.context]
+pound, pounds | GBP | 1 | fine, fined, fee, fees, cost, costs, costing, price, prices, priced, paid, pay, pays, paying, payment, worth, salary, wage, wages, rent, bill, bills, owe, owes, owed, charge, charged, charges, buy, buys, bought, sell, sells, sold, spend, spends, spent, earn, earns, earned, budget, deposit, tax, taxes, penalty, tip, ticket, tickets, cheap, cheaper, expensive, discount, loan, debt, sterling, cash, invoice, quote, quoted, bonus, reward, donation, donated, raised, profit, loss, income, cheque, parking | of, weigh, weighs, weighed, weight, lose, lost, gain, gained, heavy, heavier, lighter, light, kilograms, kg, ounces, oz, stone, ton, tons, tonnes, lift, lifts, lifting, carry, carries, carrying, diet, bodyweight, flour, sugar, meat, beef, pork, chicken, fat, muscle, baby, newborn, dog, cat, bag, bags, luggage, baggage, load, loaded, payload, thrust, pressure, psi
+
 [currency.code]
 AED, AFN, ALL, AMD, ANG, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYN, BZD
 CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, FKP, GBP, GEL
@@ -83,4 +91,4 @@ GHS, GIP, GMD, GNF, GTQ, GYD, HKD, HNL, HTG, HUF, IDR, ILS, INR, IQD, IRR, ISK, 
 KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MXV, MYR, MZN, NAD, NGN, NIO
 NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SHP, SLE, SOS, SRD
 SSP, STN, SVC, SYP, SZL, THB, TJS, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, UYI, UYU, UYW, UZS, VED, VES, VND, VUV
-WST, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XDR, XOF, XPD, XPF, XPT, XSU, XUA, YER, ZAR, ZMW, ZWG
+WST, XAD, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XCG, XDR, XOF, XPD, XPF, XPT, XSU, XUA, YER, ZAR, ZMW, ZWG

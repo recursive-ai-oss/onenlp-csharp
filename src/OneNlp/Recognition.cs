@@ -173,6 +173,37 @@ public enum Granularity
 /// <param name="Approximate">True for loose expressions: seasons, early/mid/late, parts of a day, <c>around 3pm</c>.</param>
 public readonly record struct DateRange(DateTimeOffset Start, DateTimeOffset End, Granularity Granularity, bool Approximate);
 
+/// <summary>The unit a duration is counted in (see <see cref="TemporalMatch.Unit"/>).</summary>
+public enum DurationUnit
+{
+    /// <summary>Seconds.</summary>
+    Second = 0,
+
+    /// <summary>Minutes.</summary>
+    Minute = 1,
+
+    /// <summary>Hours.</summary>
+    Hour = 2,
+
+    /// <summary>Calendar days of 24 hours (<c>3 days</c>, <c>10 calendar days</c>).</summary>
+    Day = 3,
+
+    /// <summary>Weeks of seven days; a fortnight is two.</summary>
+    Week = 4,
+
+    /// <summary>Calendar months; a quarter is three.</summary>
+    Month = 5,
+
+    /// <summary>Calendar years; a decade is ten.</summary>
+    Year = 6,
+
+    /// <summary>Business days (<c>ten business days</c>, <c>5 working days</c>): days that are not Saturdays or Sundays. Public holidays are not considered.</summary>
+    BusinessDay = 7,
+
+    /// <summary>Business hours (<c>8 business hours</c>): hours inside working time. The length of working time is not assumed.</summary>
+    BusinessHour = 8,
+}
+
 /// <summary>A resolved date, time, range, duration or recurrence.</summary>
 /// <param name="Start">Offset of the first character in the input, in UTF-16 code units.</param>
 /// <param name="End">Offset just past the last character.</param>
@@ -196,7 +227,20 @@ public readonly record struct DateRange(DateTimeOffset Start, DateTimeOffset End
 public sealed record TemporalMatch(
     int Start, int End, string Text, string Label, float Confidence,
     TemporalKind Kind, string Value, Granularity? Granularity, bool Approximate, TimeSpan? UtcOffset, DateRange? Range, TimeSpan? Amount)
-    : Recognition(Start, End, Text, Label, Confidence);
+    : Recognition(Start, End, Text, Label, Confidence)
+{
+    /// <summary>
+    /// For a <see cref="TemporalKind.Duration"/>, the unit <see cref="Count"/> is in; <see langword="null"/> for the other kinds and for a duration
+    /// that mixes units that cannot be added (<c>1 year and 3 days</c>). A duration of one term keeps its unit: <c>60 days</c> is 60 days,
+    /// <c>18 months</c> is 18 months, <c>ten business days</c> is 10 business days. A duration of several terms is counted in its smallest
+    /// unit when the terms are all clock and day units or all month and year units: <c>2 hours and 30 minutes</c> is 150 minutes,
+    /// <c>1 year and 6 months</c> is 18 months.
+    /// </summary>
+    public DurationUnit? Unit { get; init; }
+
+    /// <summary>For a duration, how many <see cref="Unit"/> it is long, as written (<c>1.5 hours</c> is 1.5); <see langword="null"/> when <see cref="Unit"/> is.</summary>
+    public decimal? Count { get; init; }
+}
 
 /// <summary>Per-call inputs to a recognizer beyond the text.</summary>
 /// <param name="ReferenceDate">

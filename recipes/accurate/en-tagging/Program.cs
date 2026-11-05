@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using RecursiveAI.OneModel.Tensors;
+using RecursiveAI.OneModel.Training;
 using RecursiveAI.OneNlp;
 using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural;
@@ -16,6 +17,9 @@ namespace RecursiveAI.OneNlp.Recipes.AccurateEnglishTagging;
 //
 //   train   --onnx M.onnx --tokenizer tokenizer.json --train F.conllu --dev F.conllu --out DIR
 //           [--pooling mean|first] [--epochs N] [--seed N] [--threads N] [--budget-seconds S] [--checkpoint-every N]
+//           [--finetune] [--max-steps N] [--eval-every STEPS] [--log-every STEPS] [--lr X] [--batch-words N] [--warmup N] [--total-steps N] [--train-embeddings]
+//           With --finetune the encoder trains with the head (TrainableTransformerEncoder; learning rate 5e-5 by default, token
+//           embedding table frozen unless --train-embeddings); --total-steps sets a warm-up and cosine-decay schedule.
 //           trains (or resumes from DIR/last.ckpt) until done or the time budget is used; writes DIR/model.onenlp when done.
 //           Run it again with the same arguments to continue.
 //   predict --model M.onenlp --gold F.conllu --out P.conllu
@@ -62,7 +66,18 @@ internal static class Program
     }
 
     private static TransformerEncoder NewEncoder(Dictionary<string, string> o) =>
-        new(Required(o, "onnx"), Required(o, "tokenizer"), o.GetValueOrDefault("pooling", "mean") == "first" ? SubwordPooling.FirstPiece : SubwordPooling.Mean);
+        new(Required(o, "onnx"), Required(o, "tokenizer"), Pooling(o));
+
+    private static SubwordPooling Pooling(Dictionary<string, string> o) =>
+        o.GetValueOrDefault("pooling", "mean") == "first" ? SubwordPooling.FirstPiece : SubwordPooling.Mean;
+
+    private static IEncoder NewTrainEncoder(Dictionary<string, string> o) =>
+        o.ContainsKey("finetune")
+            ? TrainableTransformerEncoder.LoadOnnx(
+                Required(o, "onnx"),
+                Required(o, "tokenizer"),
+                new TrainableTransformerOptions { Pooling = Pooling(o), FreezeEmbeddings = !o.ContainsKey("train-embeddings") })
+            : NewEncoder(o);
 
     private static double DevScore(IReadOnlyList<Example> examples) =>
         UdScorer.Score(examples.Select(e => e.Predicted), examples.Select(e => e.Reference), "UPOS").Value;
@@ -74,10 +89,15 @@ internal static class Program
         ulong seed = o.TryGetValue("seed", out string? s) ? ulong.Parse(s, CultureInfo.InvariantCulture) : 1;
         int every = o.TryGetValue("checkpoint-every", out string? c) ? int.Parse(c, CultureInfo.InvariantCulture) : 100;
         double budget = o.TryGetValue("budget-seconds", out string? b) ? double.Parse(b, CultureInfo.InvariantCulture) : double.PositiveInfinity;
+        bool finetune = o.ContainsKey("finetune");
+        float rate = o.TryGetValue("lr", out string? lr) ? float.Parse(lr, CultureInfo.InvariantCulture) : (finetune ? 5e-5f : LearningRate);
+        int batchWords = o.TryGetValue("batch-words", out string? bw) ? int.Parse(bw, CultureInfo.InvariantCulture) : BatchWords;
+        int warmup = o.TryGetValue("warmup", out string? wu) ? int.Parse(wu, CultureInfo.InvariantCulture) : WarmupSteps;
+        LrSchedule? schedule = o.TryGetValue("total-steps", out string? ts) ? new WarmupCosineLr(rate, warmup, long.Parse(ts, CultureInfo.InvariantCulture), 0.1f) : null;
 
         List<Example> train = [.. ConllUReader.ReadExamples(Required(o, "train"))];
         List<Example> dev = [.. ConllUReader.ReadExamples(Required(o, "dev"))];
-        using TransformerEncoder encoder = NewEncoder(o);
+        using IEncoder encoder = NewTrainEncoder(o);
         using Pipeline pipeline = Pipeline.Blank(Language.English)
             .Add("sentencizer", new Dictionary<string, string> { ["language"] = "en" })
             .Add(new Tagger(encoder, TokenColumn.Pos));
@@ -87,12 +107,17 @@ internal static class Program
             cts.CancelAfter(TimeSpan.FromSeconds(budget));
         }
 
+        int logEvery = o.TryGetValue("log-every", out string? le) ? int.Parse(le, CultureInfo.InvariantCulture) : 25;
         var clock = Stopwatch.StartNew();
         var progress = new Progress(p =>
         {
             if (p.DevScore is { } score)
             {
                 Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"step={p.Step} epoch={p.Epoch} loss={p.Loss:F4} dev_upos={score:F3} best={p.IsBest} elapsed_s={clock.Elapsed.TotalSeconds:F1}"));
+            }
+            else if (p.Step % logEvery == 0)
+            {
+                Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"step={p.Step} epoch={p.Epoch} loss={p.Loss:F4} lr={p.LearningRate:E2} elapsed_s={clock.Elapsed.TotalSeconds:F1}"));
             }
         });
 
@@ -101,9 +126,12 @@ internal static class Program
             new TrainOptions
             {
                 Epochs = epochs,
-                BatchWords = BatchWords,
-                LearningRate = LearningRate,
-                WarmupSteps = WarmupSteps,
+                BatchWords = batchWords,
+                LearningRate = rate,
+                WarmupSteps = warmup,
+                Schedule = schedule,
+                MaxSteps = o.TryGetValue("max-steps", out string? ms) ? long.Parse(ms, CultureInfo.InvariantCulture) : 0,
+                EvalEvery = o.TryGetValue("eval-every", out string? ee) ? int.Parse(ee, CultureInfo.InvariantCulture) : 0,
                 Dropout = Dropout,
                 Seed = seed,
                 DevExamples = dev,

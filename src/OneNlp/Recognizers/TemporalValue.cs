@@ -36,6 +36,11 @@ internal sealed class TemporalValue
 
     internal decimal? Seconds;
 
+    /// <summary>The count and unit of a duration (see <see cref="TemporalMatch.Unit"/>).</summary>
+    internal DurationUnit? DurUnit;
+
+    internal decimal? Count;
+
     /// <summary>A bare hour such as the 12 of "between 12 and 1 pm": usable only as an end of a time range.</summary>
     internal bool Bare;
 
