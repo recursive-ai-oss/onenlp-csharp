@@ -36,7 +36,8 @@ run() {
 }
 load() { echo "load average $1: $(uptime | sed 's/.*load average[s]*: //')"; }
 RULES=()
-for f in currency numbers sequence units; do RULES+=("$ROOT/src/OneNlp/Recognizers/Data/en/$f.rules"); done
+for f in currency numbers units; do RULES+=("$ROOT/src/OneNlp/Recognizers/Data/en/$f.rules"); done
+RULES+=("$ROOT/src/OneNlp/Recognizers/Data/shared/sequence.rules")
 REF=2026-03-18T10:30:00+00:00
 
 python3 tools/recognizers-gold/make_bench_text.py testdata/recognizers/en/gold.jsonl "$W/text.txt" 10

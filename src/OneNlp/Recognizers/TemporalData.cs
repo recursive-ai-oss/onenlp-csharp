@@ -30,13 +30,23 @@ internal sealed class TemporalData
 {
     internal const int RegionUs = 1;
     internal const int RegionGb = 2;
+    internal const int RegionFr = 4;
+    internal const int RegionDe = 8;
+    internal const int RegionAll = RegionUs | RegionGb | RegionFr | RegionDe;
 
     private static readonly HashSet<string> Roles = new(StringComparer.Ordinal)
     {
         "today", "tomorrow", "yesterday", "tonight", "noon", "midnight", "this", "next", "last", "ago", "later", "in", "at", "on", "of", "and",
         "rangeto", "from", "between", "every", "each", "other", "early", "mid", "late", "after", "before", "half", "quarter", "article", "the",
         "oclock", "approx", "weekend", "zonebase", "quarterprefix", "halfprefix", "past", "to", "plural", "year", "ordinalword", "secondfollow",
+
+        // French and German: a determiner before a date expression, the words "il y a" / "vor" before an amount, "vendredi prochain",
+        // 15h / 15 Uhr, "et quart", "halb drei", "1990er Jahre".
+        "determiner", "agoprefix", "dayaftertomorrow", "daybeforeyesterday", "nextpost", "lastpost", "andhalf", "hourmark", "hourword",
+        "plus15", "plus30", "minus15", "minus", "halfbefore", "plusquarter", "minusquarter", "daypartprefix", "decadeprefix", "decadesuffix", "decadeword",
     };
+
+    private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct" };
 
     private static readonly string[] WeekdayCodes = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
@@ -48,6 +58,12 @@ internal sealed class TemporalData
     internal HashSet<string> Starts { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     internal bool IsEmpty => Words.Count == 0;
+
+    /// <summary>Behaviours the rule data switches on (<c>time.flag</c>): <c>daypart-direct</c> lets a part of the day follow a clock hour without a preposition (German <c>5 Uhr nachmittags</c>).</summary>
+    internal HashSet<string> Flags { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>The region whose conventions apply when the caller names none (<c>time.region</c>): 0 when the data does not say, which means <see cref="RegionUs"/>.</summary>
+    internal int DefaultRegion { get; private set; }
 
     internal void Add(string section, string[] f)
     {
@@ -99,6 +115,19 @@ internal sealed class TemporalData
                 Need(f, 2, 3);
                 AddForms(f[0], new TWord("zone", Int(f[1], -14 * 60, 14 * 60), f.Length > 2 && f[2] == "z" ? 1 : 0, string.Empty));
                 break;
+            case "time.flag":
+                Need(f, 1, 1);
+                if (!FlagNames.Contains(f[0]))
+                {
+                    throw new RecognizerRulesException($"Unknown flag '{f[0]}'.");
+                }
+
+                Flags.Add(f[0]);
+                break;
+            case "time.region":
+                Need(f, 1, 1);
+                DefaultRegion = Region(f[0]);
+                break;
             case "time.holiday":
                 Need(f, 3, 3);
                 int index = Holidays.Count;
@@ -106,13 +135,7 @@ internal sealed class TemporalData
                 int mask = 0;
                 foreach (string region in f[2].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
                 {
-                    mask |= region switch
-                    {
-                        "us" => RegionUs,
-                        "gb" => RegionGb,
-                        "all" => RegionUs | RegionGb,
-                        _ => throw new RecognizerRulesException($"Unknown region '{region}' (expected us, gb or all)."),
-                    };
+                    mask |= region == "all" ? RegionAll : Region(region);
                 }
 
                 if (mask == 0)
@@ -126,6 +149,26 @@ internal sealed class TemporalData
                 throw new RecognizerRulesException($"Unknown section '{section}'.");
         }
     }
+
+    /// <summary>The region bit for a region code; throws for one the engine has no holiday or date-order rules for.</summary>
+    internal static int Region(string code) => code switch
+    {
+        "us" => RegionUs,
+        "gb" => RegionGb,
+        "fr" => RegionFr,
+        "de" => RegionDe,
+        _ => throw new RecognizerRulesException($"Unknown region '{code}' (expected us, gb, fr, de or all)."),
+    };
+
+    /// <summary>The region bit for a caller's region code, or 0 for none or an unknown code.</summary>
+    internal static int RegionOrNone(string? code) => code?.ToLowerInvariant() switch
+    {
+        "us" => RegionUs,
+        "gb" => RegionGb,
+        "fr" => RegionFr,
+        "de" => RegionDe,
+        _ => 0,
+    };
 
     private void AddForms(string forms, TWord word)
     {

@@ -15,7 +15,7 @@ Packages depend on other Recursive AI libraries (`RecursiveAI.OneFont`, `Recursi
 
 ## Data packed with the library
 
-- `src/OneNlp/Recognizers/Data/en/sequence.rules` lists the domain endings (top-level domains) of the IANA Root Zone Database, `tlds-alpha-by-domain.txt` version 2026110304 (https://data.iana.org/TLD/tlds-alpha-by-domain.txt). IANA dedicates its registry data to the public domain under CC0 1.0 (https://www.iana.org/help/licensing-terms).
+- `src/OneNlp/Recognizers/Data/shared/sequence.rules` lists the domain endings (top-level domains) of the IANA Root Zone Database, `tlds-alpha-by-domain.txt` version 2026110304 (https://data.iana.org/TLD/tlds-alpha-by-domain.txt). IANA dedicates its registry data to the public domain under CC0 1.0 (https://www.iana.org/help/licensing-terms).
 - `src/OneNlp/Recognizers/Data/en/currency.rules` lists the alphabetic currency codes of ISO 4217. The codes are facts of the published standard (checked against List One as published by the maintenance agency, dated 2026-09-17); the file carries no text of the standard.
 - `src/OneNlp/Recognizers/Data/en/holidays.rules` lists the dates of holidays. The United States federal holidays follow 5 U.S.C. 6103(a) (federal law, public domain). The bank holidays of England and Wales follow the dates published at https://www.gov.uk/bank-holidays: contains public sector information licensed under the Open Government Licence v3.0 (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/). The other observances are customary dates, and the file carries no text of any source.
 

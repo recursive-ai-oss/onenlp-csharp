@@ -92,7 +92,11 @@ internal static class Lexer
                 sb.Append(' ');
             }
 
-            sb.Append(text, items[k].Start, items[k].End - items[k].Start);
+            // A typographic apostrophe (U+2019) is the same as the plain one: d’euros and d'euros are one form.
+            for (int c = items[k].Start; c < items[k].End; c++)
+            {
+                sb.Append(text[c] == '’' ? ''' : text[c]);
+            }
         }
     }
 

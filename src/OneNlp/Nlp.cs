@@ -133,12 +133,29 @@ public static class Nlp
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     public static IEnumerable<Quantity> Quantities(string text) => Recognizers.Recognizer.English.Recognize(text).OfType<Quantity>();
 
+    /// <summary>Finds numbers, ordinals, percentages, measures and amounts of money in a text of the given language (see <see cref="Quantities(string)"/>).</summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <param name="language">English, French or German: the languages with built-in rules.</param>
+    /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>. French and German read <c>1 234,56 €</c> and <c>18.000 EUR</c> with the decimal comma and grouped thousands of their country.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
+    public static IEnumerable<Quantity> Quantities(string text, Language language) => Recognizers.Recognizer.For(language).Recognize(text).OfType<Quantity>();
+
     /// <summary>Finds plain numbers and ordinals in English text (<see cref="QuantityKind.Cardinal"/> and <see cref="QuantityKind.Ordinal"/> only).</summary>
     /// <param name="text">The text; may be empty.</param>
     /// <returns>The results in text order, with UTF-16 offsets into <paramref name="text"/>. A number that belongs to a unit, a percent sign or a currency is part of that measure and is not listed here.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     public static IEnumerable<Quantity> Numbers(string text) =>
         Recognizers.Recognizer.English.Recognize(text).OfType<Quantity>().Where(q => q.Kind is QuantityKind.Cardinal or QuantityKind.Ordinal);
+
+    /// <summary>Finds plain numbers and ordinals in a text of the given language (see <see cref="Numbers(string)"/>).</summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <param name="language">English, French or German.</param>
+    /// <returns>The results in text order, with UTF-16 offsets into <paramref name="text"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
+    public static IEnumerable<Quantity> Numbers(string text, Language language) =>
+        Recognizers.Recognizer.For(language).Recognize(text).OfType<Quantity>().Where(q => q.Kind is QuantityKind.Cardinal or QuantityKind.Ordinal);
 
     /// <summary>
     /// Finds e-mail addresses, URLs, IP addresses, hashtags, mentions, GUIDs and phone-like sequences in a text. Phone-like sequences are
@@ -148,6 +165,14 @@ public static class Nlp
     /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     public static IEnumerable<SequenceMatch> Sequences(string text) => Recognizers.Recognizer.English.Recognize(text).OfType<SequenceMatch>();
+
+    /// <summary>Finds the address-like sequences in a text of the given language (see <see cref="Sequences(string)"/>).</summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <param name="language">English, French or German.</param>
+    /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
+    public static IEnumerable<SequenceMatch> Sequences(string text, Language language) => Recognizers.Recognizer.For(language).Recognize(text).OfType<SequenceMatch>();
 
     /// <summary>
     /// Finds dates, times, date and time ranges, durations and recurrences in English text and resolves each to a value:
@@ -160,6 +185,16 @@ public static class Nlp
     public static IEnumerable<TemporalMatch> Dates(string text, DateTimeOffset reference) =>
         Recognizers.Recognizer.English.Recognize(text, new RecognitionContext(reference)).OfType<TemporalMatch>();
 
+    /// <summary>Finds dates, times, ranges, durations and recurrences in a text of the given language (see <see cref="Dates(string, DateTimeOffset)"/>).</summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <param name="reference">The moment relative expressions are resolved against; wall-clock expressions are read in its offset.</param>
+    /// <param name="language">English, French or German. French and German read <c>04/05/2026</c> as 4 May and use the holidays of France and Germany.</param>
+    /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>. Empty when there are none.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
+    public static IEnumerable<TemporalMatch> Dates(string text, DateTimeOffset reference, Language language) =>
+        Recognizers.Recognizer.For(language).Recognize(text, new RecognitionContext(reference)).OfType<TemporalMatch>();
+
     /// <summary>
     /// Resolves the first date, time or range in an English text to a stretch of time: <c>the first Monday after Easter 2027</c> is
     /// that day, <c>spring 2021</c> is March to May 2021 (approximate), <c>3pm</c> is that hour on the reference day.
@@ -170,4 +205,14 @@ public static class Nlp
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     public static DateRange? ParseDate(string text, DateTimeOffset reference) =>
         Dates(text, reference).FirstOrDefault(d => d.Range is not null)?.Range;
+
+    /// <summary>Resolves the first date, time or range in a text of the given language to a stretch of time (see <see cref="ParseDate(string, DateTimeOffset)"/>).</summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <param name="reference">The moment relative expressions are resolved against; wall-clock expressions are read in its offset.</param>
+    /// <param name="language">English, French or German.</param>
+    /// <returns>The range (start inclusive, end exclusive), or <see langword="null"/> when the text holds no date or time.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
+    public static DateRange? ParseDate(string text, DateTimeOffset reference, Language language) =>
+        Dates(text, reference, language).FirstOrDefault(d => d.Range is not null)?.Range;
 }

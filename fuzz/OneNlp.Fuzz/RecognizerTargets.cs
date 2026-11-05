@@ -62,10 +62,10 @@ internal static class RecognizerTargets
     internal static void SeedRules(string dir)
     {
         Assembly assembly = typeof(Recognizer).Assembly;
-        foreach (string name in assembly.GetManifestResourceNames().Where(n => n.Replace('\\', '/').StartsWith("Recognizers/Data/en/", StringComparison.Ordinal)))
+        foreach (string name in assembly.GetManifestResourceNames().Where(n => n.Replace('\\', '/').StartsWith("Recognizers/Data/", StringComparison.Ordinal)))
         {
             using Stream s = assembly.GetManifestResourceStream(name)!;
-            using FileStream f = File.Create(Path.Combine(dir, "seed-" + Path.GetFileName(name.Replace('\\', '/'))));
+            using FileStream f = File.Create(Path.Combine(dir, "seed-" + name.Replace('\\', '/').Replace('/', '_')));
             s.CopyTo(f);
         }
     }
