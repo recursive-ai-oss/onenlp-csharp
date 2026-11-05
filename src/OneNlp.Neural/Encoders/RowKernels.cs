@@ -35,6 +35,29 @@ internal static class RowKernels
         }
     }
 
+    // sum of a[i] * b[i] over the first count values, accumulated in four lanes and added at the end (the same order on every platform).
+    public static float Dot(ReadOnlySpan<float> a, ReadOnlySpan<float> b, int count)
+    {
+        a = a[..count];
+        b = b[..count];
+        ref float x = ref MemoryMarshal.GetReference(a);
+        ref float y = ref MemoryMarshal.GetReference(b);
+        Vector128<float> acc = Vector128<float>.Zero;
+        int i = 0;
+        for (; i <= count - 4; i += 4)
+        {
+            acc += Vector128.LoadUnsafe(ref x, (nuint)i) * Vector128.LoadUnsafe(ref y, (nuint)i);
+        }
+
+        float sum = Vector128.Sum(acc);
+        for (; i < count; i++)
+        {
+            sum += Unsafe.Add(ref x, i) * Unsafe.Add(ref y, i);
+        }
+
+        return sum;
+    }
+
     public static void Relu(Span<float> v)
     {
         ref float d = ref MemoryMarshal.GetReference(v);
@@ -311,6 +334,48 @@ internal static class RowKernels
 
         return sum;
     }
+
+    // One LSTM step after the gate pre-activations g = [i | f | g | o] (each hidden values, PyTorch order) are known (Hochreiter and Schmidhuber 1997 with the
+    // forget gate of Gers et al. 2000): c = sigmoid(f) c + sigmoid(i) tanh(g), h = sigmoid(o) tanh(c). sigmoid(x) = 1 / (1 + exp(-x)) and
+    // tanh(x) = 2 sigmoid(2x) - 1, both from the exp polynomial below, so the result is the same on every platform. g is at least 4 * hidden long; c and h
+    // are hidden long and are updated in place.
+    public static void LstmStep(ReadOnlySpan<float> g, Span<float> c, Span<float> h)
+    {
+        int n = h.Length;
+        c = c[..n];
+        g = g[..(4 * n)];
+        ref float gr = ref MemoryMarshal.GetReference(g);
+        ref float cr = ref MemoryMarshal.GetReference(c);
+        ref float hr = ref MemoryMarshal.GetReference(h);
+        int j = 0;
+        for (; j <= n - 4; j += 4)
+        {
+            Vector128<float> i = Sigmoid(Vector128.LoadUnsafe(ref gr, (nuint)j));
+            Vector128<float> f = Sigmoid(Vector128.LoadUnsafe(ref gr, (nuint)(n + j)));
+            Vector128<float> u = Tanh(Vector128.LoadUnsafe(ref gr, (nuint)((2 * n) + j)));
+            Vector128<float> o = Sigmoid(Vector128.LoadUnsafe(ref gr, (nuint)((3 * n) + j)));
+            Vector128<float> next = (f * Vector128.LoadUnsafe(ref cr, (nuint)j)) + (i * u);
+            next.StoreUnsafe(ref cr, (nuint)j);
+            (o * Tanh(next)).StoreUnsafe(ref hr, (nuint)j);
+        }
+
+        for (; j < n; j++)
+        {
+            Vector128<float> i = Sigmoid(Vector128.Create(Unsafe.Add(ref gr, j)));
+            Vector128<float> f = Sigmoid(Vector128.Create(Unsafe.Add(ref gr, n + j)));
+            Vector128<float> u = Tanh(Vector128.Create(Unsafe.Add(ref gr, (2 * n) + j)));
+            Vector128<float> o = Sigmoid(Vector128.Create(Unsafe.Add(ref gr, (3 * n) + j)));
+            Vector128<float> next = (f * Vector128.Create(Unsafe.Add(ref cr, j))) + (i * u);
+            Unsafe.Add(ref cr, j) = next.ToScalar();
+            Unsafe.Add(ref hr, j) = (o * Tanh(next)).ToScalar();
+        }
+    }
+
+    private static Vector128<float> Sigmoid(Vector128<float> x) =>
+        Vector128<float>.One / (Vector128<float>.One + Exp(Vector128<float>.Zero - x));
+
+    private static Vector128<float> Tanh(Vector128<float> x) =>
+        (Vector128.Create(2f) * Sigmoid(x + x)) - Vector128<float>.One;
 
     private static Vector128<float> Exp(Vector128<float> x)
     {

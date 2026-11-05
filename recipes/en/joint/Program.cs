@@ -29,7 +29,7 @@ namespace RecursiveAI.OneNlp.Recipes.EnglishJoint;
 // The NER JSONL files are written from the UNER .iob2 files by `recipes/en/ner convert`; entity scores come from `recipes/en/ner eval`.
 //
 // Options (train): --epochs N (40) --seed N (1) --threads N --budget-seconds S --patience N (8) --lr X --dropout X --batch-words N
-//   encoder: --width --embed-width --depth --norm-rows --prefix-rows --suffix-rows --shape-rows --prefix --suffix --hashes --relu --neighbour-rows --context-rows --bigram-rows
+//   encoder: --width --embed-width --depth --norm-rows --prefix-rows --suffix-rows --shape-rows --prefix --suffix --hashes --relu --neighbour-rows --context-rows --bigram-rows --turkic-case --language --no-tagger
 //   heads:   --heads all|tagging  --min-class-count N  --arc N --label N --context N --lstm N --lstm-layers N --ner-hidden N
 internal static class Program
 {
@@ -111,12 +111,20 @@ internal static class Program
             relu: !o.ContainsKey("gelu"),
             neighbourRows: Int(o, "neighbour-rows", 16384),
             bigramRows: Int(o, "bigram-rows", 0),
-            contextRows: Int(o, "context-rows", 16384));
+            contextRows: Int(o, "context-rows", 16384),
+            turkicCase: o.ContainsKey("turkic-case"));
 
     private static Pipeline NewPipeline(Dictionary<string, string> o, ulong seed)
     {
         FastEncoder encoder = NewEncoder(o, seed);
-        Pipeline pipeline = Pipeline.Blank(Language.English);
+        // --language xx: the tokenizer data of another language; its sentencizer is part of a tagging model (English models get their sentence boundaries
+        // from the parser).
+        Language language = Language.FromCode(o.GetValueOrDefault("language", "en"));
+        Pipeline pipeline = Pipeline.Blank(language);
+        if (language != Language.English && o.GetValueOrDefault("heads", "all") is "all" or "tagging")
+        {
+            pipeline.Add("sentencizer", new Dictionary<string, string> { ["language"] = language.Code });
+        }
         if (o.GetValueOrDefault("heads", "all") == "parser")
         {
             return pipeline.Add(new Parser(encoder, Int(o, "arc", 192), Int(o, "label", 96), Int(o, "context", 3), Int(o, "lstm", 192), Int(o, "lstm-layers", 1), labelBilinear: o.ContainsKey("bilinear")) { OwnsEncoder = true });
@@ -127,8 +135,14 @@ internal static class Program
             return pipeline.Add(new EntityRecognizer(encoder, NerDecoding.Tagging, Int(o, "ner-context", 2), Int(o, "ner-hidden", 256)) { OwnsEncoder = true });
         }
 
-        pipeline.Add(new Tagger(encoder, TokenColumn.Tag) { OwnsEncoder = true });
-        pipeline.Add(new Morphologizer(encoder, headClasses: Int(o, "morph-head", 64)));
+        // --no-tagger: treebanks without XPOS (French-GSD) have nothing for the tagger head to learn.
+        bool tagger = !o.ContainsKey("no-tagger");
+        if (tagger)
+        {
+            pipeline.Add(new Tagger(encoder, TokenColumn.Tag) { OwnsEncoder = true });
+        }
+
+        pipeline.Add(new Morphologizer(encoder, headClasses: Int(o, "morph-head", 64)) { OwnsEncoder = !tagger });
         pipeline.Add(new EditTreeLemmatizer(encoder, minClassCount: Int(o, "min-class-count", 2), headClasses: Int(o, "lemma-head", 32)));
         if (o.GetValueOrDefault("heads", "all") == "all")
         {
@@ -289,7 +303,7 @@ internal static class Program
         int minTokens = Int(o, "min-tokens", 3);
         int maxTokens = Int(o, "max-tokens", 80);
         using Pipeline full = PipelineFile.Load(o["model"]);
-        var teacher = new Pipeline(full.Tokenizer, Language.English, full.Strings).Add("sentencizer", new Dictionary<string, string> { ["data"] = "english" });
+        var teacher = new Pipeline(full.Tokenizer, full.Language, full.Strings).Add("sentencizer", new Dictionary<string, string> { ["data"] = "english" });
         teacher.Add(full.Components.First(c => c.Name == "ner"));
         using var output = new StreamWriter(o["out"], false, new UTF8Encoding(false));
         long chars = 0;
@@ -358,17 +372,28 @@ internal static class Program
         using Pipeline full = PipelineFile.Load(o["model"]);
         // --parser: the parser (which finds the sentence boundaries itself) instead of the tagging heads; the output carries heads and relations.
         bool trees = o.ContainsKey("parser");
-        var teacher = new Pipeline(full.Tokenizer, Language.English, full.Strings);
+        var teacher = new Pipeline(full.Tokenizer, full.Language, full.Strings);
         if (trees)
         {
             teacher.Add(full.Components.First(c => c.Name == "parser"));
         }
         else
         {
-            teacher.Add("sentencizer", new Dictionary<string, string> { ["data"] = "english" });
+            if (full.Components.FirstOrDefault(c => c.Name == "sentencizer") is { } sentencizer)
+            {
+                teacher.Add(sentencizer);
+            }
+            else
+            {
+                teacher.Add("sentencizer", new Dictionary<string, string> { ["data"] = "english" });
+            }
+
             foreach (string name in new[] { "tagger", "morphologizer", "lemmatizer" })
             {
-                teacher.Add(full.Components.First(c => c.Name == name));
+                if (full.Components.FirstOrDefault(c => c.Name == name) is { } head)
+                {
+                    teacher.Add(head);
+                }
             }
         }
 
