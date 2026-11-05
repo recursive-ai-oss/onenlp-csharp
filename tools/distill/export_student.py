@@ -7,7 +7,7 @@ Uses the EMA weights. The graph is (input_ids, attention_mask) -> last_hidden_st
 attention written as MatMul/Softmax (`StudentEncoder.manual_attention`), so OneModel imports it with no special cases.
 Each linear weight is its own named initializer ([in, out]; see student.py). With --ids (a JSON array of id arrays,
 special tokens included) it also writes <name>.ref.bin: float32 hidden states of each text run alone, back to back,
-the format `tools/OneNlp.Accurate parity` reads. Writes <name>.export.json with sizes and SHA-256.
+the format `tools/OneNlp.Accurate parity` reads. Writes <name>.config.json (the architecture, read by BertStyleEncoder) and <name>.export.json with sizes and SHA-256.
 """
 import argparse
 import hashlib
@@ -62,6 +62,7 @@ def main():
         np.concatenate(chunks).tofile(os.path.join(a.out, a.name + ".ref.bin"))
     files = {fn: {"bytes": os.path.getsize(os.path.join(a.out, fn)), "sha256": sha256(os.path.join(a.out, fn))}
              for fn in sorted(os.listdir(a.out)) if fn.startswith(a.name + ".onnx")}
+    json.dump(cfg.to_dict(), open(os.path.join(a.out, a.name + ".config.json"), "w"))  # the head count is not in the graph
     info = {"checkpoint_step": st["step"], "config": cfg.to_dict(), "torch": torch.__version__, "opset": 17, "files": files}
     json.dump(info, open(os.path.join(a.out, a.name + ".export.json"), "w"), indent=1)
     print(json.dumps(info))

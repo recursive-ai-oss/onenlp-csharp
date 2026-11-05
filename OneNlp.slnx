@@ -24,6 +24,7 @@
     <Project Path="recipes/en/parser/OneNlp.Recipe.EnParser.csproj" />
     <Project Path="recipes/en/fast-tagging/EnglishFastTagging.csproj" />
     <Project Path="recipes/accurate/en-tagging/AccurateEnglishTagging.csproj" />
+    <Project Path="recipes/accurate/probe/AccurateProbe.csproj" />
     <Project Path="recipes/en/ner/OneNlp.Recipes.EnNer.csproj" />
   </Folder>
   <Folder Name="/fuzz/">

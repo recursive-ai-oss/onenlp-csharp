@@ -6,8 +6,8 @@
 Teacher: jhu-clsp/mmBERT-base (MIT), frozen, bf16, used only through transformers' documented `AutoModel` API.
 Student: student.StudentEncoder (6 x 384 post-norm layers, factorised embedding), plain PyTorch.
 
-Objective: hidden-state distillation, Jiao et al. 2020 (TinyBERT) §3.2, Eq. 7 -- the mean squared error between a
-learned linear map of a student layer's output and the teacher layer it is matched to (uniform layer mapping, §3.2).
+Objective: hidden-state distillation, Jiao et al. 2020 (TinyBERT) §3.1, Eq. 8 -- the mean squared error between a
+learned linear map of a student layer's output and the teacher layer it is matched to (uniform layer mapping, §3.1 and §4.6).
 The teacher's residual-stream states have a few very large dimensions, so an intermediate target is first normalised per
 token (layer norm without parameters); the last layer is matched to the teacher's final hidden state (the vectors the heads
 will read), standardised per feature with statistics measured on the first batches, with a cosine term added so the
@@ -170,7 +170,7 @@ def init_embeddings(model, teacher, cfg):
 
 def measure_target_stats(model, teacher, data, a, device):
     sums, sq, n = 0, 0, 0
-    for step in range(-8, 0):
+    for step in range(10 ** 9, 10 ** 9 + 8):  # steps far outside the training range
         ids = torch.from_numpy(data.batch(a.seed, step, a.batch_tokens // 2)).to(device)
         mask = (ids != 0).long()
         t_final, _ = teacher_forward(teacher, ids, mask)
