@@ -1257,6 +1257,22 @@ internal sealed partial class Scan
             DateAt(k + n, a.V.Start, seconds);
             foreach (Cand b in seconds)
             {
+                // "du 3 mars au 7 avril 2026": the year at the end belongs to both ends, so the first end is not the next 3 March but the one before 7 April 2026.
+                if (a.V.NeedsRef && a.V.Kind == TemporalKind.Date && b.V.Kind == TemporalKind.Date && !b.V.NeedsRef)
+                {
+                    DateTime earlier = a.V.Start;
+                    while (earlier >= b.V.End)
+                    {
+                        earlier = earlier.AddYears(-1);
+                    }
+
+                    if (earlier != a.V.Start)
+                    {
+                        r.Add(new Cand(i, b.E, TemporalValue.Period(earlier, b.V.End, Granularity.Day, a.V.Approx || b.V.Approx, false)));
+                        continue;
+                    }
+                }
+
                 if (b.V.Kind is not (TemporalKind.Date or TemporalKind.DateRange) || b.V.End <= a.V.Start || (!framed && !(a.V.Kind == TemporalKind.Date && b.V.Kind == TemporalKind.Date) && !BothYears(a.V, b.V)))
                 {
                     continue;

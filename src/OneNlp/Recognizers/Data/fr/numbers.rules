@@ -118,12 +118,7 @@ milliardieme | 1000000000
 
 # The denominator a fraction word stands for: "trois quarts" is 3/4, "un demi" is 1/2.
 [number.fraction]
-demi | 2
-demie | 2
-demis | 2
-demies | 2
 tiers | 3
-quart | 4
 quarts | 4
 cinquième | 5
 cinquièmes | 5

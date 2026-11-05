@@ -79,7 +79,7 @@ mid | mi, milieu de, milieu d', à la mi
 late | fin, fin de, fin d'
 after | après
 before | avant
-half | semestre, semestres
+half | semestre, semestres, demi
 quarter | trimestre, trimestres
 article | un, une
 the | le, la, l', les
@@ -96,6 +96,7 @@ plus30 | et demie, et demi
 andhalf | et demi, et demie
 minus15 | moins le quart, moins un quart
 minus | moins
+clockcue | est, sera, était
 daypartprefix | du, de la, de l', de
 decadeprefix | années, annees
 

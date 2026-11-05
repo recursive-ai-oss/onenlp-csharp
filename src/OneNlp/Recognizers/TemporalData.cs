@@ -43,7 +43,7 @@ internal sealed class TemporalData
         // French and German: a determiner before a date expression, the words "il y a" / "vor" before an amount, "vendredi prochain",
         // 15h / 15 Uhr, "et quart", "halb drei", "1990er Jahre".
         "determiner", "agoprefix", "dayaftertomorrow", "daybeforeyesterday", "nextpost", "lastpost", "andhalf", "hourmark", "hourword",
-        "plus15", "plus30", "minus15", "minus", "halfbefore", "plusquarter", "minusquarter", "daypartprefix", "decadeprefix", "decadesuffix", "decadeword",
+        "plus15", "plus30", "minus15", "minus", "clockcue", "halfbefore", "plusquarter", "minusquarter", "daypartprefix", "decadeprefix", "decadesuffix", "decadeword",
     };
 
     private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct", "no-lone-day", "bare-hour-24", "determiner-inside-only" };

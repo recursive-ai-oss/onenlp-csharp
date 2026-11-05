@@ -477,6 +477,7 @@ internal sealed partial class Scan
         }
 
         int m = 0;
+        bool clockTail = false;
         Granularity grain = Granularity.Hour;
         if (Dig(e, 2) && Val(e) <= 59 && GapOk(_items[e - 1].End, _items[e].Start) && !(Ch(e + 1, ':') && Tch(e, e + 1)))
         {
@@ -494,6 +495,7 @@ internal sealed partial class Scan
         {
             m = 15;
             e += pn;
+            clockTail = true;
             grain = Granularity.Minute;
         }
         else if (Is(e, "plus30", out pn))
@@ -507,6 +509,7 @@ internal sealed partial class Scan
             h = (h + 23) % 24;
             m = 45;
             e += pn;
+            clockTail = true;
             grain = Granularity.Minute;
         }
         else if (Is(e, "minus", out pn) && Num(e + pn, out int le, out decimal lv, out bool lOrd) && !lOrd && lv is >= 1 and <= 29 && lv == decimal.Truncate(lv))
@@ -514,6 +517,7 @@ internal sealed partial class Scan
             h = (h + 23) % 24;
             m = 60 - (int)lv;
             e = le;
+            clockTail = true;
             grain = Granularity.Minute;
         }
 
@@ -526,7 +530,7 @@ internal sealed partial class Scan
             part = true;
         }
 
-        if (weak && !part && !(i > 0 && Is(i - 1, "at") && GapOk(_items[i - 1].End, _items[i].Start)))
+        if (weak && !part && !clockTail && !(i > 0 && (Is(i - 1, "at") || Is(i - 1, "clockcue")) && GapOk(_items[i - 1].End, _items[i].Start)))
         {
             return;
         }
@@ -881,12 +885,24 @@ internal sealed partial class Scan
             return value > 0 && value <= 1_000_000;
         }
 
-        if (Is(i, "half", out int n))
+        // French "une demi-heure", German "eine halbe Stunde": an article may come before the half, and a hyphen after it.
+        int h0 = i;
+        if (Is(i, "article", out int pa) && Is(i + pa, "half"))
         {
-            end = i + n;
+            h0 = i + pa;
+        }
+
+        if (Is(h0, "half", out int n))
+        {
+            end = h0 + n;
             if (Is(end, "article", out int a))
             {
                 end += a;
+            }
+
+            if (Ch(end, '-') && Tch(end - 1, end))
+            {
+                end++;
             }
 
             value = 0.5m;
