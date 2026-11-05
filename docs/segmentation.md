@@ -59,7 +59,7 @@ Development split of UD Portuguese-Bosque, raw text (`recipes/pt/fast segment`, 
 
 ## Dutch data (`SegmentationData.Dutch`, name `dutch`)
 
-Written from the UD Dutch guidelines and the Dutch-Alpino treebank; the choices below were made on its training and development files only (`tools/fetch/nl/token_stats.py` prints the counts, `tools/fetch/nl/seg_diff.py` the differences against a gold file).
+Written from the Dutch-Alpino treebank; the choices below were made on its training and development files only (`tools/fetch/nl/token_stats.py` prints the counts, `tools/fetch/nl/seg_diff.py` the differences against a gold file).
 
 - **Apostrophes**: a word with an apostrophe inside stays whole by UAX #29 (`zo'n`, `z'n`, `auto's`, `Jan's`). The short forms that start with an apostrophe (`'t`, `'s`, `'n`, `'m`, `'ns`) and years without their century (`'69`) are one token when the apostrophe follows white space, punctuation or the start of the text and the word after it is exactly one of these; any other apostrophe is a quotation mark of its own (`'ja'` is `'` `ja` `'`). A hyphen after such a form continues the token (`'s-avonds`).
 - **Hyphens** between letters or digits stay (`Zuid-Afrika`, `21-jarige`, `2-0`); a hyphen with white space around it is a token.

@@ -11,7 +11,7 @@ public sealed partial class SegmentationData
     private static readonly char[] DutchMarkRunChars = ['.', '-', '*', '=', '_', '~', '<', '>', '#', '$', '+', '/', '\\', '`', '\'', ','];
 
     /// <summary>
-    /// Dutch, after the UD Dutch guidelines (universaldependencies.org/nl/overview/tokenization.html) and the way UD Dutch-Alpino
+    /// Dutch, after the way UD Dutch-Alpino
     /// tokenizes: the neutral defaults plus
     /// apostrophe words kept whole (<c>zo'n</c>, <c>auto's</c>, <c>Jan's</c>, <c>z'n</c>), the short forms that start with an apostrophe
     /// (<c>'t</c>, <c>'s</c>, <c>'n</c>, <c>'m</c>, <c>'ns</c>) and two-digit years (<c>'69</c>) as tokens of their own,
