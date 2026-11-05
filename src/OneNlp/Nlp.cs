@@ -100,7 +100,7 @@ public static class Nlp
 
     /// <summary>Finds the named entities of a text (person, organization, location).</summary>
     /// <param name="text">The text; may be empty.</param>
-    /// <returns>The entities in text order, without overlaps; each has its <see cref="Span.Label"/> (<c>PER</c>, <c>ORG</c> or <c>LOC</c>), a confidence, and character offsets into <paramref name="text"/>. They stay valid as long as the text's <see cref="Doc"/> does. Empty when there are none.</returns>
+    /// <returns>The entities in text order, without overlaps; each has its <see cref="Span.Label"/> (<see cref="EntityLabels.Person"/>, <see cref="EntityLabels.Organization"/> or <see cref="EntityLabels.Location"/>), a confidence, and character offsets into <paramref name="text"/>. They stay valid as long as the text's <see cref="Doc"/> does. Empty when there are none.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="InvalidOperationException">No model package is available for the text's language; the message names the package to add.</exception>
     public static IReadOnlyList<Span> Entities(string text) => ModelPackages.Get(LanguageOf(text)).Process(text).Ents;

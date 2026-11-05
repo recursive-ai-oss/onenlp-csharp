@@ -38,6 +38,23 @@ public class FastEncoderSettingsTests
     }
 
     [Fact]
+    public void ReluNeighbourAndWordPairSettingsRoundTrip()
+    {
+        using var encoder = new FastEncoder(width: 16, depth: 1, normRows: 64, prefixRows: 16, suffixRows: 32, shapeRows: 16, seed: 4, relu: true, neighbourRows: 48, bigramRows: 24);
+        string json = Settings(encoder);
+        Assert.Contains("\"relu\":1", json, StringComparison.Ordinal);
+        Assert.Contains("\"neighbourRows\":48", json, StringComparison.Ordinal);
+        Assert.Contains("\"bigramRows\":24", json, StringComparison.Ordinal);
+        using IEncoder again = Create(json);
+        Assert.Equal(json, Settings(again));
+        var fast = Assert.IsType<FastEncoder>(again);
+        Assert.True(fast.Relu);
+        Assert.Equal(48, fast.NeighbourRows);
+        Assert.Equal(24, fast.BigramRows);
+        Assert.Equal(new[] { 64, 16, 32, 16, 48, 48, 48, 48, 24, 24 }, fast.TableRows);
+    }
+
+    [Fact]
     public void TheEnglishConfigurationRoundTripsAndEncodesTheSame()
     {
         using FastEncoder english = FastEncoder.English(5);

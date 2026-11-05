@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Text.Json;
 using RecursiveAI.OneModel.Tensors;
 using RecursiveAI.OneModel.Training;
@@ -33,18 +34,30 @@ public sealed class EditTreeLemmatizer : TrainableHead
     private const int MaxLabels = 1 << 18;
     private const long MaxOutputValues = 1L << 26;
     private const int Candidates = 16;
+    private const int LowerBuffer = 128;
     private string[] _labels = [];
     private EditTree[] _trees = [];
     private bool[] _lower = [];
     private Dictionary<string, int> _labelIds = new(StringComparer.Ordinal);
-    private LabelModule? _module;
+    private FactoredOutput? _module;
+    private readonly int _minClassCount;
+    private readonly int _headClasses;
 
     /// <summary>Creates an uninitialized lemmatizer.</summary>
     /// <param name="encoder">The encoder it reads.</param>
     /// <param name="name">The component name, unique in its pipeline. Default <c>lemmatizer</c>.</param>
-    public EditTreeLemmatizer(IEncoder encoder, string name = "lemmatizer")
+    /// <param name="minClassCount">Classes seen fewer times than this in the training examples are left out of the label set (their tokens leave the loss), 1 to 1000. Most classes of a treebank are substitutions that fit one word form and were seen once; the output layer's size, and so the time of every prediction, grows with the number of classes, and a class seen once says little about words not seen. Default 1 (keep every class).</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="minClassCount"/> is out of range.</exception>
+    /// <param name="headClasses">With a value above 0 the output layer is two-level (see <see cref="FactoredOutput"/>): the most frequent <paramref name="headClasses"/> classes (copying the form and the few endings that cover nearly every token) are scored for every token and the rest only for tokens none of them suits. Default 0 (every class is scored for every token).</param>
+    public EditTreeLemmatizer(IEncoder encoder, string name = "lemmatizer", int minClassCount = 1, int headClasses = 0)
         : base(name, encoder)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(headClasses);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(headClasses, 4096);
+        _headClasses = headClasses;
+        ArgumentOutOfRangeException.ThrowIfLessThan(minClassCount, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(minClassCount, 1000);
+        _minClassCount = minClassCount;
     }
 
     /// <summary>The classes (a flag character, <c>l</c> or <c>r</c>, then the serialized tree), in output order; empty until initialized.</summary>
@@ -68,7 +81,7 @@ public sealed class EditTreeLemmatizer : TrainableHead
             throw new InvalidOperationException($"The component '{Name}' is already initialized.");
         }
 
-        var seen = new SortedSet<string>(StringComparer.Ordinal);
+        var counts = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (Example example in examples)
         {
             Doc reference = example.Reference;
@@ -77,22 +90,29 @@ public sealed class EditTreeLemmatizer : TrainableHead
             {
                 if (lemmas[t] != 0)
                 {
-                    seen.Add(Label(reference[t].ToString(), reference.Strings[lemmas[t]]));
+                    string label = Label(reference[t].ToString(), reference.Strings[lemmas[t]]);
+                    counts[label] = counts.GetValueOrDefault(label) + 1;
                 }
             }
         }
 
-        if (seen.Count == 0)
+        // Falling frequency when the output layer is two-level (its first classes are the frequent ones), alphabetical otherwise.
+        IEnumerable<KeyValuePair<string, int>> kept = counts.Where(kv => kv.Value >= _minClassCount);
+        string[] seen = _headClasses > 0
+            ? [.. kept.OrderByDescending(kv => kv.Value).ThenBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => kv.Key)]
+            : [.. kept.Select(kv => kv.Key).Order(StringComparer.Ordinal)];
+
+        if (seen.Length == 0)
         {
             throw new ArgumentException($"The training examples hold no gold lemmas for the component '{Name}'.", nameof(examples));
         }
 
-        if (seen.Count > MaxLabels)
+        if (seen.Length > MaxLabels)
         {
             throw new ArgumentException($"The training examples hold more than {MaxLabels} distinct edit trees.", nameof(examples));
         }
 
-        Build([.. seen], new Generator(seed));
+        Build(seen, new Generator(seed));
     }
 
     /// <inheritdoc/>
@@ -100,7 +120,7 @@ public sealed class EditTreeLemmatizer : TrainableHead
     {
         ArgumentNullException.ThrowIfNull(encoded);
         ArgumentNullException.ThrowIfNull(examples);
-        LabelModule module = _module ?? throw new InvalidOperationException($"The component '{Name}' is not initialized.");
+        FactoredOutput module = _module ?? throw new InvalidOperationException($"The component '{Name}' is not initialized.");
         if (examples.Count != encoded.DocCount)
         {
             throw new ArgumentException("The batch has a different number of documents than examples.", nameof(examples));
@@ -132,57 +152,157 @@ public sealed class EditTreeLemmatizer : TrainableHead
             }
         }
 
-        Tensor targetTensor = Tensor.FromSpan<int>(targets, Shape.Create(targets.Length));
-        ActivationScope.Track(targetTensor);
-        return Losses.CrossEntropy(module.Forward(encoded.Vectors), targetTensor, 0f, IgnoreIndex, counted > 0);
+        return module.Loss(encoded.Vectors, targets, IgnoreIndex, counted);
     }
 
     /// <inheritdoc/>
     public override void Predict(EncodedBatch encoded, ReadOnlySpan<Doc> docs)
     {
         ArgumentNullException.ThrowIfNull(encoded);
-        LabelModule module = _module ?? throw new InvalidOperationException($"The component '{Name}' is not initialized.");
-        Tensor logitsTensor = module.Forward(encoded.Vectors);
-        ReadOnlySpan<float> logits = logitsTensor.Data<float>();
+        FactoredOutput module = _module ?? throw new InvalidOperationException($"The component '{Name}' is not initialized.");
         int classes = _labels.Length;
-        Span<int> tried = stackalloc int[Candidates]; // bounded by the constant above
-        for (int d = 0; d < docs.Length; d++)
-        {
-            Doc doc = docs[d];
-            int start = encoded.Start(d);
-            var lemmas = new int[doc.Length];
-            for (int t = 0; t < doc.Length; t++)
-            {
-                ReadOnlySpan<float> row = logits.Slice((start + t) * classes, classes);
-                string form = doc[t].ToString();
-                string lowered = form.ToLowerInvariant();
-                string? lemma = null;
-                for (int k = 0; k < Math.Min(Candidates, classes) && lemma is null; k++)
-                {
-                    int best = -1;
-                    for (int c = 0; c < classes; c++)
-                    {
-                        if ((best < 0 || row[c] > row[best]) && !tried[..k].Contains(c))
-                        {
-                            best = c;
-                        }
-                    }
+        int rows = encoded.TokenCount;
+        int k = module.HeadClasses;
+        bool factored = module.IsFactored;
+        ReadOnlySpan<float> first = factored ? module.HeadLogits(encoded.Vectors).Data<float>() : module.Logits(encoded.Vectors).Data<float>();
+        int firstWidth = factored ? k + 1 : classes;
 
-                    tried[k] = best;
-                    lemma = _trees[best].Apply(_lower[best] ? lowered : form);
+        // Two-level layer: the rows for which "other" wins get second-level scores, and tailAt maps a row to its position among them.
+        int[]? tailAt = null;
+        ReadOnlySpan<float> second = default;
+        int tailWidth = classes - k;
+        if (factored)
+        {
+            tailAt = ArrayPool<int>.Shared.Rent(rows);
+            var tailRows = new List<int>();
+            for (int r = 0; r < rows; r++)
+            {
+                ReadOnlySpan<float> row = first.Slice(r * firstWidth, firstWidth);
+                int best = 0;
+                float top = row[0];
+                for (int c = 1; c < row.Length; c++)
+                {
+                    float v = row[c];
+                    if (v > top)
+                    {
+                        top = v;
+                        best = c;
+                    }
                 }
 
-                lemmas[t] = doc.Strings.Add(lemma ?? form);
+                tailAt[r] = best == k ? tailRows.Count : -1;
+                if (best == k)
+                {
+                    tailRows.Add(r);
+                }
             }
 
-            doc.SetColumn(TokenColumn.Lemma, lemmas);
+            if (tailRows.Count > 0)
+            {
+                second = module.TailLogits(encoded.Vectors, [.. tailRows]).Data<float>();
+            }
         }
+
+        try
+        {
+            Span<int> tried = stackalloc int[2 * Candidates]; // bounded by the constant above
+            Span<char> lowered = stackalloc char[LowerBuffer]; // forms up to LowerBuffer characters are lower-cased here; longer ones get a string
+            for (int d = 0; d < docs.Length; d++)
+            {
+                Doc doc = docs[d];
+                int start = encoded.Start(d);
+                var lemmas = new int[doc.Length];
+                for (int t = 0; t < doc.Length; t++)
+                {
+                    int r = start + t;
+                    ReadOnlySpan<char> form = doc[t].Text;
+                    ReadOnlySpan<char> lower = lowered[..0];
+                    if (form.Length <= LowerBuffer)
+                    {
+                        form.ToLowerInvariant(lowered);
+                        lower = lowered[..form.Length];
+                    }
+                    else
+                    {
+                        lower = form.ToString().ToLowerInvariant();
+                    }
+
+                    ReadOnlySpan<float> firstRow = first.Slice(r * firstWidth, firstWidth);
+                    string? lemma = null;
+                    int used = 0;
+
+                    // Candidates in order of score: the best classes of the level that won, then (for "other") the first level's own.
+                    // The best class alone fits almost every token, so the loops usually end at once.
+                    if (factored && tailAt![r] >= 0)
+                    {
+                        lemma = TryRanked(second.Slice(tailAt[r] * tailWidth, tailWidth), tailWidth, k, tried, ref used, form, lower);
+                    }
+
+                    if (lemma is null)
+                    {
+                        lemma = TryRanked(firstRow, factored ? k : classes, 0, tried, ref used, form, lower);
+                    }
+
+                    lemmas[t] = doc.Strings.Add(lemma ?? form.ToString());
+                }
+
+                doc.SetColumn(TokenColumn.Lemma, lemmas);
+            }
+        }
+        finally
+        {
+            if (tailAt is not null)
+            {
+                ArrayPool<int>.Shared.Return(tailAt);
+            }
+        }
+    }
+
+    // Tries the classes of one level from the highest score down, at most Candidates of them, skipping ones already tried; the first
+    // tree that fits the form gives the lemma.
+    private string? TryRanked(ReadOnlySpan<float> scores, int count, int offset, Span<int> tried, ref int used, ReadOnlySpan<char> form, ReadOnlySpan<char> lower)
+    {
+        for (int attempt = 0; attempt < Math.Min(Candidates, count); attempt++)
+        {
+            int best = -1;
+            float top = float.NegativeInfinity;
+            ReadOnlySpan<int> skip = tried[..used];
+            for (int c = 0; c < count; c++)
+            {
+                float v = scores[c];
+                if (v > top && (used == 0 || !skip.Contains(offset + c)))
+                {
+                    top = v;
+                    best = c;
+                }
+            }
+
+            if (best < 0)
+            {
+                return null;
+            }
+
+            int cls = offset + best;
+            tried[used++] = cls;
+            string? lemma = _trees[cls].Apply(_lower[cls] ? lower : form);
+            if (lemma is not null)
+            {
+                return lemma;
+            }
+        }
+
+        return null;
     }
 
     /// <inheritdoc/>
     public override void WriteConfig(Utf8JsonWriter writer)
     {
         ArgumentNullException.ThrowIfNull(writer);
+        if (_module is { IsFactored: true })
+        {
+            writer.WriteNumber("headClasses", _module.HeadClasses);
+        }
+
         writer.WriteStartArray("labels");
         foreach (string label in _labels)
         {
@@ -211,7 +331,7 @@ public sealed class EditTreeLemmatizer : TrainableHead
             throw new InvalidDataException("A lemmatizer's 'labels' must be a non-empty list without duplicates.");
         }
 
-        var head = new EditTreeLemmatizer(encoder, name) { OwnsEncoder = true };
+        var head = new EditTreeLemmatizer(encoder, name, 1, JsonSettings.OptionalInt(config, "headClasses", 0, 4096, 0)) { OwnsEncoder = true };
         head.Build(labels, new Generator(0));
         return head;
     }
@@ -248,16 +368,6 @@ public sealed class EditTreeLemmatizer : TrainableHead
             _labelIds[labels[i]] = i;
         }
 
-        _module = new LabelModule(Encoder.Width, labels.Length, generator);
-    }
-
-    private sealed class LabelModule : NnModule
-    {
-        private readonly Linear _output;
-
-        public LabelModule(int width, int labels, Generator generator) =>
-            _output = RegisterModule("output", new Linear(width, labels, generator));
-
-        public override Tensor Forward(Tensor input) => _output.Forward(input);
+        _module = new FactoredOutput(Encoder.Width, labels.Length, _headClasses, generator);
     }
 }

@@ -189,6 +189,67 @@ public class FastTierTests
         Assert.Throws<ArgumentOutOfRangeException>(() => FastEncoder.FromSettings(document.RootElement));
     }
 
+    [Fact]
+    public void TwoLevelOutputLayersTrainSaveAndLoad()
+    {
+        List<Example> train = Toy(200, 1);
+        List<Example> test = Toy(40, 2);
+        var encoder = new FastEncoder(width: 24, depth: 1, normRows: 512, prefixRows: 64, suffixRows: 256, shapeRows: 64, seed: 3, relu: true, neighbourRows: 256);
+        using Pipeline pipeline = Pipeline.Blank()
+            .Add(new Tagger(encoder, TokenColumn.Tag) { OwnsEncoder = true })
+            .Add(new Morphologizer(encoder, headClasses: 1))
+            .Add(new EditTreeLemmatizer(encoder, minClassCount: 2, headClasses: 3));
+        pipeline.Train(train, new TrainOptions { Epochs = 14, BatchWords = 200, LearningRate = 0.01f, Dropout = 0f, Seed = 5, DevFraction = 0.1 });
+        var lemmatizer = (EditTreeLemmatizer)pipeline.Components[2];
+        Assert.True(lemmatizer.Labels.Count > 3, "the test needs a tail");
+        (double tag, double pos, double morph, double lemma) = Score(pipeline, test);
+        Assert.True(tag > 0.97 && pos > 0.97 && morph > 0.97 && lemma > 0.97, $"{tag} {pos} {morph} {lemma}");
+
+        string path = Path.Combine(Path.GetTempPath(), "onenlp-two-level-" + Guid.NewGuid().ToString("N") + ".onenlp");
+        try
+        {
+            PipelineFile.Save(pipeline, path);
+            using Pipeline loaded = PipelineFile.Load(path);
+            Assert.Equal(Score(pipeline, test), Score(loaded, test));
+            Assert.Equal(lemmatizer.Labels, ((EditTreeLemmatizer)loaded.Components[2]).Labels);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void SharedInferenceBatchIsReusedOnlyForTheSameDocuments()
+    {
+        using var encoder = new FastEncoder(width: 16, depth: 1, normRows: 64, prefixRows: 16, suffixRows: 32, shapeRows: 16, seed: 9, relu: true, neighbourRows: 32, bigramRows: 32);
+        encoder.Weights!.Eval();
+        Doc[] docs = [.. Toy(4, 4).Select(e => e.Predicted)];
+        using NoGradScope noGrad = GradMode.NoGrad();
+        using var scope = new ActivationScope();
+        EncodedBatch first = encoder.Encode(docs);
+        Assert.Same(first, encoder.Encode([.. docs]));
+
+        // One document alone gives the rows it has in the batch: nothing leaks across a document edge, with neighbours and word pairs too.
+        float[] all = first.Vectors.Data<float>().ToArray();
+        int width = encoder.Width;
+        int row = 0;
+        foreach (Doc d in docs)
+        {
+            float[] alone = encoder.Encode([d]).Vectors.Data<float>().ToArray();
+            Assert.Equal(all.AsSpan(row * width, d.Length * width).ToArray(), alone);
+            row += d.Length;
+        }
+
+        // After training-mode work the kept batch is out of date.
+        EncodedBatch kept = encoder.Encode(docs);
+        encoder.Weights.Train(true);
+        _ = encoder.Encode(docs);
+
+        encoder.Weights.Eval();
+        Assert.NotSame(kept, encoder.Encode(docs));
+    }
+
     private static (double Tag, double Pos, double Morph, double Lemma) Score(Pipeline pipeline, List<Example> test)
     {
         int tag = 0, pos = 0, morph = 0, lemma = 0, total = 0;

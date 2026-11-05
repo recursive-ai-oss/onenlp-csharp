@@ -1,4 +1,3 @@
-using System.Reflection;
 using RecursiveAI.OneNlp.Neural;
 
 namespace RecursiveAI.OneNlp.Models.English;
@@ -16,9 +15,8 @@ public static class EnglishModel
     /// <summary>The NuGet package id.</summary>
     public const string PackageId = "RecursiveAI.OneNlp.Models.English";
 
-    // The three saved pipelines, in pipeline order: tagging (sentencizer, tagger, morphologizer, lemmatizer), parser, entities.
-    // Each has its own fast encoder; they are separate files because they are separate training recipes.
-    private static readonly string[] Parts = ["tagging.onenlp", "parser.onenlp", "ner.onenlp"];
+    // One saved pipeline: tagger, morphologizer, lemmatizer, parser and entity recognizer on one shared encoder.
+    private const string Weights = "english.onenlp";
 
     /// <summary>
     /// Makes the <see cref="Nlp"/> verbs use this model for English text. Safe to call more than once and from any thread. Needed only when the
@@ -32,46 +30,8 @@ public static class EnglishModel
     /// <exception cref="InvalidDataException">A weights file is damaged.</exception>
     public static Pipeline Load()
     {
-        Assembly assembly = typeof(EnglishModel).Assembly;
-        var loaded = new List<Pipeline>(Parts.Length);
-        try
-        {
-            foreach (string part in Parts)
-            {
-                using Stream stream = assembly.GetManifestResourceStream("weights/" + part)
-                    ?? throw new InvalidOperationException($"This build of {PackageId} has no weights ('{part}'): it was built without the weights directory.");
-                loaded.Add(PipelineFile.Load(stream));
-            }
-
-            // The parts share one tokenizer and one string table, so token and label IDs mean the same to every component. Their
-            // components move into the combined pipeline, which owns and disposes them; the part pipelines are not disposed.
-            Pipeline first = loaded[0];
-            var combined = new Pipeline(first.Tokenizer, Language.English, first.Strings);
-            foreach (Pipeline part in loaded)
-            {
-                foreach (IPipelineComponent component in part.Components)
-                {
-                    // The tagging recipe saves a rule sentencizer; the parser predicts sentence starts better on raw text (see the
-                    // parser recipe's results), and it would otherwise be confined to the rule's sentences. It sets them itself.
-                    if (component.Name == "sentencizer")
-                    {
-                        continue;
-                    }
-
-                    combined.Add(component);
-                }
-            }
-
-            return combined;
-        }
-        catch
-        {
-            foreach (Pipeline part in loaded)
-            {
-                part.Dispose();
-            }
-
-            throw;
-        }
+        using Stream stream = typeof(EnglishModel).Assembly.GetManifestResourceStream("weights/" + Weights)
+            ?? throw new InvalidOperationException($"This build of {PackageId} has no weights ('{Weights}'): it was built without the weights directory.");
+        return PipelineFile.Load(stream);
     }
 }

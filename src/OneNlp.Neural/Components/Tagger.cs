@@ -163,10 +163,13 @@ public sealed class Tagger : TrainableHead
             {
                 ReadOnlySpan<float> row = p.Slice((start + t) * classes, classes);
                 int best = 0;
+                float top = row[0];
                 for (int c = 1; c < classes; c++)
                 {
-                    if (row[c] > row[best])
+                    float v = row[c];
+                    if (v > top)
                     {
+                        top = v;
                         best = c;
                     }
                 }
