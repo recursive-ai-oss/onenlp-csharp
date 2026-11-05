@@ -1,3 +1,5 @@
+using System.Buffers;
+
 namespace RecursiveAI.OneNlp.Tokenizers.Hf;
 
 /// <summary>
@@ -15,6 +17,12 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
     private readonly ITokenDecoder? _decoder;
     private readonly AddedVocabulary _added;
     private readonly int _addedOutsideModel;
+    private readonly IdsFastPath? _fast;
+    private readonly DecodeFastPath? _decodeFast;
+    private readonly TokenTable? _table;
+
+    [ThreadStatic]
+    private static IdBuffer? t_ids;
 
     /// <summary>Composes the stages. Only the model is required.</summary>
     /// <param name="model">The subword model.</param>
@@ -44,6 +52,12 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
         }
 
         _addedOutsideModel = _added.Tokens.Count(t => _model.TokenToId(t.Content) is null);
+        _fast = IdsFastPath.TryCreate(model, normalizer, preTokenizer);
+        _decodeFast = DecodeFastPath.TryCreate(decoder);
+        if (_decodeFast is not null)
+        {
+            _table = TokenTable.TryCreate(model, _added);
+        }
     }
 
     /// <summary>The model's vocabulary plus the added tokens that the model does not already contain.</summary>
@@ -68,6 +82,11 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
     /// <inheritdoc/>
     public override string Decode(ReadOnlySpan<int> ids, bool skipSpecialTokens = true)
     {
+        if (_decodeFast is not null && _table is not null)
+        {
+            return _decodeFast.Decode(ids, skipSpecialTokens, _table);
+        }
+
         var tokens = new List<string>(ids.Length);
         foreach (int id in ids)
         {
@@ -88,6 +107,73 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
         }
 
         return string.Concat(_decoder.DecodeChain(tokens));
+    }
+
+    /// <inheritdoc/>
+    public override OperationStatus EncodeToIds(ReadOnlySpan<char> text, Span<int> ids, out int written, out int consumed, bool addSpecialTokens = true)
+    {
+        if (TryFastIds(text, addSpecialTokens, out IdBuffer? buffer) && buffer.Count <= ids.Length)
+        {
+            buffer.AsSpan().CopyTo(ids);
+            written = buffer.Count;
+            consumed = text.Length;
+            return OperationStatus.Done;
+        }
+
+        return base.EncodeToIds(text, ids, out written, out consumed, addSpecialTokens);
+    }
+
+    /// <inheritdoc/>
+    public override int CountTokens(ReadOnlySpan<char> text, bool addSpecialTokens = true) =>
+        TryFastIds(text, addSpecialTokens, out IdBuffer? buffer) ? buffer.Count : base.CountTokens(text, addSpecialTokens);
+
+    /// <summary>Runs the whole general pipeline on a text and appends its IDs (used by fast paths for the stretches they leave alone).</summary>
+    /// <param name="text">A text without added tokens or unpaired surrogates.</param>
+    /// <param name="ids">Receives the IDs.</param>
+    internal void AppendGeneralIds(string text, IdBuffer ids)
+    {
+        foreach (int id in EncodeSequence(text, typeId: 0).Ids)
+        {
+            ids.Add(id);
+        }
+    }
+
+    // The fast path takes a text that the post-processor adds nothing to, with no added token that could match and no unpaired surrogate;
+    // anything else is the general path's.
+    private bool TryFastIds(ReadOnlySpan<char> text, bool addSpecialTokens, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out IdBuffer? buffer)
+    {
+        buffer = null;
+        if (_fast is null || (addSpecialTokens && _postProcessor is not null) || !_added.CannotMatchIn(text) || HasUnpairedSurrogate(text))
+        {
+            return false;
+        }
+
+        buffer = t_ids ??= new IdBuffer();
+        buffer.Clear();
+        _fast.Encode(text, buffer, this);
+        return true;
+    }
+
+    private static bool HasUnpairedSurrogate(ReadOnlySpan<char> text)
+    {
+        int i = text.IndexOfAnyInRange('\uD800', '\uDFFF');
+        while (i >= 0)
+        {
+            int at = i;
+            if (char.IsHighSurrogate(text[at]) && at + 1 < text.Length && char.IsLowSurrogate(text[at + 1]))
+            {
+                i = at + 2;
+            }
+            else
+            {
+                return true;
+            }
+
+            int next = i < text.Length ? text[i..].IndexOfAnyInRange('\uD800', '\uDFFF') : -1;
+            i = next < 0 ? -1 : i + next;
+        }
+
+        return false;
     }
 
     /// <inheritdoc/>

@@ -28,6 +28,9 @@ internal sealed partial class StageRegistry
 /// <summary>Applies decoders one after the other.</summary>
 internal sealed class SequenceDecoder(ITokenDecoder[] steps) : ITokenDecoder
 {
+    /// <summary>The steps, in order.</summary>
+    internal IReadOnlyList<ITokenDecoder> Steps => steps;
+
     public List<string> DecodeChain(List<string> tokens)
     {
         foreach (ITokenDecoder step in steps)
@@ -42,6 +45,12 @@ internal sealed class SequenceDecoder(ITokenDecoder[] steps) : ITokenDecoder
 /// <summary>Joins WordPiece tokens: a continuation prefix is removed, any other token after the first gets a space in front.</summary>
 internal sealed class WordPieceDecoder(string prefix, bool cleanup) : ITokenDecoder
 {
+    /// <summary>The continuation prefix that is removed.</summary>
+    internal string Prefix => prefix;
+
+    /// <summary>Whether <see cref="Cleanup"/> is applied to every token.</summary>
+    internal bool CleanupEnabled => cleanup;
+
     public List<string> DecodeChain(List<string> tokens)
     {
         var result = new List<string>(tokens.Count);
@@ -57,6 +66,23 @@ internal sealed class WordPieceDecoder(string prefix, bool cleanup) : ITokenDeco
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Whether <see cref="Cleanup"/> could change the text: every pattern it replaces starts with a space followed by one of these
+    /// characters, so a text without such a pair is unchanged and need not be rewritten.
+    /// </summary>
+    internal static bool CleanupMayChange(ReadOnlySpan<char> s)
+    {
+        for (int i = 0; i + 1 < s.Length; i++)
+        {
+            if (s[i] == ' ' && s[i + 1] is '.' or '?' or '!' or ',' or '\'' or 'n' or 'm' or 'd' or 's' or 'v' or 'r')
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>Undoes the spaces a tokenizer put before punctuation and contractions.</summary>
@@ -79,6 +105,12 @@ internal sealed class MetaspaceDecoder : ITokenDecoder
 {
     private readonly char _mark;
     private readonly bool _stripFirst;
+
+    /// <summary>The character that stands for a space.</summary>
+    internal char Mark => _mark;
+
+    /// <summary>Whether the spaces at the start of the first token are removed.</summary>
+    internal bool StripFirst => _stripFirst;
 
     internal MetaspaceDecoder(StageConfig c)
     {
@@ -188,6 +220,15 @@ internal sealed class FuseDecoder : ITokenDecoder
 /// <summary>Removes up to <c>start</c> leading and <c>stop</c> trailing copies of a character from every token.</summary>
 internal sealed class StripDecoder(char content, int start, int stop) : ITokenDecoder
 {
+    /// <summary>The character removed.</summary>
+    internal char Content => content;
+
+    /// <summary>The most copies removed from the start of a token.</summary>
+    internal int Start => start;
+
+    /// <summary>The most copies removed from the end of a token.</summary>
+    internal int Stop => stop;
+
     public List<string> DecodeChain(List<string> tokens)
     {
         var result = new List<string>(tokens.Count);
@@ -217,6 +258,12 @@ internal sealed class StripDecoder(char content, int start, int stop) : ITokenDe
 /// <summary>Replaces a literal string in every token.</summary>
 internal sealed class ReplaceDecoder(string pattern, string content) : ITokenDecoder
 {
+    /// <summary>The literal string replaced.</summary>
+    internal string Pattern => pattern;
+
+    /// <summary>The replacement.</summary>
+    internal string Content => content;
+
     public List<string> DecodeChain(List<string> tokens) =>
         [.. tokens.Select(t => pattern.Length == 0 ? t : t.Replace(pattern, content, StringComparison.Ordinal))];
 }

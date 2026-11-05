@@ -35,13 +35,13 @@ internal sealed record BpeOptions(
 /// </remarks>
 internal sealed class BpeModel : ITokenizerModel
 {
-    private const int CacheCapacity = 20_000;
+    private const int CacheCapacity = 50_000;
     private const int CacheMaxPieceLength = 128;
 
     private readonly Dictionary<string, int> _vocab;
     private readonly Dictionary<string, int>.AlternateLookup<ReadOnlySpan<char>> _vocabBySpan;
     private readonly string?[] _idToToken;
-    private readonly Dictionary<long, MergeEntry> _merges;
+    private readonly MergeTable _merges;
     private readonly int _unknownId;
     private readonly string? _prefix;
     private readonly string? _suffix;
@@ -49,8 +49,11 @@ internal sealed class BpeModel : ITokenizerModel
     private readonly bool _ignoreMerges;
     private readonly double _dropout;
     private readonly int[]? _byteFallbackIds;
+    private readonly int[]? _singleChar; // ID of each one-unit vocabulary entry (-1 for none), when no continuing prefix or end suffix changes the lookup
     private readonly ConcurrentDictionary<string, ModelToken[]> _cache = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, ModelToken[]>.AlternateLookup<ReadOnlySpan<char>> _cacheBySpan;
+    private readonly ConcurrentDictionary<string, int[]> _idCache = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<string, int[]>.AlternateLookup<ReadOnlySpan<char>> _idCacheBySpan;
 
     [ThreadStatic]
     private static Workspace? t_workspace;
@@ -58,6 +61,86 @@ internal sealed class BpeModel : ITokenizerModel
     private static long s_dropoutCounter;
 
     private readonly record struct MergeEntry(int Rank, int NewId);
+
+    /// <summary>
+    /// The merge rules as a flat open-addressing table, probed far more often than anything else in BPE: every adjacent pair is looked up,
+    /// and most pairs are not merges. A small bit filter answers those misses from cache before the table is touched.
+    /// </summary>
+    private sealed class MergeTable
+    {
+        private const long Empty = -1; // a pair key is two non-negative IDs, so never -1
+
+        private struct Slot
+        {
+            public long Key;
+            public int Rank;
+            public int NewId;
+        }
+
+        private readonly Slot[] _slots;
+        private readonly ulong[] _filter;
+        private readonly int _slotShift;
+        private readonly int _filterShift;
+
+        internal MergeTable(Dictionary<long, MergeEntry> merges)
+        {
+            Count = merges.Count;
+            int slotBits = 4;
+            while ((1L << slotBits) < (long)merges.Count * 2)
+            {
+                slotBits++;
+            }
+
+            _slots = new Slot[1 << slotBits];
+            Array.Fill(_slots, new Slot { Key = Empty });
+            _slotShift = 64 - slotBits;
+            int filterBits = slotBits + 3; // eight filter bits per slot keeps false positives to a few percent at half load
+            _filter = new ulong[1 << (filterBits - 6)];
+            _filterShift = 64 - filterBits;
+            foreach (KeyValuePair<long, MergeEntry> kv in merges)
+            {
+                int at = (int)((ulong)kv.Key * 0x9E3779B97F4A7C15UL >> _slotShift);
+                while (_slots[at].Key != Empty)
+                {
+                    at = (at + 1) & (_slots.Length - 1);
+                }
+
+                _slots[at] = new Slot { Key = kv.Key, Rank = kv.Value.Rank, NewId = kv.Value.NewId };
+                int bit = (int)((ulong)kv.Key * 0xC2B2AE3D27D4EB4FUL >> _filterShift);
+                _filter[bit >> 6] |= 1UL << (bit & 63);
+            }
+        }
+
+        internal int Count { get; }
+
+        internal bool TryGetValue(long key, out MergeEntry entry)
+        {
+            int bit = (int)((ulong)key * 0xC2B2AE3D27D4EB4FUL >> _filterShift);
+            if ((_filter[bit >> 6] & (1UL << (bit & 63))) != 0)
+            {
+                int at = (int)((ulong)key * 0x9E3779B97F4A7C15UL >> _slotShift);
+                while (true)
+                {
+                    ref Slot slot = ref _slots[at];
+                    if (slot.Key == key)
+                    {
+                        entry = new MergeEntry(slot.Rank, slot.NewId);
+                        return true;
+                    }
+
+                    if (slot.Key == Empty)
+                    {
+                        break;
+                    }
+
+                    at = (at + 1) & (_slots.Length - 1);
+                }
+            }
+
+            entry = default;
+            return false;
+        }
+    }
 
     private struct Symbol
     {
@@ -74,14 +157,17 @@ internal sealed class BpeModel : ITokenizerModel
         public ulong[] Heap = new ulong[128];
         public int HeapCount;
         public List<ulong> Skipped = [];
+        public int[] PairRank = new int[64];
+        public int[] PairNewId = new int[64];
     }
 
     private BpeModel(Dictionary<string, int> vocab, Dictionary<long, MergeEntry> merges, BpeOptions options)
     {
         _vocab = vocab;
         _vocabBySpan = vocab.GetAlternateLookup<ReadOnlySpan<char>>();
-        _merges = merges;
+        _merges = new MergeTable(merges);
         _cacheBySpan = _cache.GetAlternateLookup<ReadOnlySpan<char>>();
+        _idCacheBySpan = _idCache.GetAlternateLookup<ReadOnlySpan<char>>();
 
         int maxId = -1;
         foreach (int id in vocab.Values)
@@ -104,6 +190,19 @@ internal sealed class BpeModel : ITokenizerModel
         foreach (KeyValuePair<string, int> kv in vocab)
         {
             _idToToken[kv.Value] = kv.Key;
+        }
+
+        if (string.IsNullOrEmpty(options.ContinuingSubwordPrefix) && string.IsNullOrEmpty(options.EndOfWordSuffix))
+        {
+            _singleChar = new int[char.MaxValue + 1];
+            Array.Fill(_singleChar, -1);
+            foreach (KeyValuePair<string, int> kv in vocab)
+            {
+                if (kv.Key.Length == 1)
+                {
+                    _singleChar[kv.Key[0]] = kv.Value;
+                }
+            }
         }
 
         _unknownId = -1;
@@ -358,6 +457,54 @@ internal sealed class BpeModel : ITokenizerModel
         output.AddRange(tokens);
     }
 
+    /// <inheritdoc/>
+    public void TokenizeIds(ReadOnlySpan<char> piece, IdBuffer output)
+    {
+        ArgumentNullException.ThrowIfNull(output);
+        if (piece.IsEmpty)
+        {
+            return;
+        }
+
+        if (_ignoreMerges || _dropout > 0)
+        {
+            // Rare settings: keep one implementation of them.
+            var tokens = new List<ModelToken>();
+            Tokenize(piece, tokens);
+            foreach (ModelToken t in tokens)
+            {
+                output.Add(t.Id);
+            }
+
+            return;
+        }
+
+        if (_idCacheBySpan.TryGetValue(piece, out int[]? cached))
+        {
+            output.AddRange(cached);
+            return;
+        }
+
+        Workspace ws = t_workspace ??= new Workspace();
+        int count = Split(piece, ws);
+        if (count == 0)
+        {
+            return;
+        }
+
+        Merge(ws, count);
+        int first = output.Count;
+        for (int i = 0; i != -1; i = ws.Symbols[i].Next)
+        {
+            output.Add(ws.Symbols[i].Id);
+        }
+
+        if (piece.Length <= CacheMaxPieceLength && _idCache.Count < CacheCapacity)
+        {
+            _idCacheBySpan.TryAdd(piece, output.AsSpan(first).ToArray());
+        }
+    }
+
     private static long PairKey(int left, int right) => ((long)left << 32) | (uint)right;
 
     private ModelToken[] Build(ReadOnlySpan<char> piece)
@@ -396,7 +543,11 @@ internal sealed class BpeModel : ITokenizerModel
             ReadOnlySpan<char> chars = piece.Slice(i, len);
 
             int id;
-            if (_prefix is null && _suffix is null)
+            if (_singleChar is not null && len == 1)
+            {
+                id = _singleChar[chars[0]];
+            }
+            else if (_prefix is null && _suffix is null)
             {
                 id = _vocabBySpan.TryGetValue(chars, out int found) ? found : -1;
             }
@@ -486,6 +637,12 @@ internal sealed class BpeModel : ITokenizerModel
     // (rank, position). A heap entry goes stale when its pair changed; it is re-checked against the merge table when popped.
     private void Merge(Workspace ws, int count)
     {
+        if (_dropout == 0 && count <= SmallWord)
+        {
+            MergeSmall(ws, count);
+            return;
+        }
+
         ws.HeapCount = 0;
         for (int i = 0; i + 1 < count; i++)
         {
@@ -542,6 +699,77 @@ internal sealed class BpeModel : ITokenizerModel
             {
                 Push(ws, pos);
             }
+        }
+    }
+
+    private const int SmallWord = 40;
+
+    // For a short word a heap costs more than it saves: keep the rank of each adjacent pair in an array, take the lowest rank (leftmost
+    // on a tie, because the scan is left to right and only a strictly lower rank replaces the best), merge, and refresh the two pairs
+    // that touch the merged symbol. The result is the one the heap gives.
+    private void MergeSmall(Workspace ws, int count)
+    {
+        if (ws.PairRank.Length < count)
+        {
+            ws.PairRank = new int[ws.Symbols.Length];
+            ws.PairNewId = new int[ws.Symbols.Length];
+        }
+
+        int[] rank = ws.PairRank;
+        int[] newId = ws.PairNewId;
+        Symbol[] sym = ws.Symbols;
+        for (int i = 0; i < count; i++)
+        {
+            SetPair(sym, rank, newId, i);
+        }
+
+        while (true)
+        {
+            int best = -1;
+            int bestRank = int.MaxValue;
+            for (int i = 0; i != -1; i = sym[i].Next)
+            {
+                if (rank[i] < bestRank)
+                {
+                    bestRank = rank[i];
+                    best = i;
+                }
+            }
+
+            if (best < 0)
+            {
+                return;
+            }
+
+            int right = sym[best].Next;
+            sym[best].Id = newId[best];
+            sym[best].End = sym[right].End;
+            sym[best].Next = sym[right].Next;
+            sym[right].Id = -1;
+            if (sym[right].Next >= 0)
+            {
+                sym[sym[right].Next].Prev = best;
+            }
+
+            SetPair(sym, rank, newId, best);
+            if (sym[best].Prev >= 0)
+            {
+                SetPair(sym, rank, newId, sym[best].Prev);
+            }
+        }
+    }
+
+    private void SetPair(Symbol[] sym, int[] rank, int[] newId, int pos)
+    {
+        int next = sym[pos].Next;
+        if (next >= 0 && _merges.TryGetValue(PairKey(sym[pos].Id, sym[next].Id), out MergeEntry entry))
+        {
+            rank[pos] = entry.Rank;
+            newId[pos] = entry.NewId;
+        }
+        else
+        {
+            rank[pos] = int.MaxValue;
         }
     }
 

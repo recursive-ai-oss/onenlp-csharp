@@ -461,7 +461,7 @@ public sealed class TiktokenTokenizer : Tokenizer
 
     // One BMP character for each general category the patterns tell apart: letters by case class, marks and numbers; anything else is
     // "neither letter, number nor space", for which '!' stands.
-    private static char CategoryRepresentative(UnicodeCategory category) => category switch
+    internal static char CategoryRepresentative(UnicodeCategory category) => category switch
     {
         UnicodeCategory.UppercaseLetter => 'A',
         UnicodeCategory.LowercaseLetter => 'a',

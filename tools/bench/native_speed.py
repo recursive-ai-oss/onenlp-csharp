@@ -58,7 +58,7 @@ def main():
         print(f"# tokenizers {tokenizers.__version__}")
         for name, d in [
             ("WordPiece (bert-base-uncased)", "google-bert_bert-base-uncased"),
-            ("Unigram (t5-small)", "google-t5_t5-small"),
+            ("Unigram (xlm-roberta-base)", "FacebookAI_xlm-roberta-base"),
             ("SentencePiece BPE, byte fallback (TinyLlama)", "TinyLlama_TinyLlama-1.1B-Chat-v1.0"),
             ("Byte-level BPE (gpt2)", "openai-community_gpt2"),
         ]:
