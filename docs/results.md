@@ -246,3 +246,131 @@ UD French-GSD r2.18 test and WikiNER French (wp3) test against spaCy 3.8.18 trai
 ## Portuguese fast tier
 
 UD Portuguese-Bosque r2.18 test and Universal NER Portuguese-Bosque test against spaCy 3.8.18 trained with its default configuration on the same data; the table, the settings and the weights are in `recipes/pt/fast/PROVENANCE.md`. Bosque has no XPOS, so there is no tagger and no XPOS or AllTags row. Raw text: every row ahead of spaCy except tokens (99.86 vs 99.87, within noise) (words 99.74 vs 88.51, UPOS 94.43 vs 84.15, LAS 82.09 vs 65.85, sentences 92.72 vs 84.48). Gold tokens: lemmas, UAS (86.93 vs 86.05) and LAS (82.74 vs 81.96) within noise; UPOS (95.08 vs 95.92) and UFeats (93.34 vs 94.11) behind. Entities 73.13 vs 75.27 (paired difference -2.14 [-4.26, 0.39], within noise). The package is 118 MB.
+## English fast tier (shipped: three separately trained models in one file)
+
+Model `english.onenlp` in `RecursiveAI.OneNlp.Models.English` (94.7 MB, sha256 `d62f2199...3255`): the tagging model (tagger, morphologizer, lemmatizer; `recipes/en/fast-tagging`), the parser model (`recipes/en/parser`) and the entity model (`recipes/en/ner`), each with its own encoder, put into one pipeline file by `recipes/en/assemble`. No weights were changed by the assembly. Each recipe's `PROVENANCE.md` holds its data, seed and results; the package's `PROVENANCE.md` lists all three.
+
+UD English-EWT r2.18 test (2,077 sentences, 25,131 tokens) and UNER English-EWT test. Paired bootstrap 95% CI over sentences (1,000 resamples, seed 1) from `tools/OneNlp.Eval`; reference spaCy 3.8.18 trained on the same data with its default configuration, same input mode, with its own interval. "Within noise" means the intervals overlap (`docs/measurement.md`). The development sets chose every setting; the test files were read once per model, and again for the consistency check below.
+
+**Consistency check of the assembled file.** Predictions of the assembled pipeline equal the separate models' recorded scores: every gold-token row and every parser row is identical to the second decimal; the raw-text tagging rows are identical except UFeats, 93.48 against 93.49 recorded (the check feeds ten sentences at a time and the recorded run fed whole documents). The entity row is identical (61.52).
+
+### Quality, gold tokens and sentences
+
+| Metric | Ours | spaCy | Within noise |
+|---|---|---|---|
+| UPOS | 93.89 [93.50, 94.29] | 94.29 [93.89, 94.66] | yes |
+| XPOS | 93.02 [92.58, 93.43] | 93.43 [93.00, 93.82] | yes |
+| UFeats | 94.83 [94.48, 95.14] | 95.18 [94.88, 95.45] | yes |
+| AllTags | 91.01 [90.50, 91.48] | 91.53 | yes |
+| Lemmas | 96.00 [95.66, 96.35] | 95.80 [95.42, 96.13] | yes |
+| UAS | 85.77 [84.91, 86.55] | 85.40 [84.50, 86.26] | yes |
+| LAS | 81.68 [80.82, 82.49] | 81.96 [81.03, 82.83] | yes |
+| CLAS | 76.76 [75.76, 77.75] | 77.28 | yes |
+
+### Quality, raw text
+
+Tagging rows: ten consecutive sentences per call. Parser rows: whole documents, the parser sets the sentence boundaries (what `Nlp.Analyze` does).
+
+| Metric | Ours | spaCy | Within noise |
+|---|---|---|---|
+| Tokens | 99.00 [98.80, 99.19] | 95.70 [95.14, 96.21] | ahead |
+| UPOS | 92.56 [92.08, 93.03] | 92.45 [91.84, 93.06] | yes |
+| XPOS | 91.44 [90.92, 91.92] | 91.72 [91.09, 92.34] | yes |
+| UFeats | 93.48 [93.05, 93.87] | 93.37 [92.81, 93.92] | yes |
+| AllTags | 89.35 [88.76, 89.90] | 89.99 [89.34, 90.64] | yes |
+| Lemmas | 94.79 [94.36, 95.22] | 93.69 [93.08, 94.29] | ahead |
+| Sentences (whole documents) | 76.15 [74.25, 78.08] | 72.66 [70.48, 74.75] | yes |
+| UAS (whole documents) | 81.80 [80.83, 82.69] | 81.34 [80.25, 82.37] | yes |
+| LAS (whole documents) | 78.13 [77.18, 79.06] | 78.53 [77.46, 79.55] | yes |
+| CLAS (whole documents) | 73.04 [71.90, 74.11] | 74.34 | yes |
+
+MLAS, information: 65.19 [64.09, 66.32] over ten-sentence calls, against spaCy's 69.05 [67.85, 70.21]. It is outside the interval for the shipped models and for the single-encoder option alike; it is not one of the gated rows.
+
+### Entities (UNER English-EWT test, gold tokens)
+
+| Row | Ours | spaCy |
+|---|---|---|
+| micro F1 | 61.52 [58.57, 64.31] | 62.32 [59.45, 65.20] (paired difference -0.80 [-3.48, 1.85], within noise) |
+| LOC | 66.77 [61.91, 71.09] | 71.43 |
+| ORG | 46.02 [40.63, 51.01] | 44.33 |
+| PER | 68.65 [64.45, 72.54] | 68.05 |
+
+### Speed (indicative, not a gate row)
+
+Raw EWT test text (25,131 tokens, repeated four times per pass, 100,524 tokens), one thread, one document per call, five passes after the process starts; Catalyst 26.10.6514 with its English models on the same documents, run back to back in the same job. Machine: x64 worker (Ryzen 9 7950X3D, 32 threads) with other jobs running (load average 16 to 17 before, during and after), .NET SDK 10.0.403, OneModel 1.0.0. The gate run is made once, on a quiet machine, at the 1.0 gate.
+
+| | tokens/s | allocation |
+|---|---|---|
+| Catalyst, sentences + tokens + POS + lemmas | 277,000 to 455,000 | 307 B/token |
+| Ours, sentences + tokens + UPOS/UFeats + lemmas | 16,500 to 17,400 | 496 B/token |
+| Ours, the same plus XPOS | 17,400 to 20,600 | 592 B/token |
+| Ours, sentences + entities | 40,300 to 44,200 | 394 B/token |
+| Ours, parser path (the parser sets sentences) | 3,300 to 3,800 | 811 B/token |
+| Ours, full pipeline | 2,200 to 2,600 | 1,612 B/token |
+
+The ratio on the tagging path is about 0.05 to 0.06 (**misses**, and by more than the single-encoder option below). Peak working set 1,083 MB for the full pipeline run; model file 94.7 MB. Where the time goes (microseconds per token, one document per call, same machine and load): tagging encoder 39 to 43 (256 wide, two window layers, exact GELU, 32,768-row tables), lemmatizer head 24 to 26, morphologizer 6.6, tagger 1.3; parser encoder 15 to 16 and parser head 276 to 302 (bidirectional LSTM); entity encoder 38 to 40 and entity head 6; tokenizer 0.2. The separate models' encoders are the cost: the single-encoder option's encoder takes about 2 microseconds per token.
+
+## English fast tier, option: one shared encoder (not shipped)
+
+A single encoder shared by every head, trained by `recipes/en/joint` (23.7 MB, sha256 `6bb03663...50b9`): four times smaller and more than ten times faster on the tagging path, with the rows below. It is not the packaged model because its UFeats, AllTags, entity and raw CLAS and MLAS rows are weaker. Rows measured on the model file `english.onenlp` of that recipe. UD English-EWT r2.18 test, 2,077 sentences, 25,131 tokens; UNER English-EWT test. Paired bootstrap 95% CI over sentences (1,000 resamples, seed 1); reference spaCy 3.8.18 trained on the same data with its default configuration, same input mode. "Within noise" means the intervals overlap. The development sets chose the configuration; the test files were read once.
+
+### Quality, gold tokens and sentences
+
+| Metric | Ours | spaCy | Within noise |
+|---|---|---|---|
+| UPOS | 93.58 [93.17, 93.99] | 94.29 [93.91, 94.68] | yes |
+| XPOS | 92.81 [92.36, 93.24] | 93.43 [93.00, 93.87] | yes |
+| UFeats | 94.40 [94.07, 94.73] | 95.18 [94.86, 95.48] | **no** |
+| AllTags | 90.45 [89.98, 90.95] | 91.53 [91.05, 91.99] | **no** |
+| Lemmas | 95.84 [95.50, 96.17] | 95.80 [95.46, 96.13] | yes |
+| UAS | 84.98 [84.12, 85.80] | 85.40 [84.48, 86.28] | yes |
+| LAS | 81.31 [80.47, 82.16] | 81.96 [81.00, 82.91] | yes |
+
+### Quality, raw text
+
+| Metric | Ours | spaCy | Within noise |
+|---|---|---|---|
+| Tokens | 99.00 [98.81, 99.19] | 95.70 [95.16, 96.17] | ahead |
+| Sentences | 72.76 [70.97, 74.66] | 72.66 [70.46, 74.70] | yes |
+| UPOS | 92.53 [92.09, 93.01] | 92.45 [91.83, 93.05] | yes |
+| XPOS | 91.60 [91.11, 92.11] | 91.72 [91.10, 92.34] | yes |
+| UFeats | 93.39 [92.97, 93.79] | 93.37 [92.84, 93.91] | yes |
+| AllTags | 89.35 [88.80, 89.89] | 89.99 [89.34, 90.64] | yes |
+| Lemmas | 94.68 [94.29, 95.07] | 93.69 [93.07, 94.28] | ahead |
+| UAS | 80.41 [79.47, 81.36] | 81.34 [80.25, 82.34] | yes |
+| LAS | 76.93 [75.98, 77.92] | 78.53 [77.49, 79.54] | yes |
+| CLAS | 71.81 [70.67, 72.97] | 74.34 [73.19, 75.49] | **no** |
+| MLAS | 65.14 [63.97, 66.36] | 69.05 [67.85, 70.21] | **no** |
+
+### Entities (UNER English-EWT test, gold tokens)
+
+| Row | Ours | spaCy | Paired difference |
+|---|---|---|---|
+| micro F1 | 59.38 [56.06, 62.60] | 62.32 [59.42, 65.33] | -2.93 [-5.81, -0.15] |
+| LOC | 65.55 [60.45, 70.29] | 71.43 [66.56, 76.16] | -5.88 [-9.82, -1.94] |
+| ORG | 45.19 [39.35, 50.48] | 44.33 [39.12, 49.82] | 0.86 [-3.94, 5.38] |
+| PER | 64.19 [59.35, 68.55] | 68.05 [63.91, 71.83] | -3.86 [-8.32, 0.72] |
+
+The intervals overlap on every entity row; the paired differences for micro F1 and LOC exclude zero.
+
+### Speed (indicative, not a gate row)
+
+Raw EWT test text (25,131 tokens, repeated four times per pass), one thread, sentences + tokens + UPOS/UFeats + lemmas; Catalyst 26.10.6514 with its English models on the same documents, run back to back in the same job. Machine: x64 worker (Ryzen 9 7950X3D) while other jobs were running (load 9 to 15), .NET SDK 10.0.403. The gate run is made once, on a quiet machine, at the 1.0 gate.
+
+| | tokens/s | allocation | note |
+|---|---|---|---|
+| Catalyst | 530,000 to 590,000 | 307 B/token | UPOS 80.7, lemmas 83.8 on this text |
+| Ours, one document per call | 215,000 to 270,000 | 413 B/token | UPOS 92.5, lemmas 94.7 |
+| Ours, `ProcessMany` batches of 64 | 226,000 to 259,000 | 327 B/token | |
+| Ours, entities path | 209,000 to 257,000 | 393 B/token | |
+| Ours, parser path | 5,300 to 7,900 | 856 B/token | the bidirectional LSTM is the cost |
+| Ours, full pipeline | 5,500 to 7,900 | 1,377 B/token | |
+
+The ratio on the tagging path is about 0.4 (**misses**). Peak working set 640 MB for the full pipeline; model file 23.7 MB; first `Nlp.Analyze` (loads the weights) 325 ms on x64. Where the time goes (microseconds per token, one document per call): tokenizer 0.2, sentencizer 0.05, encoder about 2 (lookups 0.6, window-layer product 1.2), lemmatizer 0.9, morphologizer 1.0. A smaller configuration of the same recipe (48 wide, no window layer) ran the same path at 500,000 to 690,000 tokens/s (about 1.6 to 2.3 times Catalyst in the same conditions) with a development tagging mean 0.6 points lower; it is not the shipped model.
+
+## Dutch fast tier
+
+UD Dutch-Alpino r2.18 test and WikiNER Dutch (wp3) test against spaCy 3.8.18 trained with its default configuration on the same data, paired bootstrap 95% CI over sentences (1,000 resamples, seed 1); the table, the settings and the weights are in `recipes/nl/fast/PROVENANCE.md`. Gold tokens (the treebank's own words and sentences): lemmas (91.06 vs 91.83), UAS (85.18 vs 84.09) and LAS (80.28 vs 79.85) within noise; **UPOS (92.86 vs 94.42), XPOS (89.84 vs 91.73), UFeats (91.53 vs 93.13) and AllTags (88.12 vs 90.51) miss spaCy outside the intervals**. Raw text: tokens (99.66 vs 99.82), sentences (91.31 vs 89.60), UAS and LAS (79.48 vs 79.57) within noise; **UPOS (92.28 vs 94.36), XPOS, UFeats, AllTags and lemmas (90.44 vs 91.65) miss**. Entities (gold tokens): micro F1 87.47 vs 86.21 (difference +1.26 [0.76, 1.72], ahead), every type within noise or ahead.
+## Turkish fast tier
+
+UD Turkish-BOUN r2.18 test and Turkish-WikiNER test against spaCy 3.8.18 trained with its default configuration on the same data, paired bootstrap 95% CI over sentences (1,000 resamples, seed 1); the table, the settings and the weights are in `recipes/tr/fast/PROVENANCE.md`. Gold words: UPOS (88.42 vs 88.04), UFeats (77.48 vs 78.30), UAS, LAS, CLAS and BLEX within noise; XPOS, AllTags and lemmas (84.88 vs 80.24) ahead; MLAS behind (36.36 vs 38.85). Raw text: tokens (99.56 vs 99.42) and words (96.71 vs 97.06) within noise, sentences ahead (87.46 vs 82.09), UFeats, UAS and LAS within noise; UPOS (85.46 vs 86.82), CLAS and MLAS behind, because the multiword tokens of the treebank (`vardır` = `var` + `dır`) cannot be predicted from the spelling. Entities (gold tokens): 67.40 vs 65.82, within noise. The package is 134 MB; the consumer app runs on JIT and NativeAOT.

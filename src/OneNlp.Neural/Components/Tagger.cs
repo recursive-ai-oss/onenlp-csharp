@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Text.Json;
 using RecursiveAI.OneModel.Tensors;
 using RecursiveAI.OneModel.Training;
@@ -32,6 +33,8 @@ public sealed class Tagger : TrainableHead
     private const int MaxLabels = 1 << 20;
     private const long MaxOutputValues = 1L << 26;
     private string[] _labels = [];
+    private StringStore? _idStore;
+    private int[]? _idCache;
     private Dictionary<string, int> _labelIds = new(StringComparer.Ordinal);
     private TaggerModule? _module;
 
@@ -150,9 +153,22 @@ public sealed class Tagger : TrainableHead
     {
         ArgumentNullException.ThrowIfNull(encoded);
         TaggerModule module = _module ?? throw new InvalidOperationException($"The component '{Name}' is not initialized.");
-        Tensor probabilities = Ops.Softmax(module.Forward(encoded.Vectors));
-        ReadOnlySpan<float> p = probabilities.Data<float>();
+        RowClassifier output = module.Fast;
+        ReadOnlySpan<float> vectors = encoded.Vectors.Data<float>();
         int classes = _labels.Length;
+        float[] logits = ArrayPool<float>.Shared.Rent(output.Stride);
+        try
+        {
+            PredictRows(encoded, docs, output, vectors, classes, logits);
+        }
+        finally
+        {
+            ArrayPool<float>.Shared.Return(logits);
+        }
+    }
+
+    private void PredictRows(EncodedBatch encoded, ReadOnlySpan<Doc> docs, RowClassifier output, ReadOnlySpan<float> vectors, int classes, float[] logits)
+    {
         for (int d = 0; d < docs.Length; d++)
         {
             Doc doc = docs[d];
@@ -161,18 +177,23 @@ public sealed class Tagger : TrainableHead
             var confidence = new float[doc.Length];
             for (int t = 0; t < doc.Length; t++)
             {
-                ReadOnlySpan<float> row = p.Slice((start + t) * classes, classes);
-                int best = 0;
-                for (int c = 1; c < classes; c++)
+                output.Logits(vectors.Slice((start + t) * output.Inputs, output.Inputs), logits);
+                (int best, float top) = RowKernels.ArgMax(logits, classes);
+                float p = 1f / RowKernels.ExpSum(logits, classes, top);
+                if (_idCache is null || !ReferenceEquals(_idStore, doc.Strings))
                 {
-                    if (row[c] > row[best])
-                    {
-                        best = c;
-                    }
+                    _idStore = doc.Strings;
+                    _idCache = new int[_labels.Length];
+                    Array.Fill(_idCache, -1);
                 }
 
-                ids[t] = doc.Strings.Add(_labels[best]);
-                confidence[t] = float.IsNaN(row[best]) ? 0f : Math.Clamp(row[best], 0f, 1f);
+                if (_idCache[best] < 0)
+                {
+                    _idCache[best] = doc.Strings.Add(_labels[best]);
+                }
+
+                ids[t] = _idCache[best];
+                confidence[t] = float.IsNaN(p) ? 0f : Math.Clamp(p, 0f, 1f);
             }
 
             doc.SetColumn(Column, ids);
@@ -245,9 +266,16 @@ public sealed class Tagger : TrainableHead
     private sealed class TaggerModule : NnModule
     {
         private readonly Linear _output;
+        private readonly FrozenLinear _fast;
 
-        public TaggerModule(int width, int labels, Generator generator) =>
+        public TaggerModule(int width, int labels, Generator generator)
+        {
             _output = RegisterModule("output", new Linear(width, labels, generator));
+            _fast = new FrozenLinear(_output);
+        }
+
+        /// <summary>Inference copy of the output layer.</summary>
+        public RowClassifier Fast => _fast.Get();
 
         // Input: token vectors [N, width]. Output: label scores [N, labels].
         public override Tensor Forward(Tensor input) => _output.Forward(input);

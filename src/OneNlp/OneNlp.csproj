@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Recognizers/Data/**/*.rules" LogicalName="Recognizers/Data/%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Segmentation/Data/*.tsv" LogicalName="Segmentation/Data/%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,12 @@
+<Project>
+  <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
+       To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
+  <ItemGroup>
+    <DutchWeight Include="tagging.onenlp" Size="38303620" Sha256="5e900419cc46dd7024a7a0fdc7b8dbf71d028ad8ee14d27ffd9cddc0056c8051"
+                  Recipe="recipes/nl/fast" Data="UD Dutch-Alpino r2.18 (CC BY-SA 4.0)" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
+    <DutchWeight Include="parser.onenlp" Size="45767248" Sha256="1cd7f7667605c163d57f323b0c946f17bdc96fcc7361c2e3f233c518277a2f04"
+                  Recipe="recipes/nl/fast" Data="UD Dutch-Alpino r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />
+    <DutchWeight Include="ner.onenlp" Size="35681974" Sha256="5e3d87f37da0162c70501ce6f7eed2a2fe4280fb21553169dea491b53c1f5287"
+                  Recipe="recipes/nl/fast" Data="WikiNER Dutch wp3 (CC BY 4.0)" Contents="entity recognizer (PER, LOC, ORG, MISC)" />
+  </ItemGroup>
+</Project>

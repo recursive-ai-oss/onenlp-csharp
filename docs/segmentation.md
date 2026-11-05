@@ -28,7 +28,7 @@ The `sentencizer` component writes sentence starts from the sentence boundaries 
 
 ## Measurement
 
-`tools/eval/segmentation.sh` scores both against a UD split with `tools/OneNlp.Eval` (`segment` writes the CoNLL-U, `ud` scores it with the CoNLL 2018 metric definitions; the shared-task script can be run beside it as a cross-check), and against spaCy's rule `sentencizer` on `spacy.blank("en")`. The raw text is the `# text` lines joined by single spaces. The `mwt` variant writes the pieces of a split contraction as a multi-word token line, as English UD treebanks annotate them. The English data was tuned on the English-EWT development split only, and the French data on the French-GSD development split only; each test split was scored once.
+`tools/eval/segmentation.sh` scores both against a UD split with `tools/OneNlp.Eval` (`segment` writes the CoNLL-U, `ud` scores it with the CoNLL 2018 metric definitions; the shared-task script can be run beside it as a cross-check), and against spaCy's rule `sentencizer` on `spacy.blank("en")`. The raw text is the `# text` lines joined by single spaces. The `mwt` variant writes the pieces of a split contraction as a multi-word token line, as English UD treebanks annotate them. The English data was tuned on the English-EWT development split only, the French data on the French-GSD development split only, and the Dutch data on the Dutch-Alpino development split only; each test split was scored once.
 
 ## German data (`SegmentationData.German`, name `german`)
 
@@ -56,3 +56,26 @@ Written from the UD Portuguese guidelines and the Portuguese-Bosque treebank; th
 - **Marks**: a run of one repeated mark is one token (`...`, `--`); `!` and `?` are single tokens. Decimal commas and thousands points stay inside the number (`5,50`, `2.200,00`).
 
 Development split of UD Portuguese-Bosque, raw text (`recipes/pt/fast segment`, rule sentencizer): tokens 99.89 [99.83, 99.94], words 99.81 [99.74, 99.87], sentences 80.55 [78.27, 82.61].
+
+## Dutch data (`SegmentationData.Dutch`, name `dutch`)
+
+Written from the Dutch-Alpino treebank; the choices below were made on its training and development files only (`tools/fetch/nl/token_stats.py` prints the counts, `tools/fetch/nl/seg_diff.py` the differences against a gold file).
+
+- **Apostrophes**: a word with an apostrophe inside stays whole by UAX #29 (`zo'n`, `z'n`, `auto's`, `Jan's`). The short forms that start with an apostrophe (`'t`, `'s`, `'n`, `'m`, `'ns`) and years without their century (`'69`) are one token when the apostrophe follows white space, punctuation or the start of the text and the word after it is exactly one of these; any other apostrophe is a quotation mark of its own (`'ja'` is `'` `ja` `'`). A hyphen after such a form continues the token (`'s-avonds`).
+- **Hyphens** between letters or digits stay (`Zuid-Afrika`, `21-jarige`, `2-0`); a hyphen with white space around it is a token.
+- **Abbreviations** keep their full stop: the listed words (`mr.`, `drs.`, `prof.`, `pct.`, `mln.`, `enz.`, `bijv.`), dotted single letters (`o.a.`, `b.v.`, `t.o.v.`, `N.V.`) and single letters (initials: `J. Bakker`). Sentences do not break after the titles, dotted abbreviations and initials that name a person or place (`mr. Van Dam`, `J. Bakker`).
+- **Numbers**: a thousands point or decimal comma between digits stays inside the number by UAX #29 (`130.000`, `2,5`); `/` between digits does too (`1/2`); an amount in whole guilders with a trailing dash (`5,-`, `130.000,-`, `11.-`) is one token.
+- **Marks**: a run of one repeated mark is one token (`...`, `,,` and `''` as quotation marks), but `!` and `?` are always single tokens.
+- **Contractions**: none are cut. UD Dutch-Alpino has one multiword token (`nogeens`) in its training and development files, and the tokenizer leaves it whole.
+
+Development split of UD Dutch-Alpino, raw text (`recipes/nl/fast segment`): tokens 99.78 [99.65, 99.89], words 99.78, sentences 81.60 (the rule sentencizer alone; the parser sets sentence starts in the full pipeline). The remaining differences are a few company names with `&` (`AZ&PC`), hyphens left open before a coordination (`mond- en keelholte`) and `,,`.
+## Turkish data (`SegmentationData.Turkish`, name `turkish`)
+
+Written from the tokenization of UD Turkish-BOUN; every choice below was made on its training and development files only (`tools/fetch/tr/`).
+
+- **Apostrophes** stay inside the token: a suffix written after a name or a number is part of it (`Ankara'da`, `Ali'nin`, `1882'den`). UAX #29 already keeps a letter, apostrophe, letter run together; between a digit and a letter it cuts, so the data joins that case.
+- **Hyphens** are always tokens of their own, between letters (`Türk-Arap`) and between digits (`1-2`), as BOUN writes them.
+- **A full stop that closes a quotation** is one token with the closing quote (`gel."`), the more common form in BOUN (91 against 42 separate).
+- **Ordinals**: one to four digits and a full stop are one token before a lower-case word or a month name (`3. Ocak`); otherwise the stop is its own token (`2001.`).
+- **Multiword tokens.** BOUN writes a copula or a suffix such as `-ki`, `-ken`, `-ydi` that is spelled onto its word as a word of its own: `vardır` is `var` + `dır`, `yaparken` is `yapar` + `ken`. Whether it is a word of its own depends on the stem and the treebank is not consistent about it, so no word list decides. The tokenizer reads a table of word endings (`src/OneNlp/Segmentation/Data/tr.mwt.tsv`, 119 rows, written by `tools/fetch/tr/mwt_table.py` from the training split): the last two to nine letters of a lower-cased token (Turkish case rules: `I` is `ı`, `İ` is `i`) map to the length of the final piece, the longest ending that matches decides, and a token that is not all letters is never cut. A row is kept when the ending occurs at least three times in the training split and at least 90% of those tokens are cut the same way (`tools/fetch/tr/mwt_sweep.py` chose the two thresholds on the development split by the Words F1 they give). On the development split the table makes 119 of the treebank's 266 cuts and 87 cuts the treebank does not make. A cut word is written back as one multiword token with its two words (`SegmentationData.TryMatchMultiword` finds the pieces).
+- No abbreviation list: only six tokens of the training split keep a full stop inside or after letters (`Dr.` twice), so every full stop after a word is a token of its own.
