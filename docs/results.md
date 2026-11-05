@@ -234,3 +234,7 @@ is at least 7.6x on every row either way.
 | with date/time (2.5 M chars) | Recognizers.Text 1.8.13 | 27.16 s | 0.09 | 43.8x | 28.18 s | 0.09 | 50.5x | 5,024 MB (x64), 5,026 MB (arm64) | 334 / 303 MB | 630 / 424 ms |
 
 Pass/fail: every row is at or faster than its managed comparator, on both machines.
+
+## German fast tier
+
+UD German-GSD r2.18 test and GermEval 2014 test against spaCy 3.8.18 trained with its default configuration on the same data; the table, the settings and the weights are in `recipes/de/fast/PROVENANCE.md`. Raw text: every row within noise or ahead (tokens 99.91 vs 98.03, UPOS 92.87 vs 90.13, LAS 76.75 vs 70.77). Gold tokens: XPOS, lemmas, UAS, LAS and entities (66.28 vs 65.77) within noise; UPOS (93.46 vs 94.59), UFeats (82.67 vs 84.71) and AllTags (78.91 vs 81.29) behind. The package is 109 MB; the consumer app runs on JIT and NativeAOT.

@@ -16,13 +16,15 @@ public sealed class SegmentationData
     private static readonly char[] NoMarks = [];
     private static readonly char[] DigitJoinerMarks = [':', '/'];
     private static readonly char[] MarkRunChars = ['.', '-', '!', '?', '*', '=', '_', '~', '<', '>', '#', '$', '+', '/', '\\'];
+    // German runs of the same mark are one token, except ! and ?, which UD German writes one by one; `` and '' stand for quotation marks.
+    private static readonly char[] GermanMarkRunChars = ['.', '-', '*', '=', '_', '~', '<', '>', '#', '$', '+', '/', '\\', '`', '\''];
     private static readonly string[] CommonEmoticons = [":-)", ":)", ":-(", ":(", ";-)", ";)", ":-D", ":D", ":-P", ":P", ":'(", ":-/", ":/", ":-O", ":O", "<3", "=)", "=D", "^_^"];
 
-    /// <summary>The name of the built-in data set: <c>none</c>, <c>neutral</c> or <c>english</c>. Saved pipelines record it.</summary>
+    /// <summary>The name of the built-in data set: <c>none</c>, <c>neutral</c>, <c>english</c> or <c>german</c>. Saved pipelines record it.</summary>
     public string Name { get; private init; } = string.Empty;
 
     /// <summary>Finds a built-in data set by its <see cref="Name"/>.</summary>
-    /// <param name="name"><c>none</c>, <c>neutral</c> or <c>english</c>.</param>
+    /// <param name="name"><c>none</c>, <c>neutral</c>, <c>english</c> or <c>german</c>.</param>
     /// <returns>The data set.</returns>
     /// <exception cref="ArgumentException">There is no such data set.</exception>
     public static SegmentationData ByName(string name) => name switch
@@ -30,7 +32,8 @@ public sealed class SegmentationData
         "none" => None,
         "neutral" => Neutral,
         "english" => English,
-        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral or english.", nameof(name)),
+        "german" => German,
+        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral, english or german.", nameof(name)),
     };
 
     /// <summary>No adjustments: tokens are the UAX #29 word segments that are not white space.</summary>
@@ -82,6 +85,48 @@ public sealed class SegmentationData
             "gov.", "sen.", "rep.", "vs.",
         ]) { Name = "english" };
 
+
+    /// <summary>
+    /// German: the neutral defaults plus UD German tokenization. The contractions of a preposition and an article (<c>zum</c>, <c>im</c>,
+    /// <c>vom</c>) are split in two pieces, which the treebank annotates as a multiword token (<c>zu</c> + <c>dem</c>); abbreviations
+    /// keep their full stop (<c>Dr.</c>, <c>Nr.</c>, <c>z.B.</c>, initials); and a number followed by a full stop is one token when it is an
+    /// ordinal (<c>3. Oktober</c>) and two when the full stop ends the sentence.
+    /// </summary>
+    public static SegmentationData German { get; } = new(
+        // UD German-GSD splits a hyphen between letters off (US-Soldaten is US, -, Soldaten) and keeps it between digits (1-2).
+        keepUrlsAndEmails: true, joinHyphenated: true, hyphenPrefixes: [], digitJoiners: DigitJoinerMarks, markRuns: GermanMarkRunChars, emoticons: CommonEmoticons,
+        // Pieces are cut in nearly equal lengths, longer first, which is how the CoNLL-U reader cuts the surface form of a multiword token
+        // whose words do not concatenate to it (docs/data-formats.md): zum is zu|m, beim is be|im.
+        specialCases: new Dictionary<string, int[]>
+        {
+            ["zum"] = [2, 1], ["zur"] = [2, 1], ["im"] = [1, 1], ["am"] = [1, 1], ["vom"] = [2, 1], ["beim"] = [2, 2],
+            ["ins"] = [2, 1], ["ans"] = [2, 1], ["ums"] = [2, 1], ["aufs"] = [2, 2], ["übers"] = [3, 2],
+            ["durchs"] = [3, 3], ["fürs"] = [2, 2], ["hinterm"] = [4, 3], ["überm"] = [3, 2], ["unterm"] = [3, 3], ["vorm"] = [2, 2],
+        },
+        // Words that UD German-GSD keeps joined to their full stop more often than not (counted on its training file; usw. and bzw. are
+        // split there), a few usual ones that file does not contain, and single letters (z. B., initials).
+        abbreviations:
+        [
+            "dr", "prof", "st", "ca", "etc", "inc", "co", "ltd", "mr", "mrs", "jap", "engl", "lat", "ital", "dt", "gr", "nr", "str", "vgl", "ggf", "inkl",
+            "hrsg", "geb", "mio", "mrd", "sog", "jh", "tel", "ph.d",
+            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+        ],
+        // geht's is geht + 's.
+        clitics: ["s"], nTSuffix: false,
+        // The sentencizer never starts a sentence after these: titles and abbreviations that are followed by a name or a noun.
+        nonFinalAbbreviations:
+        [
+            "dr.", "prof.", "st.", "nr.", "str.", "ca.", "bzw.", "evtl.", "ggf.", "vgl.", "inkl.", "sog.", "max.", "min.", "jun.", "sen.", "hrsg.", "geb.", "gest.",
+            "z.b.", "u.a.", "d.h.", "z.", "u.", "d.", "v.", "mr.", "mrs.", "abs.", "kap.", "bd.",
+        ])
+    {
+        Name = "german",
+        OrdinalDot = true,
+        SameMarkRuns = true,
+        OrdinalFollowers = new[] { "januar", "februar", "märz", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "dezember",
+            "quartal", "jahrhundert", "jahrtausend", "weltkrieg", "platz", "liga", "bundesliga", "stock", "og", "klasse", "mal", "auflage", "runde", "etappe", "spieltag", "tag" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase),
+    };
+
     private SegmentationData(
         bool keepUrlsAndEmails, bool joinHyphenated, string[]? hyphenPrefixes, char[] digitJoiners, char[] markRuns, string[] emoticons, Dictionary<string, int[]> specialCases,
         string[] abbreviations, string[] clitics, bool nTSuffix, string[] nonFinalAbbreviations)
@@ -99,6 +144,15 @@ public sealed class SegmentationData
         NTSuffix = nTSuffix;
         NonFinalAbbreviations = nonFinalAbbreviations.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
     }
+
+    /// <summary>Whether a number followed by a full stop is one token (an ordinal, as in German <c>3. Oktober</c>) when what follows says so.</summary>
+    internal bool OrdinalDot { get; private init; }
+
+    /// <summary>Capitalised words (lower case here) after which a number and a full stop is an ordinal; a lower-case word always is.</summary>
+    internal FrozenSet<string> OrdinalFollowers { get; private init; } = FrozenSet<string>.Empty;
+
+    /// <summary>Whether a run of marks is made of one mark repeated (<c>...</c>) rather than any mix of them (<c>.''</c> is then a full stop and a quote).</summary>
+    internal bool SameMarkRuns { get; private init; }
 
     internal bool KeepUrlsAndEmails { get; }
 
@@ -132,8 +186,8 @@ public sealed class SegmentationData
     /// <summary>Tokens (with the full stop) after which the sentencizer never starts a sentence.</summary>
     internal FrozenSet<string> NonFinalAbbreviations { get; }
 
-    /// <summary>Picks the data for a language: English has its own; every other language gets the neutral defaults.</summary>
+    /// <summary>Picks the data for a language: English and German have their own; every other language gets the neutral defaults.</summary>
     /// <param name="language">The language.</param>
     /// <returns>The data; never <see langword="null"/>.</returns>
-    public static SegmentationData For(Language language) => language == Language.English ? English : Neutral;
+    public static SegmentationData For(Language language) => language == Language.English ? English : language == Language.German ? German : Neutral;
 }

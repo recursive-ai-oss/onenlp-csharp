@@ -1,0 +1,12 @@
+<Project>
+  <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
+       To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
+  <ItemGroup>
+    <GermanWeight Include="tagging.onenlp" Size="37387310" Sha256="ddce9e38d52563a2fd1a353332bf1f8f52374c52d17a966197ae6bf57ef2e79e"
+                  Recipe="recipes/de/fast" Data="UD German-GSD r2.18 (CC BY-SA 4.0)" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
+    <GermanWeight Include="parser.onenlp" Size="46233241" Sha256="bb21d812d517f1f6ec8f90df375b0bc5996b9cfaf890e8ad8ddb8f8a24ff21b4"
+                  Recipe="recipes/de/fast" Data="UD German-GSD r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />
+    <GermanWeight Include="ner.onenlp" Size="35681975" Sha256="f0afd41dd4545c02e58811b5c76a4a4ee3b2475bb7b1596114dcda73b524ee28"
+                  Recipe="recipes/de/fast" Data="GermEval 2014 (CC BY 4.0)" Contents="entity recognizer (PER, LOC, ORG, MISC)" />
+  </ItemGroup>
+</Project>
