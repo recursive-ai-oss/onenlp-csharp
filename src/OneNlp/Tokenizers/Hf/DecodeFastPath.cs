@@ -90,6 +90,12 @@ internal sealed class TokenTable
         _special = new bool[size];
     }
 
+    /// <summary>The number of IDs the table covers.</summary>
+    internal int Length => _tokens.Length;
+
+    /// <summary>The token of an ID whether or not it is special, or <see langword="null"/> when the ID is outside the table.</summary>
+    internal string? Raw(int id) => (uint)id < (uint)_tokens.Length ? _tokens[id] : null;
+
     /// <summary>The token of an ID, or <see langword="null"/> when it is not in the vocabulary or is a special token that is skipped.</summary>
     internal string? Get(int id, bool skipSpecialTokens) =>
         (uint)id < (uint)_tokens.Length && !(skipSpecialTokens && _special[id]) ? _tokens[id] : null;
@@ -100,24 +106,28 @@ internal sealed class ByteLevelPath : DecodeFastPath
 {
     private const int StackBytes = 1024;
 
+    // The bytes each token stands for, worked out once on first use: a token's bytes do not depend on its neighbours, only the UTF-8
+    // reading of the joined bytes does.
+    private byte[]?[]? _bytesOf;
+
     internal override string Decode(ReadOnlySpan<int> ids, bool skipSpecialTokens, TokenTable tokens)
     {
-        // A character is at most three bytes. Short inputs use a fixed stack buffer; a token that would not fit moves the work to a rented one.
+        byte[]?[] bytesOf = _bytesOf ??= Build(tokens);
         byte[]? rented = null;
-        Span<byte> bytes = stackalloc byte[StackBytes];
+        Span<byte> bytes = stackalloc byte[StackBytes]; // short outputs stay on the stack; a longer one moves to a rented buffer
         int n = 0;
         try
         {
             foreach (int id in ids)
             {
-                if (tokens.Get(id, skipSpecialTokens) is not { } token)
+                if (tokens.Get(id, skipSpecialTokens) is null || bytesOf[id] is not { } part)
                 {
                     continue;
                 }
 
-                if (n + (token.Length * 3) > bytes.Length)
+                if (n + part.Length > bytes.Length)
                 {
-                    byte[] bigger = ArrayPool<byte>.Shared.Rent(Math.Max(bytes.Length * 2, n + (token.Length * 3)));
+                    byte[] bigger = ArrayPool<byte>.Shared.Rent(Math.Max(bytes.Length * 2, n + part.Length));
                     bytes[..n].CopyTo(bigger);
                     if (rented is not null)
                     {
@@ -128,25 +138,8 @@ internal sealed class ByteLevelPath : DecodeFastPath
                     bytes = bigger;
                 }
 
-                foreach (char c in token)
-                {
-                    int b = ByteLevelTable.ToByte(c);
-                    if (b >= 0)
-                    {
-                        bytes[n++] = (byte)b;
-                    }
-                    else if (char.IsSurrogate(c))
-                    {
-                        // A character alone is read as text: an unpaired surrogate becomes U+FFFD.
-                        bytes[n++] = 0xEF;
-                        bytes[n++] = 0xBF;
-                        bytes[n++] = 0xBD;
-                    }
-                    else
-                    {
-                        n += Encoding.UTF8.GetBytes(new ReadOnlySpan<char>(in c), bytes[n..]);
-                    }
-                }
+                part.CopyTo(bytes[n..]);
+                n += part.Length;
             }
 
             return Encoding.UTF8.GetString(bytes[..n]);
@@ -158,6 +151,42 @@ internal sealed class ByteLevelPath : DecodeFastPath
                 ArrayPool<byte>.Shared.Return(rented);
             }
         }
+    }
+
+    private static byte[]?[] Build(TokenTable tokens)
+    {
+        var result = new byte[tokens.Length][];
+        var scratch = new List<byte>();
+        for (int id = 0; id < result.Length; id++)
+        {
+            if (tokens.Raw(id) is not { } token)
+            {
+                continue;
+            }
+
+            scratch.Clear();
+            foreach (char c in token)
+            {
+                int b = ByteLevelTable.ToByte(c);
+                if (b >= 0)
+                {
+                    scratch.Add((byte)b);
+                }
+                else if (char.IsSurrogate(c))
+                {
+                    // A character alone is read as text: an unpaired surrogate becomes U+FFFD.
+                    scratch.AddRange([0xEF, 0xBF, 0xBD]);
+                }
+                else
+                {
+                    scratch.AddRange(Encoding.UTF8.GetBytes(c.ToString()));
+                }
+            }
+
+            result[id] = [.. scratch];
+        }
+
+        return result;
     }
 }
 
@@ -263,6 +292,13 @@ internal sealed class WordPiecePath(string prefix, bool cleanup) : DecodeFastPat
 
                 first = false;
                 // The cleanup only rewrites a space followed by punctuation or a contraction, so most tokens are copied as they are.
+                if (cleanup && space && piece.Length == 1 && piece[0] is '.' or '?' or '!' or ',')
+                {
+                    // " ." " ?" " !" " ," are the first four rules of the cleanup, and nothing after them touches the result.
+                    buffer[n++] = piece[0];
+                    continue;
+                }
+
                 bool rewrite = cleanup && (WordPieceDecoder.CleanupMayChange(piece) || (space && piece.Length > 0 && WordPieceDecoder.CleanupMayChange([' ', piece[0]])));
                 if (rewrite)
                 {

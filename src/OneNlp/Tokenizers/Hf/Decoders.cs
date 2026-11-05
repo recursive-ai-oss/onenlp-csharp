@@ -85,19 +85,26 @@ internal sealed class WordPieceDecoder(string prefix, bool cleanup) : ITokenDeco
         return false;
     }
 
+    private static readonly (string Pattern, string Replacement)[] CleanupRules =
+    [
+        (" .", "."), (" ?", "?"), (" !", "!"), (" ,", ","), (" ' ", "'"), (" n't", "n't"),
+        (" 'm", "'m"), (" do not", " don't"), (" 's", "'s"), (" 've", "'ve"), (" 're", "'re"),
+    ];
+
     /// <summary>Undoes the spaces a tokenizer put before punctuation and contractions.</summary>
-    internal static string Cleanup(string s) => s
-        .Replace(" .", ".", StringComparison.Ordinal)
-        .Replace(" ?", "?", StringComparison.Ordinal)
-        .Replace(" !", "!", StringComparison.Ordinal)
-        .Replace(" ,", ",", StringComparison.Ordinal)
-        .Replace(" ' ", "'", StringComparison.Ordinal)
-        .Replace(" n't", "n't", StringComparison.Ordinal)
-        .Replace(" 'm", "'m", StringComparison.Ordinal)
-        .Replace(" do not", " don't", StringComparison.Ordinal)
-        .Replace(" 's", "'s", StringComparison.Ordinal)
-        .Replace(" 've", "'ve", StringComparison.Ordinal)
-        .Replace(" 're", "'re", StringComparison.Ordinal);
+    internal static string Cleanup(string s)
+    {
+        // In this order, each rule on the result of the one before. A rule longer than the text cannot match, and most tokens are short.
+        foreach ((string pattern, string replacement) in CleanupRules)
+        {
+            if (s.Length >= pattern.Length && s.Contains(pattern, StringComparison.Ordinal))
+            {
+                s = s.Replace(pattern, replacement, StringComparison.Ordinal);
+            }
+        }
+
+        return s;
+    }
 }
 
 /// <summary>Turns the visible space mark back into a space and drops the space the pre-tokenizer added in front of the first token.</summary>
