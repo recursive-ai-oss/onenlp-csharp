@@ -61,6 +61,8 @@ internal static class Program
         Check("durations", Nlp.Dates("Reply within sixty (60) days or ten business days.", reference)
             .Select(d => d.Value + "/" + d.Count + d.Unit).SequenceEqual(["5184000/60Day", "P10BD/10BusinessDay"]));
         Check("compound", Nlp.Quantities("He is 5 feet 3 inches, 1,00,000 or 6.02e23.").Select(q => q.Value).SequenceEqual([63m, 100000m, 602000000000000000000000m]));
+        Check("french", Nlp.Quantities("quatre-vingt-dix-sept élèves pour 1 234,56 €", Language.French).Select(q => q.Value).SequenceEqual([97m, 1234.56m]));
+        Check("german", Nlp.ParseDate("vom 3. März bis 7. April 2026", reference, Language.German)?.Start == new DateTimeOffset(2026, 3, 3, 0, 0, 0, TimeSpan.Zero));
         Check("sequences", Nlp.Sequences("mail a@b.com or 10.0.0.1").Select(s => s.Kind).SequenceEqual([SequenceKind.Email, SequenceKind.IpAddress]));
         Check("recognizer component", Pipeline.Blank(Language.English).Add("recognizers").Process("It cost $5.").Ents.Count == 1);
 
