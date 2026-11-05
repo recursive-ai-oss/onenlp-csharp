@@ -27,11 +27,11 @@ Gold tokens and sentences (the treebank's own words and sentences are the input;
 
 | Metric | Ours | spaCy | Within noise |
 |---|---|---|---|
-| UPOS | 92.86 [92.20, 93.52] | 94.42 [93.77, 95.04] | no |
-| XPOS | 89.84 [89.09, 90.58] | 91.73 [90.96, 92.40] | no |
-| UFeats | 91.53 [90.85, 92.20] | 93.13 [92.47, 93.72] | no |
-| AllTags | 88.12 [87.35, 88.86] | 90.51 [89.74, 91.19] | no |
-| Lemmas | 91.06 [90.48, 91.56] | 91.83 [91.21, 92.39] | yes |
+| UPOS | 93.83 [93.16, 94.49] | 94.42 [93.77, 95.04] | yes |
+| XPOS | 91.52 [90.75, 92.21] | 91.73 [90.96, 92.40] | yes |
+| UFeats | 92.94 [92.24, 93.53] | 93.13 [92.47, 93.72] | yes |
+| AllTags | 90.30 [89.49, 91.03] | 90.51 [89.74, 91.19] | yes |
+| Lemmas | 91.61 [90.99, 92.14] | 91.83 [91.21, 92.39] | yes |
 | UAS | 85.18 [84.06, 86.32] | 84.09 [82.92, 85.33] | yes |
 | LAS | 80.28 [79.12, 81.51] | 79.85 [78.58, 81.16] | yes |
 
@@ -42,14 +42,28 @@ Raw text (our tokenizer; the parser sets sentence starts):
 | Tokens | 99.66 [99.47, 99.81] | 99.82 [99.70, 99.94] | yes |
 | Sentences | 91.31 [88.74, 93.73] | 89.60 [87.04, 92.17] | yes |
 | Words | 99.66 [99.47, 99.81] | 99.82 [99.70, 99.94] | yes |
-| UPOS | 92.28 [91.60, 93.00] | 94.36 [93.67, 94.98] | no |
-| XPOS | 89.27 [88.49, 90.01] | 91.63 [90.88, 92.33] | no |
-| UFeats | 90.98 [90.27, 91.69] | 92.97 [92.29, 93.56] | no |
-| AllTags | 87.47 [86.67, 88.24] | 90.39 [89.62, 91.08] | no |
-| Lemmas | 90.44 [89.80, 90.99] | 91.65 [91.05, 92.24] | no |
+| UPOS | 93.09 [92.40, 93.77] | 94.36 [93.67, 94.98] | yes |
+| XPOS | 90.94 [90.12, 91.66] | 91.63 [90.88, 92.33] | yes |
+| UFeats | 92.47 [91.77, 93.11] | 92.97 [92.29, 93.56] | yes |
+| AllTags | 89.52 [88.68, 90.30] | 90.39 [89.62, 91.08] | yes |
+| Lemmas | 91.19 [90.51, 91.79] | 91.65 [91.05, 92.24] | yes |
 | UAS | 84.44 [83.24, 85.65] | 83.70 [82.56, 84.95] | yes |
 | LAS | 79.48 [78.28, 80.78] | 79.57 [78.26, 80.89] | yes |
 
 Entities, WikiNER Dutch wp3 test, gold tokens (paired): micro F1 87.47 [86.91, 87.98] vs 86.21 [85.70, 86.78] (difference +1.26 [0.76, 1.72]); precision 87.33 vs 85.96; recall 87.60 vs 86.46. Per type: LOC 90.22 vs 89.09, MISC 79.83 vs 78.19, ORG 80.94 vs 78.28, PER 89.72 vs 89.21; per-type intervals overlap in every case. The published WikiNER numbers (Stanza 94.8, Trankit 95.0) are on another split and are information only (`docs/references.md`).
 
-**Misses:** in both modes UPOS, XPOS, UFeats and AllTags are behind spaCy outside the intervals (gold: UPOS -1.56, XPOS -1.89, UFeats -1.60, AllTags -2.39; raw: UPOS -2.08, XPOS -2.36, UFeats -1.99, AllTags -2.92; raw lemmas -1.21). Heads, sentences, tokens and gold-token lemmas are within noise, and entities are ahead.
+**Misses:** none. The tagging heads now sit on a context encoder (see below); every row in both modes is within noise of spaCy. Parser rows are unchanged.
+
+## Tagging encoder with context (replaces the first tagging model)
+
+The first tagging model (`FastEncoder.English()` configuration, dev UPOS 94.72, XPOS 92.54, UFeats 93.83, AllTags 90.82, Lemmas 92.91) missed spaCy in the tagging rows; the errors were mostly decisions that need words far from the token (NOUN against PROPN, VERB against AUX, case and gender agreement). Its replacement adds one bidirectional LSTM layer (Hochreiter and Schmidhuber 1997; 64 units per direction, mapped back to the 256-wide window output and added to it) after one window layer, over each document, with ReLU everywhere and no layer normalization after the mix (`FastEncoder` settings `plain`, `relu`, `depth` 1, `recurrentLayers` 1, `recurrentSize` 64). Training uses AdamW at 3e-3 with 200 warm-up steps and a half-cosine fall over a fixed 20 epochs (Loshchilov and Hutter 2017) instead of a constant rate cut off by early stopping; the weights of the best development epoch are kept. The parser and entity models are unchanged.
+
+```
+train-tagging --train ... --dev ... --out DIR --plain 1 --relu 1 --depth 1 --recurrent 1 --recurrent-size 64 --lr 0.003 --cosine-epochs 20 --patience 100 --threads 4
+```
+
+- **Data, seed:** UD Dutch-Alpino r2.18 train and dev only (CC BY-SA 4.0, share-alike lineage), seed 1, as above; the test file was read once for this configuration, for the rows above.
+- **Development scores, gold tokens** (before, then after): UPOS 94.72, XPOS 92.54, UFeats 93.83, AllTags 90.82, Lemmas 92.91; UPOS 95.36, XPOS 93.33, UFeats 94.00, AllTags 92.07, Lemmas 93.46. Mean over the tagging metrics 93.50, then 94.04.
+- **Weights:** `tagging.onenlp` sha256 `0fedba853d5a8b1f50f2b504c6a10a6bd8844a443a5d7dfd9402c68dd33e5bc6`, 38,304,126 bytes, produced 2026-11-05 with 4 training threads, about 20 minutes. Fixed in `src/OneNlp.Models.Dutch/weights.manifest.props`.
+- **Screened on the development set before choosing:** a 2-layer LSTM of 128 per direction on the GELU encoder (dev mean slightly lower, at roughly twice the encoder cost); 1 layer of 16, 32 and 64 units; no window layer (cheaper, worse: the window layer matters); the cosine schedule against a constant rate; a rate of 3e-3 against 2e-3. A 32-wide LSTM scored 93.79 against 94.04 for the 64-wide one (dev mean of UPOS, XPOS, UFeats, Lemmas), so 64 was kept.
+- **Cost** (indicative, one thread, `speed` command on development text, raw text through tokenizer, sentencizer and the tagging heads): 13.5k tokens/s (before: not measured). Encoder alone (1 thread, 5,632 tokens): one ReLU window layer 6.2 us/token; plus the 64-unit LSTM 11.9 us/token; 32 units 9.8; 128 units 18.7; no window layer with the 64-unit LSTM 6.1.
