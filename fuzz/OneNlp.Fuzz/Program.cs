@@ -18,6 +18,10 @@ internal static class Program
     private static readonly Dictionary<string, Target> Targets = new()
     {
         ["word-tokenizer"] = WordTokenizerTarget.Run,
+        ["tokenizer-json"] = TokenizerJsonTarget.Run,
+        ["tokenizer-json-models"] = TokenizerJsonTarget.RunWithModels,
+        ["code-point-regex"] = CodePointRegexTarget.Run,
+        ["charsmap"] = CharsMapTarget.Run,
         ["tiktoken-ranks"] = TiktokenRanksTarget.Run,
         ["bpe-model"] = BpeModelTarget.Run,
         ["conllu"] = ConllUTarget.Run,
@@ -39,7 +43,7 @@ internal static class Program
 
     private static int Main(string[] args)
     {
-        if (args.Length == 3 && args[0] == "seeds")
+        if (args.Length >= 3 && args[0] == "seeds")
         {
             Directory.CreateDirectory(args[2]);
             switch (args[1])
@@ -75,6 +79,12 @@ internal static class Program
                 case "segmentation":
                     File.WriteAllText(Path.Combine(args[2], "seed-english"), "Mr. Smith can't visit www.x.org/a?b=1. Mail a.b@c-d.com, e.g. U.S.A. well-known 3:30 ... -- :) $$$. Yes!\n\nNext.");
                     File.WriteAllText(Path.Combine(args[2], "seed-mixed"), "Hello, world! It's 3.14 - 日本語 😀 é end");
+                    break;
+                case "tokenizer-json" or "tokenizer-json-models" when args.Length == 4:
+                    TokenizerJsonTarget.Seeds(args[2], args[3]);
+                    break;
+                case "code-point-regex":
+                    CodePointRegexTarget.Seeds(args[2]);
                     break;
             }
 

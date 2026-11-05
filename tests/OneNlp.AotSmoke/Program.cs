@@ -95,6 +95,12 @@ internal static class Program
 
         Check("tiktoken ranks", TiktokenRoundTrip());
 
+        // The tokenizer.json stages: loader, normalizers with generated tables, split patterns, post-processing, decoding.
+        foreach (string failed in StageSmoke.Run())
+        {
+            Check(failed, false);
+        }
+
         MatchingSmoke.Run(Check);
 
         TrainSaveLoad();

@@ -27,7 +27,16 @@ internal sealed class NormalizedString
         _alignment = new OffsetPair[original.Length];
         for (int i = 0; i < _alignment.Length; i++)
         {
-            _alignment[i] = new OffsetPair(originOffset + i, originOffset + i + 1);
+            // Both halves of a surrogate pair stand for the same character, so both cover its two units.
+            if (char.IsHighSurrogate(original[i]) && i + 1 < original.Length && char.IsLowSurrogate(original[i + 1]))
+            {
+                _alignment[i] = _alignment[i + 1] = new OffsetPair(originOffset + i, originOffset + i + 2);
+                i++;
+            }
+            else
+            {
+                _alignment[i] = new OffsetPair(originOffset + i, originOffset + i + 1);
+            }
         }
     }
 
@@ -129,6 +138,23 @@ internal sealed class NormalizedStringBuilder
     /// <param name="index">The unit index.</param>
     internal void AppendFrom(NormalizedString source, int index) => Append(source.Text[index], source.AlignmentAt(index));
 
+    /// <summary>The number of units appended so far.</summary>
+    internal int Length => _alignment.Count;
+
+    /// <summary>Moves every origin by a number of units, not below 0.</summary>
+    /// <param name="by">The amount to add to the start and the end of each origin.</param>
+    internal void ShiftOrigins(int by) => MapOrigins(o => Math.Max(0, o + by));
+
+    /// <summary>Replaces the start and the end of every origin by a function of it.</summary>
+    /// <param name="map">The function.</param>
+    internal void MapOrigins(Func<int, int> map)
+    {
+        for (int i = 0; i < _alignment.Count; i++)
+        {
+            _alignment[i] = new OffsetPair(map(_alignment[i].Start), map(_alignment[i].End));
+        }
+    }
+
     /// <summary>Writes the built text into a normalized string.</summary>
     /// <param name="target">The string to replace the content of.</param>
     internal void CopyTo(NormalizedString target) => target.Replace(_text.ToString(), [.. _alignment]);
@@ -158,10 +184,18 @@ internal sealed class PreTokenizedString
     internal void SplitEach(Func<NormalizedString, IEnumerable<NormalizedString>> split)
     {
         ArgumentNullException.ThrowIfNull(split);
+        SplitEach((_, piece) => split(piece));
+    }
+
+    /// <summary>Like <see cref="SplitEach(Func{NormalizedString, IEnumerable{NormalizedString}})"/>, with the index of the piece, for stages that treat the first piece differently.</summary>
+    /// <param name="split">Called once per piece with its index, in order.</param>
+    internal void SplitEach(Func<int, NormalizedString, IEnumerable<NormalizedString>> split)
+    {
+        ArgumentNullException.ThrowIfNull(split);
         var result = new List<NormalizedString>(_splits.Count);
-        foreach (NormalizedString piece in _splits)
+        for (int index = 0; index < _splits.Count; index++)
         {
-            foreach (NormalizedString part in split(piece))
+            foreach (NormalizedString part in split(index, _splits[index]))
             {
                 if (part.Length > 0)
                 {

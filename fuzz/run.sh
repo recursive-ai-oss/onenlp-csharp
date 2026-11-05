@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 # Build, instrument and run a fuzz target under libFuzzer.
 #
-#   fuzz/run.sh <target> <seconds> [corpus dir] [extra libFuzzer flags...]
+#   fuzz/run.sh <target> <seconds> [extra corpus dir] [extra libFuzzer flags...]
 #   fuzz/run.sh replay <target> <file>...      # run saved inputs once, without libFuzzer (reproduce a finding)
 #
-# Targets: word-tokenizer, segmentation, doc-json, doc-binary, docbin, edit-tree, fast-settings, pipeline-config, pipeline-file   (see fuzz/README.md)
+# Targets: see fuzz/README.md
 #
-# Environment:
+# Environment (nothing is baked into the script):
 #   ONENLP_FUZZ_WORK    required: where builds, corpora and findings go. Keep it outside the checkout.
 #   ONENLP_FUZZ_TOOLS   directory holding `libfuzzer-dotnet` (the libFuzzer host) and `sharpfuzz` (the instrumenter).
 #                       LIBFUZZER_DOTNET and SHARPFUZZ override the two paths individually.
+#   ONENLP_ARTIFACTS    build output root, as for every other project in the repo
 #   DOTNET              the dotnet executable (default: dotnet from PATH)
 #   FUZZ_TIMEOUT        per-input timeout in seconds (default 10)
-#   FUZZ_RSS_MB         memory limit in MB (default 1024)
+#   FUZZ_RSS_MB         memory limit in MB (default 2048)
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -34,8 +35,10 @@ target="${1:?usage: run.sh <target> <seconds> [corpus dir] | run.sh replay <targ
 shift
 
 case "$target" in
-  word-tokenizer|segmentation) maxlen=4096 ;;
-  doc-json|doc-binary|docbin) maxlen=8192 ;;
+  tokenizer-json | tokenizer-json-models | code-point-regex | vocab-txt | sentencepiece-model | bpe-model | tiktoken-ranks) maxlen=65536 ;;
+  charsmap) maxlen=262144 ;;
+  word-tokenizer | segmentation) maxlen=4096 ;;
+  doc-json | doc-binary | docbin) maxlen=8192 ;;
   recognizers) maxlen=4096 ;;
   recognizer-rules) maxlen=16384 ;;
   edit-tree) maxlen=8192 ;;
@@ -49,7 +52,7 @@ bin="$work/bin"
 rm -rf "$bin"
 mkdir -p "$bin"
 
-# Release build, then instrument only the library assembly.
+# Build once per run: release, then instrument only the library assembly (the harness itself needs no coverage).
 "$dotnet_bin" build "$root/fuzz/OneNlp.Fuzz/OneNlp.Fuzz.csproj" -c Release -v quiet -clp:NoSummary -o "$bin"
 
 if [[ "$mode" == replay ]]; then
@@ -73,7 +76,7 @@ findings="$work/findings/$target"
 mkdir -p "$corpus" "$findings"
 
 # Seeds come from the uninstrumented build (instrumented code needs libFuzzer's shared memory).
-"$dotnet_bin" "$bin/RecursiveAI.OneNlp.Fuzz.dll" seeds "$target" "$corpus" >/dev/null
+"$dotnet_bin" "$bin/RecursiveAI.OneNlp.Fuzz.dll" seeds "$target" "$corpus" "$root/testdata" >/dev/null
 [[ -n "$(ls -A "$corpus")" ]] || printf '\x00' >"$corpus/seed-empty"
 
 "$instrument" "$bin/RecursiveAI.OneNlp.dll" >/dev/null
@@ -85,5 +88,5 @@ dirs=("$corpus")
 # -max_total_time bounds the run; crashes, hangs and out-of-memory inputs are written to the findings folder.
 ONENLP_FUZZ_TARGET="$target" "$host" \
   --target_path="$(command -v "$dotnet_bin")" --target_arg="$bin/RecursiveAI.OneNlp.Fuzz.dll" \
-  -max_total_time="$seconds" -timeout="${FUZZ_TIMEOUT:-10}" -rss_limit_mb="${FUZZ_RSS_MB:-1024}" \
+  -max_total_time="$seconds" -timeout="${FUZZ_TIMEOUT:-10}" -rss_limit_mb="${FUZZ_RSS_MB:-2048}" \
   -max_len="$maxlen" -artifact_prefix="$findings/" -print_final_stats=1 "$@" "${dirs[@]}"

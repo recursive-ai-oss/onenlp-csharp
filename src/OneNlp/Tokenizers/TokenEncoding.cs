@@ -20,10 +20,25 @@ public enum TokenizerSide
     Right,
 }
 
+/// <summary>Which sequence of a pair is shortened when the pair is too long.</summary>
+public enum TruncationStrategy
+{
+    /// <summary>Remove tokens one at a time from whichever sequence is longer until the pair fits.</summary>
+    LongestFirst,
+
+    /// <summary>Only the first sequence is shortened.</summary>
+    OnlyFirst,
+
+    /// <summary>Only the second sequence is shortened.</summary>
+    OnlySecond,
+}
+
 /// <summary>Truncation of an encoding to a token budget, applied by the tokenizer family while it encodes.</summary>
 /// <param name="MaxLength">The most tokens an encoding may hold, special tokens included; at least 1.</param>
 /// <param name="Side">The side tokens are removed from.</param>
-public sealed record TruncationOptions(int MaxLength, TokenizerSide Side = TokenizerSide.Right);
+/// <param name="Strategy">Which sequence of a pair is shortened; a single text is always shortened.</param>
+/// <param name="Stride">The overlap of overflowing windows in a tokenizer file. It is read and kept, but overflow windows are not produced.</param>
+public sealed record TruncationOptions(int MaxLength, TokenizerSide Side = TokenizerSide.Right, TruncationStrategy Strategy = TruncationStrategy.LongestFirst, int Stride = 0);
 
 /// <summary>Padding of an encoding, applied by <see cref="Tokenizer"/> after the family has encoded.</summary>
 /// <param name="PadId">The ID of the padding token.</param>

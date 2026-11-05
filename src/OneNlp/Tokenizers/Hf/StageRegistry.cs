@@ -37,6 +37,22 @@ internal sealed partial class StageRegistry
     /// <summary>The registry the loader uses: every documented type, as a stub or as the real stage.</summary>
     internal static StageRegistry Default => DefaultInstance.Value;
 
+    /// <summary>Makes an independent copy, so that a test can replace a type without changing <see cref="Default"/>.</summary>
+    internal StageRegistry Clone()
+    {
+        var copy = new StageRegistry();
+        lock (_gate)
+        {
+            foreach (KeyValuePair<string, Func<StageConfig, INormalizer>> e in _normalizers) { copy._normalizers[e.Key] = e.Value; }
+            foreach (KeyValuePair<string, Func<StageConfig, IPreTokenizer>> e in _preTokenizers) { copy._preTokenizers[e.Key] = e.Value; }
+            foreach (KeyValuePair<string, Func<StageConfig, ITokenizerModel>> e in _models) { copy._models[e.Key] = e.Value; }
+            foreach (KeyValuePair<string, Func<StageConfig, IPostProcessor>> e in _postProcessors) { copy._postProcessors[e.Key] = e.Value; }
+            foreach (KeyValuePair<string, Func<StageConfig, ITokenDecoder>> e in _decoders) { copy._decoders[e.Key] = e.Value; }
+        }
+
+        return copy;
+    }
+
     /// <summary>Registers (or replaces) a normalizer type.</summary>
     /// <param name="type">The <c>type</c> string.</param>
     /// <param name="factory">Builds the stage from its JSON object.</param>
@@ -156,9 +172,20 @@ internal sealed partial class StageRegistry
             table.TryGetValue(type, out factory);
         }
 
-        return factory is null
-            ? throw new NotSupportedException($"The {kind} type '{type}' is not supported.")
-            : factory(config);
+        if (factory is null)
+        {
+            throw new NotSupportedException($"The {kind} type '{type}' is not supported.");
+        }
+
+        try
+        {
+            return factory(config);
+        }
+        catch (Exception ex) when (ex is KeyNotFoundException or InvalidOperationException or FormatException or OverflowException or ArgumentException or IndexOutOfRangeException)
+        {
+            // A value of the wrong kind or size read straight from the JSON (a missing member, a string where a number belongs).
+            throw new InvalidDataException($"The {kind} '{type}' is malformed: {ex.Message}", ex);
+        }
     }
 
     // Every type the published tokenizer.json documentation lists, so that a file using one fails with a clear message until the

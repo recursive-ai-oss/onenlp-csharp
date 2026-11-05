@@ -1,0 +1,237 @@
+using System.Buffers.Binary;
+using System.Text;
+
+namespace RecursiveAI.OneNlp.Tokenizers.Hf;
+
+/// <summary>
+/// The normalizer of SentencePiece models, read from the <c>precompiled_charsmap</c> data of a <c>tokenizer.json</c>. The data is a
+/// 32-bit little-endian byte count, then that many bytes of a double-array trie (4-byte units) that maps UTF-8 prefixes to offsets, then
+/// a pool of NUL-terminated UTF-8 replacement strings. At each position the longest prefix found in the trie is replaced by the pool
+/// string at its offset; if there is none, one character is copied unchanged.
+/// </summary>
+internal sealed class PrecompiledNormalizer : INormalizer
+{
+    private const int MaxBytes = 64 * 1024 * 1024;
+
+    private readonly uint[] _units;
+    private readonly byte[] _pool;
+
+    internal PrecompiledNormalizer(string base64)
+    {
+        byte[] data;
+        try
+        {
+            data = Convert.FromBase64String(base64);
+        }
+        catch (FormatException ex)
+        {
+            throw new InvalidDataException("The precompiled_charsmap is not valid base64.", ex);
+        }
+
+        if (data.Length < 4 || data.Length > MaxBytes)
+        {
+            throw new InvalidDataException("The precompiled_charsmap has an unusable size.");
+        }
+
+        uint trieBytes = BinaryPrimitives.ReadUInt32LittleEndian(data);
+        if (trieBytes % 4 != 0 || trieBytes > data.Length - 4)
+        {
+            throw new InvalidDataException("The precompiled_charsmap trie size does not fit the data.");
+        }
+
+        _units = new uint[trieBytes / 4];
+        for (int i = 0; i < _units.Length; i++)
+        {
+            _units[i] = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(4 + (i * 4)));
+        }
+
+        _pool = data[(4 + (int)trieBytes)..];
+    }
+
+    public void Normalize(NormalizedString text)
+    {
+        string s = text.Text;
+        if (s.Length == 0)
+        {
+            return;
+        }
+
+        // UTF-8 bytes of the text, and for each code point the UTF-16 index and byte index where it starts.
+        var bytes = new List<byte>(s.Length * 2);
+        var starts16 = new List<int>(s.Length);
+        var startsByte = new List<int>(s.Length);
+        var tmp = new byte[4];
+        for (int i = 0; i < s.Length;)
+        {
+            int cp = NormalizerHelpers.CodePointAt(s, i, out int w);
+            starts16.Add(i);
+            startsByte.Add(bytes.Count);
+            int n = new Rune(Rune.IsValid(cp) ? cp : 0xFFFD).EncodeToUtf8(tmp);
+            for (int k = 0; k < n; k++)
+            {
+                bytes.Add(tmp[k]);
+            }
+
+            i += w;
+        }
+
+        starts16.Add(s.Length);
+        startsByte.Add(bytes.Count);
+        byte[] input = [.. bytes];
+
+        var b = new NormalizedStringBuilder();
+        int leadingDeleted = 0;
+        int[] clusters = OneFont.TextSegmentation.GetGraphemeBoundaries(s);
+        int next = 0;
+        for (int c = 0; c < clusters.Length - 1; c++)
+        {
+            int firstCp = next;
+            while (starts16[next] < clusters[c + 1])
+            {
+                next++;
+            }
+
+            // Observed in output of tokenizers 0.22.1: a grapheme cluster shorter than 6 UTF-8 bytes is looked up as a whole, by its longest
+            // matching prefix, and then the whole cluster is replaced (so "\r\n" becomes one space and "e" + two accents becomes "é"
+            // composed, the second accent dropped). Longer clusters are mapped one code point at a time, each by itself.
+            int clusterBytes = startsByte[next] - startsByte[firstCp];
+            if (clusterBytes < 6)
+            {
+                int matched = LongestPrefix(input, startsByte[firstCp], startsByte[next], out int offset);
+                if (matched > 0)
+                {
+                    // The replacement takes the origin of the cluster's first code point only (observed in output of tokenizers 0.22.1:
+                    // "e" + accent composed to one letter covers just the "e").
+                    if (Replace(b, text, starts16[firstCp], starts16[next], offset) == 0 && b.Length == 0)
+                    {
+                        leadingDeleted += next - firstCp;
+                    }
+
+                    continue;
+                }
+            }
+
+            for (int i = firstCp; i < next; i++)
+            {
+                int matched = LongestPrefix(input, startsByte[i], startsByte[i + 1], out int offset);
+                if (matched > 0)
+                {
+                    if (Replace(b, text, starts16[i], starts16[i + 1], offset) == 0 && b.Length == 0)
+                    {
+                        leadingDeleted++;
+                    }
+                }
+                else
+                {
+                    for (int k = starts16[i]; k < starts16[i + 1]; k++)
+                    {
+                        b.AppendFrom(text, k);
+                    }
+                }
+            }
+        }
+
+        // Observed in output of tokenizers 0.22.1: characters this map deletes at the very start of the text pull every offset after them
+        // back by their number ('\u0016some' reports "some" at 0-4, not 1-5), although deletions later in the text shift nothing.
+        // Offsets must equal the reference's, so the same shift is made.
+        if (leadingDeleted > 0)
+        {
+            // The shift counts code points of the original, so an astral character's range shrinks by one unit per shifted code point
+            // (observed in output of tokenizers 0.22.1).
+            b.MapOrigins(o => ShiftByCodePoints(s, starts16, o, leadingDeleted));
+        }
+
+        b.CopyTo(text);
+    }
+
+    private static int ShiftByCodePoints(string s, List<int> starts16, int unit, int codePoints)
+    {
+        if (unit > s.Length)
+        {
+            return Math.Max(0, unit - codePoints);
+        }
+
+        int cp = starts16.BinarySearch(unit);
+        if (cp < 0)
+        {
+            cp = ~cp - 1;
+        }
+
+        int target = Math.Max(0, cp - codePoints);
+        return starts16[target];
+    }
+
+    // Appends the pool string at the offset in place of the UTF-16 range [from, to) of the text.
+    private int Replace(NormalizedStringBuilder b, NormalizedString text, int from, int to, int poolOffset)
+    {
+        if (poolOffset >= _pool.Length)
+        {
+            throw new InvalidDataException("The precompiled_charsmap points outside its replacement pool.");
+        }
+
+        int end = poolOffset;
+        while (end < _pool.Length && _pool[end] != 0)
+        {
+            end++;
+        }
+
+        string replacement = Encoding.UTF8.GetString(_pool, poolOffset, end - poolOffset);
+
+        // Observed in output of tokenizers 0.22.1: the k-th character of the replacement covers the k-th code point of the text it replaces,
+        // and the last one when the replacement is longer (U+0958 U+0301 becomes two characters that cover U+0958 and U+0301 in turn;
+        // a replacement shorter than its input leaves the later code points uncovered).
+        var origins = new List<OffsetPair>();
+        for (int k = from; k < to;)
+        {
+            int w = char.IsHighSurrogate(text.Text[k]) && k + 1 < to ? 2 : 1;
+            origins.Add(text.ToOriginal(k, k + w));
+            k += w;
+        }
+
+        int index = 0;
+        for (int k = 0; k < replacement.Length;)
+        {
+            int w = char.IsHighSurrogate(replacement[k]) && k + 1 < replacement.Length ? 2 : 1;
+            OffsetPair origin = origins[Math.Min(index, origins.Count - 1)];
+            b.Append(replacement.AsSpan(k, w), origin);
+            k += w;
+            index++;
+        }
+
+        return replacement.Length;
+    }
+
+    // Double-array trie traversal: the unit layout (offset, label, leaf flag, value) is the one the darts-clone format defines.
+    private int LongestPrefix(byte[] key, int from, int limit, out int poolOffset)
+    {
+        poolOffset = 0;
+        int best = 0;
+        uint unit = _units.Length > 0 ? _units[0] : 0;
+        long node = Offset(unit);
+        for (int i = from; i < limit; i++)
+        {
+            node ^= key[i];
+            if ((ulong)node >= (ulong)_units.Length)
+            {
+                break;
+            }
+
+            unit = _units[node];
+            if ((unit & 0x800000FFu) != key[i])
+            {
+                break;
+            }
+
+            node ^= Offset(unit);
+            if (((unit >> 8) & 1) != 0 && (ulong)node < (ulong)_units.Length)
+            {
+                best = i + 1 - from;
+                poolOffset = (int)(_units[node] & 0x7FFFFFFFu);
+            }
+        }
+
+        return best;
+    }
+
+    private static long Offset(uint unit) => (unit >> 10) << (int)((unit & (1u << 9)) >> 6);
+}

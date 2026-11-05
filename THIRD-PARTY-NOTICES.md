@@ -10,6 +10,8 @@ Packages depend on other Recursive AI libraries (`RecursiveAI.OneFont`, `Recursi
 - `src/OneNlp/Recognizers/Data/en/currency.rules` lists the alphabetic currency codes of ISO 4217. The codes are facts of the published standard; the file carries no text of the standard.
 - `src/OneNlp/Recognizers/Data/en/holidays.rules` lists the dates of holidays. The United States federal holidays follow 5 U.S.C. 6103(a) (federal law, public domain). The bank holidays of England and Wales follow the dates published at https://www.gov.uk/bank-holidays: contains public sector information licensed under the Open Government Licence v3.0 (https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/). The other observances are customary dates, and the file carries no text of any source.
 
+- `src/OneNlp/Tokenizers/Hf/NormalizationData.g.cs`, `ScriptData.g.cs` and `BertCleanData.g.cs` are generated from the Unicode Character Database 17.0.0 (`UnicodeData.txt`, `DerivedNormalizationProps.txt`, `DerivedAge.txt`, `Scripts.txt`), © Unicode, Inc., under the Unicode License v3 (https://www.unicode.org/license.txt): permission to deal in the Data Files without restriction, provided the copyright and permission notice appear with them.
+
 ## Test data (not packed)
 
 `tests/testdata/unicode/WordBreakTest.txt` and `SentenceBreakTest.txt` are the Unicode 17.0.0 UAX #29 conformance files, © 2025 Unicode, Inc., redistributed under the Unicode License v3 (https://www.unicode.org/license.txt). They are used only by the test project and are not part of any package.

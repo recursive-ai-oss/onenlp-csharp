@@ -29,6 +29,13 @@ internal static class HuggingFaceTokenizerJson
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(registry);
         byte[] bytes = ReadBounded(stream);
+
+        // Checked up front: the JSON reader parses invalid UTF-8 inside strings and only fails when a string is read.
+        if (!System.Text.Unicode.Utf8.IsValid(bytes))
+        {
+            throw new InvalidDataException("The tokenizer file is not valid UTF-8.");
+        }
+
         JsonDocument document;
         try
         {
@@ -112,7 +119,14 @@ internal static class HuggingFaceTokenizerJson
             throw t.Bad("max_length", "at least 1");
         }
 
-        return new TruncationOptions(max, ReadSide(t, "direction", TokenizerSide.Right));
+        TruncationStrategy strategy = t.OptionalString("strategy") switch
+        {
+            null or "LongestFirst" => TruncationStrategy.LongestFirst,
+            "OnlyFirst" => TruncationStrategy.OnlyFirst,
+            "OnlySecond" => TruncationStrategy.OnlySecond,
+            _ => throw t.Bad("strategy", "LongestFirst, OnlyFirst or OnlySecond"),
+        };
+        return new TruncationOptions(max, ReadSide(t, "direction", TokenizerSide.Right), strategy, t.Int("stride", 0));
     }
 
     private static PaddingOptions? ReadPadding(StageConfig root)
