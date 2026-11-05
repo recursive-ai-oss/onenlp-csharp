@@ -78,9 +78,11 @@ public sealed class FastEncoder : IEncoder
     /// <param name="embedWidth">Width of the embedding rows, 8 to 2048; 0 (the default) means <paramref name="width"/>. The attributes are joined and a linear layer maps them to <paramref name="width"/>.</param>
     /// <param name="hashes">Hash functions per attribute, 1 to 4: a token's vector for an attribute is the sum of that many rows. Default <see cref="HashesPerToken"/>.</param>
     /// <param name="plain">Join the attributes with a ReLU and no layer normalization, as the original hash-embedding recipes do; the window layers keep theirs. Default false (GELU and layer normalization).</param>
+    /// <param name="turkicCase">Lower-case the norm attribute with the Turkish and Azeri rules (<c>I</c> to <c>ı</c>, <c>İ</c> to <c>i</c>) instead of the invariant ones. Default false; a file records the setting only when it is on, so other languages' files do not change.</param>
     /// <exception cref="ArgumentOutOfRangeException">A size is out of range; each table has 1 to 4,194,304 rows and the tables hold at most 33,554,432 values together.</exception>
-    public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0, int prefixLength = PrefixLength, int suffixLength = SuffixLength, int casedRows = 0, int embedWidth = 0, bool plain = false, int hashes = HashesPerToken)
+    public FastEncoder(int width = 96, int depth = 4, int normRows = 20000, int prefixRows = 2000, int suffixRows = 5000, int shapeRows = 2500, ulong seed = 0, int prefixLength = PrefixLength, int suffixLength = SuffixLength, int casedRows = 0, int embedWidth = 0, bool plain = false, int hashes = HashesPerToken, bool turkicCase = false)
     {
+        TurkicCase = turkicCase;
         ArgumentOutOfRangeException.ThrowIfLessThan(hashes, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(hashes, MaxHashes);
         Hashes = hashes;
@@ -159,6 +161,9 @@ public sealed class FastEncoder : IEncoder
 
     /// <summary>Characters hashed as the suffix.</summary>
     public int SuffixChars { get; }
+
+    /// <summary>Whether the norm attribute is lower-cased with the Turkish rules (<c>I</c> to <c>ı</c>, <c>İ</c> to <c>i</c>).</summary>
+    public bool TurkicCase { get; }
 
     /// <summary>Width of the embedding rows before the joining layer.</summary>
     public int EmbedWidth { get; }
@@ -241,6 +246,11 @@ public sealed class FastEncoder : IEncoder
         {
             writer.WriteNumber("embedWidth", EmbedWidth);
         }
+
+        if (TurkicCase)
+        {
+            writer.WriteNumber("turkicCase", 1);
+        }
     }
 
     internal static IEncoder FromSettings(JsonElement s)
@@ -265,7 +275,8 @@ public sealed class FastEncoder : IEncoder
             JsonSettings.OptionalInt(s, "casedRows", 0, MaxRows, 0),
             embedWidth,
             JsonSettings.OptionalInt(s, "plain", 0, 1, 0) == 1,
-            JsonSettings.OptionalInt(s, "hashes", 1, MaxHashes, HashesPerToken));
+            JsonSettings.OptionalInt(s, "hashes", 1, MaxHashes, HashesPerToken),
+            JsonSettings.OptionalInt(s, "turkicCase", 0, 1, 0) == 1);
     }
 
     private static ulong Mix(ulong h)
@@ -279,12 +290,13 @@ public sealed class FastEncoder : IEncoder
 
     private static ulong Fnv(ulong h, char c) => (h ^ c) * 1099511628211UL;
 
-    private static ulong NormHash(ReadOnlySpan<char> text)
+    private ulong NormHash(ReadOnlySpan<char> text)
     {
         ulong h = 14695981039346656037UL ^ AttributeSeeds[0];
         foreach (char c in text)
         {
-            h = Fnv(h, char.ToLowerInvariant(c));
+            // Turkish and Azeri keep the dotted and dotless i apart: I is ı and İ is i (Unicode SpecialCasing, tr and az).
+            h = Fnv(h, TurkicCase ? (c == 'I' ? '\u0131' : c == '\u0130' ? 'i' : char.ToLowerInvariant(c)) : char.ToLowerInvariant(c));
         }
 
         return Mix(h);

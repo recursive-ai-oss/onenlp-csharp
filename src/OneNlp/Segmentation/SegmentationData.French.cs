@@ -76,6 +76,11 @@ public sealed partial class SegmentationData
         ArgumentNullException.ThrowIfNull(doc);
         count = 0;
         words = null;
+        if (SuffixSplits.Count > 0)
+        {
+            return TryMatchSuffixSplit(this, doc, start, out count, out words);
+        }
+
         if (MultiwordForms.Count == 0 || start < 0 || start + 1 >= doc.Length)
         {
             return false;
