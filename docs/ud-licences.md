@@ -34,8 +34,8 @@ Classical Chinese (`lzh`) is a different language and is not covered.
 | PUD | CC BY-SA 3.0 | CC BY-SA 3.0 | test | eval-only (fetched) |
 | Rhapsodie | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | go (spoken French, small); not used |
 | ParisStories | CC BY-SA 4.0 | CC BY-SA 4.0 | train, dev, test | go (oral French); not used |
-| Sequoia | LGPL-LR | none | train, dev, test | **hold**: LGPL-LR (Lesser General Public Licence for Linguistic Resources) is outside the list of allowed licences; not used until resolved |
-| FQB | LGPL-LR | none | test | **hold**, same reason (also test-only) |
+| Sequoia | LGPL-LR | none | train, dev, test | **go**: LGPL-LR is allowed with credit and treated like CC BY-SA (SA lineage). Not used for the baselines (not retrained)  |
+| FQB | LGPL-LR | none | test | **go**, same ruling (test-only: eval)  |
 | ParTUT | CC BY-NC-SA 4.0 | CC BY-NC-SA 4.0 | train, dev, test | **no-go** (NC) |
 | FTB | none in release 2.18 | none | not in the release | not available (last tagged r2.11) |
 
@@ -146,8 +146,8 @@ Terms read 2026-11-05 from the dataset's own page or card. "Chosen" means fetche
 | WikiNER (Nothman et al. 2013), wp3 files, figshare 5462500 | fr, es, it, nl (also de, en, pt, pl, ru) | figshare record licence: CC BY 4.0. Silver labels projected from Wikipedia links; the underlying text is Wikipedia (CC BY-SA) | **go, chosen** for fr, es, it, nl; SA lineage. No official split: we split by article (see the manifests) |
 | GermEval 2014 NER (NoSta-D, Benikova et al. 2014) | de | "The data is released under the permissive CC-BY license" (LREC 2014 abstract); the shared-task page links the CC BY 4.0 text; HF card: cc-by-4.0 | **go, chosen** for de; gold labels, official split; 12 fine-grained types with embedded and derived spans |
 | Turkish-WikiNER (Altinok 2023), `turkish-nlp-suite/turkish-wikiNER` | tr | HF card: `license: cc-by-sa-4.0` | **go, chosen** for tr; SA lineage; 18 OntoNotes-style types |
-| Naamapadam (Mhaske et al. 2023), `ai4bharat/naamapadam` | hi (and 10 more Indic languages) | "We license the actual packaging of the mined data under the Creative Commons CC0 license"; "We do not own any of the text from which this data has been extracted" | **go with conditions, chosen** for hi: silver training labels projected from English over parallel Samanantar sentences; the gold-annotated test set is small. The text belongs to its original publishers (crawled web text, allowed by the training-data rule) |
-| WikiANN / PAN-X (Pan et al. 2017), `unimelb-nlp/wikiann` | all nine | HF card: `license: unknown`, "[More Information Needed]" | **hold**: no terms stated; not used |
+| Naamapadam (Mhaske et al. 2023), `ai4bharat/naamapadam` | hi | Card: "We license the actual packaging of the mined data under the Creative Commons CC0 license"; "We do not own any of the text from which this data has been extracted." Source data: "Samanantar dataset", whose card says "Creative Commons Attribution-NonCommercial 4.0 International" (`license: cc-by-nc-4.0`) | **no-go** the text comes from Samanantar, which is non-commercial, so the text sources are not permissive. Hindi NER is a logged gap |
+| WikiANN / PAN-X (Pan et al. 2017), `unimelb-nlp/wikiann` | all nine | HF card: `license: unknown`, "[More Information Needed]" | **no-go**: out |
 | WikiNEuRal, MultiNERD (Babelscape) | fr, es, it, de, nl, zh (MultiNERD) | HF cards: cc-by-nc-sa-4.0 | **no-go** (NC) |
 | MultiCoNER v1/v2 | hi, zh, tr, nl, de, es, fr, it, pt | HF card: cc-by-4.0 | not examined: a fine-grained scheme that does not map onto PER/ORG/LOC; candidate for a later look |
 | CoNLL-2002 (es, nl) | es, nl | HF card: `license: unknown`; newspaper text, no open terms stated | not used (at most evaluation, through published baselines) |
@@ -158,9 +158,9 @@ NER labels follow each corpus: the baselines map them to PER, ORG, LOC (and MISC
 
 ## Rulings and data gaps (recorded 2026-11-05)
 
-Ruled by the build lead; open to the owner.
+Rulings of the project; the owner may revisit them.
 
 - **No-go by rule:** German-HDT (text licensed for academic use only, i.e. research-only); Italian-TWITTIRO and Portuguese-DANTEStocks (tweet text, platform-restricted); Turkish-Penn (translated from an LDC corpus).
-- **Held, not used until ruled:** French Sequoia and FQB (LGPL-LR); WikiANN (no terms stated); the text provenance of Naamapadam; and the stale GNU sentence in the AnCora README. Until the last is ruled, AnCora is used under its `LICENSE.txt` and metadata (CC BY 4.0), and this note is the record that the README disagrees.
-- **Hindi has no UD baseline and no UD-trained model.** Its only sizeable treebank (HDTB) is non-commercial and Hindi-PUD is test-only. A Hindi tagger or parser waits for allowed data. Hindi NER trains on Naamapadam.
+- **Ruled 2026-11-05:** French Sequoia and FQB (LGPL-LR) are allowed with credit, treated like CC BY-SA (go; unused, French baselines not retrained). WikiANN is out. Naamapadam is out: its text comes from Samanantar (CC BY-NC 4.0), so the Hindi NER baseline trained on it is withdrawn and Hindi NER is a logged gap beside Hindi UD. AnCora: the `LICENSE.txt` (CC BY 4.0) governs; the README still carries a stale sentence ("The GNU license is inherited ..."), which is recorded and not relied on.
+- **Hindi has no UD baseline and no UD-trained model.** Its only sizeable treebank (HDTB) is non-commercial and Hindi-PUD is test-only. A Hindi tagger, parser or NER model waits for allowed data (Naamapadam is out, see the NER table).
 - **Italian trains on 897 sentences** (ParlaMint train plus MarkIT), because ISDT, VIT and ParTUT are non-commercial. Italian rows are reported as they come and compared with spaCy trained on the same small set; they are not hidden or compared with systems trained on ISDT.

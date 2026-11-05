@@ -74,14 +74,14 @@ One entry per language for the data our fast-tier models and their spaCy baselin
 | German | UD German-GSD r2.18 (CC BY-SA 4.0); GermEval 2014 NER (CC BY 4.0, not SA) | GSD test; UD German-PUD; GermEval test; UNER German-PUD (test-only) | HDT no-go (text licensed for academic use) |
 | Italian | UD Italian-ParlaMint r2.18 train (CC BY-SA 4.0) and MarkIT (CC BY 4.0), derived into `it_gating`; WikiNER Italian wp3 (CC BY 4.0) | ParlaMint test (375 sentences); MarkIT test; UD Italian-PUD; WikiNER test | 897 training sentences: ISDT, VIT, ParTUT, PoSTWITA, KIParlaForest are NC; TWITTIRO no-go |
 | Turkish | UD Turkish-BOUN r2.18 (CC BY-SA 4.0); Turkish-WikiNER (CC BY-SA 4.0) | BOUN test; UD Turkish-PUD; Turkish-WikiNER test | IMST is NC; Penn no-go (translated Penn Treebank) |
-| Hindi | none for UD. Naamapadam Hindi (CC0 packaging; silver labels over parallel crawled text) | UD Hindi-PUD (test-only); Naamapadam test (gold) | HDTB is NC. No allowed Hindi treebank exists |
+| Hindi | none (Naamapadam is out: its text comes from the CC BY-NC Samanantar corpus) | UD Hindi-PUD (test-only); none | HDTB is NC. No allowed Hindi treebank exists |
 | Dutch | UD Dutch-Alpino r2.18 (CC BY-SA 4.0); WikiNER Dutch wp3 (CC BY 4.0) | Alpino test; WikiNER test | LassySmall (CC BY-SA 4.0) allowed, unused |
 
-The corpora with no official split (WikiNER, Naamapadam train and validation) are cut by the fixed rules in each `HEADER.md`/`MANIFEST.md`; the Italian training set is derived by `derive_italian` in `tools/fetch/fetch_lang.py`.
+The corpora with no official split (WikiNER train and validation) are cut by the fixed rules in each `HEADER.md`/`MANIFEST.md`; the Italian training set is derived by `derive_italian` in `tools/fetch/fetch_lang.py`.
 
 ## Data gaps
 
-- **Hindi:** no allowed UD training treebank (HDTB is non-commercial; Hindi-PUD is test-only). There is no UD baseline and no UD-trained Hindi model until allowed data exists. Hindi NER uses Naamapadam.
+- **Hindi:** no allowed UD training treebank (HDTB is non-commercial; Hindi-PUD is test-only). There is no UD baseline and no UD-trained Hindi model until allowed data exists. Hindi NER has no allowed data either: Naamapadam is out because its text comes from Samanantar (CC BY-NC 4.0), so the spaCy Hindi NER baseline run on it is withdrawn.
 - **Italian:** UD training is limited to 897 sentences (ParlaMint and MarkIT); ISDT, VIT and ParTUT are non-commercial. Rows are reported as they come.
-- **Held until ruled, not used:** French Sequoia and FQB (LGPL-LR); WikiANN (no terms stated); Naamapadam's text provenance. AnCora is used under its `LICENSE.txt` (CC BY 4.0) although its README still carries a stale GNU sentence.
+- **Ruled 2026-11-05:** French Sequoia and FQB (LGPL-LR) are allowed with credit, like CC BY-SA, and unused. WikiANN is out. Naamapadam is out (Samanantar text, CC BY-NC 4.0). AnCora is used under its `LICENSE.txt` (CC BY 4.0); its README still carries a stale GNU sentence.
 - **No-go by rule:** German-HDT (academic use only), Italian-TWITTIRO and Portuguese-DANTEStocks (tweets, platform terms), Turkish-Penn (translated from an LDC corpus).

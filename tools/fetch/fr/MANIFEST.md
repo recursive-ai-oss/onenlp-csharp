@@ -7,7 +7,7 @@ Fetched by `tools/fetch/fr/fetch.sh <data-root>`. UD release r2.18.
 - **Gating treebank: UD French-GSD** (CC BY-SA 4.0; 14,450 / 1,476 / 416 sentences). The test split is small (416 sentences, 10,017 words): intervals are wide. The README's Google notice says the underlying sentences are provided "AS IS" and Google claims no ownership; the annotations are CC BY-SA 4.0.
 - **Second test set: UD French-PUD** (CC BY-SA 3.0, 1,000 sentences, eval-only).
 - **NER: WikiNER, French wp3** (CC BY 4.0 per its figshare record; silver labels from Wikipedia links; PER, LOC, ORG, MISC). No official split: articles (blank-line-delimited blocks) go to test at index mod 20 = 0 and to dev at index mod 20 = 10; dev is thinned to 2,000 sentences. There is no allowed gold-annotated French NER corpus; WikiNEuRal and MultiNERD are NC.
-- Not used: Rhapsodie and ParisStories (go, spoken French, small), Sequoia and FQB (hold: LGPL-LR), ParTUT (no-go, NC). FTB is not in release 2.18.
+- Not used: Rhapsodie and ParisStories (go, spoken French, small), Sequoia and FQB (go, LGPL-LR with credit; unused), ParTUT (no-go, NC). FTB is not in release 2.18.
 
 ## Tokenization
 

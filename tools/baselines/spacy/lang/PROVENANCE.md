@@ -81,7 +81,7 @@ All on the Apple M2 above, one core each, in a 2-hour limit. Steps are the last 
 | it | NER | WikiNER Italian wp3 | 12,600 (epoch 3) | 20:15 | 1,444 | 86.0 |
 | tr | UD | Turkish-BOUN r2.18 | 5,600 (epoch 39) | 32:21 | 794 | 85.9 / 52.7 |
 | tr | NER | Turkish-WikiNER | 6,800 (epoch 17) | 10:39 | 651 | 66.9 |
-| hi | NER | Naamapadam Hindi (every 10th sentence) | 10,400 (epoch 4) | 15:05 | 1,739 | 73.6 |
+| hi | NER | Naamapadam Hindi (every 10th sentence; WITHDRAWN, data ruled out) | 10,400 (epoch 4) | 15:05 | 1,739 | 73.6 |
 | nl | UD | Dutch-Alpino r2.18 | 8,400 (epoch 32) | 39:57 | 767 | 95.7 / 80.9 |
 | nl | NER | WikiNER Dutch wp3 | 15,400 (epoch 4) | 22:22 | 2,929 | 88.2 |
 
@@ -287,11 +287,7 @@ Seqeval micro F1 (conlleval-style) from `score_ner.py` and the CoNLL 2018 script
 
 ### Hindi
 
-**hi: NER naamapadam-hi test, gold tokens**
-
-| micro F1 | micro precision | micro recall |
-|---|---|---|
-| 78.39 [76.38, 80.42] | 78.84 [76.54, 81.10] | 77.94 [75.86, 80.04] |
+**Withdrawn 2026-11-05.** The only Hindi baseline was NER trained on Naamapadam, whose text comes from the Samanantar corpus (CC BY-NC 4.0); Naamapadam was ruled out. The model, its predictions and its scores are not to be used or reported, and Hindi NER is a logged data gap beside Hindi UD (`docs/ud-licences.md`).
 
 ### Dutch
 
