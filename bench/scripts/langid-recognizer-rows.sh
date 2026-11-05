@@ -24,6 +24,16 @@ LINGUA=$(find_dll LinguaOracle LinguaOracle.dll)
 RECOG=$(find_dll RecognizersOracle RecognizersOracle.dll)
 echo "tools: $LANGID $EVAL $LINGUA $RECOG"
 
+# macOS does not report a peak working set to the process, so there the shell reports the maximum resident size of each run.
+run() {
+  if [ "$(uname)" = Darwin ]; then
+    local rc=0
+    /usr/bin/time -l "$@" 2>"$W/time.tmp" || rc=$?
+    awk '/maximum resident set size/ { printf "max RSS %.0f MB\n", $1 / 1048576 }' "$W/time.tmp"
+    return $rc
+  fi
+  "$@"
+}
 load() { echo "load average $1: $(uptime | sed 's/.*load average[s]*: //')"; }
 RULES=()
 for f in currency numbers sequence units; do RULES+=("$ROOT/src/OneNlp/Recognizers/Data/en/$f.rules"); done
@@ -48,22 +58,22 @@ head -n $(( $(wc -l < "$W/text.txt") / 4 )) "$W/text.txt" > "$W/text-quarter.txt
   load before
 
   echo "== language ID: ours (model $(basename "$MODEL"), $(wc -c < "$MODEL") bytes)"
-  dotnet "$LANGID" bench --model "$MODEL" --eval "$(dirname "$LB")" --set "$(basename "$LB")"
+  run dotnet "$LANGID" bench --model "$MODEL" --eval "$(dirname "$LB")" --set "$(basename "$LB")"
   load "after ours"
   for mode in high low; do
     echo "== language ID: SearchPioneer.Lingua 2.0.0, $mode accuracy"
-    dotnet "$LINGUA" bench "$mode" tools/fetch/langid/languages.tsv "$LB/words.tsv,$LB/pairs.tsv,$LB/sentences.tsv"
+    run dotnet "$LINGUA" bench "$mode" tools/fetch/langid/languages.tsv "$LB/words.tsv,$LB/pairs.tsv,$LB/sentences.tsv"
     load "after lingua $mode"
   done
 
   echo "== recognizers: ours, non-temporal rules (numbers, units, currency, sequence)"
-  dotnet "$EVAL" recognize-bench --in "$W/text.txt" --reference "$REF" --rules "${RULES[@]}"
+  run dotnet "$EVAL" recognize-bench --in "$W/text.txt" --reference "$REF" --rules "${RULES[@]}"
   echo "== recognizers: Microsoft.Recognizers.Text 1.8.13, number/unit/currency/sequence models"
-  dotnet "$RECOG" bench "$W/text.txt" 2026-03-18T10:30:00
+  run dotnet "$RECOG" bench "$W/text.txt" 2026-03-18T10:30:00
   load "after non-temporal"
   echo "== recognizers: ours, all rules (with date/time)"
-  dotnet "$EVAL" recognize-bench --in "$W/text-quarter.txt" --reference "$REF"
+  run dotnet "$EVAL" recognize-bench --in "$W/text-quarter.txt" --reference "$REF"
   echo "== recognizers: Microsoft.Recognizers.Text 1.8.13, with date/time"
-  dotnet "$RECOG" bench "$W/text-quarter.txt" 2026-03-18T10:30:00 with-datetime
+  run dotnet "$RECOG" bench "$W/text-quarter.txt" 2026-03-18T10:30:00 with-datetime
   load after
 } 2>&1 | tee "$W/rows.log"
