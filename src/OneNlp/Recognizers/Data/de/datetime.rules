@@ -54,14 +54,14 @@ fall | Herbst, Herbstes | 9 | 3
 winter | Winter, Winters | 12 | 3
 
 [time.daypart]
-morning | morgens, vormittags, =Vormittag, früh, =Morgen | 6 | 12
+morning | morgens, vormittags, =Vormittag, früh | 6 | 12
 afternoon | nachmittags, =Nachmittag | 12 | 18
 evening | abends, =Abend | 18 | 24
 night | nachts, =Nacht | 20 | 24
 
 [time.word]
 today | heute
-tomorrow | =morgen
+tomorrow | =morgen, =Morgen
 yesterday | gestern
 dayaftertomorrow | übermorgen
 daybeforeyesterday | vorgestern

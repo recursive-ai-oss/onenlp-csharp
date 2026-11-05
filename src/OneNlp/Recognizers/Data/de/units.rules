@@ -2,10 +2,10 @@
 # A form starting with "=" is case-sensitive; the others are matched without regard to case. Canonical names are the English ones.
 
 [unit]
-millimeter | length | mm, Millimeter
-centimeter | length | cm, Zentimeter
-meter | length | =m, Meter
-kilometer | length | km, Kilometer
+millimeter | length | mm, Millimeter, Millimetern
+centimeter | length | cm, Zentimeter, Zentimetern
+meter | length | =m, Meter, Metern
+kilometer | length | km, Kilometer, Kilometern
 micrometer | length | µm, μm, Mikrometer
 inch | length | Zoll
 foot | length | Fuß, Fuss
@@ -24,7 +24,7 @@ ounce | mass | Unze, Unzen
 milliliter | volume | ml, Milliliter
 centiliter | volume | cl, Zentiliter
 deciliter | volume | dl, Deziliter
-liter | volume | =l, =L, Liter
+liter | volume | =l, =L, Liter, Litern
 hectoliter | volume | hl, Hektoliter
 gallon | volume | Gallone, Gallonen
 cubic meter | volume | m3, m³, Kubikmeter
