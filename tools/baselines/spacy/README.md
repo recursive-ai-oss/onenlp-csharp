@@ -42,3 +42,20 @@ tools/baselines/spacy/run.sh score-ner <data-root> <work-dir>
 - **NER scoring.** `predict_ner.py` runs the pipeline on the gold UNER tokens; `score_ner.py` computes entity-level micro F1 with seqeval 1.2.2 (MIT, conlleval-style).
 
 Results (with intervals), training times and job ids are in `PROVENANCE.md` next to this file.
+
+## The other nine languages (ZH, FR, ES, PT, DE, IT, TR, HI, NL)
+
+Same method, one driver for all: `run_lang.sh <lang> convert|train-ud|train-ner|score-ud|score-ner <data-root> <work-dir>` over the data `tools/fetch/<lang>/fetch.sh` fetches. The configs spaCy generated are in `lang/<lang>/` (`spacy init config --lang <lang> --pipeline tagger,morphologizer,trainable_lemmatizer,parser|ner --optimize efficiency`); hashes, runs, results and deviations (Chinese `gold_preproc`, Portuguese scoring, Italian's small training set) are in `lang/PROVENANCE.md`.
+
+```
+tools/fetch/<lang>/fetch.sh <data-root>
+tools/baselines/spacy/run_lang.sh <lang> convert   <data-root> <work-dir>
+tools/baselines/spacy/run_lang.sh <lang> train-ud  <data-root> <work-dir>      # Hindi has no UD training data
+tools/baselines/spacy/run_lang.sh <lang> train-ner <data-root> <work-dir>
+GOLD_PREPROC=1 tools/baselines/spacy/run_lang.sh zh train-ud ...                 # Chinese, gold-token reference
+tools/baselines/spacy/run_lang.sh <lang> score-ud|score-ner <data-root> <work-dir>
+tools/baselines/spacy/score_lang.sh <lang> <predictions-dir> <data-root> <OneNlp.Eval.dll> <out-dir>
+STAGE=<predictions-root> tools/baselines/spacy/summarize.py <out-root> <lang> ...
+```
+
+NER is scored on gold tokens (as for English); UD in both modes. `lang/SHA256SUMS` lists the prediction files.

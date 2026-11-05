@@ -60,3 +60,21 @@ Copy this block, fill every field, and write `none` or `n/a` where a field does 
 
 - The data manifest for a dataset family is written by its fetch script (for English, `tools/fetch/en/fetch.sh` writes `manifest-en.json` under the data root, and `tools/fetch/en/MANIFEST.md` keeps the hashes and licences in the repository).
 - Recipes and their logs: `recipes/<model-id>/PROVENANCE.md`. Baselines trained with other tools for comparison: next to the baseline scripts, for example `tools/baselines/spacy/PROVENANCE.md`.
+
+## Data entries for the 0.5 languages
+
+One entry per language for the data our fast-tier models and their spaCy baselines train and are judged on. Each lists the datasets with release, role and licence; file-level hashes, split sizes and the train/test text overlap are in `tools/fetch/<lang>/MANIFEST.md`; the baselines' own log is `tools/baselines/spacy/lang/PROVENANCE.md`. The licence verdict for every UD treebank of the language is in `docs/ud-licences.md`. **All of these are SA lineage** (CC BY-SA sources, or Wikipedia-derived text) except where a line says otherwise. Evaluation files never train: `fetch_lang.py` places them under `eval/`, and the roles in each manifest are `train`, `dev`, `eval`.
+
+| Language | Training and dev data (release, licence) | Evaluation data | Notes |
+|---|---|---|---|
+| Chinese | UD Chinese-GSDSimp r2.18 (CC BY-SA 4.0); UNER Chinese-GSDSIMP (CC BY-SA 4.0) | GSDSimp test; UNER GSDSIMP test; UD Chinese-PUD and UNER Chinese-PUD (CC BY-SA 3.0, test-only, Traditional script) | Never train on the Traditional twin GSD and test on GSDSimp, or the reverse |
+| French | UD French-GSD r2.18 (CC BY-SA 4.0); WikiNER French wp3 (CC BY 4.0, silver labels, Wikipedia text) | GSD test (416 sentences); UD French-PUD (CC BY-SA 3.0, test-only); WikiNER test (our article split) | Sequoia and FQB held (LGPL-LR) |
+| Spanish | UD Spanish-AnCora r2.18 (CC BY 4.0, not SA); WikiNER Spanish wp3 (CC BY 4.0) | AnCora test; UD Spanish-PUD; WikiNER test | The AnCora README still carries a stale GNU-licence sentence; `LICENSE.txt` and metadata say CC BY 4.0 |
+| Portuguese | UD Portuguese-Bosque r2.18 (CC BY-SA 4.0); UNER Portuguese-Bosque (CC BY-SA 4.0, same tokens) | Bosque test; UNER Bosque test; UD and UNER Portuguese-PUD (CC BY-SA 3.0, test-only) | |
+| German | UD German-GSD r2.18 (CC BY-SA 4.0); GermEval 2014 NER (CC BY 4.0, not SA) | GSD test; UD German-PUD; GermEval test; UNER German-PUD (test-only) | HDT held (text licensed for academic use) |
+| Italian | UD Italian-ParlaMint r2.18 train (CC BY-SA 4.0) and MarkIT (CC BY 4.0), derived into `it_gating`; WikiNER Italian wp3 (CC BY 4.0) | ParlaMint test (375 sentences); MarkIT test; UD Italian-PUD; WikiNER test | 897 training sentences: ISDT, VIT, ParTUT, PoSTWITA, KIParlaForest are NC; TWITTIRO held |
+| Turkish | UD Turkish-BOUN r2.18 (CC BY-SA 4.0); Turkish-WikiNER (CC BY-SA 4.0) | BOUN test; UD Turkish-PUD; Turkish-WikiNER test | IMST is NC; Penn held (translated Penn Treebank) |
+| Hindi | none for UD. Naamapadam Hindi (CC0 packaging; silver labels over parallel crawled text) | UD Hindi-PUD (test-only); Naamapadam test (gold) | HDTB is NC. No allowed Hindi treebank exists |
+| Dutch | UD Dutch-Alpino r2.18 (CC BY-SA 4.0); WikiNER Dutch wp3 (CC BY 4.0) | Alpino test; WikiNER test | LassySmall (CC BY-SA 4.0) allowed, unused |
+
+The corpora with no official split (WikiNER, Naamapadam train and validation) are cut by the fixed rules in each `HEADER.md`/`MANIFEST.md`; the Italian training set is derived by `derive_italian` in `tools/fetch/fetch_lang.py`.
