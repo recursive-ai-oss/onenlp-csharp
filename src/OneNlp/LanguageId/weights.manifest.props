@@ -1,0 +1,9 @@
+<Project>
+  <!-- The weights core embeds: name, size, sha256 and where each came from. A build with a weights directory fails when a file is
+       missing or differs, and a pack fails without one. To use retrained weights, replace the row (and recipes/langid/PROVENANCE.md);
+       no code changes. Weights are never committed. -->
+  <ItemGroup>
+    <LangIdWeight Include="langid.bin" Size="3588959" Sha256="9d06cc77632083274ae5ca5fbb0f3e676abfc63aa6a2d702cbdf9d558cba9d6d"
+                  Recipe="recipes/langid" Data="Leipzig Corpora Collection (CC BY 4.0), Tatoeba (CC BY 2.0 FR), Wikipedia (CC BY-SA 4.0)" Contents="language-identification model, 75 languages" />
+  </ItemGroup>
+</Project>

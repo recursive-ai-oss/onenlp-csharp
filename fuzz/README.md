@@ -13,6 +13,8 @@
 | `doc-json` | arbitrary bytes | `Doc.FromJson`: only `InvalidDataException` may escape; a document that reads must write to binary and back to the same bytes, and to JSON and back (unless it holds an unpaired surrogate, which JSON cannot carry) |
 | `doc-binary` | byte 0 is a mode, the rest a serialized document (bit 0 rewrites the header's flags and length to fit the input, bit 1 also appends a valid checksum, so mutations reach the section decoders) | `Doc.FromBytes`: only `InvalidDataException`; a document that reads writes and reads back to the same bytes |
 | `docbin` | same framing, for a bin | `DocBin.FromBytes` and `DocBinReader`: only `InvalidDataException`; the streaming reader yields the same documents as the whole-bin reader |
+| `langid-detect` | arbitrary bytes, as above | `LanguageDetector.Default`: confidences are probabilities summing to 1, the best language is the first confidence, a restricted detector never answers outside its set, mixed-language runs tile the text |
+| `langid-model` | arbitrary bytes | `LanguageDetector.Load`: only `InvalidDataException`; a model that loads can detect |
 | `recognizers` | arbitrary bytes, read as UTF-8 (or raw UTF-16 units when the first byte is odd) | `Recognizer.English`: results ordered, in range, without overlap, with their own text; the pipeline component accepts them |
 | `recognizer-rules` | arbitrary bytes as rule data | `Recognizer.FromRules`: only `RecognizerRulesException`; rules that load must run on a sample text with the same checks |
 

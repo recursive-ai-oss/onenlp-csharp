@@ -1,0 +1,4 @@
+tool: tools/OneNlp.LangId (train)
+train --epochs 5 --samples 100000 --bits Latin=16
+defaults: other groups 14 bits, learning rate 0.4, length exponent 0.5, seed 1, clip percentile 0.9995, 400 development sentences per language, script share 0.03
+data: tools/fetch/langid (sources.tsv, SHA256SUMS, languages.tsv, fetch.py prepare), at most 150000 training sentences per language

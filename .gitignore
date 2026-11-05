@@ -21,6 +21,7 @@
 !/tools/
 !/recipes/
 !/docs/
+!/recipes/
 !/testdata/
 
 bin/

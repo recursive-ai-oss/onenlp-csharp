@@ -2,6 +2,15 @@
 
 OneNLP's own code is licensed `MIT OR Apache-2.0`, Copyright (c) Recursive AI, LLC.
 
+Packages depend on other Recursive AI libraries (`RecursiveAI.OneFont`, `RecursiveAI.OneModel`, `RecursiveAI.OneModel.Training`), which carry the same licence and their own notices. Each third-party dataset, model or weight file that is packed is listed here with its licence and provenance.
+
+## Language-identification model (packed in `RecursiveAI.OneNlp`)
+
+`LanguageId/langid.bin` is trained by `tools/OneNlp.LangId` on text from the following sources, credited as their licences require. The model is a table of numbers derived from the texts; it contains no sentence. Its provenance log is `recipes/langid/PROVENANCE.md`.
+
+- **Leipzig Corpora Collection** (Wortschatz Leipzig, Leipzig University; D. Goldhahn, T. Eckart, U. Quasthoff, "Building Large Monolingual Dictionaries at the Leipzig Corpora Collection: From 100 to 200 Languages", LREC 2012), news, web and Wikipedia text corpora, offered for download under Creative Commons Attribution 4.0 (https://creativecommons.org/licenses/by/4.0/). The list of corpora is `tools/fetch/langid/sources.tsv`.
+- **Tatoeba** (https://tatoeba.org), sentences contributed by the Tatoeba community under Creative Commons Attribution 2.0 France by default (https://creativecommons.org/licenses/by/2.0/fr/); individual sentences may carry other licences.
+- **Wikipedia** (Southern Sotho, Tswana and Tsonga editions, and the Wikipedia text inside the Leipzig corpora), Creative Commons Attribution-ShareAlike 4.0 (https://creativecommons.org/licenses/by-sa/4.0/), by the Wikipedia contributors. The training data of this model includes share-alike text.
 Packages depend on other Recursive AI libraries (`RecursiveAI.OneFont`, `RecursiveAI.OneModel`, `RecursiveAI.OneModel.Training`), which carry the same licence and their own notices. `RecursiveAI.OneNlp.Models.English` ships weights we trained on CC BY-SA 4.0 treebank and NER data; its notices are in that package (`src/OneNlp.Models.English/THIRD-PARTY-NOTICES.md`). No other third-party models or weights ship; each addition will be listed here with its licence and provenance before it is packed. The data it does ship is listed under "Data packed with the library".
 
 ## Data packed with the library

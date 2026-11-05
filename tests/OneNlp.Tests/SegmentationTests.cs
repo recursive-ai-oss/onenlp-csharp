@@ -4,7 +4,14 @@ namespace RecursiveAI.OneNlp.Tests;
 
 public class SegmentationTests
 {
-    private static string[] Words(string text) => [.. Nlp.Tokens(text).Select(t => t.ToString())];
+    // These tests pin the English rules, so they use the English pipeline directly instead of the language-detecting Nlp verbs.
+    private static readonly Pipeline English = Pipeline.Blank(Language.English).Add(SentencizerComponent.For(Language.English));
+
+    private static Token[] Tokens(string text) => [.. English.Process(text)];
+
+    private static IReadOnlyList<Span> Sentences(string text) => English.Process(text).Sentences;
+
+    private static string[] Words(string text) => [.. Tokens(text).Select(t => t.ToString())];
 
     [Theory]
     [InlineData("I don't know.", new[] { "I", "do", "n't", "know", "." })]
@@ -32,7 +39,7 @@ public class SegmentationTests
     public void OffsetsPointIntoTheOriginalStringAndSpacesAreRecovered()
     {
         const string text = "Don't  stop";
-        Doc doc = Nlp.Analyze(text);
+        Doc doc = English.Process(text);
         Assert.Equal(["Do", "n't", "stop"], doc.Select(t => t.ToString()));
         Assert.Equal([(0, 2), (2, 5), (7, 11)], doc.Select(t => (t.Idx, t.EndIdx)));
         Assert.Equal([false, true, false], doc.Select(t => t.HasSpaceAfter));
@@ -59,15 +66,15 @@ public class SegmentationTests
         const string text = "Dr. Who arrived at 3.5 p.m. on Tuesday. Was it late? Yes! \"Quite,\" he said.";
         Assert.Equal(
             ["Dr. Who arrived at 3.5 p.m. on Tuesday.", "Was it late?", "Yes!", "\"Quite,\" he said."],
-            Nlp.Sentences(text).Select(s => s.Text.ToString()));
+            Sentences(text).Select(s => s.Text.ToString()));
     }
 
     [Fact]
     public void SentencesOfEmptyAndSingleSentenceText()
     {
-        Assert.Empty(Nlp.Sentences(""));
-        Assert.Single(Nlp.Sentences("no end"));
-        Assert.Equal(2, Nlp.Sentences("One.  Two.\n").Count);
+        Assert.Empty(Sentences(""));
+        Assert.Single(Sentences("no end"));
+        Assert.Equal(2, Sentences("One.  Two.\n").Count);
     }
 
     [Fact]
@@ -81,7 +88,7 @@ public class SegmentationTests
     public void LongInputsStayLinearAndNeverThrow()
     {
         string text = new string('a', 200_000) + " " + string.Concat(Enumerable.Repeat("a-", 100_000)) + string.Concat(Enumerable.Repeat("http://", 5000));
-        Assert.NotEmpty(Nlp.Tokens(text));
-        Assert.NotNull(Nlp.Tokens("\uD800 x \uDC00 \uD83D\uDE00"));
+        Assert.NotEmpty(Tokens(text));
+        Assert.NotNull(Tokens("\uD800 x \uDC00 \uD83D\uDE00"));
     }
 }

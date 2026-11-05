@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+using RecursiveAI.OneNlp.LanguageId;
 using RecursiveAI.OneNlp.Segmentation;
 
 namespace RecursiveAI.OneNlp;
@@ -7,20 +9,44 @@ namespace RecursiveAI.OneNlp;
 /// <see cref="Doc"/>). Nothing here downloads anything.
 /// </summary>
 /// <remarks>
-/// Until language identification lands, these verbs assume English text: English tokenization data (contractions, abbreviations)
-/// applies. For another language build a <see cref="Pipeline"/> with <see cref="Pipeline.Blank(Language)"/>.
+/// The language of a text is detected first (<see cref="LanguageDetector"/>), and that language picks the model package and the
+/// segmentation data. Without a model package for the language, <see cref="Analyze(string)"/> returns tokens and sentence boundaries
+/// from the language's rule-based segmentation (English has contraction and abbreviation exceptions; other languages use plain UAX #29).
+/// To fix the language yourself, build a <see cref="Pipeline"/> with <see cref="Pipeline.Blank(Language)"/>.
 /// </remarks>
 public static class Nlp
 {
-    // Built once. With only the tokenizer and the sentencizer it never writes to the string table, so sharing it is safe.
-    private static readonly Pipeline TokenPipeline = Pipeline.Blank(Language.English);
-    private static readonly Pipeline DefaultPipeline = Pipeline.Blank(Language.English).Add(SentencizerComponent.For(Language.English));
+    // Rule-based pipelines, one per language, built on first use and shared. With only the tokenizer and the sentencizer a pipeline never
+    // writes to the string table, so sharing it between threads is safe. The key set is bounded by the languages of the detector.
+    private static readonly ConcurrentDictionary<Language, Pipeline> TokenPipelines = new();
+    private static readonly ConcurrentDictionary<Language, Pipeline> SentencePipelines = new();
 
-    // The one place the language of a text is decided. Language identification plugs in here; until then every text is English.
+    private static Pipeline Plain(Language language) =>
+        SentencePipelines.GetOrAdd(language, static l => Pipeline.Blank(l).Add(SentencizerComponent.For(l)));
+
+    // The one place the language of a text is decided. A text with no letters of a supported script is English; so is every text in a
+    // build that carries no language-ID model (a development build without ONENLP_LANGID_WEIGHTS), where nothing can be detected.
     private static Language LanguageOf(string text)
     {
         ArgumentNullException.ThrowIfNull(text);
-        return Language.English;
+        if (!LanguageDetector.TryGetDefault(out LanguageDetector? detector))
+        {
+            return Language.English;
+        }
+
+        Language language = detector.Detect(text);
+        return language == Language.Unknown ? Language.English : language;
+    }
+
+    /// <summary>The most likely language of a text, from the model that ships with this library.</summary>
+    /// <param name="text">Any text, from one word up. Digits and punctuation are ignored.</param>
+    /// <returns>The language, or <see cref="Language.Unknown"/> when the text has no letters of a supported script. Use <see cref="LanguageDetector"/> for confidences, restricted candidate sets and mixed-language text.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">This build carries no language-ID model.</exception>
+    public static Language DetectLanguage(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        return LanguageDetector.Default.Detect(text);
     }
 
     /// <summary>
@@ -32,17 +58,44 @@ public static class Nlp
     /// <returns>A document with its tokens and sentence boundaries, and the model annotations when a model package is available; otherwise those stay unset.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     public static Doc Analyze(string text) =>
-        ModelPackages.TryGet(LanguageOf(text), out Pipeline model) ? model.Process(text) : DefaultPipeline.Process(text);
+        AnalyzeAs(text, LanguageOf(text));
+
+    private static Doc AnalyzeAs(string text, Language language) =>
+        ModelPackages.TryGet(language, out Pipeline model) ? model.Process(text) : Plain(language).Process(text);
 
     /// <summary>Analyzes many texts, a batch at a time, with the same pipeline as <see cref="Analyze"/>; the texts are read lazily, so a long sequence streams.</summary>
     /// <param name="texts">The texts; none may be <see langword="null"/>.</param>
-    /// <returns>One document per text, in input order. The language is decided once, from the first text (English for now), and applies to all.</returns>
+    /// <returns>One document per text, in input order. The language is detected once, from the first text, and applies to all.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="texts"/> or one of its items is <see langword="null"/>.</exception>
     public static IEnumerable<Doc> AnalyzeMany(IEnumerable<string> texts)
     {
         ArgumentNullException.ThrowIfNull(texts);
-        Pipeline pipeline = ModelPackages.TryGet(Language.English, out Pipeline model) ? model : DefaultPipeline;
-        return pipeline.ProcessMany(texts);
+        return AnalyzeManyCore(texts);
+    }
+
+    private static IEnumerable<Doc> AnalyzeManyCore(IEnumerable<string> texts)
+    {
+        using IEnumerator<string> e = texts.GetEnumerator();
+        if (!e.MoveNext())
+        {
+            yield break;
+        }
+
+        Language language = LanguageOf(e.Current);
+        Pipeline pipeline = ModelPackages.TryGet(language, out Pipeline model) ? model : Plain(language);
+        IEnumerable<string> All()
+        {
+            yield return e.Current;
+            while (e.MoveNext())
+            {
+                yield return e.Current;
+            }
+        }
+
+        foreach (Doc doc in pipeline.ProcessMany(All()))
+        {
+            yield return doc;
+        }
     }
 
     /// <summary>Finds the named entities of a text (person, organization, location).</summary>
@@ -59,13 +112,13 @@ public static class Nlp
     /// <exception cref="InvalidOperationException">No model package is available for the text's language; the message names the package to add.</exception>
     public static string[] Lemmas(string text) => [.. ModelPackages.Get(LanguageOf(text)).Process(text).Select(t => t.Lemma)];
 
-    /// <summary>Splits a text into word tokens (UAX #29 word segments, adjusted to UD English tokenization). White space is not a token.</summary>
+    /// <summary>Splits a text into word tokens (UAX #29 word segments; for English adjusted to UD English tokenization). White space is not a token.</summary>
     /// <param name="text">The text; may be empty.</param>
     /// <returns>The tokens in order; each has character offsets into <paramref name="text"/> and keeps it alive. Empty for an empty or all-white-space text.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
-    public static Token[] Tokens(string text) => [.. TokenPipeline.Process(text)];
+    public static Token[] Tokens(string text) => [.. TokenPipelines.GetOrAdd(LanguageOf(text), static l => Pipeline.Blank(l)).Process(text)];
 
-    /// <summary>Splits a text into sentences (UAX #29 sentence boundaries snapped to tokens, with English abbreviations such as <c>Mr.</c> held together).</summary>
+    /// <summary>Splits a text into sentences (UAX #29 sentence boundaries snapped to tokens; for English abbreviations such as <c>Mr.</c> are held together).</summary>
     /// <param name="text">The text; may be empty.</param>
     /// <returns>The sentences in order, each a span of whole tokens with character offsets into <paramref name="text"/>. Empty for a text without tokens.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>

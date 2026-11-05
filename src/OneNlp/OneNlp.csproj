@@ -9,11 +9,19 @@
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- The language-identification weights are embedded as a resource, so a NativeAOT or trimmed application carries them with no file to copy. -->
+    <LangIdWeightsDir Condition="'$(LangIdWeightsDir)' == ''">$(ONENLP_LANGID_WEIGHTS)</LangIdWeightsDir>
   </PropertyGroup>
+
+  <Import Project="LanguageId/weights.manifest.props" />
 
   <ItemGroup>
     <InternalsVisibleTo Include="$(PackagePrefix)$(LibName).Tests" />
     <InternalsVisibleTo Include="$(PackagePrefix)$(LibName).Fuzz" />
+    <InternalsVisibleTo Include="$(PackagePrefix)$(LibName).LangIdTool" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="$(PackagePrefix)$(LibName).AotSmoke" />
   </ItemGroup>
 
@@ -30,6 +38,28 @@
     <None Include="../../LICENSE-MIT" Pack="true" PackagePath="/" />
     <None Include="../../LICENSE-APACHE" Pack="true" PackagePath="/" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+    <None Include="LanguageId/weights.manifest.props" Pack="true" PackagePath="/" />
   </ItemGroup>
+
+  <!-- With a weights directory (property LangIdWeightsDir or environment variable ONENLP_LANGID_WEIGHTS): check every file against the
+       manifest and embed it. Without one the project still builds (for development), without a language-ID model, and cannot be packed. -->
+  <Target Name="EmbedLangIdWeights" BeforeTargets="AssignTargetPaths" Condition="'$(LangIdWeightsDir)' != ''">
+    <ItemGroup>
+      <_LangIdWeight Include="@(LangIdWeight)" Path="$([MSBuild]::EnsureTrailingSlash('$(LangIdWeightsDir)'))%(Identity)" WeightName="%(Identity)" />
+    </ItemGroup>
+    <Error Condition="!Exists('%(_LangIdWeight.Path)')" Text="Weights file '%(_LangIdWeight.WeightName)' is missing from '$(LangIdWeightsDir)'. Put the files listed in src/OneNlp/LanguageId/weights.manifest.props there." />
+    <GetFileHash Files="@(_LangIdWeight->'%(Path)')" Algorithm="SHA256" HashEncoding="hex">
+      <Output TaskParameter="Items" ItemName="_LangIdWeightHashed" />
+    </GetFileHash>
+    <Error Condition="!$([System.String]::Equals('%(_LangIdWeightHashed.FileHash)', '%(_LangIdWeightHashed.Sha256)', System.StringComparison.OrdinalIgnoreCase))"
+           Text="Weights file '%(_LangIdWeightHashed.WeightName)' does not match the manifest: sha256 %(_LangIdWeightHashed.FileHash), expected %(_LangIdWeightHashed.Sha256). Use the weights listed in weights.manifest.props, or update the manifest and PROVENANCE.md together." />
+    <ItemGroup>
+      <EmbeddedResource Include="@(_LangIdWeightHashed)" LogicalName="weights/%(_LangIdWeightHashed.WeightName)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="RequireLangIdWeightsToPack" BeforeTargets="GenerateNuspec" Condition="'$(LangIdWeightsDir)' == ''">
+    <Error Text="Packing needs the language-ID weights: set the environment variable ONENLP_LANGID_WEIGHTS (or the property LangIdWeightsDir) to the directory that holds the files listed in src/OneNlp/LanguageId/weights.manifest.props." />
+  </Target>
 
 </Project>

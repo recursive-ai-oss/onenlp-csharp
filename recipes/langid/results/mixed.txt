@@ -1,0 +1,4 @@
+penalty 2: characters right 92.35%, documents with exactly the right runs 31.80% (2000 documents)
+penalty 4: characters right 95.96%, documents with exactly the right runs 65.85% (2000 documents)
+penalty 6: characters right 97.11%, documents with exactly the right runs 82.00% (2000 documents)
+penalty 9: characters right 97.53%, documents with exactly the right runs 89.30% (2000 documents)

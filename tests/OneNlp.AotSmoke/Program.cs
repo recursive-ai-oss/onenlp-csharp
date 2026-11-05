@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using RecursiveAI.OneNlp;
+using RecursiveAI.OneNlp.LanguageId;
 using RecursiveAI.OneNlp.Serialization;
 using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural;
@@ -40,6 +41,15 @@ internal static class Program
         Token[] tokens = Nlp.Tokens("Mr. Smith can't go. He's gone!");
         Check("contraction split", tokens.Length == 10 && tokens[2].ToString() == "ca" && tokens[3].ToString() == "n't");
         Check("sentences", Nlp.Sentences("Mr. Smith can't go. He's gone!").Count == 2);
+
+        // Language identification: the embedded model loads, restriction and mixed-language runs work.
+        if (LanguageDetector.TryGetDefault(out LanguageDetector? languageId))
+        {
+            Check("language id", Nlp.DetectLanguage("Bonjour tout le monde, comment allez-vous aujourd'hui?").Code == "fr");
+            var detector = languageId.Restrict([Language.English, Language.German]);
+            Check("restricted language id", detector.Detect("Das ist ein Haus").Code == "de" && languageId.Languages.Count == 75);
+            Check("language runs", languageId.DetectSpans("The weather is lovely today, we go out. Das Wetter ist heute schon, wir gehen hinaus.").Count == 2);
+        }
 
         // Recognizers: rule data embedded in the assembly, numbers, money and sequences, and the pipeline component.
         // Dates and times: vocabulary and holiday tables embedded as rule data, resolved against a reference date.

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Trains, evaluates and scores the language-identification model. Not shipped. It reads the same featurizer as the detector,
+       through InternalsVisibleTo, so a feature means the same thing when training and when detecting. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).LangIdTool</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).LangIdTool</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/OneNlp/OneNlp.csproj" />
+  </ItemGroup>
+
+</Project>

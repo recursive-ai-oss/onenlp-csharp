@@ -33,6 +33,8 @@ internal static class Program
         ["vocab-txt"] = VocabularyReaderTargets.RunVocabTxt,
         ["sentencepiece-model"] = VocabularyReaderTargets.RunSentencePiece,
         ["pattern-json"] = PatternJsonTarget.Run,
+        ["langid-detect"] = LanguageIdTargets.Detect,
+        ["langid-model"] = LanguageIdTargets.Model,
         ["recognizers"] = RecognizerTargets.Text,
         ["recognizer-rules"] = RecognizerTargets.Rules,
         ["edit-tree"] = NeuralTargets.EditTreeText,
@@ -57,6 +59,9 @@ internal static class Program
                 case "docbin":
                     SerializationTargets.SeedBin(args[2]);
                     break;
+                case "langid-model":
+                    LanguageIdTargets.SeedModel(args[2]);
+                    break;
                 case "recognizers":
                     RecognizerTargets.SeedText(args[2]);
                     break;
@@ -75,6 +80,7 @@ internal static class Program
                 case "pipeline-file":
                     NeuralTargets.SeedPipelineFile(args[2]);
                     break;
+                case "langid-detect":
                 case "word-tokenizer":
                 case "segmentation":
                     File.WriteAllText(Path.Combine(args[2], "seed-english"), "Mr. Smith can't visit www.x.org/a?b=1. Mail a.b@c-d.com, e.g. U.S.A. well-known 3:30 ... -- :) $$$. Yes!\n\nNext.");

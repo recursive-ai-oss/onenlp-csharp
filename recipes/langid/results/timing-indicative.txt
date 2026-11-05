@@ -1,0 +1,37 @@
+host: AMD Ryzen 9 7950X3D 16-Core Processor, 32 cores; load before: 14.74 5.48 5.01
+load: 12.3 ms
+words: 74551 texts, 382 ms
+pairs: 73086 texts, 241 ms
+sentences: 75000 texts, 1124 ms
+ours rep 1: wall 1.81 s, max RSS 128864 KB
+load: 12.2 ms
+words: 74551 texts, 412 ms
+pairs: 73086 texts, 274 ms
+sentences: 75000 texts, 992 ms
+ours rep 2: wall 1.75 s, max RSS 126612 KB
+load: 12.0 ms
+words: 74551 texts, 367 ms
+pairs: 73086 texts, 252 ms
+sentences: 75000 texts, 1035 ms
+ours rep 3: wall 1.72 s, max RSS 128632 KB
+SearchPioneer.Lingua high words (single thread):
+74551 texts, 7626 ms, 1 thread
+SearchPioneer.Lingua high pairs (single thread):
+73086 texts, 10086 ms, 1 thread
+SearchPioneer.Lingua high sentences (single thread):
+75000 texts, 52994 ms, 1 thread
+SearchPioneer.Lingua low words (single thread):
+74551 texts, 10259 ms, 1 thread
+SearchPioneer.Lingua low pairs (single thread):
+73086 texts, 14032 ms, 1 thread
+SearchPioneer.Lingua low sentences (single thread):
+75000 texts, 62639 ms, 1 thread
+lingua-language-detector high words (single thread):
+74551 texts, 21524 ms, 1 thread
+lingua-language-detector high sentences (single thread):
+75000 texts, 96038 ms, 1 thread
+lingua-language-detector low words (single thread):
+74551 texts, 8626 ms, 1 thread
+lingua-language-detector low sentences (single thread):
+75000 texts, 44593 ms, 1 thread
+host load after: 3.37 6.22 5.70

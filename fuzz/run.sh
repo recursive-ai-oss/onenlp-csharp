@@ -35,10 +35,11 @@ target="${1:?usage: run.sh <target> <seconds> [corpus dir] | run.sh replay <targ
 shift
 
 case "$target" in
+  word-tokenizer|segmentation|langid-detect) maxlen=4096 ;;
+  langid-model) maxlen=65536 ;;
+  doc-json|doc-binary|docbin) maxlen=8192 ;;
   tokenizer-json | tokenizer-json-models | code-point-regex | vocab-txt | sentencepiece-model | bpe-model | tiktoken-ranks) maxlen=65536 ;;
   charsmap) maxlen=262144 ;;
-  word-tokenizer | segmentation) maxlen=4096 ;;
-  doc-json | doc-binary | docbin) maxlen=8192 ;;
   recognizers) maxlen=4096 ;;
   recognizer-rules) maxlen=16384 ;;
   edit-tree) maxlen=8192 ;;

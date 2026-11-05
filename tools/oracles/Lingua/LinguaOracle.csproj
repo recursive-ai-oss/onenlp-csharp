@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Black-box comparator: SearchPioneer.Lingua (a managed Lingua port) predicts the language of every line of an evaluation file.
+       Not part of the solution and never shipped; comparators are allowed in tools only. The version is pinned here. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>OneNlp.Tools.LinguaOracle</RootNamespace>
+    <AssemblyName>LinguaOracle</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SearchPioneer.Lingua" VersionOverride="2.0.0" />
+  </ItemGroup>
+
+</Project>
