@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using RecursiveAI.OneNlp.Data;
+using RecursiveAI.OneNlp.Segmentation;
 
 namespace RecursiveAI.OneNlp.Recipes.Portuguese;
 
@@ -195,28 +196,23 @@ internal static partial class Program
         for (int i = 0; i < n;)
         {
             Token t = doc[start + i];
-            if (i + 1 < n && t.EndIdx == doc[start + i + 1].Idx)
+            // Contractions ("d" + "o") and enclitics ("trata" + "-se") are found from the pieces by the segmentation data.
+            if (i + 1 < n && SegmentationData.Portuguese.TryMatchMultiword(doc, start + i, out _, out string[]? words) && words is not null)
             {
                 Token u = doc[start + i + 1];
-                string surface = t.ToString() + u.ToString();
-                string second = u.ToString();
-                bool enclitic = second.Length > 1 && second[0] == '-' && Enclitics.Contains(second[1..]);
-                if (enclitic || Contractions.ContainsKey(surface.ToLowerInvariant()))
+                bool enclitic = doc.Text[u.Idx] == '-';
+                groups.Add((rows.Count, rows.Count + 1, doc.Text.Substring(t.Idx, u.EndIdx - t.Idx)));
+                for (int w = 0; w < 2; w++)
                 {
-                    string[]? words = enclitic ? null : Contractions[surface.ToLowerInvariant()];
-                    groups.Add((rows.Count, rows.Count + 1, surface));
-                    for (int w = 0; w < 2; w++)
-                    {
-                        Token piece = doc[start + i + w];
-                        firstWord[i + w] = rows.Count;
-                        string form = words is not null ? CopyCase(words[w], surface, w == 0) : w == 0 ? t.ToString() : Lex.EncliticWord(second[1..]);
-                        rows.Add(new WordRow(form, piece.Lemma, piece.Pos, piece.Tag, piece.Morph, 0, piece.Dep));
-                        headToken.Add(Relative(piece, start, i + w));
-                    }
-
-                    i += 2;
-                    continue;
+                    Token piece = doc[start + i + w];
+                    firstWord[i + w] = rows.Count;
+                    string form = enclitic && w == 1 ? Lex.EncliticWord(words[1]) : words[w];
+                    rows.Add(new WordRow(form, piece.Lemma, piece.Pos, piece.Tag, piece.Morph, 0, piece.Dep));
+                    headToken.Add(Relative(piece, start, i + w));
                 }
+
+                i += 2;
+                continue;
             }
 
             string text = t.ToString();

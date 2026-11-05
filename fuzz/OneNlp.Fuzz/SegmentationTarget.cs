@@ -4,7 +4,7 @@ using RecursiveAI.OneNlp.Segmentation;
 namespace RecursiveAI.OneNlp.Fuzz;
 
 /// <summary>
-/// Feeds arbitrary text through the word tokenizer and the sentencizer, with and without English data, and checks: offsets are
+/// Feeds arbitrary text through the word tokenizer and the sentencizer, with and without English and French data, and checks: offsets are
 /// ascending and in range, every character that is not white space is inside a token (white space never starts or ends one
 /// when no data is applied), sentences partition the tokens in order, and nothing throws.
 /// </summary>
@@ -12,12 +12,12 @@ internal static class SegmentationTarget
 {
     private static readonly UaxWordTokenizer[] Tokenizers =
     [
-        new(SegmentationData.None), new(SegmentationData.Neutral), new(SegmentationData.English),
+        new(SegmentationData.None), new(SegmentationData.Neutral), new(SegmentationData.English), new(SegmentationData.French),
     ];
 
     private static readonly SentencizerComponent[] Sentencizers =
     [
-        new(SegmentationData.None), new(SegmentationData.Neutral), new(SegmentationData.English),
+        new(SegmentationData.None), new(SegmentationData.Neutral), new(SegmentationData.English), new(SegmentationData.French),
     ];
 
     internal static void Run(ReadOnlySpan<byte> data)

@@ -26,34 +26,6 @@ internal static partial class Program
         }
     });
 
-    // UD Portuguese writes a preposition and what follows it (an article, a pronoun, a demonstrative) that have grown together as one multiword
-    // token of two words: "do" is "de" + "o". The tokenizer cuts such a token into two pieces (SegmentationData.Portuguese); the words are
-    // written back here, because a piece such as "d" is not a word. The words are those of the treebank (UD Portuguese-Bosque), lower case;
-    // the case of the surface form is copied.
-    private static readonly Dictionary<string, string[]> Contractions = new(StringComparer.Ordinal)
-    {
-        ["ao"] = ["a", "o"], ["aos"] = ["a", "os"], ["da"] = ["de", "a"], ["dali"] = ["de", "ali"],
-        ["dantes"] = ["de", "antes"], ["daquela"] = ["de", "aquela"], ["daquelas"] = ["de", "aquelas"], ["daquele"] = ["de", "aquele"],
-        ["daqueles"] = ["de", "aqueles"], ["daqui"] = ["de", "aqui"], ["daquilo"] = ["de", "aquilo"], ["das"] = ["de", "as"],
-        ["daí"] = ["de", "aí"], ["dela"] = ["de", "ela"], ["delas"] = ["de", "elas"], ["dele"] = ["de", "ele"],
-        ["deles"] = ["de", "eles"], ["dessa"] = ["de", "essa"], ["dessas"] = ["de", "essas"], ["desse"] = ["de", "esse"],
-        ["desses"] = ["de", "esses"], ["desta"] = ["de", "esta"], ["destas"] = ["de", "estas"], ["deste"] = ["de", "este"],
-        ["destes"] = ["de", "estes"], ["disso"] = ["de", "isso"], ["disto"] = ["de", "isto"], ["do"] = ["de", "o"],
-        ["dos"] = ["de", "os"], ["dum"] = ["de", "um"], ["duma"] = ["de", "uma"], ["dumas"] = ["de", "umas"],
-        ["duns"] = ["de", "uns"], ["na"] = ["em", "a"], ["nalgum"] = ["em", "algum"], ["nalguma"] = ["em", "alguma"],
-        ["nalgumas"] = ["em", "algumas"], ["nalguns"] = ["em", "alguns"], ["naquela"] = ["em", "aquela"], ["naquelas"] = ["em", "aquelas"],
-        ["naquele"] = ["em", "aquele"], ["naqueles"] = ["em", "aqueles"], ["naquilo"] = ["em", "aquilo"], ["nas"] = ["em", "as"],
-        ["nela"] = ["em", "ela"], ["nelas"] = ["em", "elas"], ["nele"] = ["em", "ele"], ["neles"] = ["em", "eles"],
-        ["nessa"] = ["em", "essa"], ["nessas"] = ["em", "essas"], ["nesse"] = ["em", "esse"], ["nesses"] = ["em", "esses"],
-        ["nesta"] = ["em", "esta"], ["nestas"] = ["em", "estas"], ["neste"] = ["em", "este"], ["nestes"] = ["em", "estes"],
-        ["nisso"] = ["em", "isso"], ["nisto"] = ["em", "isto"], ["no"] = ["em", "o"], ["nos"] = ["em", "os"],
-        ["noutra"] = ["em", "outra"], ["noutras"] = ["em", "outras"], ["noutro"] = ["em", "outro"], ["noutros"] = ["em", "outros"],
-        ["num"] = ["em", "um"], ["numa"] = ["em", "uma"], ["numas"] = ["em", "umas"], ["nuns"] = ["em", "uns"],
-        ["pela"] = ["por", "a"], ["pelas"] = ["por", "as"], ["pelo"] = ["por", "o"], ["pelos"] = ["por", "os"],
-        ["àquela"] = ["a", "aquela"], ["àquelas"] = ["a", "aquelas"], ["àquele"] = ["a", "aquele"], ["àqueles"] = ["a", "aqueles"],
-        ["àquilo"] = ["a", "aquilo"], ["às"] = ["a", "as"],
-    };
-
     private static Pipeline NewTaggingPipeline(string[] args)
     {
         FastEncoder encoder = MakeEncoder(args, EncoderSeed);
