@@ -125,3 +125,16 @@ Both comparators are mapped into this schema by scripts of ours (`tools/oracles/
 - **Verdict.** Per type and per metric (exact-span F1, value accuracy on exact matches), the two systems are scored on the same sentences and the 95% bootstrap intervals compared by the within-noise rule of `docs/measurement.md`: overlapping intervals are "within noise", otherwise "ahead" or "behind". The paired difference (ours minus the reference) and its interval are printed beside it, because with 10 to 20 items per type an overlapping interval is a weak statement.
 - **Convention differences** are the comparator's, not ours: it reports the end of "from A to B" day ranges as B and drops stated time zones. They affect only date/time rows.
 - **Throughput** is measured by `tools/oracles/bench_recognizers.sh` (about 10 MB made from the development split, 3 runs each, comparator with its number, unit, currency and sequence models). Indicative only, on a shared machine.
+
+## French and German
+
+`testdata/recognizers/{fr,de}/` hold the gold sets in the same schema, written for these languages (never copied from a comparator): `test.jsonl` and `gold.jsonl` (development). Sources: `tools/recognizers-gold/{fr,de}.src.txt`, built by `build.py --lang fr|de`; the test split was fixed and hashed before any rule for the language was written, and the development split is the only one the rules were tuned on.
+
+| File | Items | Sentences | sha256 |
+|---|---:|---:|---|
+| `fr/test.jsonl` | 347 | 357 | `7b697b11cdd5893bb6f7316a451e15fc47489e39b0fdd98cd8a14ec4b72fb1b9` |
+| `de/test.jsonl` | 349 | 359 | `640fb591d83dfc96b1048024511d01929ca68fbe6acee3bb47ae0a3dfe1ebf0d` |
+
+Every type has at least 10 test items. Conventions beyond the English ones: a preposition is outside the span (`à`, `en`, `am`, `im`, `um`, `zum`) except where it belongs to the construct (`dans 3 jours`, `il y a 3 jours`, `vor 3 Tagen`, `de 9h à 17h`, `vom 6. bis 10. April`); a French age includes `âgé de`; a German age is `N Jahre alt` or `40-jährige`; `halb eins` is 12:30 (`alt`: 00:30); unit names in values are the English canonical ones.
+
+Run the comparators with `tools/oracles/comparators_lang.sh <lang> <culture> <gold|test> <out>` (Microsoft.Recognizers.Text 1.8.13 in `fr-fr` or `de-de`; its French and German unit names are mapped to the canonical ones in `map_raw.py`), Duckling with `tools/oracles/duckling_lang.sh`, and ours with `tools/oracles/score_dev.sh <lang> <out> [gold|test]`. Results, with paired 95% intervals and Duckling beside them, are in `testdata/recognizers/{fr,de}/comparators/`.

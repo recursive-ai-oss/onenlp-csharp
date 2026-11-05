@@ -27,6 +27,8 @@ internal sealed partial class Scan
     private readonly HashSet<string>.AlternateLookup<ReadOnlySpan<char>> _connectors;
     private readonly HashSet<string>.AlternateLookup<ReadOnlySpan<char>> _negatives;
     private readonly HashSet<string>.AlternateLookup<ReadOnlySpan<char>> _points;
+    private readonly HashSet<string>.AlternateLookup<ReadOnlySpan<char>> _loneSkip;
+    private readonly Dictionary<string, OrdinalWord>.AlternateLookup<ReadOnlySpan<char>> _ordinalStems;
 
     internal Scan(RecognizerData data, string text, RecognitionContext context = default)
     {
@@ -39,6 +41,8 @@ internal sealed partial class Scan
         _connectors = data.Connectors.GetAlternateLookup<ReadOnlySpan<char>>();
         _negatives = data.NegativeWords.GetAlternateLookup<ReadOnlySpan<char>>();
         _points = data.PointWords.GetAlternateLookup<ReadOnlySpan<char>>();
+        _loneSkip = data.LoneSkip.GetAlternateLookup<ReadOnlySpan<char>>();
+        _ordinalStems = data.OrdinalStems.GetAlternateLookup<ReadOnlySpan<char>>();
         Lexer.Lex(text, _items);
         InitTemporal(context);
     }
@@ -140,6 +144,12 @@ internal sealed partial class Scan
                 return it.End;
             }
 
+            // "un", "une", "ein": an article far more often than a number, but part of "un million", "einhundert".
+            if (r.EndItem == i && _d.LoneSkip.Count > 0 && _loneSkip.Contains(word))
+            {
+                return it.End;
+            }
+
             int end = _items[r.EndItem].End;
             _numbers.Add(new NumberCandidate { Start = it.Start, End = end, Value = r.Value, Ordinal = r.Ordinal });
             return end;
@@ -219,11 +229,17 @@ internal sealed partial class Scan
 
             if (!(_cardinals.TryGetValue(next, out Cardinal c0) && c0.Kind is CardinalKind.Scale or CardinalKind.Multiplier))
             {
-                return false;
+                // "un" is an article and also the number one: "un deux" starts with a plain word.
+                if (!_cardinals.ContainsKey(w0))
+                {
+                    return false;
+                }
             }
-
-            article = true;
-            i = j;
+            else
+            {
+                article = true;
+                i = j;
+            }
         }
 
         while (_items[i].Kind == ItemKind.Word)
@@ -232,25 +248,37 @@ internal sealed partial class Scan
             bool terminal = false;
             if (_cardinals.TryGetValue(w, out Cardinal c))
             {
-                if (!ApplyCardinal(c, ref cur, ref total, ref lastScale, ref last, any, article, ref terminal))
+                if (!ApplyCardinal(c, _d.System, ref cur, ref total, ref lastScale, ref last, any, article, ref terminal))
                 {
                     break;
                 }
             }
-            else if (_ordinals.TryGetValue(w, out OrdinalWord o))
+            else if (TryOrdinal(w, out OrdinalWord o))
             {
                 if (!any && o.NotAfterNumber && PrevIsNumber(i))
                 {
                     break;
                 }
 
-                if (!ApplyOrdinal(o.Value, ref cur, ref total, lastScale, last, any, article))
+                if (!ApplyOrdinal(o.Value, _d.System, ref cur, ref total, lastScale, last, any, article))
                 {
                     break;
                 }
 
                 ordinal = true;
                 terminal = true;
+            }
+            else if (_d.System == NumberSystem.German && cur == 0 && TryGermanCompound(w, out decimal compound, out bool compoundOrdinal)
+                && compound < lastScale)
+            {
+                // "dreihundertvierundzwanzig": a whole number below a million written as one word is one group.
+                cur = compound;
+                last = Piece.Hundred;
+                if (compoundOrdinal)
+                {
+                    ordinal = true;
+                    terminal = true;
+                }
             }
             else
             {
@@ -274,6 +302,20 @@ internal sealed partial class Scan
 
             if (_connectors.Contains(Span(n)))
             {
+                if (_d.System == NumberSystem.French)
+                {
+                    // "vingt et un", "soixante et onze", "vingt-et-unieme": "et" links the tens 20 to 60 to a one (or 60 to eleven) only.
+                    int fk = Next(n, true);
+                    if (last == Piece.Tens && cur % 100 is 20 or 30 or 40 or 50 or 60 && fk >= 0 && _items[fk].Kind == ItemKind.Word
+                        && FrenchOneAfterEt(Span(fk), cur % 100 == 60))
+                    {
+                        i = fk;
+                        continue;
+                    }
+
+                    break;
+                }
+
                 // "and" only links the hundreds or a scale word to what follows: "one hundred and five", "two thousand and ten".
                 int k = Next(n, false);
                 if (last is (Piece.Hundred or Piece.Scale) && cur % 100 == 0 && k >= 0 && _items[k].Kind == ItemKind.Word && StartsLowerPart(Span(k)))
@@ -304,10 +346,193 @@ internal sealed partial class Scan
 
     private bool StartsLowerPart(ReadOnlySpan<char> w) =>
         (_cardinals.TryGetValue(w, out Cardinal c) && c.Kind is CardinalKind.Unit or CardinalKind.Teen or CardinalKind.Tens)
-        || (_ordinals.TryGetValue(w, out OrdinalWord o) && o.Value < 100);
+        || (TryOrdinal(w, out OrdinalWord o) && o.Value < 100);
+
+    /// <summary>An ordinal word as written, or a stem with one of the endings of the language (German <c>dritte</c>, <c>dritten</c>, <c>dritter</c>).</summary>
+    private bool TryOrdinal(ReadOnlySpan<char> w, out OrdinalWord ordinal)
+    {
+        if (_ordinals.TryGetValue(w, out ordinal))
+        {
+            return true;
+        }
+
+        if (_d.OrdinalStems.Count > 0)
+        {
+            foreach (string ending in _d.OrdinalEndings)
+            {
+                if (w.Length > ending.Length + 1 && w.EndsWith(ending, StringComparison.OrdinalIgnoreCase) && _ordinalStems.TryGetValue(w[..^ending.Length], out ordinal))
+                {
+                    return true;
+                }
+            }
+        }
+
+        ordinal = default;
+        return false;
+    }
+
+    /// <summary>After French "et": a one (un, une, unieme) or, after sixty only, an eleven (onze, onzieme).</summary>
+    private bool FrenchOneAfterEt(ReadOnlySpan<char> w, bool afterSixty)
+    {
+        if (_cardinals.TryGetValue(w, out Cardinal c))
+        {
+            return (c.Kind == CardinalKind.Unit && c.Value == 1) || (afterSixty && c.Kind == CardinalKind.Teen && c.Value == 11);
+        }
+
+        return TryOrdinal(w, out OrdinalWord o) && (o.Value == 1 || (afterSixty && o.Value == 11));
+    }
+
+    // ---- German number words ------------------------------------------------------------------------------------------------
+
+    /// <summary>
+    /// Reads a German number written as one word below a million: <c>dreihundertvierundzwanzig</c> is 324, <c>zweitausend</c> is 2000,
+    /// <c>einundzwanzigste</c> the 21st. The word is cut into the morphemes of the number words in the rule data (units, teens, tens,
+    /// <c>hundert</c>, <c>tausend</c>, <c>und</c>, ordinal stems), trying longer morphemes first and backing out of dead ends, and the
+    /// morphemes must fit the grammar: [unit hundert | hundert] [unit tausend | tausend] ... with a unit before its tens joined by und.
+    /// </summary>
+    private bool TryGermanCompound(ReadOnlySpan<char> word, out decimal value, out bool ordinal)
+    {
+        value = 0;
+        ordinal = false;
+        if (word.Length is < 8 or > 64 || _d.Morphemes.Length == 0)
+        {
+            return false;
+        }
+
+        string w = word.ToString().ToLowerInvariant();
+        var path = new List<Morpheme>(8);
+        if (Cut(w, w.Length, 0, false, path, out value))
+        {
+            return true;
+        }
+
+        foreach (string ending in _d.OrdinalEndings)
+        {
+            if (w.Length > ending.Length + 4 && w.EndsWith(ending, StringComparison.Ordinal))
+            {
+                path.Clear();
+                if (Cut(w, w.Length - ending.Length, 0, true, path, out value))
+                {
+                    ordinal = true;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private bool Cut(string w, int length, int pos, bool ordinal, List<Morpheme> path, out decimal value)
+    {
+        if (pos == length)
+        {
+            return Evaluate(path, ordinal, out value);
+        }
+
+        foreach (Morpheme m in _d.Morphemes)
+        {
+            if (m.Ordinal && !ordinal || pos + m.Text.Length > length || string.CompareOrdinal(w, pos, m.Text, 0, m.Text.Length) != 0)
+            {
+                continue;
+            }
+
+            path.Add(m);
+            if (Cut(w, length, pos + m.Text.Length, ordinal, path, out value))
+            {
+                return true;
+            }
+
+            path.RemoveAt(path.Count - 1);
+        }
+
+        value = 0;
+        return false;
+    }
+
+    /// <summary>Checks a morpheme sequence against the grammar of German numbers below a million and returns its value.</summary>
+    private static bool Evaluate(List<Morpheme> m, bool ordinal, out decimal value)
+    {
+        value = 0;
+        if (m.Count < 2 || (ordinal && !m[^1].Ordinal))
+        {
+            return false;
+        }
+
+        for (int k = 0; k < m.Count - 1; k++)
+        {
+            if (m[k].Ordinal)
+            {
+                return false;
+            }
+        }
+
+        int pos = 0;
+        decimal total = 0;
+        if (!Group(m, ref pos, out decimal first))
+        {
+            first = 0;
+        }
+
+        if (pos < m.Count && m[pos].Kind == MorphemeKind.Thousand)
+        {
+            pos++;
+            total = (first == 0 ? 1 : first) * 1000;
+            if (!Group(m, ref pos, out decimal rest))
+            {
+                rest = 0;
+            }
+
+            total += rest;
+        }
+        else
+        {
+            total = first;
+        }
+
+        value = total;
+        return pos == m.Count && total > 0;
+    }
+
+    // group := [unit] hundert [rest] | rest ; rest := teen | tens | unit und tens | unit
+    private static bool Group(List<Morpheme> m, ref int pos, out decimal value)
+    {
+        value = 0;
+        int start = pos;
+        if (pos + 1 < m.Count && m[pos].Kind == MorphemeKind.Unit && m[pos + 1].Kind == MorphemeKind.Hundred)
+        {
+            value = m[pos].Value * 100;
+            pos += 2;
+        }
+        else if (pos < m.Count && m[pos].Kind == MorphemeKind.Hundred)
+        {
+            value = 100;
+            pos++;
+        }
+
+        if (pos < m.Count && m[pos].Kind is MorphemeKind.Teen or MorphemeKind.Tens)
+        {
+            value += m[pos].Value;
+            pos++;
+        }
+        else if (pos < m.Count && m[pos].Kind == MorphemeKind.Unit)
+        {
+            if (pos + 2 < m.Count && m[pos + 1].Kind == MorphemeKind.And && m[pos + 2].Kind == MorphemeKind.Tens)
+            {
+                value += m[pos + 2].Value + m[pos].Value;
+                pos += 3;
+            }
+            else
+            {
+                value += m[pos].Value;
+                pos++;
+            }
+        }
+
+        return pos > start;
+    }
 
     private static bool ApplyCardinal(
-        Cardinal c, ref decimal cur, ref decimal total, ref decimal lastScale, ref Piece last, bool any, bool article, ref bool terminal)
+        Cardinal c, NumberSystem sys, ref decimal cur, ref decimal total, ref decimal lastScale, ref Piece last, bool any, bool article, ref bool terminal)
     {
         decimal v = c.Value;
         switch (c.Kind)
@@ -324,14 +549,19 @@ internal sealed partial class Scan
                 }
                 else if (!(cur % 100 == 0 || (cur % 100 >= 20 && cur % 10 == 0)))
                 {
-                    return false;
+                    // French dix-sept, dix-huit, dix-neuf (also soixante-dix-sept): a unit from seven to nine follows "dix".
+                    if (!(sys == NumberSystem.French && last == Piece.Teen && cur % 10 == 0 && v >= 7))
+                    {
+                        return false;
+                    }
                 }
 
                 cur += v;
                 last = Piece.Unit;
                 return true;
             case CardinalKind.Teen:
-                if (cur % 100 != 0)
+                // French soixante-dix, soixante-treize, quatre-vingt-dix-neuf: the teens follow 60 and 80 (twenty-based counting: four twenties and ten).
+                if (cur % 100 != 0 && !(sys == NumberSystem.French && last == Piece.Tens && cur % 100 is 60 or 80))
                 {
                     return false;
                 }
@@ -342,6 +572,14 @@ internal sealed partial class Scan
             case CardinalKind.Tens:
                 if (cur % 100 != 0)
                 {
+                    // French quatre-vingt(s): four twenties.
+                    if (sys == NumberSystem.French && v == 20 && last == Piece.Unit && cur % 100 == 4)
+                    {
+                        cur = cur - 4 + 80;
+                        last = Piece.Tens;
+                        return true;
+                    }
+
                     return false;
                 }
 
@@ -369,9 +607,10 @@ internal sealed partial class Scan
             }
 
             default:
+                bool bare = c.Kind == CardinalKind.BareScale;
                 if (v == 100)
                 {
-                    if (article && !any)
+                    if ((article && !any) || (bare && cur == 0))
                     {
                         cur = 100;
                     }
@@ -388,16 +627,16 @@ internal sealed partial class Scan
                     return true;
                 }
 
-                return ApplyScale(v, ref cur, ref total, ref lastScale, ref last, any, article);
+                return ApplyScale(v, bare, ref cur, ref total, ref lastScale, ref last, any, article);
         }
     }
 
-    private static bool ApplyScale(decimal s, ref decimal cur, ref decimal total, ref decimal lastScale, ref Piece last, bool any, bool article)
+    private static bool ApplyScale(decimal s, bool bare, ref decimal cur, ref decimal total, ref decimal lastScale, ref Piece last, bool any, bool article)
     {
         decimal g = cur;
         if (g == 0)
         {
-            if (article && !any)
+            if ((article && !any) || bare)
             {
                 g = 1;
             }
@@ -419,12 +658,18 @@ internal sealed partial class Scan
         return true;
     }
 
-    private static bool ApplyOrdinal(decimal v, ref decimal cur, ref decimal total, decimal lastScale, Piece last, bool any, bool article)
+    private static bool ApplyOrdinal(decimal v, NumberSystem sys, ref decimal cur, ref decimal total, decimal lastScale, Piece last, bool any, bool article)
     {
         if (v < 20)
         {
             // "first" .. "nineteenth": a unit may also follow tens ("twenty-first").
             bool ok = cur % 100 == 0 || (v < 10 && cur % 100 >= 20 && cur % 10 == 0);
+            if (!ok && sys == NumberSystem.French)
+            {
+                // soixante-dixieme, quatre-vingt-onzieme, dix-septieme
+                ok = (last == Piece.Tens && cur % 100 is 60 or 80 && v >= 10) || (last == Piece.Teen && cur % 10 == 0 && v is >= 7 and < 10);
+            }
+
             if (!ok)
             {
                 return false;
@@ -438,6 +683,12 @@ internal sealed partial class Scan
         {
             if (cur % 100 != 0)
             {
+                if (sys == NumberSystem.French && v == 20 && last == Piece.Unit && cur % 100 == 4)
+                {
+                    cur = cur - 4 + 80;
+                    return true;
+                }
+
                 return false;
             }
 
@@ -589,7 +840,8 @@ internal sealed partial class Scan
         string t = _t;
         int n = t.Length;
         char dec = _d.DecimalSeparator;
-        char grp = _d.GroupSeparator;
+        string groupChars = _d.GroupSeparators;
+        char grp = '\0';
         int p = pos;
         bool grouped = false;
         bool hasDecimal = false;
@@ -604,27 +856,29 @@ internal sealed partial class Scan
             }
 
             // Groups of exactly three digits ("1,234,567"); "1,2345" is two numbers.
-            while (firstRun <= 3 && p + 3 < n && t[p] == grp && IsDigit(t[p + 1]) && IsDigit(t[p + 2]) && IsDigit(t[p + 3])
-                && (p + 4 >= n || !IsDigit(t[p + 4])))
+            while (firstRun <= 3 && p + 3 < n && groupChars.Contains(t[p]) && (grp == '\0' || t[p] == grp) && IsDigit(t[p + 1]) && IsDigit(t[p + 2])
+                && IsDigit(t[p + 3]) && (p + 4 >= n || !IsDigit(t[p + 4])))
             {
+                grp = t[p];
                 p += 4;
                 grouped = true;
             }
         }
 
-        if (!grouped && !leadingSeparator && p + 3 < n && t[p] == grp)
+        if (!grouped && !leadingSeparator && p + 3 < n && groupChars == "," && t[p] == ',')
         {
             // Indian digit grouping ("1,00,000", "12,34,567"): the last group has three digits and the ones before it two.
             int run = p - pos;
             int g = p;
             int pairs = 0;
-            while (run <= 2 && g + 2 < n && t[g] == grp && IsDigit(t[g + 1]) && IsDigit(t[g + 2]))
+            while (run <= 2 && g + 2 < n && t[g] == ',' && IsDigit(t[g + 1]) && IsDigit(t[g + 2]))
             {
                 if (g + 3 < n && IsDigit(t[g + 3]))
                 {
                     if (pairs >= 1 && (g + 4 >= n || !IsDigit(t[g + 4])))
                     {
                         p = g + 4;
+                        grp = ',';
                         grouped = true;
                     }
 
@@ -752,6 +1006,13 @@ internal sealed partial class Scan
             }
         }
 
+        // German "3. März", "der 5. Stock": a whole number and a dot is an ordinal when a word follows (see DotOrdinal).
+        if (_d.OrdinalDot && plainInteger && !negative && q == literalEnd && literalEnd < n && t[literalEnd] == '.' && literalEnd - pos <= 4 && DotOrdinal(literalEnd + 1))
+        {
+            _numbers.Add(new NumberCandidate { Start = start, End = literalEnd + 1, Value = value, Ordinal = true });
+            return literalEnd + 1;
+        }
+
         if (q > literalEnd)
         {
             // Letters touch the digits: an ordinal ending ("21st"), a multiplier ("3.5k"), or the start of a unit ("5km").
@@ -800,6 +1061,55 @@ internal sealed partial class Scan
 
         _numbers.Add(new NumberCandidate { Start = start, End = literalEnd, Value = value });
         return literalEnd;
+    }
+
+    /// <summary>
+    /// Whether the dot after a whole number makes it an ordinal: white space and then a word that starts with a lower-case letter, or a
+    /// month name or one of the nouns in the rule data (<c>5. Stock</c>). "Er kaufte 3. Dann ging er." ends a sentence instead.
+    /// </summary>
+    private bool DotOrdinal(int pos)
+    {
+        string t = _t;
+        int q = pos;
+        while (q < t.Length && q - pos < 2 && (t[q] == ' ' || t[q] == ' '))
+        {
+            q++;
+        }
+
+        if (q == pos || q >= t.Length || !char.IsLetter(t[q]))
+        {
+            return false;
+        }
+
+        if (char.IsLower(t[q]))
+        {
+            return true;
+        }
+
+        int e = q;
+        while (e < t.Length && Lexer.IsWordChar(t[e]))
+        {
+            e++;
+        }
+
+        string word = t.Substring(q, e - q);
+        if (_d.OrdinalDotWords.Contains(word))
+        {
+            return true;
+        }
+
+        if (_d.Temporal.Words.TryGet(word, out List<TWord>? entries))
+        {
+            foreach (TWord w in entries)
+            {
+                if (w.Role == "month")
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static readonly string Superscripts = "\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079";
@@ -1017,6 +1327,7 @@ internal sealed partial class Scan
 
             EmitPrefixMoney(c);
             EmitSuffixed(c);
+            EmitAgePrefixed(c);
         }
 
         _doubt = false;
@@ -1058,6 +1369,55 @@ internal sealed partial class Scan
             PrefixEntry e = entries[0];
             _found.Add(MakeQuantity(start, c.End, QuantityKind.Money, value, null, null, e.Iso, e.Confidence));
             return;
+        }
+    }
+
+    /// <summary>French "âgé de 11 mois": words before the number say it is an age, and the span includes them.</summary>
+    private void EmitAgePrefixed(NumberCandidate c)
+    {
+        if (c.Attached || c.MoneyOnly || _d.AgePrefixes.Count == 0 || _d.AgeUnitsBare.Count == 0)
+        {
+            return;
+        }
+
+        int k = ItemIndexAt(c.Start);
+        if (k <= 0 || !GapOk(_items[k - 1].End, c.Start))
+        {
+            return;
+        }
+
+        int first = -1;
+        for (int n = Math.Min(_d.AgePrefixes.MaxItems, k); n >= 1 && first < 0; n--)
+        {
+            _sb.Clear();
+            Lexer.AppendKey(_sb, _t, _items, k - n, n);
+            if (_d.AgePrefixes.TryGet(_sb.ToString(), out _))
+            {
+                first = k - n;
+            }
+        }
+
+        int j = ItemIndexAt(c.End);
+        if (first < 0 || j >= _items.Count || !GapOk(c.End, _items[j].Start))
+        {
+            return;
+        }
+
+        for (int n = Math.Min(_d.AgeUnitsBare.MaxItems, _items.Count - j); n >= 1; n--)
+        {
+            int after = j + n;
+            if (after < _items.Count && _items[after].Start == _items[after - 1].End && _items[after].Kind != ItemKind.Other)
+            {
+                continue;
+            }
+
+            _sb.Clear();
+            Lexer.AppendKey(_sb, _t, _items, j, n);
+            if (_d.AgeUnitsBare.TryGet(_sb.ToString(), out List<string>? units))
+            {
+                _found.Add(MakeQuantity(_items[first].Start, _items[after - 1].End, QuantityKind.Measure, c.Value, units[0], "age", null, 1f));
+                return;
+            }
         }
     }
 

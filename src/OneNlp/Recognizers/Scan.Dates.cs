@@ -115,7 +115,7 @@ internal sealed partial class Scan
         }
 
         // Month first in the US, day first in Britain and wherever the first number cannot be a month; a dotted date is day first.
-        bool dayFirst = sep == '.' || a > 12 || (_region == TemporalData.RegionGb && b <= 12);
+        bool dayFirst = sep == '.' || a > 12 || (_region != TemporalData.RegionUs && b <= 12);
         (int month, int day) = dayFirst ? (b, a) : (a, b);
         if (month is < 1 or > 12 || day < 1 || day > DateTime.DaysInMonth(y, month))
         {
@@ -212,6 +212,14 @@ internal sealed partial class Scan
         {
             r.Add(Day(i, i + n, _today.AddDays(-1), true));
         }
+        else if (Is(i, "dayaftertomorrow", out n))
+        {
+            r.Add(Day(i, i + n, _today.AddDays(2), true));
+        }
+        else if (Is(i, "daybeforeyesterday", out n))
+        {
+            r.Add(Day(i, i + n, _today.AddDays(-2), true));
+        }
     }
 
     /// <summary><c>in 3 days</c>, <c>a week ago</c>, <c>30 minutes ago</c>, <c>in an hour</c>.</summary>
@@ -219,9 +227,16 @@ internal sealed partial class Scan
     {
         int j = i;
         bool inForm = false;
+        bool agoForm = false;
         if (Is(i, "in", out int n))
         {
             inForm = true;
+            j += n;
+        }
+        else if (Is(i, "agoprefix", out n))
+        {
+            // "il y a 3 jours", "vor 3 Tagen": the word that means "ago" comes first.
+            agoForm = true;
             j += n;
         }
 
@@ -230,8 +245,8 @@ internal sealed partial class Scan
             return;
         }
 
-        int sign = 1;
-        if (!inForm)
+        int sign = agoForm ? -1 : 1;
+        if (!inForm && !agoForm)
         {
             if (Is(e, "ago", out int an))
             {
@@ -307,6 +322,19 @@ internal sealed partial class Scan
             return;
         }
 
+        int e = j + wn;
+        if (mode == 0 && Is(e, "nextpost", out int post))
+        {
+            // "vendredi prochain": the word follows the weekday.
+            mode = 2;
+            e += post;
+        }
+        else if (mode == 0 && Is(e, "lastpost", out post))
+        {
+            mode = 3;
+            e += post;
+        }
+
         // "next Friday" is the Friday of next week (Monday to Sunday weeks); "last Friday" the latest one before today; a bare weekday the
         // first one on or after today.
         DateTime d = mode switch
@@ -315,7 +343,6 @@ internal sealed partial class Scan
             3 => CivilCalendar.Before(a, wd.A),
             _ => CivilCalendar.OnOrAfter(a, wd.A),
         };
-        int e = j + wn;
         r.Add(Day(i, e, d, nr));
         if (mode == 0 && (Is(e, "of", out int of) || Is(e, "in", out of)))
         {
@@ -335,6 +362,11 @@ internal sealed partial class Scan
             if (Ch(k, ',') && Tch(k - 1, k))
             {
                 k++;
+                if (Is(k, "determiner", out int dtn))
+                {
+                    // "Freitag, den 27. März"
+                    k += dtn;
+                }
             }
 
             var dates = new List<Cand>();
@@ -499,7 +531,7 @@ internal sealed partial class Scan
                     r.Add(Day(i, me, NextOccurrence(m, d2, a), nr));
                 }
             }
-            else if (s0 > i && ord && _items[s0].Kind == ItemKind.Digits)
+            else if (s0 > i && ord && _items[s0].Kind == ItemKind.Digits && !_td!.Flags.Contains("no-lone-day"))
             {
                 // "the 25th": the next 25th.
                 DateTime cur = new(a.Year, a.Month, 1);
@@ -658,6 +690,7 @@ internal sealed partial class Scan
         SpanFromToday(i, r);
         int j = i;
         int offset;
+        int post = 0;
         if (Is(i, "this", out int n))
         {
             offset = 0;
@@ -670,6 +703,13 @@ internal sealed partial class Scan
         {
             offset = -1;
         }
+        else if ((Find(i, "unit", out int pw, out _) || Is(i, "weekend", out pw) || Find(i, "season", out pw, out _) || Find(i, "month", out pw, out _))
+            && (Is(i + pw, "nextpost", out post) || Is(i + pw, "lastpost", out post)))
+        {
+            // "la semaine prochaine", "l'hiver dernier": the word follows the period.
+            offset = Is(i + pw, "nextpost") ? 1 : -1;
+            n = 0;
+        }
         else
         {
             return;
@@ -679,7 +719,7 @@ internal sealed partial class Scan
         int mode = offset == 0 ? 0 : offset == 1 ? 2 : -1;
         if (Find(j, "unit", out int un, out TWord u))
         {
-            int e = j + un;
+            int e = j + un + post;
             switch (u.S)
             {
                 case "week":
@@ -724,21 +764,21 @@ internal sealed partial class Scan
         if (Is(j, "weekend", out int wn))
         {
             DateTime sat = CivilCalendar.MondayOf(a).AddDays(5 + (7 * offset));
-            r.Add(Per(i, j + wn, sat, sat.AddDays(2), Granularity.Day, false, nr));
+            r.Add(Per(i, j + wn + post, sat, sat.AddDays(2), Granularity.Day, false, nr));
             return;
         }
 
         if (Find(j, "season", out int sn, out TWord sw))
         {
             DateTime s = Instance(mode, sw.A, sw.B, a);
-            r.Add(Per(i, j + sn, s, s.AddMonths(sw.B), Granularity.Season, true, nr));
+            r.Add(Per(i, j + sn + post, s, s.AddMonths(sw.B), Granularity.Season, true, nr));
             return;
         }
 
         if (Find(j, "month", out int mn, out TWord mw))
         {
             DateTime s = Instance(mode, mw.A, 1, a);
-            r.Add(Per(i, j + mn, s, s.AddMonths(1), Granularity.Month, false, nr));
+            r.Add(Per(i, j + mn + post, s, s.AddMonths(1), Granularity.Month, false, nr));
         }
     }
 
@@ -817,6 +857,25 @@ internal sealed partial class Scan
         {
             var s = new DateTime(Val(d), 1, 1);
             r.Add(Per(i, d + 2, s, s.AddYears(10), Granularity.Decade, false, false));
+        }
+
+        // French "les années 1990" and German "1990er Jahre": the same decade as "the 1990s".
+        if (Is(i, "decadeprefix", out int dpn) && Dig(i + dpn, 4) && GapOk(_items[i + dpn - 1].End, _items[i + dpn].Start) && Val(i + dpn) % 10 == 0
+            && Val(i + dpn) is >= 1000 and <= 2990 && FreeRight(i + dpn + 1))
+        {
+            var s = new DateTime(Val(i + dpn), 1, 1);
+            r.Add(Per(i, i + dpn + 1, s, s.AddYears(10), Granularity.Decade, false, false));
+        }
+        else if (Dig(i, 4) && i + 1 < _items.Count && Tch(i, i + 1) && Val(i) % 10 == 0 && Val(i) is >= 1000 and <= 2990 && Is(i + 1, "decadesuffix", out int dsn))
+        {
+            int end = i + 1 + dsn;
+            if (end < _items.Count && Is(end, "decadeword", out int dwn) && GapOk(_items[end - 1].End, _items[end].Start))
+            {
+                end += dwn;
+            }
+
+            var s = new DateTime(Val(i), 1, 1);
+            r.Add(Per(i, end, s, s.AddYears(10), Granularity.Decade, false, false));
         }
 
         // A bare year
@@ -1178,6 +1237,7 @@ internal sealed partial class Scan
         }
 
         MonthDayRange(i, j, r);
+        DayMonthRange(i, j, between, r);
         var firsts = new List<Cand>();
         DateAt(j, null, firsts);
         foreach (Cand a in firsts)
@@ -1197,6 +1257,22 @@ internal sealed partial class Scan
             DateAt(k + n, a.V.Start, seconds);
             foreach (Cand b in seconds)
             {
+                // "du 3 mars au 7 avril 2026": the year at the end belongs to both ends, so the first end is not the next 3 March but the one before 7 April 2026.
+                if (a.V.NeedsRef && a.V.Kind == TemporalKind.Date && b.V.Kind == TemporalKind.Date && !b.V.NeedsRef)
+                {
+                    DateTime earlier = a.V.Start;
+                    while (earlier >= b.V.End)
+                    {
+                        earlier = earlier.AddYears(-1);
+                    }
+
+                    if (earlier != a.V.Start)
+                    {
+                        r.Add(new Cand(i, b.E, TemporalValue.Period(earlier, b.V.End, Granularity.Day, a.V.Approx || b.V.Approx, false)));
+                        continue;
+                    }
+                }
+
                 if (b.V.Kind is not (TemporalKind.Date or TemporalKind.DateRange) || b.V.End <= a.V.Start || (!framed && !(a.V.Kind == TemporalKind.Date && b.V.Kind == TemporalKind.Date) && !BothYears(a.V, b.V)))
                 {
                     continue;
@@ -1211,6 +1287,64 @@ internal sealed partial class Scan
 
     private static bool BothYears(TemporalValue a, TemporalValue b) =>
         a.Kind == TemporalKind.DateRange && b.Kind == TemporalKind.DateRange && a.Grain == Granularity.Year && b.Grain == Granularity.Year && !a.NeedsRef && !b.NeedsRef;
+
+    /// <summary>Days of one month with the day first: <c>du 6 au 10 avril</c>, <c>vom 6. bis 10. April</c>, <c>zwischen dem 1. und 15. Juni</c>.</summary>
+    private void DayMonthRange(int s, int j, bool between, List<Cand> r)
+    {
+        int k = j;
+        if (Is(k, "determiner", out int dn))
+        {
+            k += dn;
+        }
+
+        if (!DayNum(k, out int e1, out int d1, out _))
+        {
+            return;
+        }
+
+        int cn;
+        if (between ? !Is(e1, "and", out cn) : !Is(e1, "rangeto", out cn))
+        {
+            return;
+        }
+
+        int m = e1 + cn;
+        if (Is(m, "determiner", out dn))
+        {
+            m += dn;
+        }
+
+        if (!DayNum(m, out int e2, out int d2, out _) || d2 < d1 || e2 >= _items.Count || !GapOk(_items[e2 - 1].End, _items[e2].Start)
+            || !Find(e2, "month", out int mn, out TWord mw))
+        {
+            return;
+        }
+
+        int me = e2 + mn;
+        int yk = me;
+        if (Ch(yk, ',') && Tch(yk - 1, yk))
+        {
+            yk++;
+        }
+
+        bool hasYear = YearAt(yk, out int ye, out int y);
+        DateTime start = hasYear ? new DateTime(y, mw.A, 1) : NextOccurrence(mw.A, 1, _today);
+        if (d2 > DateTime.DaysInMonth(start.Year, mw.A))
+        {
+            return;
+        }
+
+        if (!hasYear)
+        {
+            start = NextOccurrence(mw.A, d1, _today);
+        }
+        else
+        {
+            start = new DateTime(y, mw.A, d1);
+        }
+
+        r.Add(Per(s, hasYear ? ye : me, start, new DateTime(start.Year, mw.A, d2).AddDays(1), Granularity.Day, false, !hasYear));
+    }
 
     /// <summary>Days of one month: <c>May 4-8</c>, <c>April 6 to 10, 2026</c>.</summary>
     private void MonthDayRange(int s, int j, List<Cand> r)

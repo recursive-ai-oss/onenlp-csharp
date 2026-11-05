@@ -1,0 +1,72 @@
+# Units that follow a number, German. Fields: canonical name | dimension | surface forms, comma-separated | confidence (optional).
+# A form starting with "=" is case-sensitive; the others are matched without regard to case. Canonical names are the English ones.
+
+[unit]
+millimeter | length | mm, Millimeter, Millimetern
+centimeter | length | cm, Zentimeter, Zentimetern
+meter | length | =m, Meter, Metern
+kilometer | length | km, Kilometer, Kilometern
+micrometer | length | µm, μm, Mikrometer
+inch | length | Zoll
+foot | length | Fuß, Fuss
+yard | length | Yard, Yards
+mile | length | Meile, Meilen
+nautical mile | length | Seemeile, Seemeilen, sm
+
+milligram | mass | mg, Milligramm
+gram | mass | =g, Gramm
+kilogram | mass | kg, Kilo, Kilos, Kilogramm
+microgram | mass | µg, μg, Mikrogramm
+tonne | mass | Tonne, Tonnen, =t
+pound | mass | lb, lbs
+ounce | mass | Unze, Unzen
+
+milliliter | volume | ml, Milliliter
+centiliter | volume | cl, Zentiliter
+deciliter | volume | dl, Deziliter
+liter | volume | =l, =L, Liter, Litern
+hectoliter | volume | hl, Hektoliter
+gallon | volume | Gallone, Gallonen
+cubic meter | volume | m3, m³, Kubikmeter
+cubic centimeter | volume | cm3, cm³, Kubikzentimeter
+
+square meter | area | m2, m², Quadratmeter, qm
+square kilometer | area | km2, km², Quadratkilometer
+square centimeter | area | cm2, cm², Quadratzentimeter
+acre | area | Acre, Acres
+hectare | area | ha, Hektar
+
+kilometer per hour | speed | km/h, kmh, Kilometer pro Stunde, Stundenkilometer
+mile per hour | speed | mph, Meilen pro Stunde
+meter per second | speed | m/s, Meter pro Sekunde
+knot | speed | Knoten, kn, kt, kts
+
+bit | information | Bit, Bits
+byte | information | Byte, Bytes, =B
+kilobyte | information | =KB, =kB, Kilobyte, Kilobytes
+megabyte | information | =MB, Megabyte, Megabytes
+gigabyte | information | =GB, Gigabyte, Gigabytes
+terabyte | information | =TB, Terabyte, Terabytes
+petabyte | information | =PB, Petabyte, Petabytes
+kilobit | information | =Kb, kbit, Kilobit
+megabit | information | =Mb, mbit, Megabit
+gigabit | information | =Gb, gbit, Gigabit
+
+watt | power | Watt, =W
+kilowatt | power | =kW, Kilowatt
+megawatt | power | =MW, Megawatt
+horsepower | power | PS, Pferdestärken, Pferdestärke
+
+celsius | temperature | °c, ºC, ˚C, ° c, Grad Celsius, Celsius, Grad C
+fahrenheit | temperature | °f, ºF, ˚F, ° f, Grad Fahrenheit, Fahrenheit, Grad F
+kelvin | temperature | Kelvin
+degree | temperature | Grad, °, º, ˚ | 0.6
+
+[unit.compound]
+kilometer | meter | 1000
+meter | centimeter | 100
+centimeter | millimeter | 10
+meter | millimeter | 1000
+kilogram | gram | 1000
+gram | milligram | 1000
+liter | milliliter | 1000
