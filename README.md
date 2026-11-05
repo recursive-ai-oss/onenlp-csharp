@@ -10,7 +10,7 @@
 |---|---|
 | `RecursiveAI.OneNlp` | `Doc`, `Token`, `Span` (character offsets into the original string); the component `Pipeline` with batch and streaming processing; tokenizers matching Hugging Face `tokenizers` byte for byte (WordPiece, BPE, byte-level BPE, Unigram/SentencePiece, Tiktoken); UAX #29 word and sentence segmentation; `Matcher`, `PhraseMatcher`, `EntityRuler`; English recognizers for numbers, units, currency, sequences (e-mail, URL, ...) and dates and times; language ID for 75 languages; JSON and binary serialization; the `Nlp` statics. Depends on the BCL and `RecursiveAI.OneFont` only. |
 | `RecursiveAI.OneNlp.Neural` | The encoder seam, the fast hash-embedding encoder, the heads (tagger, morphologizer, edit-tree lemmatizer, biaffine dependency parser, entity recognizer), and `Train`, the API the shipped models are trained with. Depends on the core package, `RecursiveAI.OneModel` and `RecursiveAI.OneModel.Training`. |
-| `RecursiveAI.OneNlp.Models.English` | The English fast-tier model: tags, morphology, lemmas, dependency parse and entities from one shared encoder (23.7 MB), trained by `recipes/en/joint`. |
+| `RecursiveAI.OneNlp.Models.English` | The English fast-tier model: tags, morphology, lemmas, dependency parse and entities, from three separately trained models in one file (94.7 MB; `recipes/en/fast-tagging`, `parser`, `ner`, put together by `recipes/en/assemble`). `recipes/en/joint` trains a single shared encoder instead (23.7 MB, much faster, weaker rows); it is an option, not the packaged model. |
 
 ```csharp
 using RecursiveAI.OneNlp;
@@ -30,7 +30,7 @@ foreach (Span e in Nlp.Entities("Ada Lovelace lived in London."))
 }
 ```
 
-The English fast tier is within the noise of spaCy 3.8.18 (trained on the same data) on most UD English-EWT and UNER rows and behind on UFeats, AllTags and the entity micro F1 point estimate; every row is in [docs/results.md](docs/results.md). Its speed on the tagging path is below Catalyst's.
+The packaged English model is within the noise of spaCy 3.8.18 (trained on the same data) on every UD English-EWT row gated here (gold and raw tokens: UPOS, XPOS, UFeats, AllTags, lemmas, UAS, LAS, CLAS, sentences) and on the UNER entity F1 (61.52 against 62.32); MLAS on raw text is below spaCy. Its speed is far below Catalyst's on the tagging path (about 17,000 tokens/s against about 300,000, indicative); the single-encoder option is closer. Every row is in [docs/results.md](docs/results.md).
 
 The contracts are written down in [docs/contracts.md](docs/contracts.md).
 

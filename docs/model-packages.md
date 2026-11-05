@@ -33,7 +33,9 @@ The registration runs from a module initializer, and the module initializer live
 
 ## The English pipeline
 
-One pipeline from one saved pipeline (`PipelineFile`), `english.onenlp`, trained by `recipes/en/joint`: a tagger (XPOS), morphologizer (UPOS, UFeats), lemmatizer, dependency parser (predicts the sentence starts) and entity recognizer (PER, ORG, LOC), all reading one shared fast encoder, so a text is encoded once.
+One pipeline from one saved pipeline (`PipelineFile`), `english.onenlp`, assembled by `recipes/en/assemble` from three separately trained models, each with its own encoder: tagging (tagger for XPOS, morphologizer for UPOS and UFeats, edit-tree lemmatizer; `recipes/en/fast-tagging`), the dependency parser, which also predicts the sentence starts (`recipes/en/parser`), and the entity recognizer for PER, ORG and LOC (`recipes/en/ner`). The rule sentencizer saved with the tagging model is left out, because the parser sets the sentence boundaries. The assembled file predicts what each part predicted alone (the scores are in `docs/results.md`).
+
+A single shared encoder for all heads (`recipes/en/joint`, 23.7 MB) is much faster and has weaker rows; it is documented in `docs/results.md` as an option, and a user can load it with `PipelineFile.Load` like any saved pipeline.
 
 The tokenizer is the UAX #29 word tokenizer with English data, shared with the string table; the pipeline owns and disposes every component.
 

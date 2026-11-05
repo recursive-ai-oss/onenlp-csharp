@@ -1,6 +1,6 @@
 # English fast tier, one shared encoder
 
-Trains every English head on one fast encoder with the public `Train` API: tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, biaffine dependency parser with sentence starts, and entity recognizer. This is the recipe behind `RecursiveAI.OneNlp.Models.English`.
+Trains every English head on one fast encoder with the public `Train` API: tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, biaffine dependency parser with sentence starts, and entity recognizer. It is an option, not the recipe behind `RecursiveAI.OneNlp.Models.English`: the packaged model is three separately trained models (`recipes/en/fast-tagging`, `parser`, `ner`) put into one file by `recipes/en/assemble`, because its rows are stronger. This model is four times smaller and more than ten times faster on the tagging path; its measured rows are in `docs/results.md`.
 
 The two datasets are not the same text: Universal Dependencies English-EWT carries tags, lemmas and trees, UNER English-EWT carries entities. Every training example is one or the other, and a head skips the examples that hold no gold for it, so each head learns from its own data while all of them shape the shared encoder. The development score is the mean of the tagging mean (UPOS, XPOS, UFeats, Lemmas), LAS and entity F1, so no head is given up for another.
 

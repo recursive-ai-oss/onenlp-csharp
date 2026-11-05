@@ -15,7 +15,7 @@ public static class EnglishModel
     /// <summary>The NuGet package id.</summary>
     public const string PackageId = "RecursiveAI.OneNlp.Models.English";
 
-    // One saved pipeline: tagger, morphologizer, lemmatizer, parser and entity recognizer on one shared encoder.
+    // One saved pipeline holding three separately trained parts, each with its own encoder: tagger, morphologizer and lemmatizer; parser; entity recognizer.
     private const string Weights = "english.onenlp";
 
     /// <summary>
