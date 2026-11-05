@@ -201,7 +201,7 @@ public static class Nlp
     /// </summary>
     /// <param name="text">The text; may be empty.</param>
     /// <param name="reference">The moment relative expressions are resolved against; wall-clock expressions are read in its offset.</param>
-    /// <returns>The range (start inclusive, end exclusive), or <see langword="null"/> when the text holds no date or time. Durations and recurrences are not dates and are skipped; use <see cref="Dates"/> for them.</returns>
+    /// <returns>The range (start inclusive, end exclusive), or <see langword="null"/> when the text holds no date or time. Durations and recurrences are not dates and are skipped; use <see cref="Dates(string, DateTimeOffset)"/> for them.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     public static DateRange? ParseDate(string text, DateTimeOffset reference) =>
         Dates(text, reference).FirstOrDefault(d => d.Range is not null)?.Range;
