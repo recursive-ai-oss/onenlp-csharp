@@ -13,6 +13,12 @@ public sealed record PostNormConfig
     /// <summary>Hidden width. Default 768.</summary>
     public int Width { get; init; } = 768;
 
+    /// <summary>
+    /// Width of the token embedding table; 0 (the default) means <see cref="Width"/>. A smaller value is the factorised embedding of Lan et al. 2020 §3.1:
+    /// the table is lifted to <see cref="Width"/> by a learned linear map, so a large vocabulary costs <c>VocabularySize × EmbeddingWidth</c> weights.
+    /// </summary>
+    public int EmbeddingWidth { get; init; }
+
     /// <summary>Number of layers. Default 12.</summary>
     public int Layers { get; init; } = 12;
 
@@ -31,8 +37,11 @@ public sealed record PostNormConfig
     /// <summary>The ε of every layer normalization: 1e-5 for XLM-R, 1e-12 for BERT. Default 1e-5.</summary>
     public float NormEpsilon { get; init; } = 1e-5f;
 
+    internal int TableWidth => EmbeddingWidth > 0 ? EmbeddingWidth : Width;
+
     internal void Validate()
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(EmbeddingWidth);
         ArgumentOutOfRangeException.ThrowIfLessThan(VocabularySize, 1);
         ArgumentOutOfRangeException.ThrowIfLessThan(Width, 2);
         ArgumentOutOfRangeException.ThrowIfLessThan(Layers, 1);
@@ -66,6 +75,7 @@ public sealed class PostNormModule : NnModule
     private readonly PostNormConfig _config;
     private readonly Tensor _frozenTable;
     private readonly Embedding? _tokens;
+    private readonly Linear? _projection;
     private readonly Embedding _positions;
     private readonly EpsilonLayerNorm _embeddingNorm;
     private readonly Layer[] _layers;
@@ -83,16 +93,21 @@ public sealed class PostNormModule : NnModule
         var generator = new Generator(seed);
         if (frozenTable.IsEmpty)
         {
-            _tokens = RegisterModule("tokens", new Embedding(config.VocabularySize, config.Width, generator));
+            _tokens = RegisterModule("tokens", new Embedding(config.VocabularySize, config.TableWidth, generator));
         }
         else
         {
-            if (frozenTable.Rank != 2 || frozenTable.Shape[0] != config.VocabularySize || frozenTable.Shape[1] != config.Width || frozenTable.DType != DType.F32)
+            if (frozenTable.Rank != 2 || frozenTable.Shape[0] != config.VocabularySize || frozenTable.Shape[1] != config.TableWidth || frozenTable.DType != DType.F32)
             {
-                throw new ArgumentException($"The token table must be float32 [{config.VocabularySize}, {config.Width}], not {frozenTable.Shape}.", nameof(frozenTable));
+                throw new ArgumentException($"The token table must be float32 [{config.VocabularySize}, {config.TableWidth}], not {frozenTable.Shape}.", nameof(frozenTable));
             }
 
             _frozenTable = frozenTable;
+        }
+
+        if (config.TableWidth != config.Width)
+        {
+            _projection = RegisterModule("projection", new Linear(config.TableWidth, config.Width, generator));
         }
 
         _positions = RegisterModule("positions", new Embedding(config.MaxPositions, config.Width, generator));
@@ -141,7 +156,13 @@ public sealed class PostNormModule : NnModule
         Tensor positionTensor = Tensor.FromSpan<long>(positionIds, Shape.Create(1, n));
         ActivationScope.Track(positionTensor);
         Tensor table = _frozenTable.IsEmpty ? _tokens!.Weight : _frozenTable;
-        Tensor h = _embeddingNorm.Forward(Ops.Add(Ops.Embedding(table, ids), _positions.Forward(positionTensor)));
+        Tensor tokens = Ops.Embedding(table, ids);
+        if (_projection is not null)
+        {
+            tokens = _projection.Forward(tokens);
+        }
+
+        Tensor h = _embeddingNorm.Forward(Ops.Add(tokens, _positions.Forward(positionTensor)));
         Tensor mask = ModernBertModule.AttentionMask(b, n, lengths, window: 0);
         foreach (Layer layer in _layers)
         {

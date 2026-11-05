@@ -221,13 +221,22 @@ internal sealed class OnnxEncoderWeights
         return (module, config);
     }
 
-    public (PostNormModule Module, PostNormConfig Config) LoadPostNorm(PostNormConfig defaults, TrainableTransformerOptions o, bool freezeEmbeddings, ulong seed)
+    /// <summary>
+    /// Reads a BERT-style encoder. Two weight layouts are understood: the PyTorch exporter's (each linear weight is the constant of a named <c>MatMul</c>
+    /// node) and the distilled student's (<c>docs/accurate-encoder.md</c>: every weight a named initializer, stored [in, out], with a factorised
+    /// embedding). <paramref name="configHeads"/> is the head count from the model's <c>.config.json</c>, or 0; the student layout needs it
+    /// because the head count is not in the weights.
+    /// </summary>
+    public (PostNormModule Module, PostNormConfig Config) LoadPostNorm(PostNormConfig defaults, TrainableTransformerOptions o, bool freezeEmbeddings, ulong seed, int configHeads = 0)
     {
         string p = PrefixOf("embeddings.word_embeddings.weight");
+        bool student = _data.ContainsKey(p + "embeddings.projection.weight");
         TensorData table = Initializer(p + "embeddings.word_embeddings.weight");
         TensorData positions = Initializer(p + "embeddings.position_embeddings.weight");
         int layers = 0;
-        while (_matmul.ContainsKey($"{p}encoder.layer.{layers}.attention.self.query"))
+        while (student
+            ? _data.ContainsKey($"{p}encoder.layer.{layers}.attention.query.weight")
+            : _matmul.ContainsKey($"{p}encoder.layer.{layers}.attention.self.query"))
         {
             layers++;
         }
@@ -237,21 +246,27 @@ internal sealed class OnnxEncoderWeights
             throw new InvalidDataException("The graph has no 'encoder.layer.N.attention.self.query' MatMul nodes; only graphs written by the non-dynamo PyTorch exporter are supported.");
         }
 
-        int width = (int)table.Dims[1];
-        if (o.Heads < 1 && width < 64)
+        int embedWidth = (int)table.Dims[1];
+        int width = student ? (int)Initializer(p + "embeddings.projection.weight").Dims[1] : embedWidth;
+        int heads = o.Heads > 0 ? o.Heads : configHeads > 0 ? configHeads : student ? 0 : width / 64;
+        if (heads < 1 || width % heads != 0)
         {
-            throw new InvalidDataException("The head count cannot be inferred for this width; set Heads.");
+            throw new InvalidDataException("The head count is not in the weights: set Heads, or put <model>.config.json with a 'heads' value beside the model.");
         }
 
+        // The student has no padding-index offset on its positions.
+        int positionOffset = student ? 0 : o.PositionOffset;
+        string ffName = student ? "intermediate.weight" : "intermediate.dense";
         PostNormConfig config = defaults with
         {
             VocabularySize = (int)table.Dims[0],
             Width = width,
+            EmbeddingWidth = embedWidth == width ? 0 : embedWidth,
             Layers = layers,
-            Heads = o.Heads > 0 ? o.Heads : width / 64,
-            FeedForwardWidth = (int)Weight($"{p}encoder.layer.0.intermediate.dense").Dims[1],
+            Heads = heads,
+            FeedForwardWidth = (int)(student ? Initializer($"{p}encoder.layer.0.{ffName}") : Weight($"{p}encoder.layer.0.{ffName}")).Dims[1],
             MaxPositions = (int)positions.Dims[0],
-            PositionOffset = o.PositionOffset,
+            PositionOffset = positionOffset,
             NormEpsilon = o.NormEpsilon > 0 ? o.NormEpsilon : NormEpsilon() ?? defaults.NormEpsilon,
         };
 
@@ -275,20 +290,30 @@ internal sealed class OnnxEncoderWeights
                 state.Add(("tokens.weight", tokens));
             }
 
-            // The single token-type vector is added to every position row.
-            using Tensor positionTable = positions.ToTensor();
-            using Tensor type = Initializer(p + "embeddings.token_type_embeddings.weight").ToTensor();
-            float[] merged = positionTable.Data<float>().ToArray();
-            ReadOnlySpan<float> t0 = type.Data<float>()[..width];
-            for (int r = 0; r < positions.Dims[0]; r++)
+            if (student)
             {
-                for (int j = 0; j < width; j++)
+                state.Add(("projection.weight", Transposed(Initializer(p + "embeddings.projection.weight"))));
+                state.Add(("projection.bias", Floats(p + "embeddings.projection.bias")));
+                state.Add(("positions.weight", Floats(p + "embeddings.position_embeddings.weight")));
+            }
+            else
+            {
+                // The single token-type vector is added to every position row.
+                using Tensor positionTable = positions.ToTensor();
+                using Tensor type = Initializer(p + "embeddings.token_type_embeddings.weight").ToTensor();
+                float[] merged = positionTable.Data<float>().ToArray();
+                ReadOnlySpan<float> t0 = type.Data<float>()[..width];
+                for (int r = 0; r < positions.Dims[0]; r++)
                 {
-                    merged[(r * width) + j] += t0[j];
+                    for (int j = 0; j < width; j++)
+                    {
+                        merged[(r * width) + j] += t0[j];
+                    }
                 }
+
+                state.Add(("positions.weight", Tensor.FromSpan<float>(merged, positionTable.Shape)));
             }
 
-            state.Add(("positions.weight", Tensor.FromSpan<float>(merged, positionTable.Shape)));
             state.Add(("embedding_norm.weight", Floats(p + "embeddings.LayerNorm.weight")));
             state.Add(("embedding_norm.bias", Floats(p + "embeddings.LayerNorm.bias")));
             for (int i = 0; i < layers; i++)
@@ -296,7 +321,7 @@ internal sealed class OnnxEncoderWeights
                 string l = $"{p}encoder.layer.{i}.";
                 void Linear(string mine, string theirs)
                 {
-                    state.Add(($"layers{i}.{mine}.weight", Transposed(Weight(l + theirs))));
+                    state.Add(($"layers{i}.{mine}.weight", Transposed(student ? Initializer(l + theirs + ".weight") : Weight(l + theirs))));
                     state.Add(($"layers{i}.{mine}.bias", Floats(l + theirs + ".bias")));
                 }
 
@@ -306,14 +331,28 @@ internal sealed class OnnxEncoderWeights
                     state.Add(($"layers{i}.{mine}.bias", Floats(l + theirs + ".bias")));
                 }
 
-                Linear("attn.q", "attention.self.query");
-                Linear("attn.k", "attention.self.key");
-                Linear("attn.v", "attention.self.value");
-                Linear("attn.o", "attention.output.dense");
-                Norm("norm1", "attention.output.LayerNorm");
-                Linear("ff1", "intermediate.dense");
-                Linear("ff2", "output.dense");
-                Norm("norm2", "output.LayerNorm");
+                if (student)
+                {
+                    Linear("attn.q", "attention.query");
+                    Linear("attn.k", "attention.key");
+                    Linear("attn.v", "attention.value");
+                    Linear("attn.o", "attention.output");
+                    Norm("norm1", "attn_norm");
+                    Linear("ff1", "intermediate");
+                    Linear("ff2", "output");
+                    Norm("norm2", "output_norm");
+                }
+                else
+                {
+                    Linear("attn.q", "attention.self.query");
+                    Linear("attn.k", "attention.self.key");
+                    Linear("attn.v", "attention.self.value");
+                    Linear("attn.o", "attention.output.dense");
+                    Norm("norm1", "attention.output.LayerNorm");
+                    Linear("ff1", "intermediate.dense");
+                    Linear("ff2", "output.dense");
+                    Norm("norm2", "output.LayerNorm");
+                }
             }
 
             module.LoadStateDict(state);
