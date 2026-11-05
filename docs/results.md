@@ -1,6 +1,6 @@
 # Results
 
-Measured rows. The tokenizer speed rows below are final: they were taken by one `wq --class bench` group per machine, alone on the
+Measured rows. The tokenizer speed rows below are final: they were taken in one benchmark-queue group per machine, alone on the
 machine, with `bench/scripts/tokenizer-rows.sh`. Nothing else on this page is a final number yet.
 
 ## Tokenizer speed against Microsoft.ML.Tokenizers
@@ -27,8 +27,8 @@ differs from them that is information, not a failure of ours.
 
 ### Machines and pins
 
-- **x64:** AMD Ryzen 9 7950X3D (16 cores, 32 threads), Linux 7.0.0-38-generic, .NET SDK 10.0.403, Release, non-concurrent GC, ICU on. Queue job `the x64 machine.exo0l57k` (host queue job 003988, class `bench`), 2026-11-05 03:27 UTC. Load average before the run 3.6 (1 min), 15.5 (5 min), 17.4 (15 min), the tail of an earlier job; during the run (10 s samples) it fell from 3.6 to about 1.5; the machine was otherwise idle (`wq` reported the CPU 0% busy at the start).
-- **arm64:** Apple M2 (8 cores), macOS (Darwin 27.0.0), .NET SDK 10.0.403 (user-local install), Release, non-concurrent GC, ICU on. Queue job `the arm64 machine.9itrnzi3` (host queue job 000653, class `bench`), 2026-11-05 04:40 UTC. Load average before the run 2.7 / 3.9 / 12.4; during the run 2.4 to 3.3 (the harness's own thread and the OS).
+- **x64:** AMD Ryzen 9 7950X3D (16 cores, 32 threads), Linux 7.0.0-38-generic, .NET SDK 10.0.403, Release, non-concurrent GC, ICU on. Run on 2026-11-05 at 03:27 UTC. Load average before the run 3.6 (1 min), 15.5 (5 min), 17.4 (15 min), the tail of an earlier job; during the run (10 s samples) it fell from 3.6 to about 1.5; the machine was otherwise idle (the queue checked that the CPU was idle before starting).
+- **arm64:** Apple M2 (8 cores), macOS (Darwin 27.0.0), .NET SDK 10.0.403 (user-local install), Release, non-concurrent GC, ICU on. Run on 2026-11-05 at 04:40 UTC. Load average before the run 2.7 / 3.9 / 12.4; during the run 2.4 to 3.3 (the harness's own thread and the OS).
 - **Versions:** Microsoft.ML.Tokenizers 2.0.1 with Microsoft.ML.Tokenizers.Data.{Gpt2, Cl100kBase, O200kBase} 2.0.1; OneNLP at the commit of this page; information column: `tokenizers` 0.22.1 and `tiktoken` 0.14.0 (Python, one thread, x64 only).
 - **Tokenizer files:** the Hugging Face model files named in `parity.md`; the `.tiktoken` files from the published encodings.
 - **Run with** `bench/scripts/tokenizer-rows.sh MODELS INPUTS OUT`; `INPUTS` is the Tatoeba export or a directory with `short.txt`, `medium.txt` and `long.txt`.
