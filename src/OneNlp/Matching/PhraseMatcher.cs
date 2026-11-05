@@ -54,6 +54,10 @@ public sealed class PhraseMatcher
         Add(key, phrases.Select(p => _tokenizer.Tokenize(p ?? throw new ArgumentException("A phrase is null.", nameof(phrases)), _strings)));
     }
 
+    // True when the matcher's tokenizer finds at least one token in the text. Rules read from files may hold text that is only
+    // white space; the entity ruler leaves those out (they could never match) instead of failing when it first runs.
+    internal bool HasTokens(string phrase) => _tokenizer.Tokenize(phrase, _strings).Length > 0;
+
     /// <summary>Adds phrase documents under a key.</summary>
     /// <param name="key">The match key, returned with each match and used as the span label; not empty.</param>
     /// <param name="phrases">The phrases as documents; for Lemma, Pos, Tag, Dep and Morph they must carry that annotation.</param>

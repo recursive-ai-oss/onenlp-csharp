@@ -36,8 +36,9 @@ shift
 
 case "$target" in
   word-tokenizer|segmentation|langid-detect) maxlen=4096 ;;
-  langid-model) maxlen=65536 ;;
+  langid-model) maxlen=262144 ;;
   doc-json|doc-binary|docbin) maxlen=8192 ;;
+  pattern-json|conllu|jsonl) maxlen=16384 ;;
   tokenizer-json | tokenizer-json-models | code-point-regex | vocab-txt | sentencepiece-model | bpe-model | tiktoken-ranks) maxlen=65536 ;;
   charsmap) maxlen=262144 ;;
   recognizers) maxlen=4096 ;;

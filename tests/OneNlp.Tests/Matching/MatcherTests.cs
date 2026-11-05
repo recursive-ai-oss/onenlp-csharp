@@ -281,6 +281,19 @@ public class EntityRulerTests
     private static string Ents(Doc doc) => string.Join(" ", doc.Ents.Select(e => $"{e.Label}:{e.Start}-{e.End}"));
 
     [Fact]
+    public void PhraseRuleOfOnlyWhiteSpaceIsLeftOutAndOthersStillMatch()
+    {
+        // Found by fuzzing: {"label":"O","pattern":" "} made the first run throw.
+        var ruler = new EntityRuler();
+        ruler.AddPhrase("O", " ");
+        ruler.AddPhrase("O", "  \t\n", "me");
+        ruler.AddPhrase("ORG", "Acme Corp");
+        Doc doc = Doc("Hello Acme Corp");
+        ruler.Process(doc);
+        Assert.Equal("ORG:1-3", Ents(doc));
+    }
+
+    [Fact]
     public void IndexerFormMatchesShapes()
     {
         var ruler = new EntityRuler { ["CASE_NO"] = Pattern.Shape("Xdddd") };

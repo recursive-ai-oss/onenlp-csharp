@@ -70,10 +70,44 @@ internal static class LanguageIdTargets
             return;
         }
 
-        // The shipped model is megabytes; seed with its header and the first rows, which is all the loader's parsing paths need.
-        byte[] head = new byte[4096];
-        int n = s.Read(head, 0, head.Length);
-        File.WriteAllBytes(Path.Combine(dir, "model-head"), head[..n]);
+        // The libFuzzer host passes inputs through a bounded buffer, so the multi-megabyte shipped model cannot be a seed itself. Re-emit it
+        // in the same format with every group's bucket count cut to at most 2^8: a valid, small model whose header, class tables and weight
+        // section all go through the loader.
+        using var input = new BinaryReader(s);
+        using var output = new MemoryStream();
+        using var w = new BinaryWriter(output);
+        w.Write(input.ReadBytes(5)); // "ONLI" and the version
+        ushort languages = input.ReadUInt16();
+        w.Write(languages);
+        for (int i = 0; i < languages; i++)
+        {
+            byte length = input.ReadByte();
+            w.Write(length);
+            w.Write(input.ReadBytes(length));
+        }
+
+        w.Write(input.ReadBytes(8)); // exponent and temperature
+        byte groups = input.ReadByte();
+        w.Write(groups);
+        for (int g = 0; g < groups; g++)
+        {
+            w.Write(input.ReadUInt32());
+            byte bits = input.ReadByte();
+            byte classes = input.ReadByte();
+            byte kept = (byte)Math.Min(bits, (byte)8);
+            w.Write(kept);
+            w.Write(classes);
+            w.Write(input.ReadBytes(2 * classes));
+            w.Write(input.ReadBytes(4 + (4 * classes))); // weight scale and biases
+            if (classes > 1)
+            {
+                byte[] rows = input.ReadBytes(checked((1 << bits) * classes));
+                w.Write(rows, 0, (1 << kept) * classes);
+            }
+        }
+
+        w.Flush();
+        File.WriteAllBytes(Path.Combine(dir, "model-small"), output.ToArray());
     }
 
     private static string FromUnits(ReadOnlySpan<byte> data)

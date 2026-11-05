@@ -27,6 +27,8 @@ Without a libFuzzer host:
 
 To fuzz with coverage, use `fuzz/run.sh <target> <seconds>`: it builds the harness, writes seed inputs (`seeds <target> <dir>`), instruments `RecursiveAI.OneNlp.dll` with the `SharpFuzz.CommandLine` tool and runs the SharpFuzz libFuzzer host. `ONENLP_FUZZ_WORK` (outside the checkout) and `ONENLP_FUZZ_TOOLS` (holding `libfuzzer-dotnet`, and `sharpfuzz` unless `SHARPFUZZ` names it) are required; findings land in `$ONENLP_FUZZ_WORK/findings/<target>/`. Replay one with `fuzz/run.sh replay <target> <file>`.
 
+`conllu`, `jsonl` and `pattern-json` read CoNLL-U, JSON Lines examples and pattern files. `fuzz/run-many.sh <seconds> <target>...` runs several targets side by side, each with its own work directory and a copy of the seed folders (`fuzz/seeds`, `fuzz/corpus`). The `langid-model` seed is the shipped model re-emitted with at most 2^8 buckets per group: valid, small, and with a weight section to mutate; set `ONENLP_LANGID_WEIGHTS` when building so `langid-detect` runs the real model. The libFuzzer host needs a .NET 9 runtime for the instrumenter only.
+
 Targets for the neural layer: `edit-tree` (the edit-tree text format), `fast-settings` (the fast encoder's settings object), `pipeline-config` (a pipeline config inside a valid header, no weights: reaches encoder and head construction) and `pipeline-file` (a whole saved pipeline, which must also save and load back to the same bytes). `run.sh` instruments both library assemblies.
 
 To add a target, write `Run(ReadOnlySpan<byte> data)` and add one line to the table in `Program.cs`. Minimized findings go under `tests/` as fixtures (under 1 MB) with a test that feeds them.
