@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Probes for the exported transformer encoders: tokenizes probe texts, compares OneModel's hidden states with PyTorch's, times
+       model runs, and checks whether an imported graph can be differentiated. Information only; never shipped. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).Accurate</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).Accurate</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/OneNlp.Neural/OneNlp.Neural.csproj" />
+  </ItemGroup>
+
+</Project>
