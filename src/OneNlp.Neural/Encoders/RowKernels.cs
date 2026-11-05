@@ -193,6 +193,49 @@ internal static class RowKernels
         ref float br = ref MemoryMarshal.GetReference(bias);
         ref float lr = ref MemoryMarshal.GetReference(logits);
         int c = 0;
+        if (Vector256.IsHardwareAccelerated)
+        {
+            // The same sums with eight columns per register (each column still adds its products in input order, so the results are
+            // bit for bit those of the four-wide loops below). Vector256 is only used where it is a real register: on NEON it is emulated.
+            for (; c <= stride - 32; c += 32)
+            {
+                Vector256<float> b0 = Vector256.LoadUnsafe(ref br, (nuint)c);
+                Vector256<float> b1 = Vector256.LoadUnsafe(ref br, (nuint)(c + 8));
+                Vector256<float> b2 = Vector256.LoadUnsafe(ref br, (nuint)(c + 16));
+                Vector256<float> b3 = Vector256.LoadUnsafe(ref br, (nuint)(c + 24));
+                for (int i = 0; i < k; i++)
+                {
+                    Vector256<float> xv = Vector256.Create(Unsafe.Add(ref xr, i));
+                    ref float row = ref Unsafe.Add(ref wr, (i * stride) + c);
+                    b0 += xv * Vector256.LoadUnsafe(ref row, 0);
+                    b1 += xv * Vector256.LoadUnsafe(ref row, 8);
+                    b2 += xv * Vector256.LoadUnsafe(ref row, 16);
+                    b3 += xv * Vector256.LoadUnsafe(ref row, 24);
+                }
+
+                b0.StoreUnsafe(ref lr, (nuint)c);
+                b1.StoreUnsafe(ref lr, (nuint)(c + 8));
+                b2.StoreUnsafe(ref lr, (nuint)(c + 16));
+                b3.StoreUnsafe(ref lr, (nuint)(c + 24));
+            }
+
+            for (; c <= stride - 16; c += 16)
+            {
+                Vector256<float> b0 = Vector256.LoadUnsafe(ref br, (nuint)c);
+                Vector256<float> b1 = Vector256.LoadUnsafe(ref br, (nuint)(c + 8));
+                for (int i = 0; i < k; i++)
+                {
+                    Vector256<float> xv = Vector256.Create(Unsafe.Add(ref xr, i));
+                    ref float row = ref Unsafe.Add(ref wr, (i * stride) + c);
+                    b0 += xv * Vector256.LoadUnsafe(ref row, 0);
+                    b1 += xv * Vector256.LoadUnsafe(ref row, 8);
+                }
+
+                b0.StoreUnsafe(ref lr, (nuint)c);
+                b1.StoreUnsafe(ref lr, (nuint)(c + 8));
+            }
+        }
+
         for (; c <= stride - 16; c += 16)
         {
             Vector128<float> a0 = Vector128.LoadUnsafe(ref br, (nuint)c);

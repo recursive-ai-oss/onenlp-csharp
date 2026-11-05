@@ -36,6 +36,21 @@ internal static class Program
             return Profile(args[1], int.Parse(args[2], CultureInfo.InvariantCulture), int.Parse(args[3], CultureInfo.InvariantCulture), int.Parse(args[4], CultureInfo.InvariantCulture));
         }
 
+        if (args.Length == 4 && args[0] == "dump")
+        {
+            return Dump(args[1], args[2], args[3]);
+        }
+
+        if (args.Length == 4 && args[0] == "file")
+        {
+            return SpeedFile(args[1], args[2], int.Parse(args[3], CultureInfo.InvariantCulture));
+        }
+
+        if (args.Length >= 5 && args[0] == "ab")
+        {
+            return Ab(args[1], args[2..^1], int.Parse(args[^1], CultureInfo.InvariantCulture));
+        }
+
         if (args.Length == 3 && args[0] == "speed")
         {
             return Speed(args[1], int.Parse(args[2], CultureInfo.InvariantCulture));
@@ -46,6 +61,56 @@ internal static class Program
     }
 
     // The packaged English pipeline, or the saved pipeline named by ONENLP_BENCH_MODEL (for trying a model before it is packed).
+    // dump <gold.conllu> <model.onenlp> <out.txt>: every prediction of a saved pipeline (any language) on the raw document texts, one line per token and per
+    // entity, for comparing two builds of the library on the same model file. Confidences are rounded to three decimals.
+    private static int Dump(string gold, string model, string output)
+    {
+        Pipeline p = PipelineFile.Load(model);
+        using var writer = new StreamWriter(output, false, new UTF8Encoding(false));
+        int docNumber = 0;
+        foreach (string text in ReadDocuments(gold))
+        {
+            Doc doc = p.Process(text);
+            writer.WriteLine($"# doc {docNumber++} tokens {doc.Length}");
+            for (int i = 0; i < doc.Length; i++)
+            {
+                Token t = doc[i];
+                writer.WriteLine(string.Create(CultureInfo.InvariantCulture, $"{t.Idx}\t{t}\t{t.Lemma}\t{t.Pos}\t{t.Tag}\t{t.Morph}\t{t.HeadIndex}\t{t.Dep}\t{t.IsSentStart}"));
+            }
+
+            foreach (Span e in doc.Ents)
+            {
+                writer.WriteLine(string.Create(CultureInfo.InvariantCulture, $"ENT\t{e.StartChar}\t{e.EndChar}\t{e.Label}\t{e.Confidence:F3}"));
+            }
+        }
+
+        return 0;
+    }
+
+    // file <gold.conllu> <model.onenlp> <runs>: load time, first call, throughput of one saved pipeline (any language) on the raw document texts.
+    // ONENLP_BENCH_THREADS workers each take documents in turn; ONENLP_BENCH_BATCH > 1 uses ProcessMany. Peak working set at the end.
+    private static int SpeedFile(string gold, string model, int runs)
+    {
+        List<string> texts = ReadDocuments(gold);
+        int copies = int.Parse(Environment.GetEnvironmentVariable("ONENLP_BENCH_REPEAT") ?? "1", CultureInfo.InvariantCulture);
+        if (copies > 1)
+        {
+            texts = [.. Enumerable.Repeat(texts, copies).SelectMany(x => x)];
+        }
+
+        long chars = texts.Sum(t => (long)t.Length);
+        long l0 = Stopwatch.GetTimestamp();
+        Pipeline p = PipelineFile.Load(model);
+        double load = Stopwatch.GetElapsedTime(l0).TotalMilliseconds;
+        long f0 = Stopwatch.GetTimestamp();
+        _ = p.Process(texts[0]);
+        double first = Stopwatch.GetElapsedTime(f0).TotalMilliseconds;
+        Console.WriteLine($"{Path.GetFileName(model)}: load {load:F0} ms, first call {first:F0} ms, components: {string.Join(",", p.Components.Select(c => c.Name))}");
+        Measure(Path.GetFileName(model), p, texts, chars, runs);
+        Console.WriteLine($"peak working set {Process.GetCurrentProcess().PeakWorkingSet64 / 1048576} MB");
+        return 0;
+    }
+
     private static Pipeline Load() =>
         Environment.GetEnvironmentVariable("ONENLP_BENCH_MODEL") is { Length: > 0 } path ? PipelineFile.Load(path) : ModelPackages.Get(Language.English);
 
@@ -157,6 +222,93 @@ internal static class Program
         }
 
         Console.WriteLine($"threads={threads} batch={batch} tokens/run={tokens}");
+        return 0;
+    }
+
+    // ab <gold.conllu> <model>... <rounds>: the encoders and the heads of several saved pipelines on the same documents, taken in turn in one process, so that
+    // machine noise hits every model alike. Prints the best round per model and stage (microseconds per token, one thread, one document per call).
+    private static int Ab(string gold, string[] models, int rounds)
+    {
+        TensorCompute.Threads = 1;
+        List<string> texts = ReadDocuments(gold);
+        var pipelines = models.Select(m => PipelineFile.Load(m)).ToList();
+        var best = new Dictionary<string, double>();
+        long tokens = 0;
+        for (int round = 0; round <= rounds; round++)
+        {
+            for (int m = 0; m < pipelines.Count; m++)
+            {
+                Pipeline p = pipelines[m];
+                var docs = new List<Doc>();
+                foreach (string text in texts)
+                {
+                    docs.Add(p.Tokenizer.Tokenize(text, p.Strings));
+                }
+
+                tokens = docs.Sum(d => d.Length);
+                var times = new Dictionary<string, double>();
+                IEncoder[] encoders = [.. p.Components.OfType<ITrainableComponent>().Select(c => c.Encoder).Distinct()];
+                long t0 = Stopwatch.GetTimestamp();
+                foreach (IEncoder enc in encoders)
+                {
+                    foreach (Doc d in docs)
+                    {
+                        using NoGradScope ng = GradMode.NoGrad();
+                        using var scope = new ActivationScope();
+                        _ = enc.Encode([d]);
+                    }
+
+                    times["encoder " + Array.IndexOf(encoders, enc)] = Stopwatch.GetElapsedTime(t0).TotalSeconds;
+                    t0 = Stopwatch.GetTimestamp();
+                }
+
+                // The heads with the encodings kept with the documents: a second pass over fresh documents measures encoder plus heads.
+                var fresh = new List<Doc>();
+                foreach (string text in texts)
+                {
+                    fresh.Add(p.Tokenizer.Tokenize(text, p.Strings));
+                }
+
+                var headTimes = new Dictionary<string, double>();
+                IPipelineComponent? firstHead = p.Components.FirstOrDefault(c => c is ITrainableComponent);
+                t0 = Stopwatch.GetTimestamp();
+                foreach (Doc d in fresh)
+                {
+                    foreach (IPipelineComponent c in p.Components)
+                    {
+                        if (c is ITrainableComponent)
+                        {
+                            long h0 = Stopwatch.GetTimestamp();
+                            c.ProcessBatch([d]);
+                            string name = "head " + c.Name + (ReferenceEquals(c, firstHead) ? " (with encoder)" : string.Empty);
+                            headTimes[name] = headTimes.GetValueOrDefault(name) + Stopwatch.GetElapsedTime(h0).TotalSeconds;
+                        }
+                    }
+                }
+
+                times["encoder+heads"] = Stopwatch.GetElapsedTime(t0).TotalSeconds;
+                foreach (KeyValuePair<string, double> kv in headTimes)
+                {
+                    times[kv.Key] = kv.Value;
+                }
+                if (round > 0)
+                {
+                    foreach (KeyValuePair<string, double> kv in times)
+                    {
+                        string key = $"model {m} {kv.Key}";
+                        double v = kv.Value * 1e6 / tokens;
+                        best[key] = best.TryGetValue(key, out double old) ? Math.Min(old, v) : v;
+                    }
+                }
+            }
+        }
+
+        foreach (KeyValuePair<string, double> kv in best.OrderBy(k => k.Key, StringComparer.Ordinal))
+        {
+            Console.WriteLine($"{kv.Key,-28} {kv.Value,7:F2} us/token");
+        }
+
+        Console.WriteLine($"tokens={tokens} rounds={rounds}");
         return 0;
     }
 
@@ -292,6 +444,12 @@ internal static class Program
 
         // Same work as Catalyst's default pipeline: sentences, tokens, UPOS (the morphologizer) and lemmas.
         Measure("sentencizer + UPOS/UFeats + lemmas", Sub(full, true, "morphologizer", "lemmatizer"), texts, chars, runs);
+        if (Environment.GetEnvironmentVariable("ONENLP_BENCH_ONLY") == "tagging")
+        {
+            Console.WriteLine($"peak working set {Process.GetCurrentProcess().PeakWorkingSet64 / 1048576} MB");
+            return 0;
+        }
+
         Measure("sentencizer + UPOS/UFeats + XPOS + lemmas", Sub(full, true, "tagger", "morphologizer", "lemmatizer"), texts, chars, runs);
         Measure("sentencizer + entities", Sub(full, true, "ner"), texts, chars, runs);
         Measure("dependency parser (predicts sentences)", Sub(full, false, "parser"), texts, chars, runs);
