@@ -39,7 +39,6 @@ minute | Minute, Minuten, =Min, =Min. | 60 | 0
 hour | Stunde, Stunden, =Std, =Std. | 3600 | 0
 day | Tag, Tage, Tagen, Tages | 86400 | 0
 week | Woche, Wochen | 604800 | 0
-week | Fortnight | 1209600 | 0
 month | Monat, Monate, Monaten, Monats | 0 | 1
 quarter | Quartal, Quartale, Quartalen, Quartals | 0 | 3
 year | Jahr, Jahre, Jahren, Jahres | 0 | 12
