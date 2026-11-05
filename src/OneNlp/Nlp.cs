@@ -16,11 +16,48 @@ public static class Nlp
     private static readonly Pipeline TokenPipeline = Pipeline.Blank(Language.English);
     private static readonly Pipeline DefaultPipeline = Pipeline.Blank(Language.English).Add(SentencizerComponent.For(Language.English));
 
-    /// <summary>Analyzes a text with the default pipeline: tokens and sentence boundaries for now.</summary>
+    // The one place the language of a text is decided. Language identification plugs in here; until then every text is English.
+    private static Language LanguageOf(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        return Language.English;
+    }
+
+    /// <summary>
+    /// Analyzes a text. With a model package for the text's language referenced (<c>RecursiveAI.OneNlp.Models.English</c> for English)
+    /// the document carries sentences, tags, morphology, lemmas, the dependency parse and entities; without one it carries tokens and
+    /// sentence boundaries only.
+    /// </summary>
     /// <param name="text">The text; may be empty. The document keeps this string and every offset is into it.</param>
-    /// <returns>A document with its tokens and sentence boundaries; the other annotations stay unset.</returns>
+    /// <returns>A document with its tokens and sentence boundaries, and the model annotations when a model package is available; otherwise those stay unset.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
-    public static Doc Analyze(string text) => DefaultPipeline.Process(text);
+    public static Doc Analyze(string text) =>
+        ModelPackages.TryGet(LanguageOf(text), out Pipeline model) ? model.Process(text) : DefaultPipeline.Process(text);
+
+    /// <summary>Analyzes many texts, a batch at a time, with the same pipeline as <see cref="Analyze"/>; the texts are read lazily, so a long sequence streams.</summary>
+    /// <param name="texts">The texts; none may be <see langword="null"/>.</param>
+    /// <returns>One document per text, in input order. The language is decided once, from the first text (English for now), and applies to all.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="texts"/> or one of its items is <see langword="null"/>.</exception>
+    public static IEnumerable<Doc> AnalyzeMany(IEnumerable<string> texts)
+    {
+        ArgumentNullException.ThrowIfNull(texts);
+        Pipeline pipeline = ModelPackages.TryGet(Language.English, out Pipeline model) ? model : DefaultPipeline;
+        return pipeline.ProcessMany(texts);
+    }
+
+    /// <summary>Finds the named entities of a text (person, organization, location).</summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <returns>The entities in text order, without overlaps; each has its <see cref="Span.Label"/> (<c>PER</c>, <c>ORG</c> or <c>LOC</c>), a confidence, and character offsets into <paramref name="text"/>. They stay valid as long as the text's <see cref="Doc"/> does. Empty when there are none.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No model package is available for the text's language; the message names the package to add.</exception>
+    public static IReadOnlyList<Span> Entities(string text) => ModelPackages.Get(LanguageOf(text)).Process(text).Ents;
+
+    /// <summary>Finds the lemma (dictionary form) of each token of a text.</summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <returns>One lemma per token, in token order; empty for a text without tokens.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No model package is available for the text's language; the message names the package to add.</exception>
+    public static string[] Lemmas(string text) => [.. ModelPackages.Get(LanguageOf(text)).Process(text).Select(t => t.Lemma)];
 
     /// <summary>Splits a text into word tokens (UAX #29 word segments, adjusted to UD English tokenization). White space is not a token.</summary>
     /// <param name="text">The text; may be empty.</param>

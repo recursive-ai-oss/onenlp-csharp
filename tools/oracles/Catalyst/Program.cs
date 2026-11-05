@@ -2,6 +2,7 @@
 //
 //   CatalystOracle ud  <gold.conllu> <out.conllu>   tokens, sentences, UPOS and lemmas as CoNLL-U (other columns '_')
 //   CatalystOracle ner <gold.iob2>   <out.tsv>      entity-bearing tokens per sentence: sentence, begin, end, Catalyst type, tag
+//   CatalystOracle speed <gold.conllu> <runs>       single-thread throughput on the raw document texts: default pipeline, then with the entity model
 //
 // The calls follow the package's published README usage (register the English models, build a pipeline, process a document).
 using System.Globalization;
@@ -16,15 +17,20 @@ internal static class Program
 {
     private static async Task<int> Main(string[] args)
     {
-        if (args.Length != 3 || (args[0] != "ud" && args[0] != "ner"))
+        if (args.Length != 3 || (args[0] != "ud" && args[0] != "ner" && args[0] != "speed"))
         {
-            Console.Error.WriteLine("usage: CatalystOracle ud|ner <gold file> <output file>");
+            Console.Error.WriteLine("usage: CatalystOracle ud|ner <gold file> <output file>  |  speed <gold file> <runs>");
             return 2;
         }
 
         Catalyst.Models.English.Register();
         Storage.Current = new DiskStorage(Path.Combine(Path.GetTempPath(), "catalyst-models"));
         Pipeline nlp = await Pipeline.ForAsync(Language.English);
+
+        if (args[0] == "speed")
+        {
+            return await RunSpeed(nlp, args[1], int.Parse(args[2], CultureInfo.InvariantCulture));
+        }
 
         if (args[0] == "ud")
         {
@@ -94,6 +100,48 @@ internal static class Program
         }
 
         return docs;
+    }
+
+    /// <summary>Timed passes over the raw document texts on one thread; the first pass is a warm-up and is not counted.</summary>
+    private static async Task<int> RunSpeed(Pipeline nlp, string gold, int runs)
+    {
+        List<string> texts = ReadDocuments(gold);
+        long chars = texts.Sum(t => (long)t.Length);
+        Console.WriteLine($"{texts.Count} documents, {chars} characters; Catalyst 26.10.6514, English models 26.9.5316");
+        Measure("tagging pipeline (sentences, tokens, POS, lemmas)", nlp, texts, chars, runs);
+        nlp.Add(await AveragePerceptronEntityRecognizer.FromStoreAsync(language: Language.English, version: Mosaik.Core.Version.Latest, tag: "WikiNER"));
+        Measure("tagging pipeline plus WikiNER entities", nlp, texts, chars, runs);
+        return 0;
+    }
+
+    private static void Measure(string name, Pipeline nlp, List<string> texts, long chars, int runs)
+    {
+        long tokens = Pass(nlp, texts);
+        for (int r = 1; r <= runs; r++)
+        {
+            long gcBefore = GC.GetAllocatedBytesForCurrentThread();
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            tokens = Pass(nlp, texts);
+            sw.Stop();
+            double s = sw.Elapsed.TotalSeconds;
+            Console.WriteLine($"{name}: run {r}: {tokens / s:F0} tokens/s, {chars / s / 1e6:F2} M chars/s, {(GC.GetAllocatedBytesForCurrentThread() - gcBefore) / (double)tokens:F0} B/token ({tokens} tokens, {s:F2} s)");
+        }
+    }
+
+    private static long Pass(Pipeline nlp, List<string> texts)
+    {
+        long tokens = 0;
+        foreach (string text in texts)
+        {
+            var doc = new Document(text, Language.English);
+            nlp.ProcessSingle(doc);
+            foreach (var span in doc.Spans)
+            {
+                tokens += span.Tokens.Count();
+            }
+        }
+
+        return tokens;
     }
 
     private static int RunUd(Pipeline nlp, string gold, string output)

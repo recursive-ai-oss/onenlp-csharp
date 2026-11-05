@@ -1,0 +1,12 @@
+<Project>
+  <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
+       To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
+  <ItemGroup>
+    <EnglishWeight Include="tagging.onenlp" Size="12551838" Sha256="c7cb6036f8cc8ccbb6bb75b1d1e568aef2c94889f00c1f6b2d27e207a1c428be"
+                   Recipe="recipes/en/fast-tagging" Data="UD English-EWT r2.18 (CC BY-SA 4.0)" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
+    <EnglishWeight Include="parser.onenlp" Size="22108789" Sha256="612101ebeb4c62b6239a94c11727a2536537bfdb60245f337075eae1e9ddfccc"
+                   Recipe="recipes/en/parser" Data="UD English-EWT r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />
+    <EnglishWeight Include="ner.onenlp" Size="12039553" Sha256="309abffd3229006dfe48ee3df01e02faf909e41b57b1e50e3ae5102aa24f0964"
+                   Recipe="recipes/en/ner" Data="UNER English-EWT commit 8ed072de (CC BY-SA 4.0)" Contents="entity recognizer (PER, ORG, LOC)" />
+  </ItemGroup>
+</Project>
