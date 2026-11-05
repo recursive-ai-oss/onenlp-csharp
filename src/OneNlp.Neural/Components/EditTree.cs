@@ -133,7 +133,7 @@ internal sealed class EditTree
     private static EditTree Substitution(ReadOnlySpan<char> original, ReadOnlySpan<char> replacement) =>
         new(0, 0, null, null, original.ToString(), replacement.ToString());
 
-    private string? Apply(ReadOnlySpan<char> form)
+    public string? Apply(ReadOnlySpan<char> form)
     {
         if (!IsMatch)
         {

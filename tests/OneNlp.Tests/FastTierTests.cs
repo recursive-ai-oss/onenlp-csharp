@@ -189,6 +189,109 @@ public class FastTierTests
         Assert.Throws<ArgumentOutOfRangeException>(() => FastEncoder.FromSettings(document.RootElement));
     }
 
+    [Fact]
+    public void TwoLevelOutputLayersTrainSaveAndLoad()
+    {
+        List<Example> train = Toy(200, 1);
+        List<Example> test = Toy(40, 2);
+        var encoder = new FastEncoder(width: 24, depth: 1, normRows: 512, prefixRows: 64, suffixRows: 256, shapeRows: 64, seed: 3, relu: true, neighbourRows: 256);
+        using Pipeline pipeline = Pipeline.Blank()
+            .Add(new Tagger(encoder, TokenColumn.Tag) { OwnsEncoder = true })
+            .Add(new Morphologizer(encoder, headClasses: 1))
+            .Add(new EditTreeLemmatizer(encoder, minClassCount: 2, headClasses: 3));
+        pipeline.Train(train, new TrainOptions { Epochs = 14, BatchWords = 200, LearningRate = 0.01f, Dropout = 0f, Seed = 5, DevFraction = 0.1 });
+        var lemmatizer = (EditTreeLemmatizer)pipeline.Components[2];
+        Assert.True(lemmatizer.Labels.Count > 3, "the test needs a tail");
+        (double tag, double pos, double morph, double lemma) = Score(pipeline, test);
+        Assert.True(tag > 0.97 && pos > 0.97 && morph > 0.97 && lemma > 0.97, $"{tag} {pos} {morph} {lemma}");
+
+        string path = Path.Combine(Path.GetTempPath(), "onenlp-two-level-" + Guid.NewGuid().ToString("N") + ".onenlp");
+        try
+        {
+            PipelineFile.Save(pipeline, path);
+            using Pipeline loaded = PipelineFile.Load(path);
+            Assert.Equal(Score(pipeline, test), Score(loaded, test));
+            Assert.Equal(lemmatizer.Labels, ((EditTreeLemmatizer)loaded.Components[2]).Labels);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void SharedInferenceBatchIsReusedOnlyForTheSameDocuments()
+    {
+        using var encoder = new FastEncoder(width: 16, depth: 1, normRows: 64, prefixRows: 16, suffixRows: 32, shapeRows: 16, seed: 9, relu: true, neighbourRows: 32, bigramRows: 32);
+        encoder.Weights!.Eval();
+        Doc[] docs = [.. Toy(4, 4).Select(e => e.Predicted)];
+        using NoGradScope noGrad = GradMode.NoGrad();
+        using var scope = new ActivationScope();
+        EncodedBatch first = encoder.Encode(docs);
+        Assert.Same(first, encoder.Encode([.. docs]));
+
+        // One document alone gives the rows it has in the batch: nothing leaks across a document edge, with neighbours and word pairs too.
+        float[] all = first.Vectors.Data<float>().ToArray();
+        int width = encoder.Width;
+        int row = 0;
+        foreach (Doc d in docs)
+        {
+            float[] alone = encoder.Encode([d]).Vectors.Data<float>().ToArray();
+            Assert.Equal(all.AsSpan(row * width, d.Length * width).ToArray(), alone);
+            row += d.Length;
+        }
+
+        // After training-mode work the kept batch is out of date.
+        EncodedBatch kept = encoder.Encode(docs);
+        encoder.Weights.Train(true);
+        _ = encoder.Encode(docs);
+
+        encoder.Weights.Eval();
+        Assert.NotSame(kept, encoder.Encode(docs));
+    }
+
+    [Theory]
+    [InlineData(false, 1)]
+    [InlineData(false, 2)]
+    [InlineData(true, 2)]
+    public void TableLookupInferenceMatchesTheTensorPath(bool plain, int hashes)
+    {
+        // The ReLU inference path folds the joining layer into the embedding tables and the window layers into one product each; it must
+        // give what the tensor operations give, also after the weights change.
+        using var encoder = new FastEncoder(width: 24, depth: 2, normRows: 64, prefixRows: 16, suffixRows: 32, shapeRows: 16, seed: 3, embedWidth: 12, plain: plain, hashes: hashes, relu: true, neighbourRows: 40, contextRows: 24);
+        Doc[] docs = [.. Toy(5, 6).Select(e => e.Predicted)];
+        for (int round = 0; round < 2; round++)
+        {
+            encoder.Weights!.Eval();
+            float[] fast;
+            using (var scope = new ActivationScope())
+            using (GradMode.NoGrad())
+            {
+                fast = encoder.Encode(docs).Vectors.Data<float>().ToArray();
+            }
+
+            encoder.Weights.Train(true);
+            float[] reference;
+            using (var scope = new ActivationScope())
+            {
+                reference = encoder.Encode(docs).Vectors.Data<float>().ToArray();
+            }
+
+            Assert.Equal(reference.Length, fast.Length);
+            for (int i = 0; i < fast.Length; i++)
+            {
+                Assert.True(Math.Abs(fast[i] - reference[i]) < 1e-4f, $"round {round} value {i}: {fast[i]} vs {reference[i]}");
+            }
+
+            // change a weight in place: the derived tables must follow
+            Span<float> w = encoder.Weights.Parameters()[0].MutableData<float>();
+            for (int i = 0; i < w.Length; i += 3)
+            {
+                w[i] += 0.05f;
+            }
+        }
+    }
+
     private static (double Tag, double Pos, double Morph, double Lemma) Score(Pipeline pipeline, List<Example> test)
     {
         int tag = 0, pos = 0, morph = 0, lemma = 0, total = 0;
