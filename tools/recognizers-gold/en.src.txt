@@ -644,3 +644,29 @@ He came [[fourth|ordinal|4]] in the heat.
 Call [[+34 91 123 45 67|phone]] to book.
 Visit [[https://example.org/about|url]] to learn more.
 Mail [[press@example.com|email]] for the kit.
+
+# ---- repeated numerals, business days, compound measures and number forms (development split only)
+@split dev
+Payment is due within [[sixty (60) days|duration|5184000]] of receipt.
+The notice period is [[ten (10) business days|duration|P10BD]].
+Deliver within [[five (5) working days|duration|P5BD]] of the order.
+The helpdesk answers within [[48 business hours|duration|PT48BH]] of the call.
+A refund is due within [[14 calendar days|duration|1209600]] of purchase.
+The supplier has [[ten business days|duration|P10BD]] to reply.
+The term of the loan is [[eighteen (18) months|duration|P18M]].
+The bond lasts [[two (2) years|duration|P2Y]] from issue.
+[[Twelve (12) hours|duration|43200]] of notice are required.
+Please pay [[five thousand dollars ($5,000)|currency|5000 USD]] on signing.
+The fee is [[one hundred dollars (USD 100)|currency|100 USD]] per filing.
+The deposit is [[fifty percent (50%)|percentage|50]] of the price.
+The term is [[sixty|number|60]] ([[90|number|90]]) days.
+The goods must arrive [[in 3 business days|date|2026-03-23|day]] at the latest.
+Hold on, I need [[a second|duration|1]] to think.
+He is [[5 feet 3 inches|dimension|63 inch]] tall.
+The baby weighed [[6 pounds, 4 ounces|dimension|100 ounce]] at birth.
+Avogadro's number is [[6.02e23|number|602000000000000000000000]].
+The trust holds [[12,34,567 rupees|currency|1234567 INR]] in cash.
+She was fined [[2,000 pounds|currency|2000 GBP]] for the delay.
+No one answered the phone.
+One of them left before the end.
+For the first time, the team won away.

@@ -42,6 +42,12 @@ internal enum SuffixKind
 /// <summary>What follows a number: a percent sign or word, a unit, a currency name or code, or an age word.</summary>
 internal sealed record SuffixEntry(SuffixKind Kind, string Name, string? Dimension, decimal Factor, float Confidence);
 
+/// <summary>Words that, next to a word-number, show it is not a number: "no one", "one of them", "the first time".</summary>
+internal sealed record NotNumberRule(HashSet<string> Before, HashSet<string> After);
+
+/// <summary>A unit name that is also a currency name ("pounds"): money when the words around it talk about money, else the unit.</summary>
+internal sealed record AmbiguousMoney(string Iso, decimal Factor, HashSet<string> MoneyWords, HashSet<string> OtherWords);
+
 /// <summary>What precedes a number: a currency symbol or code.</summary>
 internal sealed record PrefixEntry(string Iso, float Confidence);
 
@@ -75,6 +81,13 @@ internal sealed class RecognizerData
     internal HashSet<string> NegativeWords { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     internal HashSet<string> PointWords { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    internal Dictionary<string, NotNumberRule> NotNumbers { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Pairs of units written one after the other as one length ("5 feet 3 inches"): key "larger|smaller", value smaller units in one larger.</summary>
+    internal Dictionary<string, decimal> Compounds { get; } = new(StringComparer.Ordinal);
+
+    internal Dictionary<string, AmbiguousMoney> AmbiguousMoney { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     internal FormTable<ScaleSuffix> ScaleSuffixes { get; } = new();
 
@@ -197,7 +210,7 @@ internal sealed class RecognizerData
     private static readonly HashSet<string> Sections = new(StringComparer.Ordinal)
     {
         "number.digits", "number.cardinal", "number.ordinal", "number.fraction", "number.article", "number.connector", "number.negative",
-        "number.point", "number.suffix", "number.ordinal-suffix", "percent", "unit", "age.unit", "age.suffix", "currency.symbol",
+        "number.point", "number.suffix", "number.ordinal-suffix", "percent", "unit", "unit.compound", "number.not-number", "currency.context", "age.unit", "age.suffix", "currency.symbol",
         "currency.name", "currency.code", "url.scheme", "url.tld", "url.tld.bare", "time.month", "time.weekday", "time.unit", "time.season",
         "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday",
     };
@@ -292,6 +305,38 @@ internal sealed class RecognizerData
                 foreach (string form in List(f[2]))
                 {
                     Suffixes.Add(form, new SuffixEntry(SuffixKind.Unit, f[0], f[1], 1m, Conf(f, 3)));
+                }
+
+                break;
+            case "unit.compound":
+                Need(f, 3, 3);
+                Compounds[f[0] + "|" + f[1]] = Number(f[2]);
+                break;
+            case "number.not-number":
+                Need(f, 3, 3);
+                if (!NotNumbers.TryGetValue(f[0], out NotNumberRule? rule))
+                {
+                    NotNumbers[f[0]] = rule = new NotNumberRule(new HashSet<string>(StringComparer.OrdinalIgnoreCase), new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+                }
+
+                HashSet<string> side = f[1] switch
+                {
+                    "before" => rule.Before,
+                    "after" => rule.After,
+                    _ => throw new RecognizerRulesException($"Unknown side '{f[1]}' (expected before or after)."),
+                };
+                foreach (string w in List(f[2]))
+                {
+                    side.Add(w);
+                }
+
+                break;
+            case "currency.context":
+                Need(f, 5, 5);
+                var ambiguous = new AmbiguousMoney(f[1], Number(f[2]), new HashSet<string>(List(f[3]), StringComparer.OrdinalIgnoreCase), new HashSet<string>(List(f[4]), StringComparer.OrdinalIgnoreCase));
+                foreach (string form in List(f[0]))
+                {
+                    AmbiguousMoney[form.ToLowerInvariant()] = ambiguous;
                 }
 
                 break;

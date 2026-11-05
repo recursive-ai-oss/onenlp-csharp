@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>$(PackagePrefix)$(LibName).Models.Portuguese</AssemblyName>
+    <RootNamespace>$(PackagePrefix)$(LibName).Models.Portuguese</RootNamespace>
+    <PackageId>$(PackagePrefix)$(LibName).Models.Portuguese</PackageId>
+    <Description>spaCy-class NLP for .NET: the Portuguese fast-tier model. Tagging, morphology, lemmas, dependency parse and PER/LOC/ORG entities for the Nlp verbs, trained on Universal Dependencies Portuguese-Bosque (CC BY-SA 4.0) and Universal NER Portuguese-Bosque (CC BY-SA 4.0). No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <PackageTags>$(PackageTags);portuguese;model</PackageTags>
+    <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- The weights are embedded as resources, so a NativeAOT or trimmed application carries them with no file to copy. -->
+    <PortugueseWeightsDir Condition="'$(PortugueseWeightsDir)' == ''">$(ONENLP_PORTUGUESE_WEIGHTS)</PortugueseWeightsDir>
+  </PropertyGroup>
+
+  <Import Project="weights.manifest.props" />
+
+  <ItemGroup>
+    <!-- The registration file is shipped, not compiled here. -->
+    <Compile Remove="contentFiles/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../OneNlp.Neural/OneNlp.Neural.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="PACKAGE.md" Pack="true" PackagePath="/" />
+    <None Include="PROVENANCE.md" Pack="true" PackagePath="/" />
+    <None Include="weights.manifest.props" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-MIT" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-APACHE" Pack="true" PackagePath="/" />
+    <None Include="THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+    <!-- Compiled into the referencing project: the module initializer that registers the model (docs/model-packages.md). -->
+    <Content Include="contentFiles/OneNlpModelsPortugueseRegistration.cs" Pack="true" PackagePath="contentFiles/cs/any/" BuildAction="Compile" PackageCopyToOutput="false" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+  <!-- With a weights directory (property PortugueseWeightsDir or environment variable ONENLP_PORTUGUESE_WEIGHTS): check every file against the
+       manifest and embed it. Without one the project still builds (for development), but cannot be packed. -->
+  <Target Name="EmbedPortugueseWeights" BeforeTargets="AssignTargetPaths" Condition="'$(PortugueseWeightsDir)' != ''">
+    <ItemGroup>
+      <_Weight Include="@(PortugueseWeight)" Path="$([MSBuild]::EnsureTrailingSlash('$(PortugueseWeightsDir)'))%(Identity)" WeightName="%(Identity)" />
+    </ItemGroup>
+    <Error Condition="!Exists('%(_Weight.Path)')" Text="Weights file '%(_Weight.WeightName)' is missing from '$(PortugueseWeightsDir)'. Put the files listed in src/OneNlp.Models.Portuguese/weights.manifest.props there." />
+    <GetFileHash Files="@(_Weight->'%(Path)')" Algorithm="SHA256" HashEncoding="hex">
+      <Output TaskParameter="Items" ItemName="_WeightHashed" />
+    </GetFileHash>
+    <Error Condition="!$([System.String]::Equals('%(_WeightHashed.FileHash)', '%(_WeightHashed.Sha256)', System.StringComparison.OrdinalIgnoreCase))"
+           Text="Weights file '%(_WeightHashed.WeightName)' does not match the manifest: sha256 %(_WeightHashed.FileHash), expected %(_WeightHashed.Sha256). Use the weights listed in weights.manifest.props, or update the manifest and PROVENANCE.md together." />
+    <ItemGroup>
+      <EmbeddedResource Include="@(_WeightHashed)" LogicalName="weights/%(_WeightHashed.WeightName)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="RequirePortugueseWeightsToPack" BeforeTargets="GenerateNuspec" Condition="'$(PortugueseWeightsDir)' == ''">
+    <Error Text="Packing needs the weights: set the environment variable ONENLP_PORTUGUESE_WEIGHTS (or the property PortugueseWeightsDir) to the directory that holds the files listed in weights.manifest.props." />
+  </Target>
+
+</Project>

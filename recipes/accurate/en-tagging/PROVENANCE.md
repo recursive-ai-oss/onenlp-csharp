@@ -51,3 +51,19 @@ UD English-EWT r2.18 test, gold tokens and sentences, UPOS; 95% CI by bootstrap 
 Development UPOS: mmBERT mean 96.39 [96.09, 96.64]; mmBERT first piece 95.62 (best epoch); xlm-roberta-base first piece 94.68 (20 epochs, still improving when the epoch limit ended it).
 
 Training time in C#: about 20 s per epoch with the encoder cached; the cache fill (encoding 14.5k sentences, 12.5k train and 2k dev) is most of the 227 s first epoch. Inference throughput of the encoder alone: not measured as a gated row.
+
+## Fine-tuned variant (`--finetune`)
+
+The encoder trains with the head (`TrainableTransformerEncoder`, `ModernBertModule`, token table frozen and read again from the ONNX file on load).
+
+- **Settings:** AdamW 5e-5 with 40 warm-up steps then cosine decay (planned 800 steps, floor 10%), weight decay 0.01, dropout 0.1 on the encoder output, 500 words per batch, gradient clipping at 1, seed 1, mean pooling, development UPOS every 200 steps, checkpoint every 15 steps. `run-finetune-chunk.sh` is one chunk.
+- **Run:** one chunk of 1,561 s on 8 threads (shared host, load average about 25), 236 steps, 0.58 epoch. Further chunks were queued but did not start in the time available, so training stopped there: the model is the best development checkpoint (step 200, development UPOS 96.894), finalized by resuming with `--max-steps 236`. The learning rate had only decayed to 4.3e-5.
+- **Machine:** AMD Ryzen 9 7950X3D, 8 threads; .NET SDK 10.0.403, RecursiveAI.OneModel and OneModel.Training 1.0.0; ONNX and tokenizer as above.
+- **Weights:** `model.onenlp`, 441,394,452 bytes (the layers; the token table stays in the ONNX file), sha256 `111b735ee0c0bdc9ad2c2c0096b2ff5f5d816e2d62103229b39f235f8975265a`; training-state hash `08429a8192e31ecdfa584c85dab21d40c59750d06bbd611c46fbbe22d2ae5908`. Kept out of git. SA lineage: yes (UD English-EWT, CC BY-SA 4.0), same data, roles and licences as above; test data was not used for any choice.
+- **Results,** UD English-EWT r2.18 test, gold tokens and sentences, UPOS, bootstrap over sentences (1,000 resamples, seed 1):
+
+| System | UPOS test [95% CI] | Paired difference to ours |
+|---|---|---|
+| **mmBERT-base fine-tuned, 236 steps** | **97.07 [96.79, 97.35]** | |
+| mmBERT-base frozen (above) | 96.23 [95.93, 96.51] | ours +0.84 [0.62, 1.07] |
+| spaCy 3.8.18 default config, same data | 94.29 [93.89, 94.66] | ours +2.78 [2.44, 3.16] |

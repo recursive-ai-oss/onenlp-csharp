@@ -8,6 +8,40 @@ internal static class CivilCalendar
     /// <summary>The Monday of the ISO week containing a day (ISO 8601 §3.2.2: weeks run Monday to Sunday).</summary>
     internal static DateTime MondayOf(DateTime d) => d.Date.AddDays(1 - IsoWeekday(d));
 
+    /// <summary>
+    /// The day <paramref name="n"/> business days after <paramref name="from"/> (before it when negative). Business days are Monday to Friday;
+    /// public holidays are not considered. Counting from a Saturday or Sunday starts at the weekday on the other side of the weekend from
+    /// the direction of travel (Friday going forward, Monday going back), so Saturday plus one business day is Monday.
+    /// </summary>
+    internal static DateTime AddBusinessDays(DateTime from, int n)
+    {
+        DateTime d = from.Date;
+        if (n == 0)
+        {
+            return d;
+        }
+
+        int wd = IsoWeekday(d);
+        if (wd > 5)
+        {
+            d = d.AddDays(n > 0 ? 5 - wd : 8 - wd);
+        }
+
+        int sign = Math.Sign(n);
+        int steps = Math.Abs(n);
+        d = d.AddDays(7 * sign * (steps / 5));
+        for (int k = steps % 5; k > 0; k--)
+        {
+            d = d.AddDays(sign);
+            while (IsoWeekday(d) > 5)
+            {
+                d = d.AddDays(sign);
+            }
+        }
+
+        return d;
+    }
+
     /// <summary>The first day on or after <paramref name="from"/> that falls on <paramref name="weekday"/>.</summary>
     internal static DateTime OnOrAfter(DateTime from, int weekday) => from.Date.AddDays((weekday - IsoWeekday(from) + 7) % 7);
 

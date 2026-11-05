@@ -15,6 +15,10 @@ Normative behaviour of the word tokenizer and the sentence segmenter. Language-n
    - **Mark runs**: a run of the marks `. - ! ? * = _ ~ < > # $ + / \` is one token (`...`, `--`, `?!`, `$$$`); a full stop that closes a run of other marks is its own token.
    - **Emoticons** from a short list stay whole.
    - **Contractions** (English): `n't` and the suffixes `'s 're 've 'll 'd 'm` after a letters-or-digits stem split off (`do` `n't`, `it` `'s`); the apostrophe may be `'` or U+2019. Fused forms split at fixed lengths (`can` `not`, `gon` `na`). `o'clock` and `rock'n'roll` stay whole.
+   - **Elision** (French): when the text before the first apostrophe is a listed word (`c d j l m n s t qu jusqu lorsqu puisqu quoiqu`), the elided word, apostrophe included, is a token and the rest is segmented again: `l'homme` is `l'` `homme`, `qu'est-ce` is `qu'` `est` `-ce`. Words whose prefix is not listed, and listed whole forms, stay whole (`aujourd'hui`, `quelqu'un`, `l'on`, `c'est-à-dire`).
+   - **Hyphenated pronouns** (French): a token that ends in a hyphen and a listed pronoun splits at the hyphen, the hyphen going with the pronoun (`dis-moi` is `dis` `-moi`, `a-t-il` is `a` `-t-il`, `donne-le-lui` is `donne` `-le` `-lui`). `-ci` and `-là` split off except after `celui celle celles ceux jusque par`. Other hyphenated words, and listed whole forms such as `rendez-vous`, stay whole (`peut-être`, `lui-même`, `week-end`).
+   - **Contractions that are multiword tokens** (French): `du au aux duquel auquel desquels desquelles auxquels auxquelles` are cut at fixed lengths into the pieces of the multiword token they are (`du` is `d` `u`); the pieces are what a model tags. `des` is cut the same way (`de` `s`) after a word that is not on a list of verbs, prepositions and conjunctions (`tools/fetch/fr/des_context.py` draws it from the training split) and not after punctuation, and is one token (the plural article) otherwise. `SegmentationData.TryMatchMultiword` gives the words a group of pieces stands for (`de` `le`), so that output can be written as a CoNLL-U multiword token.
+   - **Numbers** (French): digits in groups of three separated by a space (`25 785`, `1 234 567`) are one token, which holds the space; a minus sign after white space and before a digit belongs to the number; `20h30` is `20` `h` `30`; a capital letter and its full stop before another capitalized word (`V. Prebeg`) is one token; `n°` is one token.
 5. Offsets are UTF-16 offsets into the original string. Nothing is normalized. A lone surrogate is a one-character token.
 6. Work is linear in the text. The look-ahead for a URL, e-mail local part or domain is capped as above, and there is no regular expression.
 
@@ -24,4 +28,31 @@ The `sentencizer` component writes sentence starts from the sentence boundaries 
 
 ## Measurement
 
-`tools/eval/segmentation.sh` scores both against a UD split with `tools/OneNlp.Eval` (`segment` writes the CoNLL-U, `ud` scores it with the CoNLL 2018 metric definitions; the shared-task script can be run beside it as a cross-check), and against spaCy's rule `sentencizer` on `spacy.blank("en")`. The raw text is the `# text` lines joined by single spaces. The `mwt` variant writes the pieces of a split contraction as a multi-word token line, as English UD treebanks annotate them. The English data was tuned on the English-EWT development split only; the test split was scored once.
+`tools/eval/segmentation.sh` scores both against a UD split with `tools/OneNlp.Eval` (`segment` writes the CoNLL-U, `ud` scores it with the CoNLL 2018 metric definitions; the shared-task script can be run beside it as a cross-check), and against spaCy's rule `sentencizer` on `spacy.blank("en")`. The raw text is the `# text` lines joined by single spaces. The `mwt` variant writes the pieces of a split contraction as a multi-word token line, as English UD treebanks annotate them. The English data was tuned on the English-EWT development split only, and the French data on the French-GSD development split only; each test split was scored once.
+
+## German data (`SegmentationData.German`, name `german`)
+
+Written from the UD German guidelines and the German-GSD treebank; the choices below were made on its training and development files only.
+
+- **Preposition-article contractions** (`zum`, `zur`, `im`, `am`, `vom`, `beim`, `ins`, `ans`, `ums`, `aufs`, `übers`, `durchs`, `fürs`, `hinterm`, `überm`, `unterm`, `vorm`, any case) are cut into two pieces of nearly equal length, longer first (`zu`|`m`, `be`|`im`), which is how the CoNLL-U reader cuts the surface form of a multiword token whose words do not spell it (`docs/data-formats.md`). A consumer that needs UD words writes the words back (`zu` `dem`); the recipe's `predict` does, from a table of the treebank's words.
+- **Abbreviations** keep their full stop: the listed words, dotted single letters (`z.B.`, `u.a.`, `d.h.`) and single letters (`Johann S. Bach`, `z. B.`). The list holds the words GSD keeps joined to their stop more often than not (`Dr.`, `St.`, `ca.`, `etc.`, `Prof.`); `usw.` and `bzw.` are split there and so are not listed.
+- **Ordinals**: one to four digits and a full stop are one token (`3.`) when the next word is a month name, one of a few listed nouns (`Quartal`, `Jahrhundert`, `Weltkrieg`), or starts in lower case; otherwise the stop ends a sentence and is its own token (`im Jahr 2010.`). No sentence ends after an ordinal token.
+- **Hyphens** between letters split (`US-Soldaten` is `US` `-` `Soldaten`); between digits they stay (`1-2`).
+- **Marks**: a run of one repeated mark is one token (`...`, `--`, ` `` `, `''`), but `!` and `?` are always single tokens, as GSD writes them; mixed runs do not form (`.''` is a stop and a quote). `'s` after a stem splits off (`geht's`).
+- Sentences do not break after the listed titles and abbreviations (`Dr.`, `Prof.`, `St.`, `Nr.`, `z.B.`).
+- Dates and numbers with `.` or `,` between digits (`24.12.2020`, `1.234,56`) stay whole by UAX #29.
+
+Development split of UD German-GSD, raw text (`recipes/de/fast segment`): tokens 99.81 [99.69, 99.91], words 99.81, sentences 94.64.
+
+## Portuguese data (`SegmentationData.Portuguese`, name `portuguese`)
+
+Written from the UD Portuguese guidelines and the Portuguese-Bosque treebank; the lists below were counted on its training and development files only.
+
+- **Contractions** of a preposition with an article, pronoun or demonstrative (`do`, `da`, `no`, `na`, `ao`, `pelo`, `nesse`, `dele`, `daquilo`, `num`, any case; 78 forms) are cut into two pieces. A form is listed when the treebank writes it as a multiword token far more often than as a single word. The pieces are cut as the CoNLL-U reader cuts the surface form of a multiword token (`docs/data-formats.md`): the words when they spell it (`ao` is `a`|`o`), else nearly equal lengths, longer first (`do` is `d`|`o`, `pelo` is `pe`|`lo`, `nesse` is `nes`|`se`). A consumer that needs UD words writes them back (`de` `o`); the recipe's `predict` does, from the table `Contractions`. `nos` is listed although the pronoun `nos` also occurs (29 of 308 in the training file).
+- **`à`** (`a` + `a`) is one character for two words, so it stays one token; the recipe trains on it as one word and writes the two words back.
+- **Hyphenated words** stay whole (`quinta-feira`, `norte-americano`), except that a pronoun after a verb's hyphen (`se`, `me`, `te`, `lhe`, `lhes`, `nos`, `vos`, `o`, `a`, `os`, `as`, `lo`, `la`, `los`, `las`) is split off with its hyphen: `trata-se` is `trata` `-se`, `dá-lo` is `dá` `-lo`. Every single-hyphen form ending in one of these is a two-word multiword token in the treebank (counted on the training and development files). Forms with two hyphens (`dar-lhe-á`) stay whole. The recipe writes `-lo` back as the word `lo` or `o`, as the training file spells it.
+- **Currency**: `US$`, `R$` and `CR$` are one token (`DollarWords`); the amount is the next token.
+- **Abbreviations** keep their full stop: the listed words (`Dr.`, `Sra.`, `art.`, `pág.`, `etc.`, `Av.`, `Cia.`), dotted initials (`J.F.K.`) and single letters except `a`, `e` and `o`. Sentences do not break after the titles and abbreviations that precede a name or a noun.
+- **Marks**: a run of one repeated mark is one token (`...`, `--`); `!` and `?` are single tokens. Decimal commas and thousands points stay inside the number (`5,50`, `2.200,00`).
+
+Development split of UD Portuguese-Bosque, raw text (`recipes/pt/fast segment`, rule sentencizer): tokens 99.89 [99.83, 99.94], words 99.81 [99.74, 99.87], sentences 80.55 [78.27, 82.61].

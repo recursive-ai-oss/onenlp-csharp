@@ -312,15 +312,19 @@ public class TransformerEncoderTests
         int rows = ids.GetArrayLength(), len = ids[0].GetArrayLength();
         long[] x = [.. ids.EnumerateArray().SelectMany(r => r.EnumerateArray().Select(v => v.GetInt64()))];
         long[] m = [.. mask.EnumerateArray().SelectMany(r => r.EnumerateArray().Select(v => v.GetInt64()))];
-        using BertStyleEncoder encoder = BertStyleEncoder.FromOnnx(StudentFile);
+        int[] lengths = [.. mask.EnumerateArray().Select(r => r.EnumerateArray().Sum(v => v.GetInt32()))];
+        using TrainableTransformerEncoder encoder = TrainableTransformerEncoder.LoadOnnx(StudentFile, TokenizerFile);
         Assert.Equal(16, encoder.Width);
-        Assert.Equal(4, encoder.Heads);
-        Assert.Equal(2, encoder.LayerCount);
+        Assert.Equal(TransformerFamily.PostNorm, encoder.Family);
+        var module = (PostNormModule)encoder.Weights!;
+        Assert.Equal(4, module.Config.Heads);
+        Assert.Equal(2, module.Config.Layers);
+        Assert.Equal(8, module.Config.EmbeddingWidth);
         using var scope = new ActivationScope();
         using Tensor tx = Tensor.FromSpan<long>(x, Shape.Create(rows, len));
         using (GradMode.NoGrad())
         {
-            Tensor h = encoder.Forward(tx, BertStyleEncoder.PaddingMask(m, rows, len));
+            Tensor h = module.Forward(tx, lengths);
             ReadOnlySpan<float> got = h.Data<float>();
             double max = 0;
             for (int r = 0; r < rows; r++)
@@ -350,8 +354,7 @@ public class TransformerEncoderTests
         foreach (SubwordPooling pooling in new[] { SubwordPooling.FirstPiece, SubwordPooling.Mean })
         {
             using var frozen = new TransformerEncoder(StudentFile, TokenizerFile, pooling, maxLength: 8);
-            using var tuned = new TransformerEncoder(StudentFile, TokenizerFile, pooling, maxLength: 8);
-            tuned.EnableFineTuning();
+            using var tuned = TrainableTransformerEncoder.LoadOnnx(StudentFile, TokenizerFile, new TrainableTransformerOptions { Pooling = pooling, MaxLength = 8 });
             Assert.Null(frozen.Weights);
             Assert.NotNull(tuned.Weights);
             using var scope = new ActivationScope();
@@ -371,12 +374,11 @@ public class TransformerEncoderTests
     }
 
     [Fact]
-    public void FineTuningThroughTrainUpdatesTheEncoderAndTheSavedPipelineReloadsIt()
+    public void FineTuningTheStudentThroughTrainUpdatesTheEncoderAndTheSavedPipelineReloadsIt()
     {
         List<Example> train = Toy(120, 1);
         List<Example> test = Toy(30, 2);
-        using var encoder = new TransformerEncoder(StudentFile, TokenizerFile);
-        encoder.EnableFineTuning();
+        using TrainableTransformerEncoder encoder = TrainableTransformerEncoder.LoadOnnx(StudentFile, TokenizerFile);
         NnModule weights = encoder.Weights!;
         float[] before = weights.Parameters().First().Data<float>().ToArray();
         using Pipeline pipeline = Pipeline.Blank().Add(new Tagger(encoder, TokenColumn.Pos));

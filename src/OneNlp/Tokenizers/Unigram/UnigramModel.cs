@@ -33,6 +33,11 @@ internal sealed class UnigramModel : Hf.ITokenizerModel
     private readonly int? _unkId;
     private readonly double _unkScore;
     private readonly int[]? _byteIds;
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, int[]> _idCache = new(StringComparer.Ordinal);
+    private readonly System.Collections.Concurrent.ConcurrentDictionary<string, int[]>.AlternateLookup<ReadOnlySpan<char>> _idCacheBySpan;
+
+    [ThreadStatic]
+    private static List<Hf.ModelToken>? t_tokens;
 
     /// <summary>Creates the model.</summary>
     /// <param name="pieces">The pieces, indexed by ID.</param>
@@ -54,6 +59,7 @@ internal sealed class UnigramModel : Hf.ITokenizerModel
             throw new InvalidDataException($"unk_id {u} is outside the vocabulary of {pieces.Length} pieces.");
         }
 
+        _idCacheBySpan = _idCache.GetAlternateLookup<ReadOnlySpan<char>>();
         _pieces = pieces;
         _scores = scores;
         _unkId = unkId;
@@ -104,6 +110,36 @@ internal sealed class UnigramModel : Hf.ITokenizerModel
 
     /// <inheritdoc/>
     /// <exception cref="InvalidDataException">The piece has a character no piece covers and the model has no unknown token.</exception>
+    public void TokenizeIds(ReadOnlySpan<char> piece, Hf.IdBuffer output)
+    {
+        if (piece.IsEmpty)
+        {
+            return;
+        }
+
+        // The best segmentation of a piece does not depend on its neighbours, so common pieces are remembered.
+        if (_idCacheBySpan.TryGetValue(piece, out int[]? cached))
+        {
+            output.AddRange(cached);
+            return;
+        }
+
+        List<Hf.ModelToken> tokens = t_tokens ??= [];
+        tokens.Clear();
+        Tokenize(piece, tokens);
+        int first = output.Count;
+        foreach (Hf.ModelToken t in tokens)
+        {
+            output.Add(t.Id);
+        }
+
+        if (piece.Length <= 64 && _idCache.Count < 20_000)
+        {
+            _idCacheBySpan.TryAdd(piece, output.AsSpan(first).ToArray());
+        }
+    }
+
+    /// <inheritdoc/>
     public void Tokenize(ReadOnlySpan<char> piece, List<Hf.ModelToken> output)
     {
         int n = piece.Length;

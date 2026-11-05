@@ -20,7 +20,7 @@ namespace RecursiveAI.OneNlp.Recipes.EnNer;
 //   eval <model> <eval.jsonl> <out-dir> [--ref ref.tsv] [--raw]
 //   speed <model> <eval.jsonl> [threads]
 //
-// train options: --decoding tagging|spans  --epochs N  --seed N  --context N  --hidden N  --width N  --lr F  --batch-words N
+// train options: --decoding tagging|spans  --epochs N  --seed N  --context N  --hidden N  --width N  --depth N  --norm-rows N  --prefix-rows N  --suffix-rows N  --shape-rows N  --prefix N  --suffix N  --cased-rows N  --embed-width N  --plain  --hashes N  --lr F  --batch-words N
 //                --patience N  --threads N  --checkpoint-every N  --dropout F
 internal static class Program
 {
@@ -28,7 +28,6 @@ internal static class Program
     {
         try
         {
-            EncoderRegistry.Register(LexicalEncoder.EncoderKind, LexicalEncoder.FromSettings);
             switch (args.Length > 0 ? args[0] : string.Empty)
             {
                 case "convert" when args.Length == 3:
@@ -182,9 +181,13 @@ internal static class Program
         }
 
         NerDecoding decoding = Opt(args, "decoding", "tagging") == "spans" ? NerDecoding.Spans : NerDecoding.Tagging;
-        var encoder = new LexicalEncoder(Num(args, "width", 256), 64, 1 << 15, seed);
+        // The English fast-tier encoder, unless an encoder option is given (for trying other shapes).
+        string[] encoderOptions = ["width", "depth", "norm-rows", "prefix-rows", "suffix-rows", "shape-rows", "prefix", "suffix", "cased-rows", "embed-width", "plain", "hashes"];
+        FastEncoder encoder = encoderOptions.Any(o => args.Contains("--" + o))
+            ? new FastEncoder(Num(args, "width", 96), Num(args, "depth", 4), normRows: Num(args, "norm-rows", 20000), prefixRows: Num(args, "prefix-rows", 2000), suffixRows: Num(args, "suffix-rows", 5000), shapeRows: Num(args, "shape-rows", 2500), seed: seed, prefixLength: Num(args, "prefix", FastEncoder.PrefixLength), suffixLength: Num(args, "suffix", FastEncoder.SuffixLength), casedRows: Num(args, "cased-rows", 0), embedWidth: Num(args, "embed-width", 0), plain: args.Contains("--plain"), hashes: Num(args, "hashes", FastEncoder.HashesPerToken))
+            : FastEncoder.English(seed);
         using Pipeline pipeline = Pipeline.Blank(Language.English)
-            .Add(new EntityRecognizer(encoder, decoding, Num(args, "context", 2), Num(args, "hidden", 256)) { OwnsEncoder = true });
+            .Add(new EntityRecognizer(encoder, decoding, Num(args, "context", 0), Num(args, "hidden", 256)) { OwnsEncoder = true });
 
         var clock = Stopwatch.StartNew();
         var progress = new Progress(p =>

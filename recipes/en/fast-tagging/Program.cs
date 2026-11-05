@@ -23,12 +23,6 @@ namespace RecursiveAI.OneNlp.Recipes.EnglishFastTagging;
 internal static class Program
 {
     // The recipe. Everything that shapes the model is here, so that a model can be rebuilt from this file and the data.
-    private const int Width = 96;
-    private const int Depth = 4;
-    private const int NormRows = 20000;
-    private const int PrefixRows = 2000;
-    private const int SuffixRows = 5000;
-    private const int ShapeRows = 2500;
     private const ulong EncoderSeed = 1;
     private const int BatchWords = 1000;
     private const float LearningRate = 0.002f;
@@ -75,7 +69,7 @@ internal static class Program
     // heads: all | tagger | morphologizer | lemmatizer (one head alone, for timing; the recipe's model has all three).
     private static Pipeline NewPipeline(string heads = "all")
     {
-        var encoder = new FastEncoder(Width, Depth, NormRows, PrefixRows, SuffixRows, ShapeRows, EncoderSeed);
+        var encoder = FastEncoder.English(EncoderSeed);
         Pipeline pipeline = Pipeline.Blank(Language.English).Add("sentencizer", new Dictionary<string, string> { ["language"] = "en" });
         if (heads is "all" or "tagger")
         {

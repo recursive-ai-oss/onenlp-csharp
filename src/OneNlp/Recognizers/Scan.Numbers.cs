@@ -15,6 +15,10 @@ internal sealed partial class Scan
     private readonly StringBuilder _sb = new();
     private readonly List<NumberCandidate> _numbers = [];
     private readonly List<Recognition> _found = [];
+    private bool _doubt;
+
+    /// <summary>How much a number's confidence is multiplied by when a parenthesised numeral next to it disagrees.</summary>
+    private const float DoubtFactor = 0.6f;
 
     private readonly Dictionary<string, Cardinal>.AlternateLookup<ReadOnlySpan<char>> _cardinals;
     private readonly Dictionary<string, OrdinalWord>.AlternateLookup<ReadOnlySpan<char>> _ordinals;
@@ -52,6 +56,9 @@ internal sealed partial class Scan
         public bool Ordinal;
         public bool Attached;
         public bool MoneyOnly;
+
+        /// <summary>The number is followed by a parenthesised numeral that disagrees with it ("ten (12)").</summary>
+        public bool Doubt;
     }
 
     private struct WordNumber
@@ -101,6 +108,8 @@ internal sealed partial class Scan
 
             i = Math.Max(i + 1, ItemIndexAt(end));
         }
+
+        MergeParentheticals();
     }
 
     private int ScanWords(int i)
@@ -126,12 +135,51 @@ internal sealed partial class Scan
 
         if (TryWordNumber(i, true, out WordNumber r))
         {
+            if (r.EndItem == i && _d.NotNumbers.Count > 0 && IsNotNumber(i, word))
+            {
+                return it.End;
+            }
+
             int end = _items[r.EndItem].End;
             _numbers.Add(new NumberCandidate { Start = it.Start, End = end, Value = r.Value, Ordinal = r.Ordinal });
             return end;
         }
 
         return it.End;
+    }
+
+    /// <summary>
+    /// A lone word such as "one" or "first" is not a number when the word before or after it says so ("no one", "one of them", "for the
+    /// first time"): the rules are data (<c>number.not-number</c>).
+    /// </summary>
+    private bool IsNotNumber(int i, ReadOnlySpan<char> word)
+    {
+        if (!_d.NotNumbers.GetAlternateLookup<ReadOnlySpan<char>>().TryGetValue(word, out NotNumberRule? rule))
+        {
+            return false;
+        }
+
+        if (i > 0 && _items[i - 1].Kind == ItemKind.Word && GapOk(_items[i - 1].End, _items[i].Start)
+            && rule.Before.GetAlternateLookup<ReadOnlySpan<char>>().Contains(Span(i - 1)))
+        {
+            return true;
+        }
+
+        if (i + 1 >= _items.Count)
+        {
+            return false;
+        }
+
+        Item nx = _items[i + 1];
+        if (nx.Kind == ItemKind.Word && GapOk(_items[i].End, nx.Start))
+        {
+            return rule.After.GetAlternateLookup<ReadOnlySpan<char>>().Contains(Span(i + 1));
+        }
+
+        // "one's": an apostrophe and an s touching the word.
+        return nx.Kind == ItemKind.Other && nx.Start == _items[i].End && nx.End - nx.Start == 1 && _t[nx.Start] is '\'' or '\u2019'
+            && i + 2 < _items.Count && _items[i + 2].Start == nx.End && _items[i + 2].End - _items[i + 2].Start == 1
+            && _t[_items[i + 2].Start] is 's' or 'S' && rule.After.Contains("'s");
     }
 
     /// <summary>
@@ -564,6 +612,30 @@ internal sealed partial class Scan
             }
         }
 
+        if (!grouped && !leadingSeparator && p + 3 < n && t[p] == grp)
+        {
+            // Indian digit grouping ("1,00,000", "12,34,567"): the last group has three digits and the ones before it two.
+            int run = p - pos;
+            int g = p;
+            int pairs = 0;
+            while (run <= 2 && g + 2 < n && t[g] == grp && IsDigit(t[g + 1]) && IsDigit(t[g + 2]))
+            {
+                if (g + 3 < n && IsDigit(t[g + 3]))
+                {
+                    if (pairs >= 1 && (g + 4 >= n || !IsDigit(t[g + 4])))
+                    {
+                        p = g + 4;
+                        grouped = true;
+                    }
+
+                    break;
+                }
+
+                pairs++;
+                g += 3;
+            }
+        }
+
         if (p + 1 < n && t[p] == dec && IsDigit(t[p + 1]))
         {
             hasDecimal = true;
@@ -583,6 +655,13 @@ internal sealed partial class Scan
 
                 return p;
             }
+        }
+
+        int mantissaEnd = p;
+        bool hasExponent = TryExponent(p, out int exponentEnd, out int exponent);
+        if (hasExponent)
+        {
+            p = exponentEnd;
         }
 
         int literalEnd = p;
@@ -625,7 +704,7 @@ internal sealed partial class Scan
             return Math.Max(literalEnd, q);
         }
 
-        string literal = t.Substring(pos, literalEnd - pos);
+        string literal = t.Substring(pos, mantissaEnd - pos);
         string clean = grouped ? literal.Replace(grp.ToString(), string.Empty, StringComparison.Ordinal) : literal;
         if (dec != '.')
         {
@@ -642,12 +721,17 @@ internal sealed partial class Scan
             return Math.Max(literalEnd, q);
         }
 
+        if (hasExponent && !TryScale(value, exponent, out value))
+        {
+            return Math.Max(literalEnd, q);
+        }
+
         if (negative)
         {
             value = -value;
         }
 
-        bool plainInteger = !grouped && !hasDecimal && !leadingSeparator;
+        bool plainInteger = !grouped && !hasDecimal && !leadingSeparator && !hasExponent;
 
         // A fraction in digits: "1/2", "3/4". Only a proper fraction, and not the start of a date ("3/4/2020").
         if (plainInteger && !negative && literalEnd + 1 < n && t[literalEnd] == '/' && IsDigit(t[literalEnd + 1]) && (pos == 0 || t[pos - 1] != '/'))
@@ -673,7 +757,7 @@ internal sealed partial class Scan
             // Letters touch the digits: an ordinal ending ("21st"), a multiplier ("3.5k"), or the start of a unit ("5km").
             ReadOnlySpan<char> letters = t.AsSpan(literalEnd, q - literalEnd);
             bool boundary = q >= n || !IsDigit(t[q]);
-            if (boundary && plainInteger && !negative && OrdinalSuffixOk(literal, letters))
+            if (boundary && !hasDecimal && !leadingSeparator && !hasExponent && !negative && OrdinalSuffixOk(literal, letters))
             {
                 _numbers.Add(new NumberCandidate { Start = start, End = q, Value = value, Ordinal = true });
                 return q;
@@ -716,6 +800,162 @@ internal sealed partial class Scan
 
         _numbers.Add(new NumberCandidate { Start = start, End = literalEnd, Value = value });
         return literalEnd;
+    }
+
+    private static readonly string Superscripts = "\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079";
+
+    /// <summary>
+    /// Scientific notation after a mantissa that ends at <paramref name="pos"/>: "e23", "E-5", "×10^3", "x 10^-2", "×10³". The exponent
+    /// has at most three digits and must not run into a letter or a digit.
+    /// </summary>
+    private bool TryExponent(int pos, out int end, out int exponent)
+    {
+        end = pos;
+        exponent = 0;
+        string t = _t;
+        int n = t.Length;
+        int p = pos;
+        if (p >= n)
+        {
+            return false;
+        }
+
+        if (t[p] is 'e' or 'E')
+        {
+            p++;
+            return ExponentDigits(ref p, out exponent) && Boundary(p, out end);
+        }
+
+        int q = p;
+        while (q < n && t[q] == ' ' && q - p < 2)
+        {
+            q++;
+        }
+
+        if (q >= n || t[q] is not ('\u00D7' or 'x' or 'X' or '*'))
+        {
+            return false;
+        }
+
+        q++;
+        while (q < n && t[q] == ' ' && q < n)
+        {
+            q++;
+            if (q - p > 4)
+            {
+                return false;
+            }
+        }
+
+        if (q + 1 >= n || t[q] != '1' || t[q + 1] != '0')
+        {
+            return false;
+        }
+
+        q += 2;
+        if (q < n && t[q] == '^')
+        {
+            q++;
+        }
+        else if (q + 1 < n && t[q] == '*' && t[q + 1] == '*')
+        {
+            q += 2;
+        }
+        else if (q < n && (Superscripts.Contains(t[q], StringComparison.Ordinal) || t[q] == '\u207B'))
+        {
+            bool neg = t[q] == '\u207B';
+            if (neg)
+            {
+                q++;
+            }
+
+            int value = 0;
+            int count = 0;
+            while (q < n && Superscripts.IndexOf(t[q]) is int d and >= 0 && count < 3)
+            {
+                value = (value * 10) + d;
+                q++;
+                count++;
+            }
+
+            if (count == 0)
+            {
+                return false;
+            }
+
+            exponent = neg ? -value : value;
+            return Boundary(q, out end);
+        }
+        else
+        {
+            return false;
+        }
+
+        return ExponentDigits(ref q, out exponent) && Boundary(q, out end);
+
+        bool Boundary(int at, out int e)
+        {
+            e = at;
+            return at >= n || !(IsDigit(t[at]) || Lexer.IsWordChar(t[at]));
+        }
+    }
+
+    private bool ExponentDigits(ref int p, out int exponent)
+    {
+        string t = _t;
+        exponent = 0;
+        bool negative = false;
+        if (p < t.Length && t[p] is '+' or '-' or '\u2212')
+        {
+            negative = t[p] != '+';
+            p++;
+        }
+
+        int start = p;
+        while (p < t.Length && IsDigit(t[p]) && p - start < 4)
+        {
+            exponent = (exponent * 10) + (t[p] - '0');
+            p++;
+        }
+
+        if (p == start || exponent > 60 || (p < t.Length && IsDigit(t[p])))
+        {
+            return false;
+        }
+
+        if (negative)
+        {
+            exponent = -exponent;
+        }
+
+        return true;
+    }
+
+    /// <summary>Multiplies by a power of ten; false when the result does not fit a decimal or a non-zero mantissa underflows to zero.</summary>
+    private static bool TryScale(decimal mantissa, int exponent, out decimal result)
+    {
+        result = mantissa;
+        if (mantissa == 0)
+        {
+            return true;
+        }
+
+        for (int k = 0; k < Math.Abs(exponent); k++)
+        {
+            if (exponent > 0)
+            {
+                if (!TryMultiply(result, 10m, out result))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                result /= 10m;
+            }
+        }
+
+        return result != 0;
     }
 
     private bool OrdinalSuffixOk(string literal, ReadOnlySpan<char> letters)
@@ -764,6 +1004,7 @@ internal sealed partial class Scan
     {
         foreach (NumberCandidate c in _numbers)
         {
+            _doubt = c.Doubt;
             if (!c.Attached && !c.MoneyOnly)
             {
                 _found.Add(MakeQuantity(c.Start, c.End, c.Ordinal ? QuantityKind.Ordinal : QuantityKind.Cardinal, c.Value, null, null, null, 1f));
@@ -777,6 +1018,10 @@ internal sealed partial class Scan
             EmitPrefixMoney(c);
             EmitSuffixed(c);
         }
+
+        _doubt = false;
+        MergeCompounds();
+        MergeParentheticalResults();
     }
 
     private void EmitPrefixMoney(NumberCandidate c)
@@ -846,12 +1091,20 @@ internal sealed partial class Scan
 
             _sb.Clear();
             Lexer.AppendKey(_sb, _t, _items, j, n);
-            if (!_d.Suffixes.TryGet(_sb.ToString(), out List<SuffixEntry>? entries))
+            string suffixKey = _sb.ToString();
+            if (!_d.Suffixes.TryGet(suffixKey, out List<SuffixEntry>? entries))
             {
                 continue;
             }
 
             int end = _items[after - 1].End;
+            if (_d.AmbiguousMoney.Count > 0 && _d.AmbiguousMoney.TryGetValue(suffixKey, out AmbiguousMoney? money)
+                && IsMoneyContext(c, after, money) && TryMultiply(c.Value, money.Factor, out decimal amount))
+            {
+                _found.Add(MakeQuantity(c.Start, end, QuantityKind.Money, amount, null, null, money.Iso, 0.8f));
+                return;
+            }
+
             foreach (SuffixEntry e in entries)
             {
                 if (c.MoneyOnly && e.Kind != SuffixKind.Money)
@@ -865,9 +1118,9 @@ internal sealed partial class Scan
                         _found.Add(MakeQuantity(c.Start, end, QuantityKind.Percent, c.Value, "percent", "percent", null, e.Confidence));
                         break;
                     case SuffixKind.Money:
-                        if (TryMultiply(c.Value, e.Factor, out decimal money))
+                        if (TryMultiply(c.Value, e.Factor, out decimal amountOfMoney))
                         {
-                            _found.Add(MakeQuantity(c.Start, end, QuantityKind.Money, money, null, null, e.Name, e.Confidence));
+                            _found.Add(MakeQuantity(c.Start, end, QuantityKind.Money, amountOfMoney, null, null, e.Name, e.Confidence));
                         }
 
                         break;
@@ -893,7 +1146,245 @@ internal sealed partial class Scan
         };
         // 2.50 * 1000000 keeps its two decimals; dividing by 1.000... drops trailing zeros so equal numbers print and compare alike.
         value /= 1.0000000000000000000000000000m;
-        return new Quantity(start, end, _t.Substring(start, end - start), label, confidence, kind, value, unit, dimension, currency);
+        return new Quantity(start, end, _t.Substring(start, end - start), label, _doubt ? confidence * DoubtFactor : confidence, kind, value, unit, dimension, currency);
+    }
+
+    // ---- legal-drafting numerals, compound measures, ambiguous currency names --------------------------------------------------
+
+    /// <summary>A numeral in brackets right after a number written in words: "sixty (60) days".</summary>
+    private bool ParenNumber(int pos, out int openAt, out int inner)
+    {
+        openAt = -1;
+        inner = -1;
+        int j = ItemIndexAt(pos);
+        if (j >= _items.Count || !Ch(j, '(') || !GapOk(pos, _items[j].Start))
+        {
+            return false;
+        }
+
+        openAt = _items[j].Start;
+        for (int k = 0; k < _numbers.Count; k++)
+        {
+            NumberCandidate d = _numbers[k];
+            if (d.Start == openAt + 1 && !d.Ordinal && !d.Attached && !d.MoneyOnly && d.End < _t.Length && _t[d.End] == ')' && !char.IsLetter(_t[d.Start]))
+            {
+                if (inner < 0 || _numbers[inner].End < d.End)
+                {
+                    inner = k;
+                }
+            }
+        }
+
+        return inner >= 0;
+    }
+
+    /// <summary>
+    /// "sixty (60)": the numeral repeats the words. When the values agree the number grows to include the brackets; when they differ the
+    /// words' value stands, with less confidence, and nothing is merged.
+    /// </summary>
+    private void MergeParentheticals()
+    {
+        int count = _numbers.Count;
+        for (int k = 0; k < count; k++)
+        {
+            NumberCandidate c = _numbers[k];
+            if (c.Ordinal || c.Attached || c.MoneyOnly || !char.IsLetter(_t[c.Start]) || !ParenNumber(c.End, out _, out int inner))
+            {
+                continue;
+            }
+
+            NumberCandidate d = _numbers[inner];
+            if (d.Value == c.Value)
+            {
+                c.End = d.End + 1;
+            }
+            else
+            {
+                c.Doubt = true;
+            }
+
+            _numbers[k] = c;
+        }
+    }
+
+    /// <summary>"five thousand dollars ($5,000)", "fifty percent (50%)": the same as <see cref="MergeParentheticals"/> for amounts with a unit.</summary>
+    private void MergeParentheticalResults()
+    {
+        int count = _found.Count;
+        for (int k = 0; k < count; k++)
+        {
+            if (_found[k] is not Quantity q || q.Kind == QuantityKind.Ordinal || q.Kind == QuantityKind.Cardinal || !char.IsLetter(q.Text[0])
+                || !OpenBracketAfter(q.End))
+            {
+                continue;
+            }
+
+            int j = ItemIndexAt(q.End);
+            if (j >= _items.Count || !Ch(j, '(') || !GapOk(q.End, _items[j].Start))
+            {
+                continue;
+            }
+
+            for (int m = 0; m < count; m++)
+            {
+                if (_found[m] is not Quantity p || p.Start != _items[j].End)
+                {
+                    continue;
+                }
+
+                bool closed = p.End < _t.Length && _t[p.End] == ')';
+                bool same = p.Kind == q.Kind && p.Currency == q.Currency && p.Unit == q.Unit;
+                bool plain = p.Kind == QuantityKind.Cardinal && q.Kind is QuantityKind.Money or QuantityKind.Measure;
+                if (!closed || !(same || plain))
+                {
+                    continue;
+                }
+
+                if (p.Value == q.Value)
+                {
+                    _found.Add(q with { End = p.End + 1, Text = _t.Substring(q.Start, p.End + 1 - q.Start) });
+                }
+                else
+                {
+                    _found[k] = q with { Confidence = q.Confidence * DoubtFactor };
+                }
+
+                break;
+            }
+        }
+    }
+
+    /// <summary>A cheap test before the item search: an opening bracket follows after at most two white-space characters.</summary>
+    private bool OpenBracketAfter(int pos)
+    {
+        int p = pos;
+        while (p < _t.Length && p - pos < 2 && _t[p] == ' ')
+        {
+            p++;
+        }
+
+        return p < _t.Length && _t[p] == '(';
+    }
+
+    /// <summary>"5 feet 3 inches" is one length: two measures of one dimension that the compound rules pair, joined by white space, a comma or "and".</summary>
+    private void MergeCompounds()
+    {
+        if (_d.Compounds.Count == 0)
+        {
+            return;
+        }
+
+        var connectors = _connectors;
+        int count = _found.Count;
+        for (int k = 0; k < count; k++)
+        {
+            if (_found[k] is not Quantity a || a.Kind != QuantityKind.Measure || a.Value != decimal.Truncate(a.Value) || a.Value < 0)
+            {
+                continue;
+            }
+
+            int next = ItemIndexAt(a.End);
+            if (next < _items.Count && Ch(next, ',') && _items[next].Start == a.End)
+            {
+                next++;
+            }
+
+            if (next < _items.Count && _items[next].Kind == ItemKind.Word && connectors.Contains(Span(next)))
+            {
+                next++;
+            }
+
+            if (next >= _items.Count || _items[next].Start - a.End > 8 || _t.AsSpan(a.End, _items[next].Start - a.End).ContainsAny('\n', '\r'))
+            {
+                continue;
+            }
+
+            for (int m = 0; m < count; m++)
+            {
+                if (_found[m] is Quantity b && b.Start == _items[next].Start && b.Kind == QuantityKind.Measure && a.Unit is not null && b.Unit is not null
+                    && b.Value >= 0 && _d.Compounds.TryGetValue(a.Unit + "|" + b.Unit, out decimal factor) && b.Value < factor)
+                {
+                    _found.Add(MakeQuantity(a.Start, b.End, QuantityKind.Measure, (a.Value * factor) + b.Value, b.Unit, b.Dimension, null, Math.Min(a.Confidence, b.Confidence)));
+                    break;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Whether the words around "1,000 pounds" talk about money rather than weight: some word of the clause within five words before the
+    /// number or four after the unit is a money word and none is a weight word.
+    /// </summary>
+    private bool IsMoneyContext(NumberCandidate c, int unitAfter, AmbiguousMoney rule)
+    {
+        bool money = false;
+        int first = ItemIndexAt(c.Start);
+        int checkedWords = 0;
+        for (int k = first - 1; k >= 0 && checkedWords < 5; k--)
+        {
+            if (!ClauseWord(k, ref checkedWords, rule, ref money, out bool stop) || stop)
+            {
+                if (stop)
+                {
+                    break;
+                }
+
+                return false;
+            }
+        }
+
+        checkedWords = 0;
+        for (int k = unitAfter; k < _items.Count && checkedWords < 4; k++)
+        {
+            if (!ClauseWord(k, ref checkedWords, rule, ref money, out bool stop) || stop)
+            {
+                if (stop)
+                {
+                    break;
+                }
+
+                return false;
+            }
+        }
+
+        return money;
+    }
+
+    // Looks at one item of the context window: false when it is a weight word (the answer is "not money"), stop at the end of a clause.
+    private bool ClauseWord(int k, ref int words, AmbiguousMoney rule, ref bool money, out bool stop)
+    {
+        stop = false;
+        Item it = _items[k];
+        if (it.Kind == ItemKind.Digits)
+        {
+            // Another number starts another phrase ("1,000 pounds he bought 3 pounds of tea").
+            stop = true;
+            return true;
+        }
+
+        if (it.Kind == ItemKind.Other)
+        {
+            if (_t[it.Start] is '.' or ';' or '!' or '?' or ':')
+            {
+                stop = true;
+            }
+
+            return true;
+        }
+
+        if (it.Kind == ItemKind.Word)
+        {
+            words++;
+            string w = _t.Substring(it.Start, it.End - it.Start);
+            if (rule.OtherWords.Contains(w))
+            {
+                return false;
+            }
+
+            money |= rule.MoneyWords.Contains(w);
+        }
+
+        return true;
     }
 
     // ---- helpers --------------------------------------------------------------------------------------------------------------

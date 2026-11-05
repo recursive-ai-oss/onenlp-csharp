@@ -7,8 +7,10 @@ using RecursiveAI.OneNlp.Tokenizers;
 
 // Commands (arguments are --name value pairs):
 //   ids      --tokenizer tokenizer.json --texts texts.jsonl --out ids.json [--max-length 512]
-//   parity   --model m.onnx --ids ids.json --ref ref.bin [--module 1]   (--module: the trainable BertStyleEncoder instead of the graph runtime)
+//   parity   --model m.onnx --ids ids.json --ref ref.bin
 //   finetune-probe --model m.onnx --ids ids.json [--text 3] [--steps 5]   (BERT/XLM-R style graphs)
+//   trainable-parity --model m.onnx --tokenizer tokenizer.json --ids ids.json --ref ref.bin [--texts N] [--batch 8] [--family auto|modernbert|postnorm] [--position-offset 2]
+//   step-time --model m.onnx --tokenizer tokenizer.json [--rows 24] [--length 32] [--steps 4] [--threads 8]
 //   latency  --model m.onnx --length 64 --batches 1,8 --iters 20 [--threads 8]
 Dictionary<string, string> opt = [];
 for (int i = 1; i + 1 < args.Length; i += 2)
@@ -21,6 +23,8 @@ switch (args.Length > 0 ? args[0] : "")
     case "ids": Ids(opt); break;
     case "parity": Parity(opt); break;
     case "latency": Latency(opt); break;
+    case "step-time": StepTime.Run(opt); break;
+    case "trainable-parity": TrainableParity.Run(opt); break;
     case "finetune-probe": FineTuneProbe.Run(opt); break;
     default: Console.Error.WriteLine("commands: ids, parity, latency"); return 2;
 }
@@ -53,8 +57,7 @@ static void Parity(Dictionary<string, string> o)
     Buffer.BlockCopy(raw, 0, reference, 0, raw.Length);
     using Session session = Session.Load(o["model"]);
     int width = (int)session.Outputs[0].Dims[2].Value;
-    using RecursiveAI.OneNlp.Neural.Encoders.BertStyleEncoder? module = o.ContainsKey("module") ? RecursiveAI.OneNlp.Neural.Encoders.BertStyleEncoder.FromOnnx(o["model"]) : null;
-    Console.WriteLine($"kernel path {session.KernelPath}; width {width}; rows {reference.Length / width}; {(module is null ? "graph runtime" : "trainable modules")}");
+    Console.WriteLine($"kernel path {session.KernelPath}; width {width}; rows {reference.Length / width}");
     int row = 0;
     double maxRef = 0, maxAbs = 0, sumAbs = 0, minCos = 1, sumCos = 0;
     long count = 0, tokens = 0;
@@ -67,19 +70,8 @@ static void Parity(Dictionary<string, string> o)
         long[] mask = [.. Enumerable.Repeat(1L, n)];
         using Tensor a = Ids64(x, 1, n);
         using Tensor b = Ids64(mask, 1, n);
-        float[] h;
-        if (module is not null)
-        {
-            // The trainable modules rebuilt from the same initializers, run without recording.
-            using var scope = new ActivationScope();
-            using var noGrad = RecursiveAI.OneModel.Tensors.GradMode.NoGrad();
-            h = module.Forward(a).Data<float>().ToArray();
-        }
-        else
-        {
-            using SessionOutputs outs = session.Run(new Dictionary<string, Tensor> { ["input_ids"] = a, ["attention_mask"] = b });
-            h = outs[session.Outputs[0].Name].Data<float>().ToArray();
-        }
+        using SessionOutputs outs = session.Run(new Dictionary<string, Tensor> { ["input_ids"] = a, ["attention_mask"] = b });
+        float[] h = outs[session.Outputs[0].Name].Data<float>().ToArray();
 
         double textMax = 0;
         for (int r = 0; r < n; r++, row++)

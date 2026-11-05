@@ -71,3 +71,27 @@ gigabit | information | =Gb, gbit, gigabit, gigabits
 celsius | temperature | °c, ºC, ˚C, ° c, degrees celsius, degree celsius, degrees centigrade, degrees c, celsius, centigrade
 fahrenheit | temperature | °f, ºF, ˚F, ° f, degrees fahrenheit, degree fahrenheit, degrees f, fahrenheit
 kelvin | temperature | kelvin, kelvins, degrees kelvin
+
+# Two measures written one after the other are one: "5 feet 3 inches" is 63 inches. Fields: larger unit | smaller unit | smaller units in one larger.
+[unit.compound]
+mile | yard | 1760
+mile | foot | 5280
+yard | foot | 3
+yard | inch | 36
+foot | inch | 12
+kilometer | meter | 1000
+meter | centimeter | 100
+centimeter | millimeter | 10
+meter | millimeter | 1000
+ton | pound | 2000
+stone | pound | 14
+pound | ounce | 16
+kilogram | gram | 1000
+gram | milligram | 1000
+liter | milliliter | 1000
+gallon | quart | 4
+gallon | pint | 8
+quart | pint | 2
+pint | cup | 2
+cup | tablespoon | 16
+tablespoon | teaspoon | 3

@@ -1,0 +1,42 @@
+# Provenance: Portuguese fast tier (`recipes/pt/fast`)
+
+Format: `docs/provenance.md`. The shipped weights are listed in `src/OneNlp.Models.Portuguese/weights.manifest.props`.
+
+- **Data:** UD Portuguese-Bosque r2.18 (CC BY-SA 4.0; train and dev) for morphology, lemmas, parser and sentence starts; Universal NER Portuguese-Bosque (commit f2c2ad67; CC BY-SA 4.0; train and dev; PER, ORG, LOC) for entities. Hashes: `tools/fetch/pt/MANIFEST.md`. Test files are read only by `predict` and `ner-eval`.
+- **Share-alike lineage:** yes. Label generator: none. Pretrained components: none.
+- **Configuration (all defaults of the recipe):** `FastEncoder.English()` configuration (64-wide hash embeddings, one hash function and 32,768 rows for each of lower-cased form, 3-character prefix, 3-character suffix and shape, mixed to 256, two window layers). Morphologizer and lemmatizer share one encoder: AdamW 2e-3, 200 warm-up steps, dropout 0.1, 1,000-word batches, seed 1; there is no tagger because Bosque has no XPOS. Parser: arc 256, label 128, two-layer BiLSTM 192, dropout 0.25, 1,500-word batches, seed 7, ten sentences per document. NER: BILUO tagging, hidden 256, dropout 0.4, lr 3e-3, seed 7. Patience 6 on the development score everywhere (tagging: mean of UPOS, UFeats, Lemmas; parser: LAS; NER: entity F1).
+- **Training files:** `prepare` rewrites the treebank into the tokens the tokenizer makes: `à` (one character, two words) is one word with the columns of its first word; the verb and the pronoun of `trata-se` are two words, `trata` and `-se`; contractions (`do` = `de` + `o`) stay multiword tokens that the reader cuts into two pieces. `ner-convert` carries the Universal NER tags (which are on the treebank's words) onto the same tokens. Development files are rewritten the same way; test files are never rewritten for scoring except in memory, to give the pipeline its tokens (`predict --mode gold`).
+- **Produced:** 2026-11-05, AMD Ryzen 9 7950X3D (shared), 4 training threads, .NET SDK 10.0.403, OneModel 1.0.0. Wall time: morphologizer and lemmatizer 4.5 min (11 epochs, best at step 873, dev mean 95.14), parser 25 min in two chunks (21 epochs, best at step 1,888, dev LAS 82.34), NER 5.5 min (11 epochs, best at step 874, dev F1 70.68).
+- **Weights (sha256):** `tagging.onenlp` a1c625a70b86bb487abfbde88b97b76012bb2c3d724a40568f0f0bbd5a8a5407 (36.7 MB); `parser.onenlp` 277a4526586eb4233f552373923f2bccadb3495afc70956924ba8ca4a08566d4 (46.0 MB); `ner.onenlp` 79829139344a306f8683542708916e20b74e7d122c8031af2ec990229848af9f (35.7 MB).
+- **Choices on the development set only** (the test file was read once for each final configuration): four tagging encoders (4-character suffix with a cased table 94.69; width 320, depth 3, 96-wide embeddings 94.96; two hash functions with larger tables 94.83) against 95.07 for the default; four NER variants (cased table and 4-character suffix 70.77; dropout 0.5 70.87; one neighbour on each side 71.43) against 70.99 for the default, within the seed spread of about 1.5 points, so the default stayed. Adding UD Portuguese-GSD r2.18 (CC BY-SA 4.0, 9,616 sentences) to the training text lowered the Bosque development mean to about 90 after seven epochs (the two treebanks annotate features and lemmas differently), so it is not used. Tokenization rules were chosen on the training and development files (`docs/segmentation.md`).
+- **Separation check:** 1 of the 1,167 Bosque test sentences also occurs as exact text in the training file (2 folded); the official split is kept.
+
+## Results (UD Portuguese-Bosque r2.18 test and Universal NER Portuguese-Bosque test, bootstrap 95% over sentences, 1,000 resamples, seed 1; reference: spaCy 3.8.18 default configuration trained on the same data, `tools/baselines/spacy/lang/PROVENANCE.md`)
+
+Gold tokens and sentences (the treebank's tokens, with `à` and the pronouns after a verb's hyphen as the tokenizer makes them; paired with spaCy's predictions, which are on the treebank's words). Bosque has no XPOS, so XPOS and AllTags are not reported.
+
+| Metric | Ours | spaCy | Within noise |
+|---|---|---|---|
+| Words | 99.97 [99.94, 99.99] | 100.00 | no |
+| UPOS | 95.08 [94.79, 95.38] | 95.92 [95.66, 96.22] | no |
+| UFeats | 93.34 [92.98, 93.67] | 94.11 [93.82, 94.42] | no |
+| Lemmas | 96.96 [96.74, 97.17] | 96.90 [96.70, 97.11] | yes |
+| UAS | 86.93 [86.32, 87.53] | 86.05 [85.45, 86.64] | yes |
+| LAS | 82.74 [82.07, 83.35] | 81.96 [81.30, 82.61] | yes |
+
+Raw text (spaCy's tokenizer keeps contractions whole, so its Words and tagging rows lose on them):
+
+| Metric | Ours | spaCy | Within noise |
+|---|---|---|---|
+| Tokens | 99.86 [99.79, 99.92] | 99.87 [99.80, 99.93] | yes |
+| Sentences | 92.72 [91.10, 94.29] | 84.48 [82.19, 86.74] | no (ahead) |
+| Words | 99.74 [99.65, 99.81] | 88.51 [88.02, 88.99] | no (ahead) |
+| UPOS | 94.43 [94.11, 94.75] | 84.15 [83.59, 84.73] | no (ahead) |
+| UFeats | 92.79 [92.42, 93.15] | 82.16 [81.55, 82.73] | no (ahead) |
+| Lemmas | 96.24 [96.03, 96.48] | 85.35 [84.83, 85.86] | no (ahead) |
+| UAS | 86.28 [85.64, 86.89] | 70.23 [69.30, 71.07] | no (ahead) |
+| LAS | 82.09 [81.38, 82.76] | 65.85 [64.88, 66.65] | no (ahead) |
+
+Entities, Universal NER Portuguese-Bosque test, gold tokens (paired, scored on the treebank's words): micro F1 73.13 [70.58, 75.60] vs 75.27 [72.73, 77.60] (difference -2.14 [-4.26, 0.39], within noise); precision 72.68 vs 76.96 (difference -4.27 [-6.58, -1.59], outside); recall 73.58 vs 73.66. Per type: LOC 72.50 vs 74.43, ORG 67.34 vs 70.32, PER 79.05 vs 80.64; all within noise.
+
+**Misses:** in gold-token mode UPOS (-0.84) and UFeats (-0.77) are behind spaCy outside the intervals; Words is 99.97 (an enclitic's word is spelled from the training file's most frequent form, so a few differ). Everything else is within noise or ahead. In gold-token mode ours is given the tokenizer's tokens, so `à` is written back as two words from a lexicon rather than tagged word by word, while spaCy's predictions are on the gold words.

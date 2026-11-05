@@ -19,6 +19,7 @@ public static class EncoderRegistry
         [HashEmbeddingEncoder.EncoderKind] = HashEmbeddingEncoder.FromSettings,
         [FastEncoder.EncoderKind] = FastEncoder.FromSettings,
         [TransformerEncoder.EncoderKind] = TransformerEncoder.FromSettings,
+        [TrainableTransformerEncoder.EncoderKind] = TrainableTransformerEncoder.FromSettings,
     };
 
     /// <summary>Registers an encoder kind.</summary>

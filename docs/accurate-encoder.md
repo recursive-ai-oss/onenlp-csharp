@@ -59,21 +59,67 @@ The encoder is **frozen**: `Weights` is `null`, `Train` leaves it alone, and hea
 
 ## Fine-tuning the encoder
 
-The graph runtime and the autodiff tensor layer are separate: `Session.Run` returns tensors with `RequiresGrad == false`, so an imported graph cannot be backpropagated. What does work for BERT-style models is moving the weights into OneModel.Training's own modules. `tools/OneNlp.Accurate` (`finetune-probe`) builds `Embedding` + `LayerNorm` + 12 `TransformerEncoderLayer` for XLM-R from the ONNX initializers (the bias and norm initializers keep their PyTorch names; each linear layer's weight is the unnamed initializer of the `MatMul` node with the matching path), and measures:
+The graph runtime and the autodiff tensor layer are separate: `Session.Run` returns tensors with `RequiresGrad == false`, so an imported graph cannot be backpropagated. `TrainableTransformerEncoder` therefore rebuilds the encoder from the exported file's weights in modules written on OneModel's tensor ops, so `Train` updates the encoder together with the head. `TransformerEncoder` (above) stays the frozen, cached inference path.
 
-- output of the modules against the graph runtime: max abs difference 1.4e-5;
-- five AdamW steps (learning rate 2e-5) on one 26-token sequence with an eight-way linear head: loss 2.392, 2.287, 2.209, 2.091, 1.947, nonzero gradients in layer 0, 2.1 to 2.7 s per step on 8 threads (277,057,536 parameters).
+```csharp
+using var encoder = TrainableTransformerEncoder.LoadOnnx("mmbert-base.onnx", "tokenizer.json");   // family detected from the weights
+using var pipeline = Pipeline.Blank(Language.English).Add(new Tagger(encoder, TokenColumn.Pos));
+pipeline.Train(examples, new TrainOptions { LearningRate = 5e-5f, WarmupSteps = 40, BatchWords = 500 });
+PipelineFile.Save(pipeline, "tagger.onenlp");   // kind "transformer-trainable": settings plus the layers' weights
+```
 
-mmBERT (ModernBERT: pre-norm, bias-free norms, rotary positions, gated-GELU feed-forward, alternating local and global attention) has no module in `OneModel.Training.Layers`; the tensor ops it needs exist. It was not built. What it needs: a pre-norm encoder layer, bias-free norm and linear layers, rotary position embedding, a gated-GELU feed-forward block, and sliding-window masks.
+### Encoder kinds in a saved pipeline
 
-## The distilled student
+| Kind | Class | Trains | Weights in the pipeline file |
+|---|---|---|---|
+| `transformer` | `TransformerEncoder` | no (frozen ONNX graph) | none; file names and hash only |
+| `transformer-trainable` | `TrainableTransformerEncoder` | yes | the layers (not the frozen token table) |
 
-The default small encoder is distilled from mmBERT-base (MIT) by `tools/distill/`, with PyTorch as development tooling only. Nothing there ships; the result is one ONNX file and its `tokenizer.json`, treated by the library like any other exported encoder.
+Both reference the exported model and tokenizer by name (`TransformerEncoder.ModelDirectory`). The trainable kind reads the token table from the exported model again on load and overwrites the layers from the checkpoint, so the model file must still be there.
 
-**Architecture** (`tools/distill/student.py`, `BertStyleEncoder` in `.Neural`): six post-norm transformer layers of width 384 (12 heads, feed-forward 1536, exact GELU), learned absolute positions (512), and a factorised token embedding: a 256,000 x 96 table lifted to 384 by a linear map (Lan et al. 2020, section 3.1), so the vocabulary costs 24.6 M of the 35.5 M weights. It uses mmBERT's tokenizer unchanged, so token ids equal the teacher's for every text and no vocabulary is pruned.
+### Families
 
-**Objective** (`tools/distill/distill.py`): hidden-state distillation (Jiao et al. 2020, section 3.1, Eq. 8). Each student layer's output goes through its own learned linear map and is matched by mean squared error to a teacher layer: the uniform mapping (section 4.6) sends student layers 1 to 5 to teacher hidden states 4, 7, 11, 15 and 18, and the last layer to the teacher's final hidden state, standardised per feature, with a cosine term. Intermediate targets are layer-normalised per token because the teacher's residual stream has a few very large dimensions. The token table starts from the teacher's, reduced to 96 columns by principal components. Data: FineWeb-2 and Wikipedia text in 113 languages, sampled with language weights proportional to the square root of the amount of text, windows of 128, 256 and 512 pieces.
+The family is read from the weight names (`TransformerFamily.Auto`) or given. Weights come from graphs written by the PyTorch exporter without dynamo (`torch.onnx.export(..., dynamo=False)`), where each linear layer's weight is the constant of the `MatMul` node named after the module; other graphs are rejected with a message.
 
-**Export** (`tools/distill/export_student.py`): the same graph shape as the other exported encoders (inputs `input_ids`, `attention_mask`; output `last_hidden_state`; opset 17, attention as MatMul/Softmax), written from the exponential moving average of the weights. Every linear weight is a named initializer (`model.encoder.layer.N.attention.query.weight` and so on, stored `[in, out]`) and the architecture is in `<name>.config.json` beside the file.
+- **`ModernBert`** (mmBERT, ModernBERT; `ModernBertModule`). Warner et al. 2024 (arXiv 2412.13663) §2 and the mmBERT paper (arXiv 2509.06888): token embedding, layer norm, then pre-norm layers `x = x + Wo(attention(rotary(Wqkv(norm(x)))))` and `x = x + Wo2(gelu(a) * b)` with `[a, b] = Wi(norm(x))` (GeGLU, Shazeer 2020, arXiv 2002.05202), a final norm. No biases, norms without shift, epsilon 1e-5; the first layer has no attention norm. Layer `i` is global when `i % 3 == 0`; the others see tokens at most 64 positions away (a 128-token window). Rotary embeddings (Su et al. 2021, arXiv 2104.09864) pair coordinate `i` with `i + d/2`, base 160,000 in mmBERT's global and local layers (ModernBERT: 160,000 and 10,000). Details the papers leave open were settled against the exported graph of mmBERT-base and checked against PyTorch: `Wqkv` is laid out `[3, heads, d]`, the first half of `Wi` goes through GELU, the window test is `|i - j| <= 64`, attention scale `1/sqrt(d)`.
+- **`PostNorm`** (XLM-R, RoBERTa, BERT; `PostNormModule`). Token and learned position embeddings (the single token-type vector is added into every position row), layer norm, and post-norm layers with exact GELU. XLM-R starts positions at 2 (`PositionOffset`), BERT at 0; epsilon is read from the graph (1e-5 and 1e-12).
 
-**Fine-tuning.** `TransformerEncoder.EnableFineTuning()` moves the initializers into a `BertStyleEncoder` (OneModel.Training modules). `Weights` then returns it, `Encode` runs it with the autodiff graph recording, and `Train` updates the encoder together with the heads. The modules reproduce the graph runtime to float32 rounding (the unit tests check the committed random fixture against PyTorch; `tools/OneNlp.Accurate parity --module 1` checks the real student). Frozen use is unchanged and keeps the per-document cache.
+The head count is not in the weights: it defaults to width / 64 (set `Heads` otherwise). A graph with two different rotary bases does not say which table is the global one, so `GlobalRopeTheta` and `LocalRopeTheta` must be given for it (the loader refuses to guess); a graph with one base uses it for both.
+
+### Pooling and the embedding table
+
+Pieces become tokens as in `TransformerEncoder` (same tokenizer, windows and `Mean`/`FirstPiece`), but as a differentiable gather: each token's vector is the sum of the rows of its pieces, scaled by `1/count`, so gradients reach every piece. Windows of up to `MaxBatchPieces` padded pieces (default 8,192) run together; padding keys are masked.
+
+`FreezeEmbeddings` (default `true`) keeps the 256,000 x 768 token table (197 million values in mmBERT) out of training and out of the saved weights. Fine-tuning a tagger barely moves it, and dense AdamW over it would add two moment tensors and a 786 MB gradient to every step. With `false` the table trains, and a pipeline holding it cannot be saved (the pipeline file's weights are capped at 1 GiB, and `WriteSettings` says so).
+
+`Train` has one learning rate for the encoder and the head. 5e-5 with a short warm-up is what the recipe uses.
+
+### Tests
+
+`tests/OneNlp.Tests/TrainableTransformerTests.cs` uses two random tiny encoders exported from PyTorch (`tools/accurate/make_tiny_fixture.py`, `make_tiny_modernbert_fixture.py`; the second has alternating global and local layers with a window of 8, two rotary bases and padding): modules against PyTorch's hidden states (max abs below 2e-5), padded batches against single sequences, token vectors against `TransformerEncoder`'s for both poolings and with windowing, finite-difference gradients through rotary, the gated feed-forward and the window mask, a tagger trained through `Train` and reloaded from a saved pipeline, and a resumed run reproducing an uninterrupted one bit for bit.
+
+### Measured
+
+Forward parity of the trainable modules (one text per run, fast mode, the same 200 texts as above; `tools/OneNlp.Accurate trainable-parity`). "Graph runtime" is `TransformerEncoder`'s inference path on the exported file.
+
+| Model | Tokens | Comparison | max abs | mean abs | min cosine |
+|---|---:|---|---:|---:|---:|
+| mmBERT-base (`ModernBert`) | 5,255 | trainable vs PyTorch | 1.0e-3 (2.6e-5 of the largest value, 40.7) | 2.2e-6 | 1.00000000 |
+| | | trainable vs graph runtime | 4.6e-3 | 1.9e-6 | 0.99999993 |
+| | | graph runtime vs PyTorch | 3.5e-3 | 2.3e-6 | 0.99999996 |
+| xlm-roberta-base (`PostNorm`) | 4,764 | trainable vs PyTorch | 7.3e-5 | 2.7e-7 | 1.00000000 |
+| | | trainable vs graph runtime | 4.0e-5 | 2.1e-7 | 1.00000000 |
+| | | graph runtime vs PyTorch | 6.3e-5 | 2.9e-7 | 1.00000000 |
+
+Batches of 8 right-padded sequences gave exactly the rows of the sequences run alone. The trainable module is closer to PyTorch than the imported graph is.
+
+One fine-tuning step (24 sequences of 32 pieces, 8 threads, 110,344,721 trainable parameters, frozen token table, AdamW, gradient clipping), C# against plain PyTorch 2.15.0 CPU on the same batch (`step-time` and `tools/accurate/torch_step_time.py`; indicative, shared host at load average about 25, steady-state steps 1 to 3):
+
+| | forward | backward | clip | AdamW | total |
+|---|---:|---:|---:|---:|---:|
+| OneModel | 0.70 s | 1.27 s | 0.33 s | 0.34 s | 2.62 s |
+| PyTorch | 0.47 s | 0.80 s | 0.06 s | 0.20 s | 1.52 s |
+
+The C# step takes 1.7 times the PyTorch step, inside the 3x rule. Gradient clipping (about 6 times) and the AdamW update (1.7 times) are the slowest parts relative to PyTorch. The full recipe ran at about 6.6 s per step on batches of 500 words (about 700 pieces), peak resident memory 11 GB.
+
+Fine-tuning proof (`recipes/accurate/en-tagging`, `--finetune`; `PROVENANCE.md`): one 26-minute chunk, 236 steps (0.58 epoch of UD English-EWT r2.18 train), development UPOS 96.894 at step 200 (the frozen encoder reached 96.39 on development), test UPOS 97.07 [96.79, 97.35], 0.84 [0.62, 1.07] above the frozen encoder's 96.23 and 2.78 [2.44, 3.16] above spaCy's 94.29.

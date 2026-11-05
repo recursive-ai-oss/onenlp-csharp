@@ -44,7 +44,8 @@ internal static class RecognizerTargets
         Check(
             recognizer,
             "Meet tomorrow at 3pm PST, from Monday to Friday, the first Monday after Easter 2027, in 3 days, every 2 weeks, spring 2021, 2026-06-30T09:15:00Z, "
-            + "between 12 and 1 pm, Thanksgiving, 04/05/2026, two hours and 30 minutes, late March 2026, Q3 2025, the 1990s.",
+            + "between 12 and 1 pm, Thanksgiving, 04/05/2026, two hours and 30 minutes, late March 2026, Q3 2025, the 1990s, sixty (60) days, ten business days, "
+            + "in 3 working days, wait a second, no one, 5 feet 3 inches, 1,00,000, 6.02e23, 1.5\u00D710^3, five thousand dollars ($5,000), 1,000 pounds.",
             new RecognitionContext(new DateTimeOffset(2026, 3, 18, 10, 30, 0, TimeSpan.Zero)));
     }
 
@@ -54,7 +55,8 @@ internal static class RecognizerTargets
             "Pay $2.5 million or twenty-one euros by the 3rd; 12% of 3.5 km at 98.6\u00b0F, 10 GB, 5 years old. Mail Bob@Example.com, "
             + "see https://www.example.com/a_(b)?q=1#x or www.x.org, ping 10.0.0.1 or 2001:db8::1, call +1 (555) 123-4567, "
             + "On Friday, March 27 at 3:30 pm EST or from 9am to 5pm, last night, in 45 minutes, every Monday at 9am, 2 hours and 30 minutes ago. "
-            + "#tag @user 123e4567-e89b-12d3-a456-426614174000 and one and a half, three quarters, a dozen, minus 5.");
+            + "#tag @user 123e4567-e89b-12d3-a456-426614174000 and one and a half, three quarters, a dozen, minus 5. Payment within sixty (60) days or ten (10) business days, "
+            + "five thousand dollars ($5,000), 5 feet 3 inches, 12,34,567 and 6.02e23 and 1.5\u00D710^3, wait a second, one of them, for the first time, 1,000th, 1,000 pounds.");
     }
 
     internal static void SeedRules(string dir)
@@ -80,6 +82,7 @@ internal static class RecognizerTargets
             if (r is TemporalMatch t)
             {
                 Require(t.Value.Length > 0 && (t.Range is not { } range || range.End >= range.Start), "temporal value and range");
+                Require((t.Unit is null) == (t.Count is null) && (t.Unit is null || t.Kind == TemporalKind.Duration), "duration count and unit");
             }
             previousEnd = r.End;
         }

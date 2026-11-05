@@ -29,15 +29,19 @@ internal static class Program
             options[args[i]] = args[i + 1];
         }
 
-        if (!options.TryGetValue("--models", out string? models) || !options.TryGetValue("--tatoeba", out string? tatoeba))
+        if (!options.TryGetValue("--models", out string? models) || (!options.TryGetValue("--tatoeba", out string? tatoeba) && !options.ContainsKey("--inputs")))
         {
-            Console.Error.WriteLine("usage: --models DIR --tatoeba FILE [--filter TEXT] [--out FILE] [--dump-inputs DIR] [--budget-ms N]");
+            Console.Error.WriteLine("usage: --models DIR (--tatoeba FILE | --inputs DIR) [--filter TEXT] [--out FILE] [--dump-inputs DIR] [--budget-ms N]");
             return 2;
         }
 
         int budgetMs = options.TryGetValue("--budget-ms", out string? b) ? int.Parse(b, CultureInfo.InvariantCulture) : 1000;
         string? filter = options.GetValueOrDefault("--filter");
-        Dictionary<string, string> inputs = Corpus.Build(tatoeba);
+        // --inputs names a directory holding short.txt, medium.txt and long.txt as a previous run dumped them, so that two machines
+        // time exactly the same text.
+        Dictionary<string, string> inputs = options.TryGetValue("--inputs", out string? inputDir)
+            ? Sizes.ToDictionary(size => size, size => File.ReadAllText(Path.Combine(inputDir, size + ".txt"), new UTF8Encoding(false)), StringComparer.Ordinal)
+            : Corpus.Build(tatoeba!);
         if (options.TryGetValue("--dump-inputs", out string? dump))
         {
             Directory.CreateDirectory(dump);
@@ -63,6 +67,7 @@ internal static class Program
             catch (Exception ex) when (ex is not OutOfMemoryException)
             {
                 Console.WriteLine($"   FAILED to run: {ex.GetType().Name}: {ex.Message}");
+                Console.WriteLine(ex.StackTrace);
                 rows.Add(new Row(family.Name, "all", "all", null, null, null, null, null, null, $"could not run: {ex.GetType().Name}: {ex.Message}", family.Used));
             }
         }
@@ -92,7 +97,7 @@ internal static class Program
         foreach (string size in Sizes)
         {
             string text = inputs[size];
-            int[] theirIds = theirs.EncodeToIds(text).ToArray();
+            int[] theirIds = theirs.EncodeToIds(text).Select(family.ToHuggingFaceId).ToArray();
             int[] ourIds = new int[(text.Length * 3) + 16];
             ours.EncodeToIds(text, ourIds, out int written, out _, false);
             Array.Resize(ref ourIds, written);
@@ -128,8 +133,9 @@ internal static class Program
                 rows.Add(Compare(family, "count", size, budgetMs, () => ours.CountTokens(text, false), () => theirs.CountTokens(text)));
             }
 
+            int[] theirDecodeIds = ourIds.Select(family.FromHuggingFaceId).ToArray();
             string oursText = ours.Decode(ourIds);
-            string theirText = theirs.Decode(ourIds);
+            string theirText = theirs.Decode(ourIds.Select(family.FromHuggingFaceId).ToArray());
             if (!string.Equals(oursText, theirText, StringComparison.Ordinal))
             {
                 int at = 0;
@@ -144,7 +150,7 @@ internal static class Program
             }
             else
             {
-                rows.Add(Compare(family, "decode", size, budgetMs, () => ours.Decode(ourIds).Length, () => theirs.Decode(ourIds).Length));
+                rows.Add(Compare(family, "decode", size, budgetMs, () => ours.Decode(ourIds).Length, () => theirs.Decode(theirDecodeIds).Length));
             }
         }
 
@@ -368,7 +374,7 @@ internal sealed record Family(string Name, string OursSource, Func<OursTokenizer
     /// Describes a family whose tokenizer loads from the first of several files that works (the native format first, then
     /// <c>tokenizer.json</c>), so a file a loader cannot read yet does not stop the row; the file used is named in the table.
     /// </summary>
-    public static Family WithFallbacks(string name, string directory, string[] files, Func<MlTokenizer> loadTheirs)
+    public static Family WithFallbacks(string name, string directory, string[] files, Func<MlTokenizer> loadTheirs, Func<int, int>? toHuggingFaceId = null, Func<int, int>? fromHuggingFaceId = null)
     {
         string used = files[0];
         OursTokenizer Load()
@@ -391,10 +397,24 @@ internal sealed record Family(string Name, string OursSource, Func<OursTokenizer
             throw new NotSupportedException(string.Join("; ", errors));
         }
 
-        return new Family(name, files[0], Load, loadTheirs) { _source = () => used };
+        return new Family(name, files[0], Load, loadTheirs)
+        {
+            _source = () => used,
+            ToHuggingFaceId = toHuggingFaceId ?? (static id => id),
+            FromHuggingFaceId = fromHuggingFaceId ?? (static id => id),
+        };
     }
 
     private Func<string>? _source;
+
+    /// <summary>
+    /// How the comparator's IDs relate to the Hugging Face file's, for a model whose published IDs are shifted (XLM-RoBERTa numbers the
+    /// SentencePiece pieces from the model file and the Hugging Face file puts four control tokens first). Identity when they agree.
+    /// </summary>
+    public Func<int, int> ToHuggingFaceId { get; init; } = static id => id;
+
+    /// <summary>The inverse of <see cref="ToHuggingFaceId"/>.</summary>
+    public Func<int, int> FromHuggingFaceId { get; init; } = static id => id;
 
     /// <summary>The file ours was loaded from (valid after loading).</summary>
     public string Used => _source?.Invoke() ?? OursSource;
@@ -406,21 +426,27 @@ internal static class Families
     {
         string Dir(string name) => Path.Combine(models, name);
 
-        yield return Family.WithFallbacks("WordPiece (bert-base-uncased)", Dir("google-bert_bert-base-uncased"), ["vocab.txt", "tokenizer.json"],
+        yield return Family.WithFallbacks("WordPiece (bert-base-uncased)", Dir("google-bert_bert-base-uncased"), ["tokenizer.json", "vocab.txt"],
             () =>
             {
                 using FileStream s = File.OpenRead(Path.Combine(Dir("google-bert_bert-base-uncased"), "vocab.txt"));
-                return BertTokenizer.Create(s);
+                // The Hugging Face file lowercases and strips accents; the comparator's defaults only lowercase.
+                return BertTokenizer.Create(s, new BertOptions { LowerCaseBeforeTokenization = true, RemoveNonSpacingMarks = true });
             });
 
-        yield return Family.WithFallbacks("Unigram (t5-small)", Dir("google-t5_t5-small"), ["spiece.model", "tokenizer.json"],
+        // t5-small's spiece.model cannot be read by the comparator (it throws while building its Unigram model), so the Unigram row
+        // uses xlm-roberta-base.
+        yield return Family.WithFallbacks("Unigram (xlm-roberta-base)", Dir("FacebookAI_xlm-roberta-base"), ["tokenizer.json", "sentencepiece.bpe.model"],
             () =>
             {
-                using FileStream s = File.OpenRead(Path.Combine(Dir("google-t5_t5-small"), "spiece.model"));
+                using FileStream s = File.OpenRead(Path.Combine(Dir("FacebookAI_xlm-roberta-base"), "sentencepiece.bpe.model"));
                 return SentencePieceTokenizer.Create(s, addBeginningOfSentence: false, addEndOfSentence: false);
-            });
+            },
+            // piece id p of the model file is token p + 1 in the Hugging Face file, except the control pieces (unk 0, bos 1, eos 2).
+            toHuggingFaceId: static id => id switch { 0 => 3, 1 => 0, 2 => 2, _ => id + 1 },
+            fromHuggingFaceId: static id => id switch { 3 => 0, 0 => 1, 2 => 2, 1 => 1, _ => id - 1 });
 
-        yield return Family.WithFallbacks("SentencePiece BPE, byte fallback (TinyLlama)", Dir("TinyLlama_TinyLlama-1.1B-Chat-v1.0"), ["tokenizer.model", "tokenizer.json"],
+        yield return Family.WithFallbacks("SentencePiece BPE, byte fallback (TinyLlama)", Dir("TinyLlama_TinyLlama-1.1B-Chat-v1.0"), ["tokenizer.json", "tokenizer.model"],
             () =>
             {
                 using FileStream s = File.OpenRead(Path.Combine(Dir("TinyLlama_TinyLlama-1.1B-Chat-v1.0"), "tokenizer.model"));

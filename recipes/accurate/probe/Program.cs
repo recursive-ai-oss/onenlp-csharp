@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using RecursiveAI.OneModel.Tensors;
+using RecursiveAI.OneNlp;
 using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
@@ -15,10 +16,17 @@ namespace RecursiveAI.OneNlp.Recipes.AccurateProbe;
 // A head trained on a frozen transformer encoder (an exported ONNX model), to compare encoders with the same recipe.
 //
 //   upos    --onnx M.onnx --tokenizer T.json --train F.conllu --dev F.conllu --out DIR [--lang en] [--epochs N] [--seed N]
-//           [--pooling mean|first] [--threads N] [--patience N]
+//           [--pooling mean|first] [--threads N] [--patience N] [--lr X] [--batch-words N] [--warmup N] [--dropout X]
+//           [--finetune [--train-embeddings] --total-steps N] [--max-steps N] [--eval-every STEPS] [--budget-seconds S] [--checkpoint-every N]
+//           With --finetune the encoder trains with the head (TrainableTransformerEncoder; warm-up and cosine decay over --total-steps).
+//           --budget-seconds stops the run cleanly after that long; start it again with the same arguments to resume from DIR.
 //           UPOS tagger; prints the best development accuracy (the model-selection score).
 //   ner     --onnx M.onnx --tokenizer T.json --train F.jsonl --dev F.jsonl --out DIR [same options]
 //           Named entity recognizer (BILUO tagging, constrained decoding); prints the best development entity F1.
+//   predict-upos --model M.onenlp --gold F.conllu --out P.conllu [--model-dir D]
+//           gold tokens in, UPOS out as CoNLL-U for the OneNlp.Eval tool.
+//   predict-ner  --model M.onenlp --gold F.jsonl --out PREFIX [--model-dir D]
+//           gold tokens in; writes PREFIX.gold.iob2 and PREFIX.pred.iob2 (one token per line, tag last) for 'OneNlp.Eval span'.
 //   convert --in F.iob2 --out F.jsonl
 //           UNER-style .iob2 to the JSON Lines the ner command reads (gold tokens, character offsets).
 //
@@ -46,6 +54,8 @@ internal static class Program
             {
                 "upos" => Train(o, ner: false),
                 "ner" => Train(o, ner: true),
+                "predict-upos" => PredictUpos(o),
+                "predict-ner" => PredictNer(o),
                 "convert" => Convert(Required(o, "in"), Required(o, "out")),
                 _ => 2,
             };
@@ -66,10 +76,19 @@ internal static class Program
         Language language = Language.FromCode(o.GetValueOrDefault("lang", "en"));
         List<Example> train = [.. ner ? JsonlReader.Read(Required(o, "train")) : ConllUReader.ReadExamples(Required(o, "train"))];
         List<Example> dev = [.. ner ? JsonlReader.Read(Required(o, "dev")) : ConllUReader.ReadExamples(Required(o, "dev"))];
-        using var encoder = new TransformerEncoder(
-            Required(o, "onnx"),
-            Required(o, "tokenizer"),
-            o.GetValueOrDefault("pooling", "mean") == "first" ? SubwordPooling.FirstPiece : SubwordPooling.Mean);
+        SubwordPooling pooling = o.GetValueOrDefault("pooling", "mean") == "first" ? SubwordPooling.FirstPiece : SubwordPooling.Mean;
+        bool finetune = o.ContainsKey("finetune");
+        using IEncoder encoder = finetune
+            ? TrainableTransformerEncoder.LoadOnnx(Required(o, "onnx"), Required(o, "tokenizer"), new TrainableTransformerOptions { Pooling = pooling, FreezeEmbeddings = !o.ContainsKey("train-embeddings") })
+            : new TransformerEncoder(Required(o, "onnx"), Required(o, "tokenizer"), pooling);
+        float rate = o.TryGetValue("lr", out string? lr) ? float.Parse(lr, CultureInfo.InvariantCulture) : 0.003f;
+        int warmup = o.TryGetValue("warmup", out string? wu) ? int.Parse(wu, CultureInfo.InvariantCulture) : 100;
+        LrSchedule? schedule = o.TryGetValue("total-steps", out string? ts) ? new WarmupCosineLr(rate, warmup, long.Parse(ts, CultureInfo.InvariantCulture), 0.1f) : null;
+        using var cts = new CancellationTokenSource();
+        if (o.TryGetValue("budget-seconds", out string? bs))
+        {
+            cts.CancelAfter(TimeSpan.FromSeconds(double.Parse(bs, CultureInfo.InvariantCulture)));
+        }
         Pipeline pipeline = Pipeline.Blank(language);
         pipeline = ner
             ? pipeline.Add(new EntityRecognizer(encoder, NerDecoding.Tagging, 2, 256))
@@ -90,18 +109,22 @@ internal static class Program
             new TrainOptions
             {
                 Epochs = epochs,
-                BatchWords = 1000,
-                LearningRate = 0.003f,
-                WarmupSteps = 100,
-                Dropout = ner ? 0.2f : 0.1f,
+                BatchWords = o.TryGetValue("batch-words", out string? bw) ? int.Parse(bw, CultureInfo.InvariantCulture) : 1000,
+                LearningRate = rate,
+                WarmupSteps = warmup,
+                Schedule = schedule,
+                MaxSteps = o.TryGetValue("max-steps", out string? ms) ? long.Parse(ms, CultureInfo.InvariantCulture) : 0,
+                EvalEvery = o.TryGetValue("eval-every", out string? ee) ? int.Parse(ee, CultureInfo.InvariantCulture) : 0,
+                Dropout = o.TryGetValue("dropout", out string? dr) ? float.Parse(dr, CultureInfo.InvariantCulture) : ner ? 0.2f : 0.1f,
                 Seed = seed,
                 DevExamples = dev,
                 Score = ner ? DevScores.Entities() : UposScore,
                 Patience = patience,
                 CheckpointDirectory = outDir,
-                CheckpointEvery = 200,
+                CheckpointEvery = o.TryGetValue("checkpoint-every", out string? ce) ? int.Parse(ce, CultureInfo.InvariantCulture) : 200,
                 Progress = progress,
-            });
+            },
+            cts.Token);
 
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"best_dev={result.BestScore:F3} best_step={result.BestStep} steps={result.Steps} epochs={result.Epochs} stopped_early={result.StoppedEarly} completed={result.Completed}"));
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"wall_s={clock.Elapsed.TotalSeconds:F1} threads={TensorCompute.Threads} weights_sha256={result.WeightsSha256}"));
@@ -111,6 +134,96 @@ internal static class Program
         }
 
         return 0;
+    }
+
+    private static int PredictUpos(Dictionary<string, string> o)
+    {
+        TransformerEncoder.ModelDirectory = o.GetValueOrDefault("model-dir");
+        using Pipeline pipeline = PipelineFile.Load(Required(o, "model"));
+        var sb = new StringBuilder();
+        foreach (ConllUSentence sentence in ConllUReader.Read(Required(o, "gold")))
+        {
+            Doc predicted = Example.Blank(sentence.Doc);
+            foreach (IPipelineComponent component in pipeline.Components.Where(c => c is ITrainableComponent))
+            {
+                component.Process(predicted);
+            }
+
+            foreach (string comment in sentence.Comments.Where(c => c.StartsWith("# sent_id", StringComparison.Ordinal)))
+            {
+                sb.Append(comment).Append('\n');
+            }
+
+            int next = 0;
+            for (int i = 0; i < predicted.Length; i++)
+            {
+                if (next < sentence.MultiwordTokens.Count && sentence.MultiwordTokens[next].FirstWord == i)
+                {
+                    MultiwordToken m = sentence.MultiwordTokens[next++];
+                    sb.Append(m.FirstWord + 1).Append('-').Append(m.LastWord + 1).Append('\t').Append(m.Form).Append("\t_\t_\t_\t_\t_\t_\t_\t_\n");
+                }
+
+                string pos = predicted[i].Pos;
+                sb.Append(i + 1).Append('\t').Append(sentence.Forms[i]).Append("\t_\t").Append(pos.Length == 0 ? "_" : pos)
+                    .Append("\t_\t_\t").Append(i == 0 ? "0\troot" : "1\tdep").Append("\t_\t_\n");
+            }
+
+            sb.Append('\n');
+        }
+
+        File.WriteAllText(Required(o, "out"), sb.ToString(), new UTF8Encoding(false));
+        return 0;
+    }
+
+    private static int PredictNer(Dictionary<string, string> o)
+    {
+        TransformerEncoder.ModelDirectory = o.GetValueOrDefault("model-dir");
+        using Pipeline pipeline = PipelineFile.Load(Required(o, "model"));
+        string prefix = Required(o, "out");
+        using var gold = new StreamWriter(prefix + ".gold.iob2", false, new UTF8Encoding(false)) { NewLine = "\n" };
+        using var pred = new StreamWriter(prefix + ".pred.iob2", false, new UTF8Encoding(false)) { NewLine = "\n" };
+        foreach (Example e in JsonlReader.Read(Required(o, "gold")))
+        {
+            Doc blank = Example.Blank(e.Reference);
+            pipeline.Process(blank);
+            List<string> g = IobTags(e.Reference);
+            List<string> p = IobTags(blank);
+            for (int t = 0; t < blank.Length; t++)
+            {
+                gold.WriteLine(blank[t].ToString() + '\t' + g[t]);
+                pred.WriteLine(blank[t].ToString() + '\t' + p[t]);
+            }
+
+            gold.WriteLine();
+            pred.WriteLine();
+        }
+
+        return 0;
+    }
+
+    private static List<string> IobTags(Doc doc)
+    {
+        var tags = new List<string>(doc.Length);
+        foreach (Span e in doc.Ents)
+        {
+            while (tags.Count < e.Start)
+            {
+                tags.Add("O");
+            }
+
+            tags.Add("B-" + e.Label);
+            for (int t = e.Start + 1; t < e.End; t++)
+            {
+                tags.Add("I-" + e.Label);
+            }
+        }
+
+        while (tags.Count < doc.Length)
+        {
+            tags.Add("O");
+        }
+
+        return tags;
     }
 
     private static double UposScore(IReadOnlyList<Example> examples) =>

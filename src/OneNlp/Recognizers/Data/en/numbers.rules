@@ -154,3 +154,14 @@ day | day, days
 [age.suffix]
 old
 of age
+
+# A lone word is not a number when the word before or after it says so. Fields: word | before or after | words.
+# "no one", "the one", "one of them", "one another", "one's own"; the idiom "for the first time" (the ordinal there is not a position).
+[number.not-number]
+one | before | no, any, every, each, some, the, this, that, which, whose, another, which
+one | after | of, another, can, could, should, must, might, may, would, has, 's
+first | after | time, times
+second | after | time, times
+third | after | time, times
+fourth | after | time, times
+fifth | after | time, times

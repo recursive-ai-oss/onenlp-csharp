@@ -3,7 +3,8 @@
 #
 #   bench/scripts/tokenizer-rows.sh MODELS_DIR TATOEBA_FILE OUT_DIR [FILTER]
 #
-# MODELS_DIR holds one directory per Hugging Face model and a tiktoken directory; TATOEBA_FILE is the sentence export.
+# MODELS_DIR holds one directory per Hugging Face model and a tiktoken directory. TATOEBA_FILE is the sentence export, or a
+# directory with short.txt, medium.txt and long.txt from an earlier run, so that several machines time the same text.
 # Writes OUT_DIR/rows.md, OUT_DIR/native.txt (when ONENLP_ORACLES is set), OUT_DIR/run.log and OUT_DIR/machine.txt (CPU, cores, versions, and the load before, during and after).
 # For a publishable run, start it through the host's benchmark queue so the machine is otherwise idle.
 set -euo pipefail
@@ -35,7 +36,8 @@ SAMPLER=$!
 trap 'kill $SAMPLER 2>/dev/null || true' EXIT
 : > "$OUT/load-during.txt"
 
-ARGS=(--models "$MODELS" --tatoeba "$TATOEBA" --out "$OUT/rows.md" --dump-inputs "$OUT/inputs")
+if [ -d "$TATOEBA" ]; then SOURCE=(--inputs "$TATOEBA"); else SOURCE=(--tatoeba "$TATOEBA"); fi
+ARGS=(--models "$MODELS" "${SOURCE[@]}" --out "$OUT/rows.md" --dump-inputs "$OUT/inputs")
 [ -n "$FILTER" ] && ARGS+=(--filter "$FILTER")
 dotnet "$DLL" "${ARGS[@]}" > "$OUT/run.log" 2>&1
 

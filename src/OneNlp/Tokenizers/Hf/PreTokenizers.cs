@@ -209,6 +209,12 @@ internal static class Splitter
 /// <summary>Splits at every character a predicate accepts, with a chosen behaviour.</summary>
 internal sealed class PredicateSplitPreTokenizer(Func<int, bool> predicate, SplitBehavior behavior) : IPreTokenizer
 {
+    /// <summary>The test for a delimiter character.</summary>
+    internal Func<int, bool> Predicate => predicate;
+
+    /// <summary>What happens to the delimiters.</summary>
+    internal SplitBehavior Behavior => behavior;
+
     public void PreTokenize(PreTokenizedString text) =>
         text.SplitEach(piece => Splitter.Split(piece, Splitter.CharMatches(piece.Text, predicate), behavior));
 }
@@ -259,6 +265,9 @@ internal sealed class CharDelimiterPreTokenizer : IPreTokenizer
 /// <summary>Applies pre-tokenizers one after the other, each to the pieces the one before produced.</summary>
 internal sealed class SequencePreTokenizer(IPreTokenizer[] steps) : IPreTokenizer
 {
+    /// <summary>The steps, in order.</summary>
+    internal IReadOnlyList<IPreTokenizer> Steps => steps;
+
     public void PreTokenize(PreTokenizedString text)
     {
         foreach (IPreTokenizer step in steps)
@@ -322,6 +331,12 @@ internal sealed class SplitPreTokenizer : IPreTokenizer
 /// </summary>
 internal sealed class ByteLevelPreTokenizer(bool addPrefixSpace, bool useRegex) : IPreTokenizer
 {
+    /// <summary>Whether a space is put in front of a text that does not start with one.</summary>
+    internal bool AddPrefixSpace => addPrefixSpace;
+
+    /// <summary>Whether the text is split with the GPT-2 pattern.</summary>
+    internal bool UseRegex => useRegex;
+
     // The GPT-2 pattern as the published BPE papers' code lists it: contractions, letters, numbers, other symbols, then whitespace.
     private static readonly CodePointRegex Gpt2 = CodePointRegex.Parse(@"'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+");
 
@@ -351,6 +366,15 @@ internal sealed class MetaspacePreTokenizer : IPreTokenizer
     private readonly char _mark;
     private readonly string _scheme;
     private readonly bool _split;
+
+    /// <summary>The character that stands for a space.</summary>
+    internal char Mark => _mark;
+
+    /// <summary>Whether a mark is put in front of the text ("always"), only of the first piece ("first") or never.</summary>
+    internal string Scheme => _scheme;
+
+    /// <summary>Whether the text is cut in front of every mark.</summary>
+    internal bool Splits => _split;
 
     internal MetaspacePreTokenizer(StageConfig c)
     {

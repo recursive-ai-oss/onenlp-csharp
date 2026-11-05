@@ -48,6 +48,22 @@ internal interface ITokenizerModel
     /// <param name="output">Receives the tokens; the model appends and never clears it.</param>
     void Tokenize(ReadOnlySpan<char> piece, List<ModelToken> output);
 
+    /// <summary>
+    /// Like <see cref="Tokenize"/> but appends only the IDs, so a model can skip building the vocabulary strings and ranges. The default
+    /// calls <see cref="Tokenize"/>; a model overrides it when that is measurably cheaper.
+    /// </summary>
+    /// <param name="piece">The text of the piece; never empty.</param>
+    /// <param name="output">Receives the IDs.</param>
+    void TokenizeIds(ReadOnlySpan<char> piece, IdBuffer output)
+    {
+        var tokens = new List<ModelToken>();
+        Tokenize(piece, tokens);
+        foreach (ModelToken t in tokens)
+        {
+            output.Add(t.Id);
+        }
+    }
+
     /// <summary>Looks a token string up in the model vocabulary.</summary>
     /// <param name="token">The token exactly as it appears in the vocabulary.</param>
     /// <returns>The ID, or <see langword="null"/> when it is not in the vocabulary.</returns>

@@ -48,7 +48,7 @@ public class SegmentationTests
     [Fact]
     public void NeutralDataDoesNotSplitContractionsButStillKeepsUrls()
     {
-        using Pipeline pipeline = Pipeline.Blank(Language.German);
+        using Pipeline pipeline = Pipeline.Blank(Language.FromCode("sw"));
         Doc doc = pipeline.Process("don't visit http://a.de/x well-known");
         Assert.Equal(["don't", "visit", "http://a.de/x", "well-known"], doc.Select(t => t.ToString()));
     }
