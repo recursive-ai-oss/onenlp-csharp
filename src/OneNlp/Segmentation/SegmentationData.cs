@@ -11,18 +11,18 @@ namespace RecursiveAI.OneNlp.Segmentation;
 /// <see cref="None"/> switches every adjustment off, which leaves exactly the UAX #29 segments (minus white space).
 /// Instances are immutable and safe to share between threads.
 /// </remarks>
-public sealed class SegmentationData
+public sealed partial class SegmentationData
 {
     private static readonly char[] NoMarks = [];
     private static readonly char[] DigitJoinerMarks = [':', '/'];
     private static readonly char[] MarkRunChars = ['.', '-', '!', '?', '*', '=', '_', '~', '<', '>', '#', '$', '+', '/', '\\'];
     private static readonly string[] CommonEmoticons = [":-)", ":)", ":-(", ":(", ";-)", ";)", ":-D", ":D", ":-P", ":P", ":'(", ":-/", ":/", ":-O", ":O", "<3", "=)", "=D", "^_^"];
 
-    /// <summary>The name of the built-in data set: <c>none</c>, <c>neutral</c> or <c>english</c>. Saved pipelines record it.</summary>
+    /// <summary>The name of the built-in data set: <c>none</c>, <c>neutral</c>, <c>english</c> or <c>french</c>. Saved pipelines record it.</summary>
     public string Name { get; private init; } = string.Empty;
 
     /// <summary>Finds a built-in data set by its <see cref="Name"/>.</summary>
-    /// <param name="name"><c>none</c>, <c>neutral</c> or <c>english</c>.</param>
+    /// <param name="name"><c>none</c>, <c>neutral</c>, <c>english</c> or <c>french</c>.</param>
     /// <returns>The data set.</returns>
     /// <exception cref="ArgumentException">There is no such data set.</exception>
     public static SegmentationData ByName(string name) => name switch
@@ -30,7 +30,8 @@ public sealed class SegmentationData
         "none" => None,
         "neutral" => Neutral,
         "english" => English,
-        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral or english.", nameof(name)),
+        "french" => French,
+        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral, english or french.", nameof(name)),
     };
 
     /// <summary>No adjustments: tokens are the UAX #29 word segments that are not white space.</summary>
@@ -132,8 +133,9 @@ public sealed class SegmentationData
     /// <summary>Tokens (with the full stop) after which the sentencizer never starts a sentence.</summary>
     internal FrozenSet<string> NonFinalAbbreviations { get; }
 
-    /// <summary>Picks the data for a language: English has its own; every other language gets the neutral defaults.</summary>
+    /// <summary>Picks the data for a language: English and French have their own; every other language gets the neutral defaults.</summary>
     /// <param name="language">The language.</param>
     /// <returns>The data; never <see langword="null"/>.</returns>
-    public static SegmentationData For(Language language) => language == Language.English ? English : Neutral;
+    public static SegmentationData For(Language language) =>
+        language == Language.English ? English : language == Language.French ? French : Neutral;
 }

@@ -1,0 +1,12 @@
+<Project>
+  <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
+       To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
+  <ItemGroup>
+    <FrenchWeight Include="tagging.onenlp" Size="0" Sha256="0"
+                   Recipe="recipes/fr/fast-tagging" Data="UD French-GSD r2.18 (CC BY-SA 4.0)" Contents="sentencizer, morphologizer, lemmatizer" />
+    <FrenchWeight Include="parser.onenlp" Size="0" Sha256="0"
+                   Recipe="recipes/fr/parser" Data="UD French-GSD r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />
+    <FrenchWeight Include="ner.onenlp" Size="0" Sha256="0"
+                   Recipe="recipes/fr/ner" Data="WikiNER French wp3 (CC BY 4.0 labels over Wikipedia text)" Contents="entity recognizer (PER, ORG, LOC, MISC)" />
+  </ItemGroup>
+</Project>
