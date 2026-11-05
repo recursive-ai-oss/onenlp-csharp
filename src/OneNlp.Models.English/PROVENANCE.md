@@ -1,14 +1,14 @@
 # Provenance: RecursiveAI.OneNlp.Models.English
 
-The package packs three saved pipelines (`weights.manifest.props` lists name, size and sha256 of each; a pack fails when one differs). Each was trained from scratch in C# with the `Train` API by the recipe named below, which is in the source repository. Weights are not stored in git.
+The package packs one saved pipeline, `english.onenlp` (`weights.manifest.props` lists its size and sha256; a pack fails when it differs). It holds three separately trained models, each with its own encoder, put into one file by `recipes/en/assemble` (no weights change; each part predicts what it predicted alone, checked on the test sets). All three were trained from scratch in C# with the `Train` API by the recipes in the source repository. Weights are not stored in git.
 
-| File | Recipe | Components | Data | Seed |
-|---|---|---|---|---|
-| `tagging.onenlp` | `recipes/en/fast-tagging` | sentencizer, tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, on a fast hash-embedding encoder | UD English-EWT r2.18, train and dev | 1 |
-| `parser.onenlp` | `recipes/en/parser` | biaffine dependency parser with sentence starts, fast encoder and a bidirectional LSTM | UD English-EWT r2.18, train and dev | 1 |
-| `ner.onenlp` | `recipes/en/ner` | entity recognizer (BILUO tagging, constrained decoding; PER, ORG, LOC), fast encoder | UNER English-EWT commit 8ed072de, train and dev | 7 |
+| Part | Recipe | Components | Data | Seed | Part file sha256 |
+|---|---|---|---|---|---|
+| tagging | `recipes/en/fast-tagging` (v2) | tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer; `FastEncoder.English()` | UD English-EWT r2.18, train and dev | 1 | `86009eed5179efd38421e1d67cc29416fd29e0e54ad488820d13259269970cb9` (36,958,094 bytes) |
+| parser | `recipes/en/parser` | biaffine dependency parser with sentence starts, two bidirectional LSTM layers of 192; its own fast encoder (96 wide, four window layers) | UD English-EWT r2.18, train and dev | training 7, encoder 1 | `612101ebeb4c62b6239a94c11727a2536537bfdb60245f337075eae1e9ddfccc` (22,108,789 bytes) |
+| entities | `recipes/en/ner` | entity recognizer (BILUO tagging, PER, ORG, LOC); `FastEncoder.English()` | UNER English-EWT commit 8ed072de, train and dev | 7 | `fe3e09746b5fd5245d348760a779cbee0f2ec57e0201a5265a7b41a0399e9cce` (35,677,809 bytes) |
 
-The sentencizer saved in `tagging.onenlp` is not used by the packaged pipeline; the parser predicts sentence starts.
+Assembled file: `english.onenlp`, 94,743,982 bytes, sha256 `d62f2199b06d26f5fdff0e7a8b4bd150ea017484997665a6458f5c0e0e033255`. The rule sentencizer saved with the tagging part is left out: the parser sets sentence starts. Settings and results: the `PROVENANCE.md` next to each recipe. A single-encoder alternative (`recipes/en/joint`, 23.7 MB, faster, lower scores) is documented in `docs/results.md` and is not packed.
 
 ## Datasets
 
@@ -21,7 +21,7 @@ The sentencizer saved in `tagging.onenlp` is not used by the packaged pipeline; 
 | UNER English-EWT, `en_ewt-ud-dev.iob2` | 8ed072de | dev | CC BY-SA 4.0 | `0cafd881cf31d39897b6d588420fab8fbbe4423d271725c59921ac9dd49c0713` |
 | UNER English-EWT, `en_ewt-ud-test.iob2` | 8ed072de | eval only | CC BY-SA 4.0 | `821ad826d5f503ac03b4edc3fbc2174f21fbb005ec25863caf2051c434616d6e` |
 
-- **Share-alike lineage:** yes, all three files. Credit is in `THIRD-PARTY-NOTICES.md`.
+- **Share-alike lineage:** yes. Credit is in `THIRD-PARTY-NOTICES.md`.
 - **Label generator:** none; labels are the datasets' gold annotations.
 - **Pretrained components:** none.
 - **Evaluation sets:** the test files above, read only by each recipe's `predict` step and the scorer. Each recipe's `PROVENANCE.md` has the scores and the train/test separation.

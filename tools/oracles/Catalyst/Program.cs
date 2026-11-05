@@ -106,6 +106,13 @@ internal static class Program
     private static async Task<int> RunSpeed(Pipeline nlp, string gold, int runs)
     {
         List<string> texts = ReadDocuments(gold);
+        int copies = int.Parse(Environment.GetEnvironmentVariable("ONENLP_BENCH_REPEAT") ?? "1", CultureInfo.InvariantCulture);
+        if (copies > 1)
+        {
+            // Many threads finish one pass over the file in milliseconds; repeating it gives a pass worth timing.
+            texts = [.. Enumerable.Repeat(texts, copies).SelectMany(x => x)];
+        }
+
         long chars = texts.Sum(t => (long)t.Length);
         Console.WriteLine($"{texts.Count} documents, {chars} characters; Catalyst 26.10.6514, English models 26.9.5316");
         Measure("tagging pipeline (sentences, tokens, POS, lemmas)", nlp, texts, chars, runs);
@@ -116,32 +123,53 @@ internal static class Program
 
     private static void Measure(string name, Pipeline nlp, List<string> texts, long chars, int runs)
     {
-        long tokens = Pass(nlp, texts);
+        int workers = int.Parse(Environment.GetEnvironmentVariable("ONENLP_BENCH_THREADS") ?? "1", CultureInfo.InvariantCulture);
+        long tokens = Pass(nlp, texts, workers);
         for (int r = 1; r <= runs; r++)
         {
-            long gcBefore = GC.GetAllocatedBytesForCurrentThread();
+            long gcBefore = GC.GetTotalAllocatedBytes(precise: true);
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            tokens = Pass(nlp, texts);
+            tokens = Pass(nlp, texts, workers);
             sw.Stop();
             double s = sw.Elapsed.TotalSeconds;
-            Console.WriteLine($"{name}: run {r}: {tokens / s:F0} tokens/s, {chars / s / 1e6:F2} M chars/s, {(GC.GetAllocatedBytesForCurrentThread() - gcBefore) / (double)tokens:F0} B/token ({tokens} tokens, {s:F2} s)");
+            Console.WriteLine($"{name}: threads {workers} run {r}: {tokens / s:F0} tokens/s, {chars / s / 1e6:F2} M chars/s, {(GC.GetTotalAllocatedBytes(precise: true) - gcBefore) / (double)tokens:F0} B/token ({tokens} tokens, {s:F2} s)");
         }
+
+        Console.WriteLine($"peak working set {System.Diagnostics.Process.GetCurrentProcess().PeakWorkingSet64 / 1048576} MB");
     }
 
-    private static long Pass(Pipeline nlp, List<string> texts)
+    // Documents go to worker threads round-robin, each processing its own documents with the one shared pipeline.
+    private static long Pass(Pipeline nlp, List<string> texts, int workers)
     {
-        long tokens = 0;
-        foreach (string text in texts)
+        long total = 0;
+        var threads = new Thread[workers];
+        for (int w = 0; w < workers; w++)
         {
-            var doc = new Document(text, Language.English);
-            nlp.ProcessSingle(doc);
-            foreach (var span in doc.Spans)
+            int worker = w;
+            threads[w] = new Thread(() =>
             {
-                tokens += span.Tokens.Count();
-            }
+                long tokens = 0;
+                for (int i = worker; i < texts.Count; i += workers)
+                {
+                    var doc = new Document(texts[i], Language.English);
+                    nlp.ProcessSingle(doc);
+                    foreach (var span in doc.Spans)
+                    {
+                        tokens += span.Tokens.Count();
+                    }
+                }
+
+                Interlocked.Add(ref total, tokens);
+            });
+            threads[w].Start();
         }
 
-        return tokens;
+        foreach (Thread t in threads)
+        {
+            t.Join();
+        }
+
+        return total;
     }
 
     private static int RunUd(Pipeline nlp, string gold, string output)

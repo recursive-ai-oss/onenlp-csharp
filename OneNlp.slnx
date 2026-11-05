@@ -33,6 +33,8 @@
     <Project Path="recipes/fr/ner/FrNer.csproj" />
     <Project Path="recipes/de/fast/OneNlp.Recipes.German.csproj" />
     <Project Path="recipes/pt/fast/OneNlp.Recipes.Portuguese.csproj" />
+    <Project Path="recipes/en/joint/OneNlp.Recipe.EnJoint.csproj" />
+    <Project Path="recipes/en/assemble/OneNlp.Recipe.EnAssemble.csproj" />
   </Folder>
   <Folder Name="/fuzz/">
     <Project Path="fuzz/OneNlp.Fuzz/OneNlp.Fuzz.csproj" />
