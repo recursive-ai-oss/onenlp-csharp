@@ -234,3 +234,61 @@ is at least 7.6x on every row either way.
 | with date/time (2.5 M chars) | Recognizers.Text 1.8.13 | 27.16 s | 0.09 | 43.8x | 28.18 s | 0.09 | 50.5x | 5,024 MB (x64), 5,026 MB (arm64) | 334 / 303 MB | 630 / 424 ms |
 
 Pass/fail: every row is at or faster than its managed comparator, on both machines.
+
+## English fast tier (one shared encoder)
+
+Model `english.onenlp` (`recipes/en/joint`, sha256 `6bb03663...50b9`). UD English-EWT r2.18 test, 2,077 sentences, 25,131 tokens; UNER English-EWT test. Paired bootstrap 95% CI over sentences (1,000 resamples, seed 1); reference spaCy 3.8.18 trained on the same data with its default configuration, same input mode. "Within noise" means the intervals overlap. The development sets chose the configuration; the test files were read once.
+
+### Quality, gold tokens and sentences
+
+| Metric | Ours | spaCy | Within noise |
+|---|---|---|---|
+| UPOS | 93.58 [93.17, 93.99] | 94.29 [93.91, 94.68] | yes |
+| XPOS | 92.81 [92.36, 93.24] | 93.43 [93.00, 93.87] | yes |
+| UFeats | 94.40 [94.07, 94.73] | 95.18 [94.86, 95.48] | **no** |
+| AllTags | 90.45 [89.98, 90.95] | 91.53 [91.05, 91.99] | **no** |
+| Lemmas | 95.84 [95.50, 96.17] | 95.80 [95.46, 96.13] | yes |
+| UAS | 84.98 [84.12, 85.80] | 85.40 [84.48, 86.28] | yes |
+| LAS | 81.31 [80.47, 82.16] | 81.96 [81.00, 82.91] | yes |
+
+### Quality, raw text
+
+| Metric | Ours | spaCy | Within noise |
+|---|---|---|---|
+| Tokens | 99.00 [98.81, 99.19] | 95.70 [95.16, 96.17] | ahead |
+| Sentences | 72.76 [70.97, 74.66] | 72.66 [70.46, 74.70] | yes |
+| UPOS | 92.53 [92.09, 93.01] | 92.45 [91.83, 93.05] | yes |
+| XPOS | 91.60 [91.11, 92.11] | 91.72 [91.10, 92.34] | yes |
+| UFeats | 93.39 [92.97, 93.79] | 93.37 [92.84, 93.91] | yes |
+| AllTags | 89.35 [88.80, 89.89] | 89.99 [89.34, 90.64] | yes |
+| Lemmas | 94.68 [94.29, 95.07] | 93.69 [93.07, 94.28] | ahead |
+| UAS | 80.41 [79.47, 81.36] | 81.34 [80.25, 82.34] | yes |
+| LAS | 76.93 [75.98, 77.92] | 78.53 [77.49, 79.54] | yes |
+| CLAS | 71.81 [70.67, 72.97] | 74.34 [73.19, 75.49] | **no** |
+| MLAS | 65.14 [63.97, 66.36] | 69.05 [67.85, 70.21] | **no** |
+
+### Entities (UNER English-EWT test, gold tokens)
+
+| Row | Ours | spaCy | Paired difference |
+|---|---|---|---|
+| micro F1 | 59.38 [56.06, 62.60] | 62.32 [59.42, 65.33] | -2.93 [-5.81, -0.15] |
+| LOC | 65.55 [60.45, 70.29] | 71.43 [66.56, 76.16] | -5.88 [-9.82, -1.94] |
+| ORG | 45.19 [39.35, 50.48] | 44.33 [39.12, 49.82] | 0.86 [-3.94, 5.38] |
+| PER | 64.19 [59.35, 68.55] | 68.05 [63.91, 71.83] | -3.86 [-8.32, 0.72] |
+
+The intervals overlap on every entity row; the paired differences for micro F1 and LOC exclude zero.
+
+### Speed (indicative, not a gate row)
+
+Raw EWT test text (25,131 tokens, repeated four times per pass), one thread, sentences + tokens + UPOS/UFeats + lemmas; Catalyst 26.10.6514 with its English models on the same documents, run back to back in the same job. Machine: x64 worker (Ryzen 9 7950X3D) while other jobs were running (load 9 to 15), .NET SDK 10.0.403. The gate run is made once, on a quiet machine, at the 1.0 gate.
+
+| | tokens/s | allocation | note |
+|---|---|---|---|
+| Catalyst | 530,000 to 590,000 | 307 B/token | UPOS 80.7, lemmas 83.8 on this text |
+| Ours, one document per call | 215,000 to 270,000 | 413 B/token | UPOS 92.5, lemmas 94.7 |
+| Ours, `ProcessMany` batches of 64 | 226,000 to 259,000 | 327 B/token | |
+| Ours, entities path | 209,000 to 257,000 | 393 B/token | |
+| Ours, parser path | 5,300 to 7,900 | 856 B/token | the bidirectional LSTM is the cost |
+| Ours, full pipeline | 5,500 to 7,900 | 1,377 B/token | |
+
+The ratio on the tagging path is about 0.4 (**misses**). Peak working set 640 MB for the full pipeline; model file 23.7 MB; first `Nlp.Analyze` (loads the weights) 325 ms on x64. Where the time goes (microseconds per token, one document per call): tokenizer 0.2, sentencizer 0.05, encoder about 2 (lookups 0.6, window-layer product 1.2), lemmatizer 0.9, morphologizer 1.0. A smaller configuration of the same recipe (48 wide, no window layer) ran the same path at 500,000 to 690,000 tokens/s (about 1.6 to 2.3 times Catalyst in the same conditions) with a development tagging mean 0.6 points lower; it is not the shipped model.

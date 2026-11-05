@@ -104,12 +104,12 @@ internal static class Program
             seed: seed,
             prefixLength: Int(o, "prefix", 3),
             suffixLength: Int(o, "suffix", 3),
-            embedWidth: Int(o, "embed-width", 32),
+            embedWidth: Int(o, "embed-width", 64),
             hashes: Int(o, "hashes", 1),
             relu: !o.ContainsKey("gelu"),
             neighbourRows: Int(o, "neighbour-rows", 16384),
             bigramRows: Int(o, "bigram-rows", 0),
-            contextRows: Int(o, "context-rows", 0));
+            contextRows: Int(o, "context-rows", 16384));
 
     private static Pipeline NewPipeline(Dictionary<string, string> o, ulong seed)
     {
@@ -120,8 +120,8 @@ internal static class Program
         pipeline.Add(new EditTreeLemmatizer(encoder, minClassCount: Int(o, "min-class-count", 2), headClasses: Int(o, "lemma-head", 32)));
         if (o.GetValueOrDefault("heads", "all") == "all")
         {
-            pipeline.Add(new Parser(encoder, Int(o, "arc", 192), Int(o, "label", 96), Int(o, "context", 3), Int(o, "lstm", 0), Int(o, "lstm-layers", 1), labelBilinear: !o.ContainsKey("no-bilinear")));
-            pipeline.Add(new EntityRecognizer(encoder, NerDecoding.Tagging, Int(o, "ner-context", 0), Int(o, "ner-hidden", 256)));
+            pipeline.Add(new Parser(encoder, Int(o, "arc", 192), Int(o, "label", 96), Int(o, "context", 3), Int(o, "lstm", 192), Int(o, "lstm-layers", 1), labelBilinear: o.ContainsKey("bilinear")));
+            pipeline.Add(new EntityRecognizer(encoder, NerDecoding.Tagging, Int(o, "ner-context", 2), Int(o, "ner-hidden", 256)));
         }
 
         return pipeline;

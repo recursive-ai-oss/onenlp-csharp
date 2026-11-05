@@ -2,30 +2,35 @@
 
 **spaCy-class NLP for .NET.** A clean-room library for .NET 10 with no native code, NativeAOT and trim clean. OneNLP is unaffiliated with other projects named OneNLP.
 
-> **Early preview, under construction.** Today the library has the shared types and contracts everything else will build on, and nothing more: no models, no tokenizer families, no recognizers, no language ID. Nothing here claims accuracy, speed or parity with any other library yet, and the API will change.
+> **Early preview.** The API will change. Only components whose measured rows are in [docs/results.md](docs/results.md) are listed as working; speed rows are indicative until the first release.
 
 ## What is in it
 
-| Package | Contents today |
+| Package | Contents |
 |---|---|
-| `RecursiveAI.OneNlp` | `Doc`, `Token` and `Span` (character offsets into the original string, zero-copy views), a component `Pipeline` with batch and streaming processing, name-to-factory component registration without reflection, the `Tokenizer` contract (BCL span style), a rule-based word tokenizer, and the `Nlp` statics. Depends on the BCL and `RecursiveAI.OneFont` only. |
-| `RecursiveAI.OneNlp.Neural` | The encoder seam, so far one interface. Depends on the core package, `RecursiveAI.OneModel` and `RecursiveAI.OneModel.Training`. |
+| `RecursiveAI.OneNlp` | `Doc`, `Token`, `Span` (character offsets into the original string); the component `Pipeline` with batch and streaming processing; tokenizers matching Hugging Face `tokenizers` byte for byte (WordPiece, BPE, byte-level BPE, Unigram/SentencePiece, Tiktoken); UAX #29 word and sentence segmentation; `Matcher`, `PhraseMatcher`, `EntityRuler`; English recognizers for numbers, units, currency, sequences (e-mail, URL, ...) and dates and times; language ID for 75 languages; JSON and binary serialization; the `Nlp` statics. Depends on the BCL and `RecursiveAI.OneFont` only. |
+| `RecursiveAI.OneNlp.Neural` | The encoder seam, the fast hash-embedding encoder, the heads (tagger, morphologizer, edit-tree lemmatizer, biaffine dependency parser, entity recognizer), and `Train`, the API the shipped models are trained with. Depends on the core package, `RecursiveAI.OneModel` and `RecursiveAI.OneModel.Training`. |
+| `RecursiveAI.OneNlp.Models.English` | The English fast-tier model: tags, morphology, lemmas, dependency parse and entities from one shared encoder (23.7 MB), trained by `recipes/en/joint`. |
 
 ```csharp
 using RecursiveAI.OneNlp;
 
-Doc doc = Nlp.Analyze("Ada Lovelace wrote the first program.");
+Doc doc = Nlp.Analyze("Ada Lovelace wrote the first program in London.");
 foreach (Token t in doc)
 {
-    Console.WriteLine($"{t.Idx}..{t.EndIdx} {t}");   // offsets are into the string you passed in
+    Console.WriteLine($"{t} {t.Pos} {t.Lemma} {t.Dep}");
 }
 
-using Pipeline pipeline = Pipeline.Blank(Language.English).Add("norm");
-foreach (Doc d in pipeline.ProcessMany(["First text.", "Second text."]))
+foreach (Span e in Nlp.Entities("Ada Lovelace lived in London."))
 {
-    Console.WriteLine(d[0].Norm);
+    if (e.Label == EntityLabels.Person)
+    {
+        Console.WriteLine(e);   // offsets are into the string you passed in
+    }
 }
 ```
+
+The English fast tier is within the noise of spaCy 3.8.18 (trained on the same data) on most UD English-EWT and UNER rows and behind on UFeats, AllTags and the entity micro F1 point estimate; every row is in [docs/results.md](docs/results.md). Its speed on the tagging path is below Catalyst's.
 
 The contracts are written down in [docs/contracts.md](docs/contracts.md).
 
@@ -38,11 +43,12 @@ You need the .NET SDK pinned in `global.json`.
 
 Build output goes to `artifacts/` in the repository (ignored by git). Set `ONENLP_ARTIFACTS` to a directory to put it elsewhere; each checkout gets its own folder under it. Machine-specific MSBuild overrides can go in an ignored `Directory.Build.local.props`.
 
-The NativeAOT smoke app is `tests/OneNlp.AotSmoke`; publish it with `dotnet publish tests/OneNlp.AotSmoke -c Release -r <rid>` (it needs the platform's native toolchain, `clang` and `zlib1g-dev` on Linux).
+The NativeAOT smoke app is `tests/OneNlp.AotSmoke`; publish it with `dotnet publish tests/OneNlp.AotSmoke -c Release -r <rid>` (it needs the platform's native C toolchain and `zlib1g-dev` on Linux).
 
 ## Layout
 
-- `src/OneNlp`, `src/OneNlp.Neural`: the packages.
+- `src/OneNlp`, `src/OneNlp.Neural`, `src/OneNlp.Models.English`: the packages.
+- `recipes/`: the training recipes users can run.
 - `tests/OneNlp.Tests`, `tests/OneNlp.AotSmoke`: tests and the AOT smoke app.
 - `bench/OneNlp.Bench`: BenchmarkDotNet suites.
 - `fuzz/OneNlp.Fuzz`: fuzz targets ([fuzz/README.md](fuzz/README.md)).

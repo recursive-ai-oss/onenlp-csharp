@@ -33,15 +33,9 @@ The registration runs from a module initializer, and the module initializer live
 
 ## The English pipeline
 
-One pipeline built from three saved pipelines (`PipelineFile`), each from its own recipe, in this order:
+One pipeline from one saved pipeline (`PipelineFile`), `english.onenlp`, trained by `recipes/en/joint`: a tagger (XPOS), morphologizer (UPOS, UFeats), lemmatizer, dependency parser (predicts the sentence starts) and entity recognizer (PER, ORG, LOC), all reading one shared fast encoder, so a text is encoded once.
 
-| Part | Recipe | Components |
-|---|---|---|
-| `tagging.onenlp` | `recipes/en/fast-tagging` | tagger (XPOS), morphologizer (UPOS, UFeats), lemmatizer. Its saved rule sentencizer is dropped. |
-| `parser.onenlp` | `recipes/en/parser` | dependency parser; predicts the sentence starts |
-| `ner.onenlp` | `recipes/en/ner` | entity recognizer (PER, ORG, LOC) |
-
-The tokenizer is the UAX #29 word tokenizer with English data, shared by all parts, as are the string table and the components' encoders' ownership: the combined pipeline owns and disposes every component. Each part has its own encoder, so the text passes through three fast encoders; a retrain that shares one encoder across heads makes this cheaper without any change to the package mechanics.
+The tokenizer is the UAX #29 word tokenizer with English data, shared with the string table; the pipeline owns and disposes every component.
 
 ## Package layout and the weights
 
@@ -56,7 +50,7 @@ src/OneNlp.Models.English/
 
 - Weights never enter git. Building or packing with the environment variable `ONENLP_ENGLISH_WEIGHTS` (or the property `EnglishWeightsDir`) set to a directory holding the files named in the manifest embeds them as resources `weights/<name>`.
 - Every file is hashed (SHA-256) and compared with the manifest at build. A missing or different file fails the build with the file name and both hashes. Without the variable the project builds (for development) but `dotnet pack` fails, saying what to set.
-- **Re-pack with retrained weights:** put the new files in the directory, change the `Size` and `Sha256` of their rows in `weights.manifest.props`, update `PROVENANCE.md` (datasets, recipe, seed), and pack. No code changes. The three parts may be retrained independently or replaced by a single file once a recipe trains them together (change the `Parts` list in `EnglishModel.cs` and the manifest).
+- **Re-pack with retrained weights:** put the new files in the directory, change the `Size` and `Sha256` of their rows in `weights.manifest.props`, update `PROVENANCE.md` (datasets, recipe, seed), and pack. No code changes. 
 - The package contains: the assembly (with the weights embedded), the manifest, `PROVENANCE.md`, `THIRD-PARTY-NOTICES.md`, `PACKAGE.md`, both licences and the registration file.
 
 `tests/OneNlp.ModelConsumer/run.sh <weights-dir> <work-dir>` packs the core, neural and model packages into a throwaway folder feed, then builds, runs and NativeAOT-publishes a consumer app against that feed with and without the model package.
