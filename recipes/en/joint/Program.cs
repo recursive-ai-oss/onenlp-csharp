@@ -58,6 +58,7 @@ internal static class Program
             {
                 "train" => Train(o),
                 "predict" => Predict(o),
+                "label" => Label(o),
                 _ => 2,
             };
         }
@@ -181,6 +182,12 @@ internal static class Program
         List<Example> dev = Documents(o["ud-dev"], perDoc, strings);
         int cap = Int(o, "max-train-docs", int.MaxValue); // screening and smoke runs use a slice of the training data
         train = [.. train.Take(cap)];
+        if (o.TryGetValue("extra-train", out string? extra))
+        {
+            // Sentences labelled by an earlier model (see `label`) on text that is neither dev nor test: more data for a narrower encoder.
+            train.AddRange(Documents(extra, perDoc, strings).Take(Int(o, "extra-docs", int.MaxValue)));
+        }
+
         if (all)
         {
             train.AddRange(JsonlReader.Read(o["ner-train"], strings).Take(cap == int.MaxValue ? int.MaxValue : cap * 10));
@@ -233,6 +240,66 @@ internal static class Program
             Console.WriteLine($"model={model} bytes={new FileInfo(model).Length}");
         }
 
+        return 0;
+    }
+
+    // label --model M.onenlp --text texts.jsonl --out labelled.conllu [--max-chars N] [--min-tokens 3] [--max-tokens 80]
+    // Runs the tagging heads of an existing model (its tokenizer, a sentencizer, tagger, morphologizer and lemmatizer) over running text
+    // (one JSON object per line, the text in "t") and writes the sentences as CoNLL-U with tags, features and lemmas. A narrower model
+    // trained on these sentences as well as the treebank learns from far more text than the treebank holds (self-training).
+    private static int Label(Dictionary<string, string> o)
+    {
+        long maxChars = o.TryGetValue("max-chars", out string? mc) ? long.Parse(mc, CultureInfo.InvariantCulture) : long.MaxValue;
+        int minTokens = Int(o, "min-tokens", 3);
+        int maxTokens = Int(o, "max-tokens", 80);
+        using Pipeline full = PipelineFile.Load(o["model"]);
+        var teacher = new Pipeline(full.Tokenizer, Language.English, full.Strings).Add("sentencizer", new Dictionary<string, string> { ["data"] = "english" });
+        foreach (string name in new[] { "tagger", "morphologizer", "lemmatizer" })
+        {
+            teacher.Add(full.Components.First(c => c.Name == name));
+        }
+
+        using var output = new StreamWriter(o["out"], false, new UTF8Encoding(false));
+        long chars = 0;
+        long sentences = 0;
+        long tokens = 0;
+        foreach (string line in File.ReadLines(o["text"]))
+        {
+            if (line.Length == 0)
+            {
+                continue;
+            }
+
+            using System.Text.Json.JsonDocument json = System.Text.Json.JsonDocument.Parse(line);
+            string text = json.RootElement.GetProperty("t").GetString() ?? string.Empty;
+            chars += text.Length;
+            Doc doc = teacher.Process(text);
+            foreach (Span sentence in doc.Sentences)
+            {
+                if (sentence.Length < minTokens || sentence.Length > maxTokens)
+                {
+                    continue;
+                }
+
+                sentences++;
+                int k = 0;
+                foreach (Token t in sentence)
+                {
+                    bool adjacent = t.Index + 1 < doc.Length && t.Index + 1 < sentence.End && doc[t.Index + 1].Idx == t.EndIdx;
+                    output.Write(string.Create(CultureInfo.InvariantCulture, $"{++k}\t{t}\t{Cell(t.Lemma)}\t{Cell(t.Pos)}\t{Cell(t.Tag)}\t{Cell(t.Morph)}\t{(k == 1 ? 0 : 1)}\t{(k == 1 ? "root" : "dep")}\t_\t{(adjacent ? "SpaceAfter=No" : "_")}\n"));
+                    tokens++;
+                }
+
+                output.Write('\n');
+            }
+
+            if (chars >= maxChars)
+            {
+                break;
+            }
+        }
+
+        Console.WriteLine($"chars={chars} sentences={sentences} tokens={tokens}");
         return 0;
     }
 

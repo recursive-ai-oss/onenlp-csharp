@@ -52,6 +52,42 @@ internal static class RowKernels
         }
     }
 
+    // v[i] = gelu(v[i]) = v[i] * Phi(v[i]) = 0.5 * v[i] * (1 + erf(v[i] / sqrt(2))) (Hendrycks and Gimpel 2016, eq. 1: the exact form, not the tanh
+    // approximation). erf comes from Abramowitz and Stegun 7.1.26, erf(z) = 1 - (a1 t + a2 t^2 + ... + a5 t^5) exp(-z^2) with t = 1 / (1 + p z) for z >= 0 and
+    // erf(-z) = -erf(z); its absolute error is at most 1.5e-7, so a value is off by at most 0.5 |v| * 1.5e-7, far below float noise in the layers around it.
+    // exp uses the polynomial below, so the result is the same on every platform.
+    public static void Gelu(Span<float> v)
+    {
+        ref float d = ref MemoryMarshal.GetReference(v);
+        int n = v.Length;
+        int i = 0;
+        for (; i <= n - 4; i += 4)
+        {
+            Gelu(Vector128.LoadUnsafe(ref d, (nuint)i)).StoreUnsafe(ref d, (nuint)i);
+        }
+
+        for (; i < n; i++)
+        {
+            ref float e = ref Unsafe.Add(ref d, i);
+            e = Gelu(Vector128.Create(e)).ToScalar();
+        }
+    }
+
+    private static Vector128<float> Gelu(Vector128<float> x)
+    {
+        Vector128<float> z = Vector128.Abs(x) * Vector128.Create(0.70710678118f);
+        Vector128<float> t = Vector128<float>.One / (Vector128<float>.One + (Vector128.Create(0.3275911f) * z));
+        Vector128<float> poly = Vector128.Create(1.061405429f);
+        poly = (poly * t) + Vector128.Create(-1.453152027f);
+        poly = (poly * t) + Vector128.Create(1.421413741f);
+        poly = (poly * t) + Vector128.Create(-0.284496736f);
+        poly = (poly * t) + Vector128.Create(0.254829592f);
+        Vector128<float> erf = Vector128<float>.One - (poly * t * Exp(Vector128<float>.Zero - (z * z)));
+        // sign of x on erf: erf is odd
+        Vector128<float> signed = Vector128.ConditionalSelect(Vector128.LessThan(x, Vector128<float>.Zero), Vector128<float>.Zero - erf, erf);
+        return Vector128.Create(0.5f) * x * (Vector128<float>.One + signed);
+    }
+
     // Mean and 1/sqrt(variance + epsilon) of a row, the variance taken around the mean over all values (as LayerNorm does).
     private static (float Mean, float InvStd) Moments(ReadOnlySpan<float> v)
     {

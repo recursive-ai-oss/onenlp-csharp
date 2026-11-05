@@ -515,7 +515,7 @@ public sealed class FastEncoder : IEncoder
                 }
             }
 
-            if (inference && _module.CanRunInference)
+            if (inference)
             {
                 return _module.RunInference(ids, n, prev, next);
             }
@@ -581,16 +581,7 @@ public sealed class FastEncoder : IEncoder
             return slot.Batch;
         }
 
-        Tensor owned;
-        if (_module.CanRunInference)
-        {
-            owned = Compute(docs, starts, true);
-        }
-        else
-        {
-            using var scope = new ActivationScope();
-            owned = Compute(docs, starts, false).Clone();
-        }
+        Tensor owned = Compute(docs, starts, true);
 
         if (slot is not null && !slot.Batch.Vectors.IsReleased)
         {
@@ -686,8 +677,19 @@ public sealed class FastEncoder : IEncoder
 
         public override Tensor Forward(Tensor input) => throw new NotSupportedException("Call Run.");
 
-        // The table-lookup inference path needs ReLU: the exact GELU is an error function per value.
-        public bool CanRunInference => _relu;
+        // The table-lookup inference path serves both activations (RowKernels.Gelu is the exact form to 1e-7).
+
+        private void ActivateRow(Span<float> row)
+        {
+            if (_relu)
+            {
+                RowKernels.Relu(row);
+            }
+            else
+            {
+                RowKernels.Gelu(row);
+            }
+        }
 
 
         private Tensor Activate(Tensor x) => _relu ? Ops.Relu(x) : Ops.Gelu(x);
@@ -834,7 +836,15 @@ public sealed class FastEncoder : IEncoder
                         }
                     }
 
-                    RowKernels.Relu(row);
+                    if (_plain)
+                    {
+                        RowKernels.Relu(row);
+                    }
+                    else
+                    {
+                        ActivateRow(row);
+                    }
+
                     if (!_plain)
                     {
                         RowKernels.LayerNorm(row, mixGamma, mixBeta, row);
@@ -867,7 +877,7 @@ public sealed class FastEncoder : IEncoder
                             RowKernels.Add(zs, y.Slice(((r + 1) * stride) + (2 * w), w));
                         }
 
-                        RowKernels.Relu(zs);
+                        ActivateRow(zs);
                         RowKernels.LayerNormAdd(zs, gamma, beta, x.AsSpan(r * w, w));
                     }
                 }
