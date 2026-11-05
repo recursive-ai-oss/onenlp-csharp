@@ -43,7 +43,7 @@ VALUE = {
     "daterange": rf"^{DATE}/{DATE}$",
     "timerange": rf"^{TOD}/{TOD}$",
     "datetimerange": rf"^{DATE}{TOD}/{DATE}{TOD}$",
-    "duration": r"^(\d+|P(\d+Y)?(\d+M)?)$",
+    "duration": r"^(\d+|P(\d+Y)?(\d+M)?|P\d+BD|PT\d+BH)$",
     "set": r"^(P\d+[YMWD]|PT\d+H|XXXX-WXX-\d(T\d\d:\d\d)?|T\d\d:\d\d)$",
 }
 REF = re.compile(r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d$")

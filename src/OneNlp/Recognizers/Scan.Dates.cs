@@ -266,6 +266,9 @@ internal sealed partial class Scan
             case "week":
                 day = _today.AddDays(sign * (double)(amount * unit.A / 86400m)).Date;
                 break;
+            case "business day" when amount == decimal.Truncate(amount) && amount <= 10_000:
+                day = CivilCalendar.AddBusinessDays(_today, sign * (int)amount);
+                break;
             case "month" when amount == decimal.Truncate(amount):
                 day = _today.AddMonths(sign * (int)amount);
                 break;
@@ -618,7 +621,7 @@ internal sealed partial class Scan
         }
 
         if (!Num(j + n, out int ne, out decimal amount, out bool ord) || ord || amount != decimal.Truncate(amount) || amount is < 2 or > 1000
-            || !Find(ne, "unit", out int un, out TWord u) || u.S is "second" or "minute" or "hour" || !GapOk(_items[ne - 1].End, _items[ne].Start))
+            || !Find(ne, "unit", out int un, out TWord u) || u.S is "second" or "minute" or "hour" or "business day" or "business hour" || !GapOk(_items[ne - 1].End, _items[ne].Start))
         {
             return;
         }

@@ -103,7 +103,11 @@ internal sealed partial class Scan
         string label = v.Label;
         _found.Add(new TemporalMatch(
             start, end, _t.Substring(start, end - start), label, c.C, v.Kind, v.Format(), v.Kind == TemporalKind.Duration ? null : v.Grain,
-            v.Approx, v.Offset is int o ? TimeSpan.FromMinutes(o) : null, v.ToRange(_ref), length));
+            v.Approx, v.Offset is int o ? TimeSpan.FromMinutes(o) : null, v.ToRange(_ref), length)
+        {
+            Unit = v.DurUnit,
+            Count = v.Count,
+        });
     }
 
     // ---- items and vocabulary -------------------------------------------------------------------------------------------------
@@ -686,8 +690,9 @@ internal sealed partial class Scan
             return false;
         }
 
-        // "a second" is far more often an ordinal ("a second chance") than a duration.
-        if (article && unit.S == "second")
+        // "a second" is far more often an ordinal ("a second chance") than a duration; it is a duration when what follows
+        // cannot be the thing that is second: the end of the phrase, or a word such as "ago" or "to" ("wait a second, please").
+        if (article && unit.S == "second" && !SecondIsUnit(a + un))
         {
             return false;
         }
@@ -696,12 +701,24 @@ internal sealed partial class Scan
         return true;
     }
 
+    /// <summary>"a second" counts seconds when the item after it is missing, is punctuation, or is a <c>secondfollow</c> word.</summary>
+    private bool SecondIsUnit(int next)
+    {
+        if (next >= _items.Count || _items[next].Kind == ItemKind.Other)
+        {
+            return true;
+        }
+
+        return _items[next].Kind == ItemKind.Word && Is(next, "secondfollow");
+    }
+
     private void DurationAt(int i, List<Cand> r)
     {
         decimal seconds = 0;
         decimal years = 0;
         decimal months = 0;
         decimal previous = decimal.MaxValue;
+        var parts = new List<(decimal Amount, TWord Unit)>();
         int j = i;
         for (int terms = 0; terms < 6; terms++)
         {
@@ -721,6 +738,25 @@ internal sealed partial class Scan
 
             if (!Term(k, out int e, out decimal amount, out TWord u))
             {
+                break;
+            }
+
+            if (u.A == 0 && u.B == 0)
+            {
+                // Business days and hours have no fixed length, so they cannot be added to other terms: they stand alone.
+                if (terms == 0)
+                {
+                    bool day = u.S == "business day";
+                    string n = Trim(amount).ToString(CultureInfo.InvariantCulture);
+                    r.Add(new Cand(i, e, new TemporalValue
+                    {
+                        Kind = TemporalKind.Duration,
+                        Text = day ? $"P{n}BD" : $"PT{n}BH",
+                        DurUnit = day ? DurationUnit.BusinessDay : DurationUnit.BusinessHour,
+                        Count = Trim(amount),
+                    }));
+                }
+
                 break;
             }
 
@@ -751,6 +787,7 @@ internal sealed partial class Scan
                     break;
             }
 
+            parts.Add((amount, u));
             j = e;
             if (Is(j, "and", out int hn) && Is(j + hn, "article", out int ha) && Is(j + hn + ha, "half", out int hh) && terms == 0 && amount == decimal.Truncate(amount))
             {
@@ -762,6 +799,8 @@ internal sealed partial class Scan
                     years += 5;
                     months -= u.B / 2m;
                 }
+
+                parts[^1] = (amount + 0.5m, u);
                 j += hn + ha + hh;
                 terms = 6;
             }
@@ -772,9 +811,74 @@ internal sealed partial class Scan
                 Text = TemporalValue.DurationText(seconds, years, months),
                 Seconds = years == 0 && months == 0 ? seconds : null,
             };
+            CountOf(parts, v);
             r.Add(new Cand(i, j, v));
         }
     }
+
+    /// <summary>
+    /// Sets the count and unit of a duration (see <see cref="TemporalMatch.Unit"/>): one term keeps its unit, several are counted in the
+    /// smallest, and terms from the two families (clock and days, months and years) cannot be added, so they get none.
+    /// </summary>
+    private static void CountOf(List<(decimal Amount, TWord Unit)> parts, TemporalValue v)
+    {
+        if (parts.Count == 1)
+        {
+            (decimal a, TWord u) = parts[0];
+            (v.DurUnit, v.Count) = u.S switch
+            {
+                "second" => (DurationUnit.Second, a),
+                "minute" => (DurationUnit.Minute, a),
+                "hour" => (DurationUnit.Hour, a),
+                "day" => (DurationUnit.Day, a),
+                "week" => (DurationUnit.Week, a * u.A / 604800m),
+                "month" => (DurationUnit.Month, a),
+                "quarter" => (DurationUnit.Month, a * 3),
+                "year" => (DurationUnit.Year, a),
+                "decade" => (DurationUnit.Year, a * 10),
+                _ => ((DurationUnit?)null, (decimal?)null),
+            };
+            v.Count = v.Count is decimal c ? Trim(c) : null;
+            return;
+        }
+
+        if (parts.TrueForAll(p => p.Unit.A > 0))
+        {
+            decimal total = 0;
+            int smallest = int.MaxValue;
+            foreach ((decimal a, TWord u) in parts)
+            {
+                total += a * u.A;
+                smallest = Math.Min(smallest, u.A);
+            }
+
+            (v.DurUnit, int per) = smallest switch
+            {
+                1 => ((DurationUnit?)DurationUnit.Second, 1),
+                60 => (DurationUnit.Minute, 60),
+                3600 => (DurationUnit.Hour, 3600),
+                86400 => (DurationUnit.Day, 86400),
+                _ => (DurationUnit.Week, 604800),
+            };
+            v.Count = Trim(total / per);
+        }
+        else if (parts.TrueForAll(p => p.Unit.B > 0 && p.Unit.A == 0))
+        {
+            decimal total = 0;
+            int smallest = int.MaxValue;
+            foreach ((decimal a, TWord u) in parts)
+            {
+                total += a * u.B;
+                smallest = Math.Min(smallest, u.B);
+            }
+
+            bool inYears = smallest >= 12;
+            v.DurUnit = inYears ? DurationUnit.Year : DurationUnit.Month;
+            v.Count = Trim(inYears ? total / 12 : total);
+        }
+    }
+
+    private static decimal Trim(decimal d) => d / 1.0000000000000000000000000000m;
 
     // ---- sets -----------------------------------------------------------------------------------------------------------------
 

@@ -35,7 +35,7 @@ internal sealed class TemporalData
     {
         "today", "tomorrow", "yesterday", "tonight", "noon", "midnight", "this", "next", "last", "ago", "later", "in", "at", "on", "of", "and",
         "rangeto", "from", "between", "every", "each", "other", "early", "mid", "late", "after", "before", "half", "quarter", "article", "the",
-        "oclock", "approx", "weekend", "zonebase", "quarterprefix", "halfprefix", "past", "to", "plural", "year", "ordinalword",
+        "oclock", "approx", "weekend", "zonebase", "quarterprefix", "halfprefix", "past", "to", "plural", "year", "ordinalword", "secondfollow",
     };
 
     private static readonly string[] WeekdayCodes = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
