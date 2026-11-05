@@ -15,6 +15,7 @@
   <Folder Name="/tools/">
     <Project Path="tools/OneNlp.Toy/OneNlp.Toy.csproj" />
     <Project Path="tools/OneNlp.ModelBench/OneNlp.ModelBench.csproj" />
+    <Project Path="tools/OneNlp.Accurate/OneNlp.Accurate.csproj" />
     <Project Path="tools/OneNlp.Eval/OneNlp.Eval.csproj" />
     <Project Path="tools/OneNlp.LangId/OneNlp.LangId.csproj" />
     <Project Path="tools/OneNlp.Parity/OneNlp.Parity.csproj" />
@@ -22,6 +23,7 @@
   <Folder Name="/recipes/">
     <Project Path="recipes/en/parser/OneNlp.Recipe.EnParser.csproj" />
     <Project Path="recipes/en/fast-tagging/EnglishFastTagging.csproj" />
+    <Project Path="recipes/accurate/en-tagging/AccurateEnglishTagging.csproj" />
     <Project Path="recipes/en/ner/OneNlp.Recipes.EnNer.csproj" />
   </Folder>
   <Folder Name="/fuzz/">

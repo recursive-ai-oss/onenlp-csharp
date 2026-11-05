@@ -112,6 +112,7 @@ internal static class Program
         }
 
         MatchingSmoke.Run(Check);
+        TransformerSmoke.Run(Check);
 
         TrainSaveLoad();
         FastTierSaveLoad();
