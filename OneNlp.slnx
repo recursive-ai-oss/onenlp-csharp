@@ -6,6 +6,7 @@
     <Project Path="src/OneNlp.Models.French/OneNlp.Models.French.csproj" />
     <Project Path="src/OneNlp.Models.German/OneNlp.Models.German.csproj" />
     <Project Path="src/OneNlp.Models.Portuguese/OneNlp.Models.Portuguese.csproj" />
+    <Project Path="src/OneNlp.Models.Dutch/OneNlp.Models.Dutch.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/OneNlp.Tests/OneNlp.Tests.csproj" />
@@ -35,6 +36,7 @@
     <Project Path="recipes/pt/fast/OneNlp.Recipes.Portuguese.csproj" />
     <Project Path="recipes/en/joint/OneNlp.Recipe.EnJoint.csproj" />
     <Project Path="recipes/en/assemble/OneNlp.Recipe.EnAssemble.csproj" />
+    <Project Path="recipes/nl/fast/OneNlp.Recipes.Dutch.csproj" />
   </Folder>
   <Folder Name="/fuzz/">
     <Project Path="fuzz/OneNlp.Fuzz/OneNlp.Fuzz.csproj" />
