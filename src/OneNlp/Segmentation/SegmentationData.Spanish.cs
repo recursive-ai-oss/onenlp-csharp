@@ -11,7 +11,7 @@ public sealed partial class SegmentationData
     // The enclitic pronouns that attach to an infinitive or a gerund (dar + me + lo = dármelo). Longest first, so that "nos" is tried
     // before "os" would be; "os" itself is left out, because words in -ros and -tros (primeros, nuestros) are far more common than
     // second-person-plural enclitics.
-    private static class Enclitics
+    private static class SpanishEnclitics
     {
         internal static readonly string[] Pronouns = ["nos", "les", "las", "los", "me", "te", "se", "lo", "la", "le"];
     }
@@ -136,7 +136,7 @@ public sealed partial class SegmentationData
         while (enclitics.Count < 3)
         {
             string? found = null;
-            foreach (string pronoun in Enclitics.Pronouns)
+            foreach (string pronoun in SpanishEnclitics.Pronouns)
             {
                 if (stemEnd - pronoun.Length >= 2 && lower.AsSpan(0, stemEnd).EndsWith(pronoun, StringComparison.Ordinal))
                 {
