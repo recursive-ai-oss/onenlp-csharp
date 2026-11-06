@@ -71,6 +71,10 @@ public sealed class TransformerEncoder : IEncoder
     /// </summary>
     public static string? ModelDirectory { get; set; }
 
+    /// <summary>The directory of the pipeline file being loaded on this thread, for encoder graphs saved beside it.</summary>
+    [ThreadStatic]
+    internal static string? PipelineDirectory;
+
     /// <summary>Loads an exported encoder and its tokenizer.</summary>
     /// <param name="modelPath">The ONNX file, with inputs <c>input_ids</c> and <c>attention_mask</c> ([batch, sequence], integers) and a first output of shape [batch, sequence, width].</param>
     /// <param name="tokenizerPath">The model's <c>tokenizer.json</c>.</param>
@@ -246,7 +250,24 @@ public sealed class TransformerEncoder : IEncoder
         }
 
         string? sha = s.TryGetProperty("modelSha256", out _) ? JsonSettings.String(s, "modelSha256", 64) : null;
-        string model = Resolve(JsonSettings.String(s, "model", 1024));
+        string model = JsonSettings.String(s, "model", 1024);
+        if (s.TryGetProperty("relativeTo", out _))
+        {
+            // A fine-tuned encoder's graph, saved beside its pipeline file (PipelineFile.Save).
+            if (JsonSettings.String(s, "relativeTo", 16) != "pipeline" || Path.IsPathRooted(model) || model.Contains("..", StringComparison.Ordinal) || model.AsSpan().IndexOfAny('/', '\\') >= 0)
+            {
+                throw new InvalidDataException("'model' must be a plain file name beside the pipeline file.");
+            }
+
+            model = PipelineDirectory is null
+                ? throw new InvalidDataException("This pipeline keeps its encoder in a file beside it; load it from a file path.")
+                : Path.Combine(PipelineDirectory, model);
+        }
+        else
+        {
+            model = Resolve(model);
+        }
+
         string tokenizer = Resolve(JsonSettings.String(s, "tokenizer", 1024));
         return new TransformerEncoder(
             model,

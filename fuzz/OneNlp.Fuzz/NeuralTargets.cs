@@ -113,6 +113,51 @@ internal static class NeuralTargets
         File.WriteAllText(Path.Combine(dir, "seed-small"), """{"width":8,"depth":0,"normRows":1,"prefixRows":1,"suffixRows":1,"shapeRows":1,"seed":0}""");
     }
 
+    /// <summary>An ONNX model file given to the weight writer: only <see cref="InvalidDataException"/> or <see cref="NotSupportedException"/> may escape, and no output file is left behind on failure.</summary>
+    internal static void OnnxPatch(ReadOnlySpan<byte> data)
+    {
+        string directory = Path.Combine(Path.GetTempPath(), "onenlp-fuzz-onnx-" + Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        Directory.CreateDirectory(directory);
+        string input = Path.Combine(directory, "in.onnx");
+        string output = Path.Combine(directory, "out.onnx");
+        File.WriteAllBytes(input, data.ToArray());
+        foreach (string name in PatchNames)
+        {
+            try
+            {
+                OnnxWeightPatcher.Patch(input, output, [new WeightPatch(name, [16], static () => new float[16])]);
+            }
+            catch (Exception e) when (e is InvalidDataException or NotSupportedException)
+            {
+                Require(!File.Exists(output), "a failed patch leaves no output");
+                continue;
+            }
+
+            Require(File.Exists(output) && new FileInfo(output).Length > 0, "a patch writes its output");
+            File.Delete(output);
+        }
+    }
+
+    private static readonly string[] PatchNames = ["m.embeddings.LayerNorm.bias", "model.embeddings.LayerNorm.bias", "m.encoder.layer.1.output.LayerNorm.bias", "model.embeddings.projection.bias"];
+
+    internal static void SeedOnnxPatch(string dir)
+    {
+        // The tiny fixtures (random encoders we generated), found by walking up from the working directory.
+        for (string? at = Directory.GetCurrentDirectory(); at is not null; at = Path.GetDirectoryName(at))
+        {
+            string fixtures = Path.Combine(at, "testdata", "accurate");
+            if (Directory.Exists(fixtures))
+            {
+                foreach (string file in Directory.GetFiles(fixtures, "*.onnx"))
+                {
+                    File.Copy(file, Path.Combine(dir, "seed-" + Path.GetFileName(file)), overwrite: true);
+                }
+
+                return;
+            }
+        }
+    }
+
     internal static void SeedPipelineFile(string dir) => File.WriteAllBytes(Path.Combine(dir, "seed-pipeline"), TinyPipelineBytes());
 
     internal static void SeedPipelineConfig(string dir)

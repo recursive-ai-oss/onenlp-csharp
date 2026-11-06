@@ -277,6 +277,7 @@ public class TrainableTransformerTests
         finally
         {
             File.Delete(path);
+            File.Delete(Path.ChangeExtension(path, null) + ".encoder0.onnx");
         }
     }
 
