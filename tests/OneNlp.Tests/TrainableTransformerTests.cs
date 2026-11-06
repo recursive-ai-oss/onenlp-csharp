@@ -386,4 +386,57 @@ public class TrainableTransformerTests
             TransformerEncoder.ModelDirectory = null;
         }
     }
+
+    [Fact]
+    public void ASharedEncoderKeepsTheEncoderOutOfTheSavedHeadsAndReloadsThroughTheRegistry()
+    {
+        List<Example> train = Toy(120, 1);
+        List<Example> test = Toy(30, 2);
+        using TrainableTransformerEncoder encoder = Modern();
+        using Pipeline trained = Pipeline.Blank().Add(new Tagger(encoder, TokenColumn.Pos));
+        trained.Train(train, new TrainOptions { Epochs = 30, BatchWords = 200, LearningRate = 0.01f, Dropout = 0f, Seed = 5, DevFraction = 0.1 });
+        double accuracy = Accuracy(trained, test);
+        Assert.True(accuracy > 0.95, $"UPOS {accuracy}");
+
+        // The heads alone, bound to a shared encoder: what the accurate-tier package ships for each language.
+        var shared = new SharedEncoder(encoder, "test-shared-encoder");
+        var from = (Tagger)trained.Components.First(c => c is Tagger);
+        using var config = new MemoryStream();
+        using (var w = new Utf8JsonWriter(config))
+        {
+            w.WriteStartObject();
+            from.WriteConfig(w);
+            w.WriteEndObject();
+        }
+
+        using JsonDocument configJson = JsonDocument.Parse(config.ToArray());
+        ITrainableComponent copy = HeadRegistry.Create(from.Kind, "tagger", shared, configJson.RootElement);
+        using var weights = new MemoryStream();
+        Checkpoint.Save(weights, from.Weights);
+        weights.Position = 0;
+        Checkpoint.Load(weights, copy.Weights);
+        using Pipeline heads = Pipeline.Blank().Add(copy);
+
+        using var file = new MemoryStream();
+        PipelineFile.Save(heads, file);
+        Assert.True(file.Length < 100_000, $"the heads file holds {file.Length} bytes: the encoder's weights must not be in it");
+
+        // Without the registration the file cannot be loaded, and says why.
+        file.Position = 0;
+        InvalidDataException missing = Assert.Throws<InvalidDataException>(() => PipelineFile.Load(file));
+        Assert.Contains("test-shared-encoder", missing.Message, StringComparison.Ordinal);
+
+        SharedEncoder.Register("test-shared-encoder", encoder);
+        try
+        {
+            file.Position = 0;
+            using Pipeline loaded = PipelineFile.Load(file);
+            Assert.Equal(accuracy, Accuracy(loaded, test));
+            Assert.Throws<InvalidOperationException>(() => SharedEncoder.Register("test-shared-encoder", encoder));
+        }
+        finally
+        {
+            Assert.True(SharedEncoder.Unregister("test-shared-encoder"));
+        }
+    }
 }
