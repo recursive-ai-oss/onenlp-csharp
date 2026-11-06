@@ -71,7 +71,8 @@ static void Parity(Dictionary<string, string> o)
         using Tensor a = Ids64(x, 1, n);
         using Tensor b = Ids64(mask, 1, n);
         using SessionOutputs outs = session.Run(new Dictionary<string, Tensor> { ["input_ids"] = a, ["attention_mask"] = b });
-        ReadOnlySpan<float> h = outs[session.Outputs[0].Name].Data<float>();
+        float[] h = outs[session.Outputs[0].Name].Data<float>().ToArray();
+
         double textMax = 0;
         for (int r = 0; r < n; r++, row++)
         {

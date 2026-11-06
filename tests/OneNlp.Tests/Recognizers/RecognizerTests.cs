@@ -18,7 +18,7 @@ public class RecognizerTests
     // The number, unit, currency and sequence rules alone: a date such as "2020-01-15" is read as a date by the full English rules.
     private static readonly Recognizer NumberRules = Recognizer.FromRules(
         [.. typeof(Recognizer).Assembly.GetManifestResourceNames()
-            .Where(n => n.Replace('\\', '/').Contains("Recognizers/Data/en/", StringComparison.Ordinal)
+            .Where(n => (n.Replace('\\', '/').Contains("Recognizers/Data/en/", StringComparison.Ordinal) || n.Replace('\\', '/').Contains("Recognizers/Data/shared/", StringComparison.Ordinal))
                 && !n.EndsWith("datetime.rules", StringComparison.Ordinal) && !n.EndsWith("holidays.rules", StringComparison.Ordinal))
             .Select(n =>
             {
@@ -292,7 +292,7 @@ public class RecognizerTests
     }
 
     [Fact]
-    public void OnlyEnglishIsBuiltIn() => Assert.Throws<NotSupportedException>(() => Recognizer.For(Language.German));
+    public void OnlyEnglishFrenchAndGermanAreBuiltIn() => Assert.Throws<NotSupportedException>(() => Recognizer.For(Language.Spanish));
 
     [Fact]
     public void HappyPathVerbsFilterByKind()

@@ -1,0 +1,164 @@
+# Date and time vocabulary, French (fr-FR). Same sections as the English file; the roles added for French and German are described in docs/recognizers.md.
+#
+# Dates are day first (le 3 mars 2026, 03/04/2026 is 3 April). A form starting with "=" is case-sensitive, the others are matched without regard to case.
+
+[time.region]
+fr
+
+[time.month]
+1 | janvier, =janv, =janv.
+2 | février, fevrier, =févr, =févr., =fevr, =fevr.
+3 | mars
+4 | avril, =avr, =avr.
+5 | mai
+6 | juin
+7 | juillet, =juil, =juil.
+8 | août, aout
+9 | septembre, =sept, =sept.
+10 | octobre, =oct, =oct.
+11 | novembre, =nov, =nov.
+12 | décembre, decembre, =déc, =déc., =dec, =dec.
+
+[time.weekday]
+1 | lundi | lundis
+2 | mardi | mardis
+3 | mercredi | mercredis
+4 | jeudi | jeudis
+5 | vendredi | vendredis
+6 | samedi | samedis
+7 | dimanche | dimanches
+
+[time.unit]
+second | seconde, secondes, sec | 1 | 0
+minute | minute, minutes, min | 60 | 0
+hour | heure, heures | 3600 | 0
+day | jour, jours, journée, journées, journee, journees | 86400 | 0
+week | semaine, semaines | 604800 | 0
+week | quinzaine, quinzaines | 1209600 | 0
+month | mois | 0 | 1
+quarter | trimestre, trimestres | 0 | 3
+year | an, ans, année, années, annee, annees | 0 | 12
+decade | décennie, décennies, decennie, decennies | 0 | 120
+business day | jour ouvré, jours ouvrés, jour ouvrable, jours ouvrables, jour ouvre, jours ouvres | 0 | 0
+
+[time.season]
+spring | printemps | 3 | 3
+summer | été, ete | 6 | 3
+fall | automne | 9 | 3
+winter | hiver | 12 | 3
+
+[time.daypart]
+morning | matin, matinée, matinee | 6 | 12
+afternoon | après-midi, apres-midi, après midi | 12 | 18
+evening | soir, soirée, soiree | 18 | 24
+night | nuit | 20 | 24
+
+[time.word]
+today | aujourd'hui
+tomorrow | demain
+yesterday | hier
+dayaftertomorrow | après-demain, apres-demain
+daybeforeyesterday | avant-hier
+tonight | ce soir, cette nuit
+this | ce, cet, cette
+nextpost | prochain, prochaine, suivant, suivante
+lastpost | dernier, dernière, derniere, passé, passée, précédent, précédente
+agoprefix | il y a
+later | plus tard
+in | dans
+at | à
+of | de, d', du
+and | et
+rangeto | à, au, jusqu'à, jusqu'au, jusqu'en, -, –, —
+from | de, du, depuis, dès, d'
+between | entre
+every | tous les, toutes les, chaque
+each | chaque
+early | début, début de, début d'
+mid | mi, milieu de, milieu d', à la mi
+late | fin, fin de, fin d'
+after | après
+before | avant
+half | semestre, semestres, demi
+quarter | trimestre, trimestres
+article | un, une
+the | le, la, l', les
+determiner | le, la, l', les
+approx | environ, vers, autour de, à peu près, approximativement, aux alentours de
+weekend | week-end, weekend, fin de semaine
+zonebase | =UTC, =GMT
+quarterprefix | =T
+halfprefix | =S
+hourmark | h
+hourword | heure, heures
+plus15 | et quart
+plus30 | et demie, et demi
+andhalf | et demi, et demie
+minus15 | moins le quart, moins un quart
+minus | moins
+clockcue | est, sera, était
+daypartprefix | du, de la, de l', de
+decadeprefix | années, annees
+
+[time.recurrence]
+P1D | day | quotidien, quotidienne, quotidiennement, journalier, journalière
+P1W | week | hebdomadaire, hebdomadaires, hebdomadairement
+P1M | month | mensuel, mensuelle, mensuellement
+P3M | quarter | trimestriel, trimestrielle, trimestriellement
+P1Y | year | annuel, annuelle, annuellement
+PT1H | hour | horaire
+
+[time.zone]
+=UTC, =GMT | 0 | z
+=WET | 0
+=WEST | 60
+=CET | 60
+=CEST | 120
+=EET | 120
+=EEST | 180
+=BST | 60
+=MSK | 180
+=EST | -300
+=EDT | -240
+=CST | -360
+=CDT | -300
+=MST | -420
+=MDT | -360
+=PST | -480
+=PDT | -420
+
+[time.holiday]
+Jour de l'An, Nouvel An, Jour de l'an, Premier de l'an | fixed 01-01 | fr
+Saint-Sylvestre, réveillon du Nouvel An, réveillon de la Saint-Sylvestre | fixed 12-31 | fr
+Épiphanie, Jour des Rois | fixed 01-06 | fr
+Chandeleur | fixed 02-02 | fr
+Saint-Valentin | fixed 02-14 | fr
+Mardi gras | easter -47 | fr
+Mercredi des Cendres | easter -46 | fr
+Dimanche des Rameaux | easter -7 | fr
+Jeudi saint | easter -3 | fr
+Vendredi saint | easter -2 | fr
+Samedi saint | easter -1 | fr
+Pâques, dimanche de Pâques, Paques, dimanche de Paques | easter 0 | fr
+Lundi de Pâques, lundi de Paques | easter 1 | fr
+Poisson d'avril | fixed 04-01 | fr
+Fête du Travail, fête du travail | fixed 05-01 | fr
+Victoire 1945, Fête de la Victoire, Armistice de 1945 | fixed 05-08 | fr
+Ascension, jeudi de l'Ascension | easter 39 | fr
+Pentecôte, dimanche de Pentecôte | easter 49 | fr
+Lundi de Pentecôte | easter 50 | fr
+Fête des mères | nth last sun 5 | fr
+Fête des pères | nth 3 sun 6 | fr
+Fête de la musique | fixed 06-21 | fr
+Fête nationale, Quatorze Juillet, quatorze juillet | fixed 07-14 | fr
+Assomption | fixed 08-15 | fr
+Halloween | fixed 10-31 | fr
+Toussaint | fixed 11-01 | fr
+Armistice, Armistice 1918, jour de l'Armistice | fixed 11-11 | fr
+Réveillon de Noël, réveillon de Noel | fixed 12-24 | fr
+Noël, Noel | fixed 12-25 | fr
+Saint-Étienne | fixed 12-26 | fr
+
+[time.flag]
+no-lone-day
+bare-hour-24

@@ -1,0 +1,75 @@
+# Units that follow a number, French. Fields: canonical name | dimension | surface forms, comma-separated | confidence (optional).
+# A form starting with "=" is case-sensitive; the others are matched without regard to case. Canonical names are the English ones.
+# Short forms that are also common words (a, an, m as in "3 m" is kept case-sensitive) are left out on purpose.
+
+[unit]
+millimeter | length | mm, millimètre, millimètres, millimetre, millimetres
+centimeter | length | cm, centimètre, centimètres, centimetre, centimetres
+meter | length | =m, mètre, mètres, metre, metres
+kilometer | length | km, kilomètre, kilomètres, kilometre, kilometres
+micrometer | length | micron, microns, µm, μm, micromètre, micromètres
+inch | length | pouce, pouces
+foot | length | pied, pieds
+yard | length | yard, yards
+mile | length | mile, miles
+nautical mile | length | mille marin, milles marins
+
+milligram | mass | mg, milligramme, milligrammes
+gram | mass | =g, gramme, grammes
+kilogram | mass | kg, kilo, kilos, kilogramme, kilogrammes
+microgram | mass | µg, μg, microgramme, microgrammes
+tonne | mass | tonne, tonnes, =t
+quintal | mass | quintal, quintaux
+pound | mass | lb, lbs
+ounce | mass | once, onces
+
+milliliter | volume | ml, millilitre, millilitres
+centiliter | volume | cl, centilitre, centilitres
+deciliter | volume | dl, décilitre, décilitres
+liter | volume | =l, =L, litre, litres
+hectoliter | volume | hl, hectolitre, hectolitres
+gallon | volume | gallon, gallons
+cubic meter | volume | m3, m³, mètre cube, mètres cubes, metre cube, metres cubes
+cubic centimeter | volume | cm3, cm³, centimètre cube, centimètres cubes
+
+square meter | area | m2, m², mètre carré, mètres carrés, metre carre, metres carres
+square kilometer | area | km2, km², kilomètre carré, kilomètres carrés
+square centimeter | area | cm2, cm², centimètre carré, centimètres carrés
+square foot | area | pied carré, pieds carrés
+acre | area | acre, acres
+hectare | area | ha, hectare, hectares
+
+kilometer per hour | speed | km/h, kmh, kilomètre par heure, kilomètres par heure, kilomètres-heure, kilomètre-heure
+mile per hour | speed | mph, mile par heure, miles par heure
+meter per second | speed | m/s, mètre par seconde, mètres par seconde
+knot | speed | nœud, nœuds, noeud, noeuds, kt, kts
+
+bit | information | bit, bits
+byte | information | octet, octets, =o, =B
+kilobyte | information | =Ko, =ko, =KB, =kB, kilo-octet, kilo-octets, kilooctet, kilooctets
+megabyte | information | =Mo, =MB, méga-octet, méga-octets, mégaoctet, mégaoctets
+gigabyte | information | =Go, =GB, giga-octet, giga-octets, gigaoctet, gigaoctets
+terabyte | information | =To, =TB, téra-octet, téra-octets, téraoctet, téraoctets
+petabyte | information | =Po, =PB, péta-octet, péta-octets
+kilobit | information | =Kb, kbit, kilobit, kilobits
+megabit | information | =Mb, mbit, mégabit, mégabits
+gigabit | information | =Gb, gbit, gigabit, gigabits
+
+watt | power | watt, watts, =W
+kilowatt | power | =kW, kilowatt, kilowatts
+megawatt | power | =MW, mégawatt, mégawatts
+horsepower | power | ch, cv, chevaux, cheval-vapeur
+
+celsius | temperature | °c, ºC, ˚C, ° c, degrés celsius, degré celsius, degres celsius, degrés centigrades, degrés c, celsius, centigrade
+fahrenheit | temperature | °f, ºF, ˚F, ° f, degrés fahrenheit, degré fahrenheit, degres fahrenheit, degrés f, fahrenheit
+kelvin | temperature | kelvin, kelvins, degrés kelvin
+degree | temperature | degré, degrés, degre, degres, °, º, ˚ | 0.6
+
+[unit.compound]
+kilometer | meter | 1000
+meter | centimeter | 100
+centimeter | millimeter | 10
+meter | millimeter | 1000
+kilogram | gram | 1000
+gram | milligram | 1000
+liter | milliliter | 1000

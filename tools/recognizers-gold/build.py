@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Builds the English recognizer gold files from en.src.txt.
+"""Builds the recognizer gold files of one language from <lang>.src.txt.
 
-Usage: build.py [--out DIR]   (default: ../../testdata/recognizers/en)
+Usage: build.py [--lang en|fr|de] [--out DIR]   (default: English, ../../testdata/recognizers/<lang>)
+
+In the source, {nbsp} and {nnbsp} stand for U+00A0 and U+202F so that sentences with typographic spaces stay readable.
 
 An '@split dev|test|auto' line in the source assigns the sentences below it; 'auto' (default) uses the stratified hash rule.
 Writes gold.jsonl (the development split) and test.jsonl (the held-out split), validates every label against the schema in
@@ -114,14 +116,16 @@ def parse_line(line, ref, n):
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=os.path.join(here, "..", "..", "testdata", "recognizers", "en"))
-    out = ap.parse_args().out
+    ap.add_argument("--lang", default="en")
+    ap.add_argument("--out")
+    args = ap.parse_args()
+    out = args.out or os.path.join(here, "..", "..", "testdata", "recognizers", args.lang)
     ref = None
     forced = "auto"
     docs = {}
     assigned = {}
-    for n, raw in enumerate(open(os.path.join(here, "en.src.txt"), encoding="utf-8"), 1):
-        line = raw.rstrip("\n")
+    for n, raw in enumerate(open(os.path.join(here, args.lang + ".src.txt"), encoding="utf-8"), 1):
+        line = raw.rstrip("\n").replace("{nbsp}", "\u00a0").replace("{nnbsp}", "\u202f")
         if not line.strip() or line.startswith("#"):
             continue
         if line.startswith("@ref "):

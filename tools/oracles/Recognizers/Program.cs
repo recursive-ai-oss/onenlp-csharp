@@ -16,7 +16,7 @@ namespace OneNlp.Tools.RecognizersOracle;
 
 internal static class Program
 {
-    private static readonly string Culture = Microsoft.Recognizers.Text.Culture.English;
+    private static readonly string Culture = Environment.GetEnvironmentVariable("ONENLP_CULTURE") ?? Microsoft.Recognizers.Text.Culture.English;
 
     private static int Main(string[] args)
     {

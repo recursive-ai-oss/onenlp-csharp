@@ -18,6 +18,8 @@ namespace RecursiveAI.OneNlp.Recognizers;
 public sealed class Recognizer
 {
     private static readonly Lazy<Recognizer> EnglishRules = new(() => LoadEmbedded(Language.English));
+    private static readonly Lazy<Recognizer> FrenchRules = new(() => LoadEmbedded(Language.French));
+    private static readonly Lazy<Recognizer> GermanRules = new(() => LoadEmbedded(Language.German));
 
     private readonly RecognizerData _data;
 
@@ -30,17 +32,38 @@ public sealed class Recognizer
     /// <summary>The recognizer for English, from the rules built into this package.</summary>
     public static Recognizer English => EnglishRules.Value;
 
+    /// <summary>The recognizer for French, from the rules built into this package.</summary>
+    public static Recognizer French => FrenchRules.Value;
+
+    /// <summary>The recognizer for German, from the rules built into this package.</summary>
+    public static Recognizer German => GermanRules.Value;
+
     /// <summary>The language the rules are for; <see cref="Language.Unknown"/> for rules loaded without one.</summary>
     public Language Language { get; }
 
     /// <summary>Returns the recognizer for a language from the rules built into this package.</summary>
     /// <param name="language">The language.</param>
-    /// <exception cref="NotSupportedException">No rules for the language are built in. English is the only one so far; <see cref="FromRules"/> loads rules from a file.</exception>
-    public static Recognizer For(Language language) =>
-        language == Language.English
-            ? English
-            : throw new NotSupportedException(
-                $"No built-in recognizer rules for language '{language.Code}'. English ('en') is the only one so far; load rules with Recognizer.FromRules.");
+    /// <exception cref="NotSupportedException">No rules for the language are built in. English, French and German are; <see cref="FromRules"/> loads rules from a file.</exception>
+    public static Recognizer For(Language language)
+    {
+        if (language == Language.English)
+        {
+            return English;
+        }
+
+        if (language == Language.French)
+        {
+            return French;
+        }
+
+        if (language == Language.German)
+        {
+            return German;
+        }
+
+        throw new NotSupportedException(
+            $"No built-in recognizer rules for language '{language.Code}'. English ('en'), French ('fr') and German ('de') are built in; load rules with Recognizer.FromRules.");
+    }
 
     /// <summary>Compiles recognizer rules from rule data.</summary>
     /// <param name="rules">One or more rule files as UTF-8 text, in the format described in <c>docs/recognizers.md</c>. Sections may repeat across files.</param>
@@ -87,11 +110,13 @@ public sealed class Recognizer
     private static Recognizer LoadEmbedded(Language language)
     {
         Assembly assembly = typeof(Recognizer).Assembly;
+        // Rules every language shares (the sequence syntax vocabulary: URL schemes and domain endings) sit in Data/shared/.
         string prefix = "Recognizers/Data/" + language.Code + "/";
+        const string Shared = "Recognizers/Data/shared/";
         string[] names =
         [
             .. assembly.GetManifestResourceNames()
-                .Where(n => n.Replace('\\', '/').StartsWith(prefix, StringComparison.Ordinal))
+                .Where(n => n.Replace('\\', '/').StartsWith(prefix, StringComparison.Ordinal) || n.Replace('\\', '/').StartsWith(Shared, StringComparison.Ordinal))
                 .Order(StringComparer.Ordinal),
         ];
         var files = new List<ReadOnlyMemory<byte>>(names.Length);

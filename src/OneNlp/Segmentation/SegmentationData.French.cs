@@ -64,7 +64,7 @@ public sealed partial class SegmentationData
 
     /// <summary>
     /// Finds out whether the tokens starting at <paramref name="start"/> are the pieces of one multiword token (French <c>d</c> + <c>u</c> for <c>du</c>)
-    /// and gives the words they stand for.
+    /// and gives the words they stand for. Spanish groups have two to four pieces (<c>del</c>, <c>ver</c> + <c>lo</c>, <c>encontrar</c> + <c>nos</c> + <c>las</c>).
     /// </summary>
     /// <param name="doc">The document the tokenizer made.</param>
     /// <param name="start">The index of the first candidate token.</param>
@@ -76,6 +76,11 @@ public sealed partial class SegmentationData
         ArgumentNullException.ThrowIfNull(doc);
         count = 0;
         words = null;
+        if (Contractions.Count > 0 || EncliticVerbs)
+        {
+            return TryMatchTokenGroup(doc, start, out count, out words);
+        }
+
         if (SuffixSplits.Count > 0)
         {
             return TryMatchSuffixSplit(this, doc, start, out count, out words);

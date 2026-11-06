@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- A consumer of the packed packages, as a user's project would be: it restores RecursiveAI.OneNlp and (with WithModel=true) the Spanish
+       model package from a folder feed (environment variable ONENLP_CONSUMER_FEED), never from project references. Not part of the
+       solution. Run it with run.sh. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).ModelConsumer.Spanish</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).ModelConsumer.Spanish</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <WithModel Condition="'$(WithModel)' == ''">true</WithModel>
+    <DefineConstants Condition="'$(WithModel)' != 'true'">$(DefineConstants);NO_MODEL</DefineConstants>
+    <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ONENLP_CONSUMER_FEED)</RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RecursiveAI.OneNlp" VersionOverride="$(Version)" />
+    <PackageReference Include="RecursiveAI.OneNlp.Models.Spanish" VersionOverride="$(Version)" Condition="'$(WithModel)' == 'true'" />
+  </ItemGroup>
+
+</Project>

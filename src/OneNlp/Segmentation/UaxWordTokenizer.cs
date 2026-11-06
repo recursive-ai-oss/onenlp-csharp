@@ -380,6 +380,19 @@ public sealed class UaxWordTokenizer : IWordTokenizer
             return;
         }
 
+        // Contractions and verbs with enclitic pronouns (Spanish): one piece for each word of the multiword token.
+        if (_data.HasMultiwordTokens && _data.TryMultiwordWords(token, out string[] words) && SegmentationData.PieceLengths(token, words) is { } pieceLengths)
+        {
+            int from = pos;
+            foreach (int length in pieceLengths)
+            {
+                tokens.Add(new TokenBoundary(from, length));
+                from += length;
+            }
+
+            return;
+        }
+
         if (_data.ContextualSplits.Count > 0 && _contextual.TryGetValue(token, out SegmentationData.ContextualSplit? contextual))
         {
             // A contraction after a noun, the plain word after a verb, a preposition or punctuation ("la plupart des" against "avec des").

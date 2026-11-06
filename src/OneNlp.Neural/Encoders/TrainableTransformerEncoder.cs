@@ -170,7 +170,7 @@ public sealed class TrainableTransformerEncoder : IEncoder
         }
         else
         {
-            (PostNormModule module, PostNormConfig config) = reader.LoadPostNorm(new PostNormConfig(), options, options.FreezeEmbeddings, options.Seed);
+            (PostNormModule module, PostNormConfig config) = reader.LoadPostNorm(new PostNormConfig(), options, options.FreezeEmbeddings, options.Seed, ConfigHeads(modelPath));
             string settings = Resolved(family, options, config.Heads, options.GlobalEvery, options.LocalWindow, options.GlobalRopeTheta, options.LocalRopeTheta, config.NormEpsilon, config.PositionOffset);
             return new TrainableTransformerEncoder(module, (ids, lengths) => module.Forward(ids, lengths), config.Width, family, tokenizer, modelPath, tokenizerPath, modelSha256, options, settings);
         }
@@ -407,6 +407,19 @@ public sealed class TrainableTransformerEncoder : IEncoder
         };
 
         return LoadOnnx(TransformerEncoder.Resolve(JsonSettings.String(s, "model", 1024)), TransformerEncoder.Resolve(JsonSettings.String(s, "tokenizer", 1024)), options, sha);
+    }
+
+    // The head count of a distilled student is not in its weights; its export writes <model>.config.json beside the model. 0 when absent.
+    private static int ConfigHeads(string modelPath)
+    {
+        string config = Path.ChangeExtension(modelPath, ".config.json");
+        if (!File.Exists(config) || new FileInfo(config).Length > 1 << 20)
+        {
+            return 0;
+        }
+
+        using JsonDocument doc = JsonDocument.Parse(File.ReadAllBytes(config));
+        return doc.RootElement.ValueKind == JsonValueKind.Object && doc.RootElement.TryGetProperty("heads", out JsonElement h) && h.TryGetInt32(out int n) && n is >= 1 and <= 1024 ? n : 0;
     }
 
     private static float Real(JsonElement s, string name)

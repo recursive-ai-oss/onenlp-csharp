@@ -21,11 +21,39 @@ internal enum CardinalKind
     Tens,
     Scale,
     Multiplier,
+
+    /// <summary>A scale word that may stand alone for one of itself: French <c>cent</c>, <c>mille</c>; German <c>hundert</c>, <c>tausend</c>.</summary>
+    BareScale,
+}
+
+/// <summary>How number words combine. English is additive and multiplicative in the short scale; the others need rules of their own.</summary>
+internal enum NumberSystem
+{
+    English,
+
+    /// <summary>French: <c>quatre-vingt-dix-sept</c> (80 + 10 + 7), <c>soixante et onze</c>, invariable <c>mille</c>, hundreds with a plural <c>cents</c>.</summary>
+    French,
+
+    /// <summary>German: whole numbers below a million are written as one word, units before tens (<c>dreihundertvierundzwanzig</c>).</summary>
+    German,
 }
 
 internal readonly record struct Cardinal(CardinalKind Kind, decimal Value);
 
 internal readonly record struct OrdinalWord(decimal Value, bool NotAfterNumber);
+
+internal enum MorphemeKind
+{
+    Unit,
+    Teen,
+    Tens,
+    Hundred,
+    Thousand,
+    And,
+}
+
+/// <summary>A piece of a German number word: <c>drei</c>, <c>hundert</c>, <c>und</c>, an ordinal stem such as <c>zwanzigst</c>.</summary>
+internal readonly record struct Morpheme(string Text, MorphemeKind Kind, decimal Value, bool Ordinal);
 
 internal readonly record struct ScaleSuffix(decimal Value, bool MoneyOnly);
 
@@ -64,13 +92,40 @@ internal sealed class RecognizerData
 
     internal char DecimalSeparator { get; private set; } = '.';
 
-    internal char GroupSeparator { get; private set; } = ',';
+    /// <summary>The characters that may separate groups of three digits (<c>1,234</c>; <c>1 234</c> with a space, no-break space or narrow no-break space; <c>1.234</c>).</summary>
+    internal string GroupSeparators { get; private set; } = ",";
+
+    internal NumberSystem System { get; private set; } = NumberSystem.English;
+
+    /// <summary>A whole number followed by a dot and a word is an ordinal (German <c>3. März</c>).</summary>
+    internal bool OrdinalDot { get; private set; }
+
+    /// <summary>Words that follow a number and a dot and show the dot makes an ordinal even when the word has a capital letter (German nouns: <c>5. Stock</c>).</summary>
+    internal HashSet<string> OrdinalDotWords { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Words that are never a number on their own (the indefinite articles <c>un</c>, <c>ein</c>) but count inside a longer number.</summary>
+    internal HashSet<string> LoneSkip { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Endings a declined ordinal takes after its stem (German <c>dritte</c>, <c>dritten</c>); the bare stem is looked up as written.</summary>
+    internal List<string> OrdinalEndings { get; } = [];
+
+    /// <summary>Words before a number that make the following age unit an age (<c>âgé de</c> 5 ans).</summary>
+    internal FormTable<bool> AgePrefixes { get; } = new();
+
+    /// <summary>Age units that are an age without more words (<c>5 Jahre alt</c> needs <c>alt</c>; <c>5-jährig</c> does not).</summary>
+    internal FormTable<string> AgeUnitsBare { get; } = new();
 
     internal string NegativeSigns { get; private set; } = "-\u2212";
 
     internal Dictionary<string, Cardinal> Cardinals { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     internal Dictionary<string, OrdinalWord> Ordinals { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Ordinal stems that need an ending to be a word (German <c>dritt</c>, written <c>number.ordinal</c> with a trailing <c>~</c>).</summary>
+    internal Dictionary<string, OrdinalWord> OrdinalStems { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>The parts German number words are cut into, longest first; empty for other languages.</summary>
+    internal Morpheme[] Morphemes { get; private set; } = [];
 
     internal Dictionary<string, int> Fractions { get; } = new(StringComparer.OrdinalIgnoreCase);
 
@@ -210,9 +265,9 @@ internal sealed class RecognizerData
     private static readonly HashSet<string> Sections = new(StringComparer.Ordinal)
     {
         "number.digits", "number.cardinal", "number.ordinal", "number.fraction", "number.article", "number.connector", "number.negative",
-        "number.point", "number.suffix", "number.ordinal-suffix", "percent", "unit", "unit.compound", "number.not-number", "currency.context", "age.unit", "age.suffix", "currency.symbol",
+        "number.point", "number.suffix", "number.ordinal-suffix", "percent", "unit", "unit.compound", "number.not-number", "currency.context", "age.unit", "age.suffix", "age.prefix", "age.word", "number.lone-skip", "number.ordinal-ending", "number.ordinal-dot-word", "currency.symbol",
         "currency.name", "currency.code", "url.scheme", "url.tld", "url.tld.bare", "time.month", "time.weekday", "time.unit", "time.season",
-        "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday",
+        "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday", "time.flag", "time.region",
     };
 
     private void Apply(string section, string[] f)
@@ -227,13 +282,30 @@ internal sealed class RecognizerData
                         DecimalSeparator = OneChar(f[1]);
                         break;
                     case "group":
-                        GroupSeparator = OneChar(f[1]);
+                        GroupSeparators = Groups(f[1]);
+                        break;
+                    case "system":
+                        System = f[1] switch
+                        {
+                            "english" => NumberSystem.English,
+                            "french" => NumberSystem.French,
+                            "german" => NumberSystem.German,
+                            _ => throw new RecognizerRulesException($"Unknown number system '{f[1]}' (expected english, french or german)."),
+                        };
+                        break;
+                    case "ordinal-dot":
+                        OrdinalDot = f[1] switch
+                        {
+                            "yes" => true,
+                            "no" => false,
+                            _ => throw new RecognizerRulesException($"Unknown value '{f[1]}' (expected yes or no)."),
+                        };
                         break;
                     case "negative":
                         NegativeSigns = f[1];
                         break;
                     default:
-                        throw new RecognizerRulesException($"Unknown key '{f[0]}' (expected decimal, group or negative).");
+                        throw new RecognizerRulesException($"Unknown key '{f[0]}' (expected decimal, group, negative, system or ordinal-dot).");
                 }
 
                 break;
@@ -246,12 +318,21 @@ internal sealed class RecognizerData
                     "tens" => CardinalKind.Tens,
                     "scale" => CardinalKind.Scale,
                     "multiplier" => CardinalKind.Multiplier,
+                    "bare-scale" => CardinalKind.BareScale,
                     _ => throw new RecognizerRulesException($"Unknown cardinal kind '{f[1]}'."),
                 }, Number(f[2]));
                 break;
             case "number.ordinal":
                 Need(f, 2, 3);
-                Ordinals[f[0].ToLowerInvariant()] = new OrdinalWord(Number(f[1]), f.Length > 2 && f[2] == "not-after-number");
+                if (f[0].EndsWith('~'))
+                {
+                    OrdinalStems[f[0][..^1].ToLowerInvariant()] = new OrdinalWord(Number(f[1]), false);
+                }
+                else
+                {
+                    Ordinals[f[0].ToLowerInvariant()] = new OrdinalWord(Number(f[1]), f.Length > 2 && f[2] == "not-after-number");
+                }
+
                 break;
             case "number.fraction":
                 Need(f, 2, 2);
@@ -348,6 +429,43 @@ internal sealed class RecognizerData
                 Need(f, 1, 1);
                 _ageSuffixes.AddRange(List(f[0]));
                 break;
+            case "age.prefix":
+                Need(f, 1, 1);
+                foreach (string form in List(f[0]))
+                {
+                    AgePrefixes.Add(form, true);
+                }
+
+                break;
+            case "age.word":
+                Need(f, 2, 2);
+                foreach (string form in List(f[1]))
+                {
+                    Suffixes.Add(form, new SuffixEntry(SuffixKind.Age, f[0], "age", 1m, 1f));
+                    AgeUnitsBare.Add(form, f[0]);
+                }
+
+                break;
+            case "number.lone-skip":
+                Need(f, 1, 1);
+                foreach (string w in List(f[0]))
+                {
+                    LoneSkip.Add(w);
+                }
+
+                break;
+            case "number.ordinal-ending":
+                Need(f, 1, 1);
+                OrdinalEndings.AddRange(List(f[0]).Select(e => e.ToLowerInvariant()));
+                break;
+            case "number.ordinal-dot-word":
+                Need(f, 1, 1);
+                foreach (string w in List(f[0]))
+                {
+                    OrdinalDotWords.Add(w);
+                }
+
+                break;
             case "currency.symbol":
                 Need(f, 3, 4);
                 float conf = Conf(f, 3);
@@ -431,6 +549,7 @@ internal sealed class RecognizerData
         {
             foreach (string form in forms)
             {
+                AgeUnitsBare.Add(form, canonical);
                 foreach (string suffix in _ageSuffixes)
                 {
                     var entry = new SuffixEntry(SuffixKind.Age, canonical, "age", 1m, 1f);
@@ -440,12 +559,65 @@ internal sealed class RecognizerData
             }
         }
 
+        if (System == NumberSystem.German)
+        {
+            BuildMorphemes();
+        }
+
         foreach (string code in CurrencyCodes)
         {
             // Codes are upper case in text ("USD 5"); a lower-case "usd" is left alone because many codes are English words (ALL, TRY, TOP).
             Prefixes.Add("=" + code, new PrefixEntry(code, 1f));
             Suffixes.Add("=" + code, new SuffixEntry(SuffixKind.Money, code, "currency", 1m, 1f));
         }
+    }
+
+    // The parts of a German number word: the units, teens, tens, hundert and tausend of the cardinal table, the connector und, and the
+    // ordinal stems (which need an ending, so they only count as the last part).
+    private void BuildMorphemes()
+    {
+        var parts = new List<Morpheme>();
+        foreach ((string word, Cardinal c) in Cardinals)
+        {
+            MorphemeKind? kind = c.Kind switch
+            {
+                CardinalKind.Unit when c.Value is >= 1 and <= 9 && c.Value == decimal.Truncate(c.Value) => MorphemeKind.Unit,
+                CardinalKind.Teen => MorphemeKind.Teen,
+                CardinalKind.Tens => MorphemeKind.Tens,
+                CardinalKind.Scale or CardinalKind.BareScale when c.Value == 100 => MorphemeKind.Hundred,
+                CardinalKind.Scale or CardinalKind.BareScale when c.Value == 1000 => MorphemeKind.Thousand,
+                _ => null,
+            };
+            if (kind is MorphemeKind k)
+            {
+                parts.Add(new Morpheme(word, k, c.Value, false));
+            }
+        }
+
+        foreach (string word in Connectors)
+        {
+            parts.Add(new Morpheme(word, MorphemeKind.And, 0, false));
+        }
+
+        foreach ((string stem, OrdinalWord o) in OrdinalStems)
+        {
+            MorphemeKind kind = o.Value switch
+            {
+                < 10 => MorphemeKind.Unit,
+                < 20 => MorphemeKind.Teen,
+                < 100 => MorphemeKind.Tens,
+                100 => MorphemeKind.Hundred,
+                _ => MorphemeKind.Thousand,
+            };
+            parts.Add(new Morpheme(stem, kind, o.Value, true));
+        }
+
+        parts.Sort((a, b) =>
+        {
+            int c = b.Text.Length.CompareTo(a.Text.Length);
+            return c != 0 ? c : string.CompareOrdinal(a.Text, b.Text);
+        });
+        Morphemes = [.. parts];
     }
 
     private static void Need(string[] f, int min, int max)
@@ -466,6 +638,25 @@ internal sealed class RecognizerData
 
     private static char OneChar(string s) =>
         s.Length == 1 ? s[0] : throw new RecognizerRulesException($"'{s}' must be one character.");
+
+    // A group separator is one character, or several named or written characters separated by spaces: "space nbsp nnbsp .".
+    private static string Groups(string s)
+    {
+        var chars = new StringBuilder();
+        foreach (string part in s.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            chars.Append(part switch
+            {
+                "space" => ' ',
+                "nbsp" => ' ',
+                "nnbsp" => ' ',
+                "thinsp" => ' ',
+                _ => OneChar(part),
+            });
+        }
+
+        return chars.Length > 0 ? chars.ToString() : throw new RecognizerRulesException("A group separator is needed.");
+    }
 
     private static decimal Number(string s) =>
         decimal.TryParse(s, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal v)

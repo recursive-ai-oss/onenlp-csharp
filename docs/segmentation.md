@@ -44,6 +44,17 @@ Written from the UD German guidelines and the German-GSD treebank; the choices b
 
 Development split of UD German-GSD, raw text (`recipes/de/fast segment`): tokens 99.81 [99.69, 99.91], words 99.81, sentences 94.64.
 
+## Spanish data (`SegmentationData.Spanish`, name `spanish`)
+
+Written from the UD Spanish guidelines and the AnCora treebank; the choices below were made on its training and development files only.
+
+- **Contractions** `del` (`de` + `el`) and `al` (`a` + `el`), any case, are cut into two pieces, which is how the CoNLL-U reader cuts a surface form its words do not spell (`de`|`l`, `a`|`l`; `docs/data-formats.md`).
+- **Verbs with enclitic pronouns** are multiword tokens in AnCora (`conseguirlo` = `conseguir` + `lo`, `situándose` = `situando` + `se`). A token is cut when it ends in one to three of `me te se lo la le nos les las los`, what is left is an infinitive (`-ar -er -ir`) or a gerund (`-ando -iendo -yendo`) once the accent written for the stress is removed, and it is not on a short list of words the training file writes whole although they look like a verb and a pronoun (`parte`, `fuerte`, `muerte`, `Carlos`; the 47 words that occur more often whole than split). The pieces are the words when they spell the surface form (`conseguir`|`lo`), otherwise nearly equal parts (`situá`|`ndose`), as the reader cuts them. `os` is not an enclitic here: `-ros` and `-tros` words are far more common than second-person-plural forms. Imperative and subjunctive forms (`dámelo`, `véase`: about 45 of 1,540 clitic tokens in the training file) are not recognized. `SegmentationData.TryMatchMultiword` gives the words (`encontrárnoslas` is `encontrar` `nos` `las`; `reírse` keeps its accent).
+- **Abbreviations** keep their full stop: single letters (`W.`, `A.`), `fig.`, `EE.UU.`, `Co.`, `kg.` and the usual titles (`Sr.`, `Dra.`, `Prof.`, `Avda.`, `núm.`). Newswire AnCora has few of them. Sentences do not break after the titles.
+- **Inverted `¿` and `¡`** are tokens of their own (UAX #29 already separates them). Numbers with `.` or `,` between digits (`2.000`, `3,5`) stay whole; hyphenated names (`Ruiz-Mateos`) stay whole, as in the neutral defaults; apostrophe names (`d'Hebron`) stay whole by UAX #29.
+
+Development split of UD Spanish-AnCora, raw text (`recipes/es/fast segment`): tokens 99.92 [99.88, 99.95], words 99.91 [99.87, 99.94], sentences 94.89 [93.87, 95.90] (rules alone; the parser sets sentences in the pipeline). What is left: team names joined by a slash (`Reynard/Honda`, 11 tokens), quotes glued to a word, and `km.24`.
+
 ## Portuguese data (`SegmentationData.Portuguese`, name `portuguese`)
 
 Written from the UD Portuguese guidelines and the Portuguese-Bosque treebank; the lists below were counted on its training and development files only.
