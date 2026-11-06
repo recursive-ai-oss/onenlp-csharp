@@ -11,6 +11,7 @@ daypart-direct
 no-lone-day
 bare-hour-24
 bare-range-24
+determiner-inside-only
 
 [time.month]
 1 | januari, =jan., =jan
@@ -94,14 +95,13 @@ before | voor
 half | helft, halfjaar, semester
 quarter | kwartaal
 article | een
-the | de, het
 determiner | de, het
 approx | ongeveer, rond, circa, ca., omstreeks, zo'n
 weekend | weekend, weekeinde
 zonebase | =UTC, =GMT
 quarterprefix | =Q
 halfprefix | =H
-hourmark | uur
+hourword | uur
 halfbefore | half
 plusquarter | kwart over
 minusquarter | kwart voor

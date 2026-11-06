@@ -269,8 +269,8 @@ Het boeket is voor [[Moederdag|date|2026-05-10|day]] bij ons thuis.
 De kaart is voor [[Vaderdag|date|2026-06-21|day]] bij ons thuis.
 Het vuurwerk is voor [[Oudejaarsavond|date|2026-12-31|day]] op het plein.
 Het gedenkteken is open op [[Bevrijdingsdag|date|2026-05-05|day]] voor iedereen.
-De club komt samen op [[de derde donderdag van april|date|2026-04-16|day]] in het centrum.
-De audit is op [[de laatste vrijdag van maart|date|2026-03-27|day]] zoals gepland.
+De club komt samen op de [[derde donderdag van april|date|2026-04-16|day]] in het centrum.
+De audit is op de [[laatste vrijdag van maart|date|2026-03-27|day]] zoals gepland.
 De koning leest de troonrede voor op [[Prinsjesdag|date|2026-09-15|day]] in Den Haag.
 De kinderen zetten hun schoen voor [[Sinterklaasavond|date|2026-12-05|day]] bij de open haard.
 De winkels zijn op [[Goede Vrijdag|date|2026-04-03|day]] gewoon open.
@@ -439,8 +439,8 @@ In de doos zitten [[2.400|number|2400]] schroeven.
 Het gemiddelde is [[2,75|number|2.75]] per wedstrijd.
 Ze nodigde [[tweeëndertig|number|32]] vrienden uit voor het diner.
 Het boek heeft [[driehonderdvijftig|number|350]] pagina's.
-Er kwamen vanochtend [[eenenveertig|number|41]] brieven binnen.
-Het fonds is [[drie miljoen|number|3000000]] euro waard.
+Er kwamen [[eenenveertig|number|41]] brieven binnen.
+Het fonds is [[drie miljoen euro|currency|3000000 EUR]] waard.
 De score daalde met [[-3|number|-3]] punten.
 Hij bestelde [[zes|number|6]] koffie voor het team.
 Het museum ontving [[vijftienduizend|number|15000]] bezoekers.
@@ -449,7 +449,7 @@ Op dat schip zaten [[twaalfhonderd|number|1200]] passagiers.
 Ze gaven [[1.000.000|number|1000000]] uit aan reclame.
 Het team scoorde [[negentien|number|19]] punten.
 De route heeft [[achtenzestig|number|68]] bochten.
-Hij las [[achthonderd|number|800]] pagina's in een week.
+Hij las [[achthonderd|number|800]] pagina's in [[een week|duration|604800]].
 Op de kermis kwamen [[tweeduizend|number|2000]] mensen.
 
 # ---- ordinals
@@ -485,7 +485,7 @@ De vrachtwagen vervoert [[12 ton|dimension|12 tonne]] grind.
 De tank bevat [[1.500 liter|dimension|1500 liter]] water.
 
 # ---- temperatures
-Buiten is het vanochtend [[15 °C|temperature|15 celsius]].
+Buiten is het nu [[15 °C|temperature|15 celsius]].
 De kamer staat in de winter op [[68 °F|temperature|68 fahrenheit]].
 IJs smelt normaal bij [[0 °C|temperature|0 celsius]].
 De wijn wordt geserveerd op ongeveer [[12 graden|temperature|12 degree]].
@@ -496,7 +496,7 @@ Morgen wordt het [[-2 °C|temperature|-2 celsius]] op de toppen.
 Een jongen van [[16 jaar oud|age|16 year]] won de race.
 Een meisje van [[6 maanden oud|age|6 month]] slaapt rustig.
 Een opa van [[85 jaar oud|age|85 year]] vertelt verhalen in de kroeg.
-Een [[70-jarige|age|70 year]] vrouw wandelt elke dag.
+Een [[70-jarige|age|70 year]] vrouw wandelt [[elke dag|set|P1D|day]].
 
 # ---- money
 De lunch kostte [[15 €|currency|15 EUR]] per persoon.
@@ -510,7 +510,7 @@ De winnaar krijgt [[duizend euro|currency|1000 EUR]] prijs.
 
 # ---- sequences
 Schrijf naar [[persdienst@voorbeeld.nl|email]] voor vrijdagavond.
-Het portaal staat op [[https://portaal.voorbeeld.nl/inloggen|url]] sinds vorige maand.
+Het portaal staat op [[https://portaal.voorbeeld.nl/inloggen|url]] sinds kort.
 De testserver heeft het adres [[10.1.2.3|ip]] in het netwerk.
 Bel [[030 555 0147|phone]] voor informatie.
 Volg [[#feest2026|hashtag]] en schrijf naar [[@gemeente_utrecht|mention]] voor details.
@@ -526,12 +526,12 @@ Het werk is klaar op [[30 april|date|2026-04-30|day]] zonder uitstel.
 Het rapport verscheen op [[18-06-2019|date|2019-06-18|day]] laat in de avond.
 Ik kom [[morgen|date|2026-03-19|day]] na de lunch langs.
 Ze hebben elkaar [[gisteren|date|2026-03-17|day]] gezien voor een kop koffie.
-Het kaartje verloopt [[over 10 dagen|date|2026-03-28|day]] om middernacht.
+Het kaartje verloopt [[over 10 dagen|date|2026-03-28|day]] zonder uitstel.
 Ze schreef [[2 weken geleden|date|2026-03-04|day]] zonder antwoord.
 De markt opent [[volgende zaterdag|date|2026-03-28|day|alt=2026-03-21]] op het plein.
 We vieren feest met [[Pasen|date|2026-04-05|day]] allemaal samen.
 Het vuurwerk is gepland voor [[Oud en Nieuw|date|2026-12-31|day]] op de dijk.
-Het concert is op [[de eerste maandag van mei|date|2026-05-04|day]] in de schouwburg.
+Het concert is op de [[eerste maandag van mei|date|2026-05-04|day]] in de schouwburg.
 
 # ---- date ranges
 De bouwplaats is [[vorige week|daterange|2026-03-09/2026-03-16|week]] dicht vanwege vakantie.
@@ -539,7 +539,7 @@ Het saldo komt [[volgende maand|daterange|2026-04-01/2026-05-01|month]] op de ba
 Het project start in [[september 2026|daterange|2026-09-01/2026-10-01|month]] met een paar mensen.
 Het museum is in [[2019|daterange|2019-01-01/2020-01-01|year]] geopend na de restauratie.
 Het rapport van het [[tweede kwartaal 2026|daterange|2026-04-01/2026-07-01|quarter]] is te laat.
-De tentoonstelling is [[van 2 tot 20 mei|daterange|2026-05-02/2026-05-21|day]] elke dag open.
+De tentoonstelling is [[van 2 tot 20 mei|daterange|2026-05-02/2026-05-21|day]] met gratis toegang.
 We gaan [[volgende zomer|daterange|2026-06-01/2026-09-01|season|approx]] naar de bergen met de neven.
 De groep is ontstaan [[eind 2019|daterange|2019-09-01/2020-01-01|year|approx]] in een kelder.
 We spreken elkaar [[medio mei|daterange|2026-05-11/2026-05-21|month|approx]] voor het saldo.
@@ -553,7 +553,7 @@ De dienst begint om [[zes uur 's ochtends|time|T06:00|hour]] in het magazijn.
 De zitting is [[donderdag om 11:00|datetime|2026-03-19T11:00|minute]] in de rechtszaal.
 De vlucht landt [[morgen om 6:40|datetime|2026-03-19T06:40|minute]] op Schiphol.
 Het feest begint [[zaterdag om 19:30|datetime|2026-03-21T19:30|minute]] in de tuin.
-De winkel is open [[van 8 tot 12 uur|timerange|T08:00/T12:00|hour]] 's ochtends.
+De winkel is open [[van 8 tot 12 uur|timerange|T08:00/T12:00|hour]] volgens het bord.
 De les is [[tussen 16:00 en 18:00|timerange|T16:00/T18:00|minute]] in lokaal twee.
 Ik kom [[morgenavond|datetimerange|2026-03-19T18:00/2026-03-20T00:00|hour|approx]] even langs.
 We zien elkaar [[zaterdagmiddag|datetimerange|2026-03-21T12:00/2026-03-21T18:00|hour|approx]] in het park.

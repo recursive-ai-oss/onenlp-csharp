@@ -438,7 +438,7 @@ La media è [[2,75|number|2.75]] per partita.
 Ha invitato [[trentadue|number|32]] amici alla cena.
 Il libro ha [[trecentocinquanta|number|350]] pagine.
 Sono arrivate [[quarantuno|number|41]] lettere questa mattina.
-Il fondo vale [[tre milioni|number|3000000]] di euro.
+Il fondo vale [[tre milioni di euro|currency|3000000 EUR]].
 Il punteggio è sceso di [[-3|number|-3]] punti.
 Ha ordinato [[sei|number|6]] caffè per la squadra.
 Il museo ha ricevuto [[quindicimila|number|15000]] visitatori.

@@ -831,7 +831,14 @@ internal sealed partial class Scan
                 TemporalValue? range = JoinTimes(a.V, b.V, framed, framed && _td!.Flags.Contains("bare-range-24"));
                 if (range is not null)
                 {
-                    r.Add(new Cand(i, b.E, range));
+                    // "van 8 tot 12 uur": the hour word after the second end belongs to the range.
+                    int rangeEnd = b.E;
+                    if (rangeEnd < _items.Count && Is(rangeEnd, "hourword", out int hwn) && GapOk(_items[rangeEnd - 1].End, _items[rangeEnd].Start))
+                    {
+                        rangeEnd += hwn;
+                    }
+
+                    r.Add(new Cand(i, rangeEnd, range));
                 }
             }
         }
