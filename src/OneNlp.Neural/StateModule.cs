@@ -26,6 +26,14 @@ internal sealed class StateModule : NnModule
     {
         var heads = new List<ITrainableComponent>();
         var encoders = new List<IEncoder>();
+
+        // A trained word segmenter is the pipeline's tokenizer; its tagger and encoder come first, so a file without one numbers its weights as before.
+        if (pipeline.Tokenizer is NeuralWordSegmenter segmenter)
+        {
+            heads.Add(segmenter.Head);
+            encoders.Add(segmenter.Head.Encoder);
+        }
+
         foreach (IPipelineComponent component in pipeline.Components)
         {
             if (component is ITrainableComponent head)

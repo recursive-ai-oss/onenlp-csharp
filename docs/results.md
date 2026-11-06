@@ -399,3 +399,43 @@ UD Spanish-AnCora r2.18 test and WikiNER Spanish (wp3) test against spaCy 3.8.18
 ## Italian fast tier
 
 UD Italian-ParlaMint r2.18 test (gating) and WikiNER Italian (wp3) test against spaCy 3.8.18 trained with its default configuration on the same data, paired bootstrap 95% CI over sentences (1,000 resamples, seed 1); the tables, the settings and the weights are in `recipes/it/fast/PROVENANCE.md`. The training treebank is small: 897 sentences (ParlaMint and MarkIT; the larger Italian treebanks are non-commercial), so parser rows are low in absolute terms (LAS 72.6) for both systems. Gold words and sentences: UPOS (94.44 vs 94.10), XPOS (93.74 vs 93.59), UAS (78.52 vs 77.08) and LAS (72.57 vs 71.39) within noise; UFeats (89.52 vs 87.42), AllTags (86.31 vs 84.08) and lemmas (95.18 vs 93.13) ahead. Raw text: tokens 99.86 vs 99.75 within noise; every other row ahead (spaCy's tokenizer keeps `del` and `farlo` as one token where the treebank has several words; words 99.67 vs 89.73, UPOS 94.01 vs 83.53, LAS 72.77 vs 58.38, sentences 96.00 vs 87.55). Entities, gold tokens: micro F1 86.35 vs 83.54 (+2.80 [2.18, 3.42]); PER, ORG and MISC ahead, LOC within noise. No row misses. Indicative cost on one thread of the shared worker: the whole pipeline 7.2k tokens/s. The package is 103 MB; the consumer app runs on JIT and NativeAOT.
+
+## Chinese fast tier
+
+UD Chinese-GSDSimp r2.18 test and UNER Chinese-GSDSIMP test against spaCy 3.8.18 trained with its default configuration on the same data, paired bootstrap 95% CI over sentences (1,000 resamples, seed 1); the settings and weights are in `recipes/zh/fast/PROVENANCE.md`. spaCy's default Chinese tokenizer cuts single characters, so its raw-text pipeline cannot reach word-level scores (Tokens 39.43); the gold-token reference is the `gold_preproc` training run described in `tools/baselines/spacy/lang/PROVENANCE.md`, which trains and scores on gold words. The pipeline cuts words with a trained character tagger (`docs/segmentation.md`), tags, lemmatizes, parses and finds entities.
+
+Gold words and sentences (spaCy `gold_preproc`):
+
+| Metric | Ours | spaCy | Within noise |
+|---|---|---|---|
+| UPOS | 90.41 [89.70, 91.07] | 90.35 [89.70, 90.99] | yes |
+| XPOS | 91.37 [90.75, 91.98] | 91.11 [90.45, 91.70] | yes |
+| UFeats | 98.38 [98.13, 98.59] | 98.43 [98.19, 98.66] | yes |
+| AllTags | 89.49 [88.76, 90.17] | 89.52 [88.79, 90.20] | yes |
+| Lemmas | 99.87 [99.79, 99.94] | 99.91 [99.85, 99.96] | yes |
+| UAS | 74.94 [73.46, 76.38] | 73.11 [71.46, 74.68] | yes |
+| LAS | 68.76 [67.12, 70.32] | 68.24 [66.47, 69.94] | yes |
+| CLAS | 65.85 [64.15, 67.51] | 65.49 [63.52, 67.27] | yes |
+| MLAS | 56.94 [55.08, 58.69] | 58.87 [56.85, 60.72] | yes |
+
+Raw text (spaCy's default pipeline, character tokens):
+
+| Metric | Ours | spaCy | Within noise |
+|---|---|---|---|
+| Tokens, Words | 89.62 [88.87, 90.42] | 39.43 [38.60, 40.23] | no (ahead) |
+| Sentences | 99.40 [98.70, 99.90] | 46.93 [42.22, 51.79] | no (ahead) |
+| UPOS | 81.90 [80.99, 82.86] | 34.92 [34.11, 35.68] | no (ahead) |
+| XPOS | 82.73 [81.85, 83.67] | 35.69 [34.86, 36.47] | no (ahead) |
+| UFeats | 88.24 [87.49, 89.01] | 38.38 [37.56, 39.16] | no (ahead) |
+| AllTags | 81.00 [80.09, 81.99] | 34.29 [33.48, 35.06] | no (ahead) |
+| Lemmas | 89.56 [88.82, 90.35] | 39.43 [38.60, 40.23] | no (ahead) |
+| UAS | 62.50 [60.81, 64.17] | 9.12 [8.44, 9.79] | no (ahead) |
+| LAS | 57.88 [56.21, 59.63] | 8.59 [7.94, 9.28] | no (ahead) |
+
+Entities, UNER Chinese-GSDSIMP test, gold tokens (paired with spaCy `gold_preproc`): micro F1 62.80 [58.46, 67.23] vs 61.86 [57.66, 66.12] (difference 0.94 [-2.18, 4.40], within noise); precision 62.44 vs 67.08 (-4.64 [-8.52, -0.50], inside the noise rule); recall 63.17 vs 57.40. Per type: LOC 69.86 vs 68.15, ORG 47.91 vs 45.00, PER 57.69 vs 59.08, all within noise. On raw text (our segmenter's words, character-span F1) the micro F1 is 52.88 [48.60, 57.61]; spaCy's default model reaches 13.30 on gold tokens only, and no raw-text spaCy row exists.
+
+For information (`docs/references.md`): Stanza 1.5.1 raw text UPOS 88.82, LAS 70.65; UDPipe 2 gold tokens UPOS 95.73, LAS 83.60; Trankit base raw UPOS 94.17, LAS 81.96 (an older annotation). Our fast tier is below them, as expected of a fast tier with no pretrained embeddings; the gate is spaCy's.
+
+**Misses:** none. Everything is within noise or ahead; MLAS (-1.93) is inside the noise rule.
+
+Indicative speed (1 thread, load average 8-13 on the shared worker, raw development text; Catalyst has no Chinese model, so there is no managed row): segmenter alone 22-23k words/s (3.7 kB allocated per word); segmenter and tagging 16-17k words/s; the whole pipeline (segmenter, tagging, parser, entities) 4.5-4.6k words/s.
