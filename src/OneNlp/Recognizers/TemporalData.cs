@@ -32,7 +32,11 @@ internal sealed class TemporalData
     internal const int RegionGb = 2;
     internal const int RegionFr = 4;
     internal const int RegionDe = 8;
-    internal const int RegionAll = RegionUs | RegionGb | RegionFr | RegionDe;
+    internal const int RegionEs = 16;
+    internal const int RegionMx = 32;
+    internal const int RegionPt = 64;
+    internal const int RegionBr = 128;
+    internal const int RegionAll = RegionUs | RegionGb | RegionFr | RegionDe | RegionEs | RegionMx | RegionPt | RegionBr;
 
     private static readonly HashSet<string> Roles = new(StringComparer.Ordinal)
     {
@@ -44,9 +48,12 @@ internal sealed class TemporalData
         // 15h / 15 Uhr, "et quart", "halb drei", "1990er Jahre".
         "determiner", "agoprefix", "dayaftertomorrow", "daybeforeyesterday", "nextpost", "lastpost", "andhalf", "hourmark", "hourword",
         "plus15", "plus30", "minus15", "minus", "clockcue", "halfbefore", "plusquarter", "minusquarter", "daypartprefix", "decadeprefix", "decadesuffix", "decadeword",
+
+        // Spanish and Portuguese: the article (or the fused preposition and article) that introduces a clock time, "las 15:00", "às 15h".
+        "hourarticle",
     };
 
-    private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct", "no-lone-day", "bare-hour-24", "determiner-inside-only" };
+    private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct", "no-lone-day", "bare-hour-24", "determiner-inside-only", "of-before-year" };
 
     private static readonly string[] WeekdayCodes = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
@@ -59,7 +66,7 @@ internal sealed class TemporalData
 
     internal bool IsEmpty => Words.Count == 0;
 
-    /// <summary>Behaviours the rule data switches on (<c>time.flag</c>): <c>daypart-direct</c> lets a part of the day follow a clock hour without a preposition (German <c>5 Uhr nachmittags</c>); <c>no-lone-day</c> stops "the 25th" being the next 25th (French <c>la 2e place</c> is an ordinal); <c>bare-hour-24</c> lets <c>16</c> be the first end of <c>von 16 bis 18:30 Uhr</c>; <c>determiner-inside-only</c> keeps a determiner out of the span except in <c>Dienstag, den 24. März</c> and day ranges.</summary>
+    /// <summary>Behaviours the rule data switches on (<c>time.flag</c>): <c>daypart-direct</c> lets a part of the day follow a clock hour without a preposition (German <c>5 Uhr nachmittags</c>); <c>no-lone-day</c> stops "the 25th" being the next 25th (French <c>la 2e place</c> is an ordinal); <c>bare-hour-24</c> lets <c>16</c> be the first end of <c>von 16 bis 18:30 Uhr</c>; <c>determiner-inside-only</c> keeps a determiner out of the span except in <c>Dienstag, den 24. März</c> and day ranges; <c>of-before-year</c> lets the word <c>of</c> stand between a month and its year, or a day and its month in a range (Spanish and Portuguese <c>3 de marzo de 2026</c>, <c>del 6 al 10 de abril</c>).</summary>
     internal HashSet<string> Flags { get; } = new(StringComparer.Ordinal);
 
     /// <summary>The region whose conventions apply when the caller names none (<c>time.region</c>): 0 when the data does not say, which means <see cref="RegionUs"/>.</summary>
@@ -157,7 +164,11 @@ internal sealed class TemporalData
         "gb" => RegionGb,
         "fr" => RegionFr,
         "de" => RegionDe,
-        _ => throw new RecognizerRulesException($"Unknown region '{code}' (expected us, gb, fr, de or all)."),
+        "es" => RegionEs,
+        "mx" => RegionMx,
+        "pt" => RegionPt,
+        "br" => RegionBr,
+        _ => throw new RecognizerRulesException($"Unknown region '{code}' (expected us, gb, fr, de, es, mx, pt, br or all)."),
     };
 
     /// <summary>The region bit for a caller's region code, or 0 for none or an unknown code.</summary>
@@ -167,6 +178,10 @@ internal sealed class TemporalData
         "gb" => RegionGb,
         "fr" => RegionFr,
         "de" => RegionDe,
+        "es" => RegionEs,
+        "mx" => RegionMx,
+        "pt" => RegionPt,
+        "br" => RegionBr,
         _ => 0,
     };
 

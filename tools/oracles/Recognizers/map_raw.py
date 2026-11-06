@@ -21,15 +21,22 @@ CURRENCY = {
     "Dollar": "USD", "United States dollar": "USD", "Euro": "EUR", "Pound": "GBP", "British pound": "GBP", "Yen": "JPY",
     "Japanese yen": "JPY", "Indian rupee": "INR", "Rupee": "INR", "Swiss franc": "CHF", "Canadian dollar": "CAD",
     "Australian dollar": "AUD",
+    "Dólar": "USD", "Franco suizo": "CHF", "Franco suíço": "CHF", "Franco suíço": "CHF", "Real brasileiro": "BRL", "Peso": "MXN",
 }
 TEMPERATURE = {"c": "celsius", "f": "fahrenheit", "k": "kelvin", "degree": "degree", "degré": "degree", "celsius": "celsius", "fahrenheit": "fahrenheit",
-               "kelvin": "kelvin"}
+               "kelvin": "kelvin", "grado celsius": "celsius", "grado fahrenheit": "fahrenheit", "grado": "degree", "grau celsius": "celsius",
+               "grau fahrenheit": "fahrenheit", "grau": "degree"}
 # French unit names the comparator reports in the culture's language, mapped to the English names the gold values use.
 UNIT_NAMES = {
     "ans": "year", "jour": "day", "jours": "day", "mois": "month", "semaines": "week", "semaine": "week", "centilitre": "centiliter",
     "kilogramme": "kilogram", "kilomètre par heure": "kilometer per hour", "kilomètres": "kilometer", "kilomètre": "kilometer",
     "litre": "liter", "mètre carré": "square meter", "mètres": "meter", "mètre": "meter", "degré": "degree", "gigaoctet": "gigabyte",
     "giga-octet": "gigabyte", "kilowatt": "kilowatt",
+    # Spanish and Portuguese
+    "año": "year", "ano": "year", "día": "day", "dia": "day", "mes": "month", "mês": "month", "semana": "week", "kilogramo": "kilogram",
+    "quilograma": "kilogram", "kilómetro por hora": "kilometer per hour", "quilômetro por hora": "kilometer per hour", "kilómetro": "kilometer",
+    "quilômetro": "kilometer", "metro cuadrado": "square meter", "metro quadrado": "square meter", "metro": "meter", "litro": "liter",
+    "vatio": "watt",
 }
 SEQUENCE = {"email", "url", "ip", "phone", "hashtag", "mention", "guid"}
 

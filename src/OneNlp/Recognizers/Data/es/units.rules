@@ -1,0 +1,74 @@
+# Units that follow a number, Spanish. Fields: canonical name | dimension | surface forms, comma-separated | confidence (optional).
+# A form starting with "=" is case-sensitive; the others are matched without regard to case. Canonical names are the English ones.
+# Short forms that are also common words (m, t, l) are case-sensitive.
+
+[unit]
+millimeter | length | mm, milímetro, milímetros, milimetro, milimetros
+centimeter | length | cm, centímetro, centímetros, centimetro, centimetros
+meter | length | =m, metro, metros
+kilometer | length | km, kilómetro, kilómetros, kilometro, kilometros
+micrometer | length | micra, micras, µm, μm, micrómetro, micrómetros
+inch | length | pulgada, pulgadas
+foot | length | pie, pies
+yard | length | yarda, yardas
+mile | length | milla, millas
+nautical mile | length | milla náutica, millas náuticas
+
+milligram | mass | mg, miligramo, miligramos
+gram | mass | =g, gramo, gramos
+kilogram | mass | kg, kilo, kilos, kilogramo, kilogramos
+microgram | mass | µg, μg, microgramo, microgramos
+tonne | mass | tonelada, toneladas, =t
+pound | mass | libra, libras, lb, lbs
+ounce | mass | onza, onzas
+
+milliliter | volume | ml, mililitro, mililitros
+centiliter | volume | cl, centilitro, centilitros
+deciliter | volume | dl, decilitro, decilitros
+liter | volume | =l, =L, litro, litros
+hectoliter | volume | hl, hectolitro, hectolitros
+gallon | volume | galón, galones, galon
+cubic meter | volume | m3, m³, metro cúbico, metros cúbicos
+cubic centimeter | volume | cm3, cm³, centímetro cúbico, centímetros cúbicos
+
+square meter | area | m2, m², metro cuadrado, metros cuadrados
+square kilometer | area | km2, km², kilómetro cuadrado, kilómetros cuadrados
+square centimeter | area | cm2, cm², centímetro cuadrado, centímetros cuadrados
+square foot | area | pie cuadrado, pies cuadrados
+acre | area | acre, acres
+hectare | area | ha, hectárea, hectáreas, hectarea, hectareas
+
+kilometer per hour | speed | km/h, kmh, kilómetro por hora, kilómetros por hora, kilometro por hora, kilometros por hora
+mile per hour | speed | mph, milla por hora, millas por hora
+meter per second | speed | m/s, metro por segundo, metros por segundo
+knot | speed | nudo, nudos, kt, kts
+
+bit | information | bit, bits
+byte | information | byte, bytes, =B
+kilobyte | information | =KB, =kB, kilobyte, kilobytes
+megabyte | information | =MB, megabyte, megabytes
+gigabyte | information | =GB, gigabyte, gigabytes
+terabyte | information | =TB, terabyte, terabytes
+petabyte | information | =PB, petabyte, petabytes
+kilobit | information | kbit, kilobit, kilobits
+megabit | information | mbit, megabit, megabits
+gigabit | information | gbit, gigabit, gigabits
+
+watt | power | vatio, vatios, watt, watts, =W
+kilowatt | power | =kW, kilovatio, kilovatios
+megawatt | power | =MW, megavatio, megavatios
+horsepower | power | cv, hp, caballo de vapor, caballos de vapor
+
+celsius | temperature | °c, ºC, ˚C, ° c, grados celsius, grado celsius, grados centígrados, grados centigrados, grados c, celsius, centígrado, centigrado
+fahrenheit | temperature | °f, ºF, ˚F, ° f, grados fahrenheit, grado fahrenheit, grados f, fahrenheit
+kelvin | temperature | kelvin, kelvins, grados kelvin
+degree | temperature | grado, grados, °, º, ˚ | 0.6
+
+[unit.compound]
+kilometer | meter | 1000
+meter | centimeter | 100
+centimeter | millimeter | 10
+meter | millimeter | 1000
+kilogram | gram | 1000
+gram | milligram | 1000
+liter | milliliter | 1000
