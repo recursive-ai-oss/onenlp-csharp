@@ -28,7 +28,6 @@
 {"id":"0fcd39ce1a08","text":"C'è un gatto sul divano del salotto.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"10cb965d9544","text":"Gli deve 1.200 € di affitto.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":16,"type":"currency","text":"1.200 €","value":"1200 EUR"}]}
 {"id":"10fc981eca45","text":"Viaggiamo a Pasqua 2027 con i bambini.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":12,"end":23,"type":"date","text":"Pasqua 2027","value":"2027-03-28","grain":"day"}]}
-{"id":"127682d62446","text":"La garanzia è di 5 anni dall'acquisto.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":17,"end":23,"type":"duration","text":"5 anni","value":"P5Y"}]}
 {"id":"133a72f521c3","text":"Richiamate il +39 (06) 555 0123 se serve.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":31,"type":"phone","text":"+39 (06) 555 0123"}]}
 {"id":"13802978b8e8","text":"Il corso si tiene ogni lunedì nell'annesso.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":18,"end":29,"type":"set","text":"ogni lunedì","value":"XXXX-WXX-1","grain":"day"}]}
 {"id":"145b813140db","text":"Questo filo è stato lanciato da @la_piccola_squadra sulla piattaforma.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":32,"end":51,"type":"mention","text":"@la_piccola_squadra"}]}
@@ -36,7 +35,6 @@
 {"id":"14dc25ed7762","text":"Il saldo cala del 2 % ogni anno.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":18,"end":21,"type":"percentage","text":"2 %","value":"2"}]}
 {"id":"1555a4d88846","text":"L'appartamento copre 100 m² a terra.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":21,"end":27,"type":"dimension","text":"100 m²","value":"100 square meter"}]}
 {"id":"15ed1b721de7","text":"L'ufficio è al secondo piano.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":22,"type":"ordinal","text":"secondo","value":"2"}]}
-{"id":"162fc21a65c3","text":"Il termine è di sessanta giorni dal ricevimento.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":31,"type":"duration","text":"sessanta giorni","value":"5184000"}]}
 {"id":"166fdb076cba","text":"La sfida #maratona_2026 parte domani.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":23,"type":"hashtag","text":"#maratona_2026"}]}
 {"id":"178eade34fca","text":"Il comitato si riunisce tutte le domeniche a scuola.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":24,"end":42,"type":"set","text":"tutte le domeniche","value":"XXXX-WXX-7","grain":"day"}]}
 {"id":"186f29c1aac1","text":"Andiamo a camminare questo fine settimana se il tempo regge.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":20,"end":41,"type":"daterange","text":"questo fine settimana","value":"2026-03-21/2026-03-23","grain":"day"}]}
@@ -44,6 +42,7 @@
 {"id":"19a7875cf3a8","text":"Lo chef ha assaggiato la zuppa e ha sorriso.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"1a30ff66f6b1","text":"Le piogge dovrebbero smettere a inizio maggio in zona.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":32,"end":45,"type":"daterange","text":"inizio maggio","value":"2026-05-01/2026-05-11","grain":"month","approx":true}]}
 {"id":"1b8a7637d6d6","text":"La lettera parte ogni mercoledì alle 14:00 per gli abbonati.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":17,"end":42,"type":"set","text":"ogni mercoledì alle 14:00","value":"XXXX-WXX-3T14:00","grain":"minute"}]}
+{"id":"1dd5248b5d91","text":"Il termine scade dopo sessanta giorni dal ricevimento.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":22,"end":37,"type":"duration","text":"sessanta giorni","value":"5184000"}]}
 {"id":"1eaf0333cda0","text":"Grazie a @recursiveai per la correzione rapida.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":21,"type":"mention","text":"@recursiveai"}]}
 {"id":"1f1ff74ea8ac","text":"I bambini giocano nel cortile della scuola.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"210b46b7c545","text":"Il pranzo è servito a mezzogiorno in albergo.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":22,"end":33,"type":"time","text":"mezzogiorno","value":"T12:00","grain":"hour"}]}
@@ -71,11 +70,11 @@
 {"id":"2f696fdb39b1","text":"Lanciamo tra 2 giorni se tutto va bene.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":21,"type":"date","text":"tra 2 giorni","value":"2026-03-20","grain":"day"}]}
 {"id":"303b0b634c25","text":"L'affitto è dovuto mensilmente da contratto.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":30,"type":"set","text":"mensilmente","value":"P1M","grain":"month"}]}
 {"id":"30fe91f68459","text":"C'erano 1.250 posti nella sala grande.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":13,"type":"number","text":"1.250","value":"1250"}]}
+{"id":"3190cb3b6a07","text":"La garanzia dura 5 anni dall'acquisto.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":17,"end":23,"type":"duration","text":"5 anni","value":"P5Y"}]}
 {"id":"331625e92d35","text":"Contattate info@esempio.net oppure chiamate la segreteria.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":11,"end":27,"type":"email","text":"info@esempio.net"}]}
 {"id":"33494cde285c","text":"Hanno superato la prova diciassette studenti.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":24,"end":35,"type":"number","text":"diciassette","value":"17"}]}
 {"id":"33ba375e9270","text":"Le fatture partono ogni mese dalla banca.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":19,"end":28,"type":"set","text":"ogni mese","value":"P1M","grain":"month"}]}
 {"id":"3544bfb88a2e","text":"Il coro prova tutti i venerdì dopo il lavoro.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":29,"type":"set","text":"tutti i venerdì","value":"XXXX-WXX-5","grain":"day"}]}
-{"id":"35ac48ab0ca5","text":"Il congedo è di due settimane dall'inizio.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":29,"type":"duration","text":"due settimane","value":"1209600"}]}
 {"id":"35c619ca1600","text":"La pagina d'aiuto si trova su ftp://files.esempio.org/pub/ per i clienti.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":30,"end":58,"type":"url","text":"ftp://files.esempio.org/pub/"}]}
 {"id":"38acf3bb39a5","text":"Ha pagato 1.234,56 € per la bicicletta.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":10,"end":20,"type":"currency","text":"1.234,56 €","value":"1234.56 EUR"}]}
 {"id":"38e87b184c71","text":"Consegnate il modulo entro il 15/04/2026 per favore.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":27,"end":40,"type":"date","text":"il 15/04/2026","value":"2026-04-15","grain":"day"}]}
@@ -194,6 +193,7 @@
 {"id":"80837b223d99","text":"Usate squadra@esempio.com per le domande.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":25,"type":"email","text":"squadra@esempio.com"}]}
 {"id":"8113ef6b6690","text":"La sala è prenotata dalle 10:00 alle 12:30 per la squadra.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":20,"end":42,"type":"timerange","text":"dalle 10:00 alle 12:30","value":"T10:00/T12:30","grain":"minute"}]}
 {"id":"8190dbce5251","text":"Il mittente era non-rispondere@notifiche.esempio.io ancora una volta.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":51,"type":"email","text":"non-rispondere@notifiche.esempio.io"}]}
+{"id":"82ee6718fce4","text":"Il congedo dura due settimane dall'inizio.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":29,"type":"duration","text":"due settimane","value":"1209600"}]}
 {"id":"843033397e20","text":"Cerchiamo una soluzione semplice e duratura.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"84876931b706","text":"Il cimitero è aperto a Ognissanti per tutti.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":23,"end":33,"type":"date","text":"Ognissanti","value":"2026-11-01","grain":"day"}]}
 {"id":"84d443bef440","text":"La squadra si riunisce ogni settimana nella sala tre.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":23,"end":37,"type":"set","text":"ogni settimana","value":"P1W","grain":"week"}]}

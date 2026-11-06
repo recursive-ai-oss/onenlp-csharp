@@ -382,14 +382,14 @@ La traversata richiede [[3 giorni|duration|259200]] con il mare grosso.
 Ha aspettato [[45 minuti|duration|2700]] alla stazione.
 Il progetto è durato [[1 anno e 6 mesi|duration|P1Y6M]] prima di fermarsi.
 Il tirocinio dura [[3 mesi|duration|P3M]] senza esito.
-Il congedo è di [[due settimane|duration|1209600]] dall'inizio.
+Il congedo dura [[due settimane|duration|1209600]] dall'inizio.
 La bimba ha dormito [[un'ora e mezza|duration|5400]] senza interruzioni.
 La pausa dura [[30 secondi|duration|30]] poi si riprende.
 Ha corso per [[2 ore e 30 minuti|duration|9000]] senza sosta.
-La garanzia è di [[5 anni|duration|P5Y]] dall'acquisto.
+La garanzia dura [[5 anni|duration|P5Y]] dall'acquisto.
 Il film dura [[90 minuti|duration|5400]] senza intervallo.
 Ha vissuto [[dieci anni|duration|P10Y]] a Torino prima di partire.
-Il termine è di [[sessanta giorni|duration|5184000]] dal ricevimento.
+Il termine scade dopo [[sessanta giorni|duration|5184000]] dal ricevimento.
 Lo studio è durato [[18 mesi|duration|P18M]] in tutto.
 Aspetta [[un'ora|duration|3600]] poi riprova.
 
