@@ -16,6 +16,10 @@
   <Import Project="EmbedWeights.targets" />
 
   <ItemGroup>
+    <InternalsVisibleTo Include="$(PackagePrefix)$(LibName).Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- The registration file is shipped, not compiled here. -->
     <Compile Remove="contentFiles/**" />
   </ItemGroup>
