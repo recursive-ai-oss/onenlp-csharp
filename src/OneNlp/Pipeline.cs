@@ -122,9 +122,10 @@ public sealed class Pipeline : IDisposable
         return ProcessManyAsyncCore(texts, batchSize, cancellationToken);
     }
 
-    /// <summary>Disposes the components that implement <see cref="IDisposable"/>.</summary>
+    /// <summary>Disposes the components, and the tokenizer, that implement <see cref="IDisposable"/>.</summary>
     public void Dispose()
     {
+        (Tokenizer as IDisposable)?.Dispose();
         foreach (IPipelineComponent component in _components)
         {
             (component as IDisposable)?.Dispose();

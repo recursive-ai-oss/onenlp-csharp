@@ -68,9 +68,9 @@ public static class PipelineFile
     {
         ArgumentNullException.ThrowIfNull(pipeline);
         ArgumentNullException.ThrowIfNull(stream);
-        if (pipeline.Tokenizer is not (RuleWordTokenizer or UaxWordTokenizer))
+        if (pipeline.Tokenizer is not (RuleWordTokenizer or UaxWordTokenizer or NeuralWordSegmenter))
         {
-            throw new NotSupportedException("Only a pipeline with the rule word tokenizer or the UAX #29 word tokenizer can be saved so far.");
+            throw new NotSupportedException("Only a pipeline with the rule word tokenizer, the UAX #29 word tokenizer or a trained word segmenter can be saved so far.");
         }
 
         (List<ITrainableComponent> heads, List<IEncoder> encoders) = StateModule.Collect(pipeline);
@@ -179,7 +179,6 @@ public static class PipelineFile
         }
 
         Language language = Language.FromCode(JsonSettings.String(root, "language", 32));
-        IWordTokenizer tokenizer = ReadTokenizer(JsonSettings.Property(root, "tokenizer"));
 
         JsonElement encodersJson = JsonSettings.Property(root, "encoders");
         JsonElement componentsJson = JsonSettings.Property(root, "components");
@@ -193,6 +192,21 @@ public static class PipelineFile
         foreach (JsonElement e in encodersJson.EnumerateArray())
         {
             encoders.Add(EncoderRegistry.Create(JsonSettings.String(e, "kind"), JsonSettings.Property(e, "settings")));
+        }
+
+        IWordTokenizer tokenizer;
+        try
+        {
+            tokenizer = ReadTokenizer(JsonSettings.Property(root, "tokenizer"), encoders);
+        }
+        catch
+        {
+            foreach (IEncoder e in encoders)
+            {
+                e.Dispose();
+            }
+
+            throw;
         }
 
         var pipeline = new Pipeline(tokenizer, language);
@@ -226,7 +240,7 @@ public static class PipelineFile
         }
     }
 
-    private static IWordTokenizer ReadTokenizer(JsonElement e)
+    private static IWordTokenizer ReadTokenizer(JsonElement e, List<IEncoder> encoders)
     {
         switch (JsonSettings.String(e, "kind", 16))
         {
@@ -235,8 +249,14 @@ public static class PipelineFile
             case "uax":
                 string data = JsonSettings.String(e, "data", 16);
                 return new UaxWordTokenizer(SegmentationData.ByName(data));
+            case "segmenter":
+                // A trained word segmenter: its tagger reads one of the file's encoders and holds the labels B and I.
+                int encoderIndex = JsonSettings.Int(e, "encoder", 0, encoders.Count - 1);
+                var head = HeadRegistry.Create(Tagger.ComponentKind, NeuralWordSegmenter.HeadName, encoders[encoderIndex], JsonSettings.Property(e, "head")) as Tagger
+                    ?? throw new InvalidDataException("The segmenter's head must be a tagger.");
+                return new NeuralWordSegmenter(head);
             default:
-                throw new InvalidDataException("Unsupported tokenizer kind; known kinds are 'rule' and 'uax'.");
+                throw new InvalidDataException("Unsupported tokenizer kind; known kinds are 'rule', 'uax' and 'segmenter'.");
         }
     }
 
@@ -284,6 +304,14 @@ public static class PipelineFile
             {
                 w.WriteString("kind", "uax");
                 w.WriteString("data", uax.Data.Name);
+            }
+            else if (pipeline.Tokenizer is NeuralWordSegmenter segmenter)
+            {
+                w.WriteString("kind", "segmenter");
+                w.WriteNumber("encoder", encoders.FindIndex(e => ReferenceEquals(e, segmenter.Head.Encoder)));
+                w.WriteStartObject("head");
+                segmenter.Head.WriteConfig(w);
+                w.WriteEndObject();
             }
             else
             {
