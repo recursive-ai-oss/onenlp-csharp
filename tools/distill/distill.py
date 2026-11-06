@@ -357,7 +357,7 @@ def main():
             log.flush()
             print(rec, flush=True)
         timeout = (time.time() - t_chunk) / 60 >= a.minutes
-        if step % a.ckpt_every == 0 or timeout:
+        if step % a.ckpt_every == 0 or timeout or step >= a.max_steps:
             save(ckpt, {"model": model.state_dict(), "opt": opt.state_dict(), "ema": ema, "step": step, "args": vars(a)})
         if timeout:
             break
