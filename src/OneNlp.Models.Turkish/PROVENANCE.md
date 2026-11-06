@@ -1,14 +1,15 @@
 # Provenance: RecursiveAI.OneNlp.Models.Turkish
 
-The package packs three saved pipelines (`weights.manifest.props` lists name, size and sha256 of each; a pack fails when one differs). Each was trained from scratch in C# with the `Train` API by `recipes/tr/fast` (commands `train-tagging`, `train-parser`, `ner-train`), which is in the source repository. Weights are not stored in git.
+The package packs four saved pipelines (`weights.manifest.props` lists name, size and sha256 of each; a pack fails when one differs). Each was trained from scratch in C# with the `Train` API by `recipes/tr/fast` (commands `train-splitter`, `train-tagging`, `train-parser`, `ner-train`), which is in the source repository. Weights are not stored in git.
 
 | File | Components | Data | Seed |
 |---|---|---|---|
-| `tagging.onenlp` | sentencizer, tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, on a fast hash-embedding encoder (width 384, 96-wide embeddings, Turkish lower-casing) | UD Turkish-BOUN r2.18, train and dev | 1 |
+| `splitter.onenlp` | the pipeline's tokenizer: whole-word Turkish UAX #29 tokenizer plus a trained multiword-token splitter (B/I tagger over characters, fast encoder width 128 with a bidirectional LSTM) | UD Turkish-BOUN r2.18, train and dev | 1 |
+| `tagging.onenlp` | sentencizer, tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, on a fast hash-embedding encoder (width 384, 96-wide embeddings, one ReLU window layer and a bidirectional LSTM of 64, Turkish lower-casing) | UD Turkish-BOUN r2.18, train and dev | 1 |
 | `parser.onenlp` | biaffine dependency parser with sentence starts, fast encoder and a two-layer bidirectional LSTM | UD Turkish-BOUN r2.18, train and dev | 7 |
 | `ner.onenlp` | entity recognizer (BILUO tagging, constrained decoding; PER, ORG, LOC), fast encoder | Turkish-WikiNER, train and dev (PERSON, ORG, GPE and LOC kept; GPE and LOC are both LOC; other types are O) | 7 |
 
-The sentencizer saved in `tagging.onenlp` is not used by the packaged pipeline; the parser predicts sentence starts. The tokenizer is the UAX #29 word tokenizer with the Turkish data (`docs/segmentation.md`), whose multiword-token table was written from the BOUN training split.
+The sentencizer saved in `tagging.onenlp` is not used by the packaged pipeline; the parser predicts sentence starts. The tokenizer is the UAX #29 word tokenizer with the whole-word Turkish data (`docs/segmentation.md`) followed by the trained multiword-token splitter.
 
 ## Datasets
 

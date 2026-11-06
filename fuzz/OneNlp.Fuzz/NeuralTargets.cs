@@ -289,7 +289,7 @@ internal static class NeuralTargets
 
         using Pipeline training = Pipeline.Blank(Language.Turkish).Add(new Tagger(encoder, TokenColumn.Tag, NeuralMultiwordSplitter.HeadName) { OwnsEncoder = true });
         _ = training.Train(examples, new TrainOptions { Epochs = 1, BatchWords = 40, DevFraction = 0, Seed = 1 });
-        using var holder = new Pipeline(new NeuralMultiwordSplitter(new UaxWordTokenizer(RecursiveAI.OneNlp.Segmentation.SegmentationData.TurkishWhole), (Tagger)training.Components[0]), Language.Turkish);
+        using var holder = new Pipeline(new NeuralMultiwordSplitter(new RecursiveAI.OneNlp.Segmentation.UaxWordTokenizer(RecursiveAI.OneNlp.Segmentation.SegmentationData.TurkishWhole), (Tagger)training.Components[0]), Language.Turkish);
         using var stream = new MemoryStream();
         PipelineFile.Save(holder, stream);
         return stream.ToArray();
