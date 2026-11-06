@@ -1,0 +1,174 @@
+# Date and time vocabulary, Dutch (nl-NL). Same sections as the English file; the roles added for French and German are described in docs/recognizers.md.
+#
+# Dates are day first (20 maart 2026; 03-04-2026 is 3 April). A form starting with "=" is case-sensitive, the others are matched without regard to
+# case. Glued words such as "zaterdagavond" are cut by [time.glue].
+
+[time.region]
+nl
+
+[time.flag]
+daypart-direct
+no-lone-day
+bare-hour-24
+
+[time.month]
+1 | januari, =jan., =jan
+2 | februari, =feb., =feb
+3 | maart, =mrt., =mrt
+4 | april, =apr., =apr
+5 | mei
+6 | juni, =jun., =jun
+7 | juli, =jul., =jul
+8 | augustus, =aug., =aug
+9 | september, =sep., =sept., =sept
+10 | oktober, =okt., =okt
+11 | november, =nov., =nov
+12 | december, =dec., =dec
+
+[time.weekday]
+1 | maandag, =ma | maandags
+2 | dinsdag, =di | dinsdags
+3 | woensdag, =wo | woensdags
+4 | donderdag, =do | donderdags
+5 | vrijdag, =vr | vrijdags
+6 | zaterdag, =za | zaterdags
+7 | zondag, =zo | zondags
+
+[time.unit]
+second | seconde, seconden, =sec, =sec. | 1 | 0
+minute | minuut, minuten, =min, =min. | 60 | 0
+hour | uur, uren | 3600 | 0
+day | dag, dagen, etmaal | 86400 | 0
+week | week, weken | 604800 | 0
+month | maand, maanden | 0 | 1
+quarter | kwartaal, kwartalen | 0 | 3
+year | jaar, jaren | 0 | 12
+decade | decennium, decennia, jaartiental | 0 | 120
+business day | werkdag, werkdagen | 0 | 0
+
+[time.season]
+spring | lente, voorjaar | 3 | 3
+summer | zomer | 6 | 3
+fall | herfst, najaar | 9 | 3
+winter | winter | 12 | 3
+
+[time.daypart]
+morning | ochtend, ochtends, 's ochtends, morgen vroeg, voormiddag, 's morgens | 6 | 12
+afternoon | middag, middags, 's middags, namiddag | 12 | 18
+evening | avond, avonds, 's avonds | 18 | 24
+night | nacht, nachts, 's nachts | 20 | 24
+
+[time.glue]
+maandag, dinsdag, woensdag, donderdag, vrijdag, zaterdag, zondag, morgen, gister, gisteren, eergister, van | ochtend, middag, avond, nacht, voormiddag, namiddag
+
+[time.word]
+today | vandaag
+tomorrow | morgen
+yesterday | gisteren, gister
+dayaftertomorrow | overmorgen
+daybeforeyesterday | eergisteren
+tonight | vannacht, vanacht
+noon | twaalf uur 's middags
+midnight | middernacht
+this | deze, dit, van
+next | volgende, komende, aanstaande
+last | vorige, afgelopen, laatste
+ago | geleden
+later | later
+in | over, binnen
+at | om
+on | op
+of | van, in
+and | en
+rangeto | tot, tot en met, t/m, -, –, —
+from | van, vanaf, sinds
+between | tussen
+every | elke, elk, iedere, ieder, alle, om de
+each | elke, iedere
+early | begin, begin van
+mid | medio, midden
+late | eind, einde, eind van
+after | na
+before | voor
+half | helft, halfjaar, semester
+quarter | kwartaal
+article | een
+the | de, het
+determiner | de, het
+approx | ongeveer, rond, circa, ca., omstreeks, zo'n
+weekend | weekend, weekeinde
+zonebase | =UTC, =GMT
+quarterprefix | =Q
+halfprefix | =H
+hourmark | uur
+halfbefore | half
+plusquarter | kwart over
+minusquarter | kwart voor
+decadeprefix | jaren, de jaren
+
+[time.recurrence]
+P1D | day | dagelijks, dagelijkse
+P1W | week | wekelijks, wekelijkse
+P1M | month | maandelijks, maandelijkse
+P3M | quarter | driemaandelijks, per kwartaal
+P1Y | year | jaarlijks, jaarlijkse
+PT1H | hour | uurlijks
+
+[time.decade]
+dertig | 30
+veertig | 40
+vijftig | 50
+zestig | 60
+zeventig | 70
+tachtig | 80
+negentig | 90
+
+[time.zone]
+=UTC, =GMT | 0 | z
+=WET | 0
+=WEST | 60
+=CET, =MET | 60
+=CEST, =MEST | 120
+=EET | 120
+=EEST | 180
+=MSK | 180
+=EST | -300
+=EDT | -240
+=CST | -360
+=CDT | -300
+=MST | -420
+=MDT | -360
+=PST | -480
+=PDT | -420
+
+# Sources: the Algemene termijnenwet art. 3 lists the Dutch general holidays (Nieuwjaarsdag, Tweede Paasdag, Hemelvaartsdag, Tweede Pinksterdag,
+# Eerste and Tweede Kerstdag, Koningsdag, which is 27 April, or 26 April when that is a Sunday); Pasen and Pinksteren are Sundays; the other
+# entries are customary dates.
+[time.holiday]
+Nieuwjaarsdag, Nieuwjaar | fixed 01-01 | nl
+Driekoningen | fixed 01-06 | nl
+Valentijnsdag | fixed 02-14 | nl
+Carnaval | easter -49 | nl
+Aswoensdag | easter -46 | nl
+Palmzondag | easter -7 | nl
+Witte Donderdag | easter -3 | nl
+Goede Vrijdag | easter -2 | nl
+Stille Zaterdag | easter -1 | nl
+Pasen, Eerste Paasdag, Paaszondag | easter 0 | nl
+Tweede Paasdag, Paasmaandag | easter 1 | nl
+Koningsdag | fixed-not-sunday 04-27 | nl
+Dodenherdenking | fixed 05-04 | nl
+Bevrijdingsdag | fixed 05-05 | nl
+Moederdag | nth 2 sun 5 | nl
+Hemelvaartsdag, Hemelvaart | easter 39 | nl
+Pinksteren, Eerste Pinksterdag, Pinksterzondag | easter 49 | nl
+Tweede Pinksterdag, Pinkstermaandag | easter 50 | nl
+Vaderdag | nth 3 sun 6 | nl
+Prinsjesdag | nth 3 tue 9 | nl
+Halloween | fixed 10-31 | nl
+Sint-Maarten | fixed 11-11 | nl
+Sinterklaasavond, Pakjesavond | fixed 12-05 | nl
+Kerstavond | fixed 12-24 | nl
+Kerstmis, Kerst, Eerste Kerstdag | fixed 12-25 | nl
+Tweede Kerstdag | fixed 12-26 | nl
+Oudejaarsavond, Oudejaarsdag, Oud en Nieuw | fixed 12-31 | nl

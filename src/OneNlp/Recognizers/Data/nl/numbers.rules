@@ -1,0 +1,150 @@
+# Number rules for Dutch (nl-NL). Whole numbers below a million are one word (driehonderdvierentwintig, tweeëntwintig): the recognizer cuts a word
+# into the parts listed in [number.cardinal] and [number.ordinal] (stems with a trailing "~") and the connectors en and ën, units before tens.
+#
+# Format: [section] headers, then one rule per line, fields separated by "|". "#" starts a comment. Words are matched without regard to case.
+
+[number.digits]
+system | dutch
+decimal | ,
+group | .
+negative | -−
+
+[number.cardinal]
+nul | unit | 0
+een | unit | 1
+één | unit | 1
+twee | unit | 2
+drie | unit | 3
+vier | unit | 4
+vijf | unit | 5
+zes | unit | 6
+zeven | unit | 7
+acht | unit | 8
+negen | unit | 9
+tien | teen | 10
+elf | teen | 11
+twaalf | teen | 12
+dertien | teen | 13
+veertien | teen | 14
+vijftien | teen | 15
+zestien | teen | 16
+zeventien | teen | 17
+achttien | teen | 18
+negentien | teen | 19
+twintig | tens | 20
+dertig | tens | 30
+veertig | tens | 40
+vijftig | tens | 50
+zestig | tens | 60
+zeventig | tens | 70
+tachtig | tens | 80
+negentig | tens | 90
+honderd | bare-scale | 100
+duizend | bare-scale | 1000
+miljoen | scale | 1000000
+miljard | scale | 1000000000
+biljoen | scale | 1000000000000
+biljard | scale | 1000000000000000
+dozijn | multiplier | 12
+anderhalf | unit | 1.5
+
+[number.ordinal]
+eerst~ | 1
+tweed~ | 2
+derd~ | 3
+vierd~ | 4
+vijfd~ | 5
+zesd~ | 6
+zevend~ | 7
+achtst~ | 8
+negend~ | 9
+tiend~ | 10
+elfd~ | 11
+twaalfd~ | 12
+dertiend~ | 13
+veertiend~ | 14
+vijftiend~ | 15
+zestiend~ | 16
+zeventiend~ | 17
+achttiend~ | 18
+negentiend~ | 19
+twintigst~ | 20
+dertigst~ | 30
+veertigst~ | 40
+vijftigst~ | 50
+zestigst~ | 60
+zeventigst~ | 70
+tachtigst~ | 80
+negentigst~ | 90
+honderdst~ | 100
+duizendst~ | 1000
+miljoenst~ | 1000000
+
+[number.ordinal-ending]
+e
+
+# The denominator a fraction word stands for: "drie kwart" is 3/4.
+[number.fraction]
+half | 2
+halve | 2
+derde | 3
+derden | 3
+kwart | 4
+vijfde | 5
+vijfden | 5
+zesde | 6
+zesden | 6
+achtste | 8
+achtsten | 8
+tiende | 10
+tienden | 10
+
+[number.article]
+een
+
+# "een" counts only inside a longer number ("honderdeen", "een miljoen"); alone it is the article.
+[number.lone-skip]
+een
+
+[number.connector]
+en
+ën
+
+[number.negative]
+min
+
+[number.point]
+komma
+
+[number.suffix]
+k | 1000 | any
+mln | 1000000 | any
+mld | 1000000000 | any
+
+# 1e 2e 3e 2de 5de 8ste 21ste.
+[number.ordinal-suffix]
+e | 0123456789 | any
+de | 0123456789 | any
+ste | 0123456789 | any
+
+[number.not-number]
+eerste | after | keer, maal, helft
+tweede | after | hands
+een | before | op, met, geen, elkaar
+
+[percent]
+%, procent, ％, pct
+
+[age.unit]
+year | jaar
+month | maand, maanden
+week | week, weken
+day | dag, dagen
+
+[age.suffix]
+oud
+
+# "5-jarige" is an age without "oud": the unit is joined to the number.
+[age.word]
+year | jarig, jarige, jarigen
+month | maandig, maandige
