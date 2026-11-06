@@ -59,7 +59,7 @@ public sealed partial class SegmentationData
     internal FrozenSet<string> NotEncliticVerbs { get; private init; } = FrozenSet<string>.Empty;
 
     /// <summary>Whether this data set has multiword tokens at all.</summary>
-    internal bool HasMultiwordTokens => Contractions.Count > 0 || EncliticVerbs;
+    internal bool HasMultiwordTokens => Contractions.Count > 0 || EncliticVerbs || ItalianEncliticVerbs;
 
     // The words of a surface form that UD annotates as one multiword token: a contraction (del is de + el) or a verb with enclitic pronouns
     // (dármelo is dar + me + lo; the stress accent goes). The rule for verbs: the word ends in one to three enclitic pronouns
@@ -109,6 +109,11 @@ public sealed partial class SegmentationData
         {
             words = CopyCase(parts, token);
             return true;
+        }
+
+        if (ItalianEncliticVerbs)
+        {
+            return TryItalianEncliticVerb(token, out words);
         }
 
         if (!EncliticVerbs || token.Length < 4)

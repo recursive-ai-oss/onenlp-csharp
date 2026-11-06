@@ -76,7 +76,7 @@ public sealed partial class SegmentationData
         ArgumentNullException.ThrowIfNull(doc);
         count = 0;
         words = null;
-        if (Contractions.Count > 0 || EncliticVerbs)
+        if (Contractions.Count > 0 || EncliticVerbs || ItalianEncliticVerbs)
         {
             return TryMatchTokenGroup(doc, start, out count, out words);
         }
