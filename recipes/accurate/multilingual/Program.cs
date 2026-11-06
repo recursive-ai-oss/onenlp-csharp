@@ -178,7 +178,7 @@ internal static class Program
         using var encoder = TrainableTransformerEncoder.LoadOnnx(
             Required(args, "onnx"),
             Required(args, "tokenizer"),
-            new TrainableTransformerOptions { Pooling = SubwordPooling.Mean, FreezeEmbeddings = true });
+            new TrainableTransformerOptions { Pooling = SubwordPooling.Mean, FreezeEmbeddings = true, ExpandWordForms = true });
         using Pipeline pipeline = Pipeline.Blank(Language.English);
         var inner = new List<IDisposable>();
         foreach (string lang in langs)
@@ -497,11 +497,13 @@ internal static class Program
 
     private static void PredictRaw(IEncoder encoder, ITrainableComponent[] heads, Pipeline tokenizer, SegmentationData data, string gold, string output)
     {
+        var forms = new MultiwordFormsComponent(tokenizer.Language);
         var sb = new StringBuilder();
         var chunk = new List<string>();
         void Flush()
         {
             Doc doc = tokenizer.Process(string.Join(' ', chunk));
+            forms.Process(doc);
             Annotate(encoder, heads, [doc]);
             foreach (Span sentence in doc.Sentences)
             {
@@ -635,7 +637,7 @@ internal static class Program
             var docs = new Doc[n];
             for (int i = 0; i < n; i++)
             {
-                docs[i] = Example.Blank(sentences[start + i].Doc);
+                docs[i] = Example.Blank(Merge([sentences[start + i]], store));
                 docs[i].SetSentenceBoundaries(sentences[start + i].Doc.GetSentenceBoundaries());
             }
 
@@ -707,6 +709,66 @@ internal static class Program
         return result;
     }
 
+    // The text of one sentence as the encoder reads it, with one token for each word. A multiword token whose words spell its surface form
+    // (English "don't" = "do" + "n't") is written as it stands; one whose words do not (French "du" = "de" + "le", German "zum" = "zu" + "dem")
+    // is written as its words separated by spaces, so that each word has characters of its own and a vector of its own. Inference does the same
+    // from the tokenizer's pieces (MultiwordFormsComponent and the encoder's ExpandWordForms).
+    private static void AppendWords(ConllUSentence s, StringBuilder text, List<TokenBoundary> tokens)
+    {
+        int n = s.Doc.Length;
+        int m = 0;
+        int word = 0;
+        while (word < n)
+        {
+            bool spaceAfter;
+            if (m < s.MultiwordTokens.Count && s.MultiwordTokens[m].FirstWord == word)
+            {
+                MultiwordToken mwt = s.MultiwordTokens[m++];
+                int count = mwt.LastWord - mwt.FirstWord + 1;
+                bool spelled = string.Concat(Enumerable.Range(word, count).Select(i => s.Forms[i])) == mwt.Form;
+                if (spelled)
+                {
+                    int start = text.Length;
+                    text.Append(mwt.Form);
+                    int at = start;
+                    for (int k = 0; k < count; k++)
+                    {
+                        tokens.Add(new TokenBoundary(at, s.Forms[word + k].Length));
+                        at += s.Forms[word + k].Length;
+                    }
+                }
+                else
+                {
+                    for (int k = 0; k < count; k++)
+                    {
+                        if (k > 0)
+                        {
+                            text.Append(' ');
+                        }
+
+                        tokens.Add(new TokenBoundary(text.Length, s.Forms[word + k].Length));
+                        text.Append(s.Forms[word + k]);
+                    }
+                }
+
+                spaceAfter = !mwt.Misc.Contains("SpaceAfter=No", StringComparison.Ordinal);
+                word += count;
+            }
+            else
+            {
+                tokens.Add(new TokenBoundary(text.Length, s.Forms[word].Length));
+                text.Append(s.Forms[word]);
+                spaceAfter = !s.Misc[word].Contains("SpaceAfter=No", StringComparison.Ordinal);
+                word++;
+            }
+
+            if (word < n && spaceAfter)
+            {
+                text.Append(' ');
+            }
+        }
+    }
+
     private static Doc Merge(List<ConllUSentence> sentences, StringStore strings)
     {
         var text = new StringBuilder();
@@ -722,13 +784,11 @@ internal static class Program
                 text.Append(' ');
             }
 
-            int charOffset = text.Length;
             int tokenOffset = tokens.Count;
             Doc d = s.Doc;
-            text.Append(d.Text);
+            AppendWords(s, text, tokens);
             for (int t = 0; t < d.Length; t++)
             {
-                tokens.Add(new TokenBoundary(charOffset + d.GetStarts()[t], d.GetLengths()[t]));
                 heads.Add(tokenOffset + d.GetHeads()[t]);
                 marks.Add(t == 0 ? SentenceBoundary.Start : SentenceBoundary.Inside);
                 for (int c = 0; c < columns.Length; c++)

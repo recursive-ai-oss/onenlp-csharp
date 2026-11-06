@@ -66,6 +66,15 @@ public sealed class TrainableTransformerOptions
 
     /// <summary>The seed of the (immediately overwritten) initial weights; kept so every load is deterministic. Default 1.</summary>
     public ulong Seed { get; init; } = 1;
+
+    /// <summary>
+    /// Whether the encoder reads the words of a multiword token instead of its surface. In many languages the treebanks split a written word into
+    /// several syntactic words (French <c>du</c> = <c>de</c> + <c>le</c>, German <c>zum</c> = <c>zu</c> + <c>dem</c>, Spanish <c>dárselo</c> = <c>dar</c> + <c>se</c> +
+    /// <c>lo</c>); a transformer that reads the surface gives all of them the same vector. With this option, a token whose <see cref="TokenColumn.Norm"/> is set
+    /// is read as that word, and neighbouring tokens that both have a norm and touch each other are separated by a space, so the encoder sees
+    /// <c>de le</c>. Tokens without a norm are read as they are written. Default <see langword="false"/>.
+    /// </summary>
+    public bool ExpandWordForms { get; init; }
 }
 
 /// <summary>
@@ -225,8 +234,9 @@ public sealed class TrainableTransformerEncoder : IEncoder
                 continue;
             }
 
-            TokenEncoding enc = _tokenizer.Encode(docs[d].Text, addSpecialTokens: false);
-            plans[d] = new DocPlan(enc, TransformerEncoder.MapPiecesToTokens(docs[d], enc));
+            Doc source = _options.ExpandWordForms ? WordFormView(docs[d]) : docs[d];
+            TokenEncoding enc = _tokenizer.Encode(source.Text, addSpecialTokens: false);
+            plans[d] = new DocPlan(enc, TransformerEncoder.MapPiecesToTokens(source, enc));
             AddWindows(windows, d, enc.Length, capacity);
         }
 
@@ -404,6 +414,7 @@ public sealed class TrainableTransformerEncoder : IEncoder
             NormEpsilon = Real(s, "normEpsilon"),
             PositionOffset = JsonSettings.Int(s, "positionOffset", 0, MaxLengthLimit),
             MaxBatchPieces = JsonSettings.Int(s, "maxBatchPieces", 2, 1 << 24),
+            ExpandWordForms = s.TryGetProperty("expandForms", out JsonElement expand) && expand.ValueKind == JsonValueKind.True,
         };
 
         return LoadOnnx(TransformerEncoder.Resolve(JsonSettings.String(s, "model", 1024)), TransformerEncoder.Resolve(JsonSettings.String(s, "tokenizer", 1024)), options, sha);
@@ -447,6 +458,7 @@ public sealed class TrainableTransformerEncoder : IEncoder
             NormEpsilon = Real(settings, "normEpsilon"),
             PositionOffset = JsonSettings.Int(settings, "positionOffset", 0, MaxLengthLimit),
             MaxBatchPieces = JsonSettings.Int(settings, "maxBatchPieces", 2, 1 << 24),
+            ExpandWordForms = settings.TryGetProperty("expandForms", out JsonElement expand) && expand.ValueKind == JsonValueKind.True,
         };
 
         var config = new ModernBertConfig
@@ -557,10 +569,70 @@ public sealed class TrainableTransformerEncoder : IEncoder
             w.WriteNumber("normEpsilon", epsilon);
             w.WriteNumber("positionOffset", positionOffset);
             w.WriteNumber("maxBatchPieces", o.MaxBatchPieces);
+            if (o.ExpandWordForms)
+            {
+                w.WriteBoolean("expandForms", true);
+            }
+
             w.WriteEndObject();
         }
 
         return System.Text.Encoding.UTF8.GetString(stream.ToArray());
+    }
+
+    // The document as the encoder reads it with ExpandWordForms: tokens that carry a norm are read as that word, and two touching tokens that both
+    // carry one (the pieces of one multiword token) are separated by a space. The view has the same tokens in the same order, so rows map back one to one.
+    // Returns the document itself when no token has a norm.
+    internal static Doc WordFormView(Doc doc)
+    {
+        ReadOnlySpan<int> norms = doc.GetColumn(TokenColumn.Norm);
+        bool any = false;
+        for (int i = 0; i < norms.Length && !any; i++)
+        {
+            any = norms[i] != 0;
+        }
+
+        if (!any)
+        {
+            return doc;
+        }
+
+        var text = new System.Text.StringBuilder(doc.Text.Length + 16);
+        var tokens = new TokenBoundary[doc.Length];
+        int copied = 0; // characters of the original text already copied
+        for (int i = 0; i < doc.Length; i++)
+        {
+            Token t = doc[i];
+            bool expanded = norms[i] != 0;
+            if (t.Idx > copied)
+            {
+                text.Append(doc.Text, copied, t.Idx - copied);
+            }
+            else if (i > 0 && t.Idx == copied && expanded && norms[i - 1] != 0)
+            {
+                text.Append(' ');
+            }
+
+            int start = text.Length;
+            if (expanded)
+            {
+                text.Append(doc.Strings[norms[i]]);
+            }
+            else
+            {
+                text.Append(doc.Text, t.Idx, t.Length);
+            }
+
+            tokens[i] = new TokenBoundary(start, text.Length - start);
+            copied = t.Idx + t.Length;
+        }
+
+        if (copied < doc.Text.Length)
+        {
+            text.Append(doc.Text, copied, doc.Text.Length - copied);
+        }
+
+        return new Doc(doc.Strings, text.ToString(), tokens);
     }
 
     // The same windows as TransformerEncoder: overlap by half, each piece owned by the window whose centre is nearest.

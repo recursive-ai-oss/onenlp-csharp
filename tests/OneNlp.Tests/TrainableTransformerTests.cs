@@ -439,4 +439,53 @@ public class TrainableTransformerTests
             Assert.True(SharedEncoder.Unregister("test-shared-encoder"));
         }
     }
+
+    [Fact]
+    public void ExpandedWordFormsLetThePiecesOfAMultiwordTokenHaveVectorsOfTheirOwn()
+    {
+        // One written word "thecat" stands for the two words "the" and "cat" (as French "du" is "de" + "le"). With the option the encoder reads
+        // "the cat", so the result equals that of the text written with a space.
+        var strings = new StringStore();
+        Doc Written()
+        {
+            var d = new Doc(strings, "thecat", [new TokenBoundary(0, 3), new TokenBoundary(3, 3)]);
+            d.SetAnnotation(TokenColumn.Norm, 0, "the");
+            d.SetAnnotation(TokenColumn.Norm, 1, "cat");
+            return d;
+        }
+
+        var words = new Doc(strings, "the cat", [new TokenBoundary(0, 3), new TokenBoundary(4, 3)]);
+        using TrainableTransformerEncoder plain = Modern(ModernOptions());
+        using TrainableTransformerEncoder expanding = Modern(new TrainableTransformerOptions
+        {
+            Heads = 2, GlobalEvery = 2, LocalWindow = 8, GlobalRopeTheta = 160000f, LocalRopeTheta = 10000f, MaxLength = 64, ExpandWordForms = true,
+        });
+        plain.Weights!.Eval();
+        expanding.Weights!.Eval();
+        using var noGrad = GradMode.NoGrad();
+        float[] expected = [.. expanding.Encode([words]).Vectors.Data<float>()];
+        float[] viaNorms = [.. expanding.Encode([Written()]).Vectors.Data<float>()];
+        Assert.Equal(expected, viaNorms);
+        float[] asWritten = [.. plain.Encode([Written()]).Vectors.Data<float>()];
+        int width = expanding.Width;
+        Assert.NotEqual(asWritten, viaNorms); // read as written, the encoder sees different text
+        Assert.NotEqual(viaNorms.AsSpan(0, width).ToArray(), viaNorms.AsSpan(width, width).ToArray());
+
+        // Without any norm the option changes nothing.
+        float[] plainText = [.. plain.Encode([words]).Vectors.Data<float>()];
+        float[] expandedText = [.. expanding.Encode([words]).Vectors.Data<float>()];
+        Assert.Equal(plainText, expandedText);
+
+        // The setting is saved with the encoder and read back.
+        using var ms = new MemoryStream();
+        using (var w = new Utf8JsonWriter(ms))
+        {
+            w.WriteStartObject();
+            expanding.WriteSettings(w);
+            w.WriteEndObject();
+        }
+
+        using JsonDocument settings = JsonDocument.Parse(ms.ToArray());
+        Assert.True(settings.RootElement.GetProperty("expandForms").GetBoolean());
+    }
 }
