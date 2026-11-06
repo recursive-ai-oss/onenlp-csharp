@@ -24,18 +24,19 @@ internal sealed partial class Scan
     private void InitTemporal(RecognitionContext context)
     {
         _td = _d.Temporal;
-        if (_td.IsEmpty)
-        {
-            return;
-        }
-
-        _starts = _td.Starts.GetAlternateLookup<ReadOnlySpan<char>>();
         _ref = context.ReferenceDate;
         if (_ref is DateTimeOffset r)
         {
             _today = r.DateTime.Date;
             _now = r.DateTime;
         }
+
+        if (_td.IsEmpty)
+        {
+            return;
+        }
+
+        _starts = _td.Starts.GetAlternateLookup<ReadOnlySpan<char>>();
 
         int region = TemporalData.RegionOrNone(context.Region);
         _region = region != 0 ? region : _td.DefaultRegion != 0 ? _td.DefaultRegion : TemporalData.RegionUs;

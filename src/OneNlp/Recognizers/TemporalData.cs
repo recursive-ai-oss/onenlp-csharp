@@ -234,7 +234,7 @@ internal sealed class TemporalData
         }
     }
 
-    private static HolidayRule ParseRule(string rule)
+    internal static HolidayRule ParseRule(string rule)
     {
         string[] p = rule.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         try

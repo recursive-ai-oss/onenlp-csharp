@@ -43,6 +43,9 @@ internal enum NumberSystem
     /// <summary>Italian: like German, whole numbers below a million are one word, but the tens come before the units (<c>trecentoventiquattro</c>, <c>ventitré</c>).</summary>
     Italian,
 
+    /// <summary>Chinese: numerals are built from digit, ten/hundred/thousand and ten-thousand/hundred-million characters, with no spaces between words (see <c>ChineseData</c>).</summary>
+    Chinese,
+
     /// <summary>
     /// Spanish and Portuguese: tens are joined to the unit by a connector (<c>treinta y cinco</c>, <c>trinta e cinco</c>), hundreds are words of their
     /// own (<c>doscientos</c>), and an ordinal tens word may be followed by an ordinal unit (<c>vigésimo tercero</c>, <c>décimo quinto</c>).
@@ -200,6 +203,27 @@ internal sealed class RecognizerData
 
     internal TemporalData Temporal { get; } = new();
 
+    /// <summary>The Chinese numeral and date vocabulary (the <c>zh.*</c> sections); empty for other languages.</summary>
+    internal ChineseData Chinese { get; } = new();
+
+    internal bool IsChinese => System == NumberSystem.Chinese;
+
+    /// <summary>Leading digits and length of a plain digit run that is phone-like (a national mobile number), or none.</summary>
+    internal string[] PhonePlainStarts { get; private set; } = [];
+
+    internal int PhonePlainLength { get; private set; }
+
+    /// <summary>An area code and a subscriber number joined by a hyphen (<c>010-12345678</c>): the leading digit and the digit counts.</summary>
+    internal string PhoneAreaLead { get; private set; } = string.Empty;
+
+    internal int PhoneAreaMin { get; private set; }
+
+    internal int PhoneAreaMax { get; private set; }
+
+    internal int PhoneSubMin { get; private set; }
+
+    internal int PhoneSubMax { get; private set; }
+
     internal HashSet<string> BareTlds { get; } = new(StringComparer.Ordinal);
 
     /// <summary>The decimal and group separators for a caller's region: the language's own unless the data names a different convention for the region.</summary>
@@ -328,7 +352,8 @@ internal sealed class RecognizerData
         "number.digits", "number.cardinal", "number.ordinal", "number.fraction", "number.article", "number.connector", "number.negative",
         "number.point", "number.suffix", "number.ordinal-suffix", "percent", "percent.prefix", "unit", "unit.compound", "number.not-number", "currency.context", "age.unit", "age.suffix", "age.prefix", "age.word", "number.lone-skip", "number.part", "number.ordinal-ending", "number.ordinal-dot-word", "currency.symbol",
         "currency.name", "currency.code", "url.scheme", "url.tld", "url.tld.bare", "time.month", "time.weekday", "time.unit", "time.season",
-        "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday", "time.flag", "time.region", "time.glue", "time.decade", "phone.space-start",
+        "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday", "time.flag", "time.region", "time.glue", "time.decade", "phone.space-start", "phone.plain", "phone.area", "zh.digit", "zh.small", "zh.big", "zh.word", "zh.relday", "zh.relperiod",
+        "zh.weekday", "zh.season", "zh.daypart", "zh.unit", "zh.holiday", "zh.lunar", "zh.zone", "zh.unit-prefix",
     };
 
     private void Apply(string section, string[] f)
@@ -359,7 +384,8 @@ internal sealed class RecognizerData
                             "german" or "dutch" => NumberSystem.German,
                             "italian" => NumberSystem.Italian,
                             "iberian" => NumberSystem.Iberian,
-                            _ => throw new RecognizerRulesException($"Unknown number system '{f[1]}' (expected english, french, german, dutch, italian or iberian)."),
+                            "chinese" => NumberSystem.Chinese,
+                            _ => throw new RecognizerRulesException($"Unknown number system '{f[1]}' (expected english, french, german, dutch, italian, iberian or chinese)."),
                         };
                         break;
                     case "ordinal-dot":
@@ -620,6 +646,19 @@ internal sealed class RecognizerData
                 PhoneSpaceMinDigits = (int)Math.Clamp(Number(f[1]), 7, 15);
                 PhoneSpaceMaxDigits = (int)Math.Clamp(Number(f[2]), PhoneSpaceMinDigits, 15);
                 break;
+            case "phone.plain":
+                // Digits a national plain run starts with, and its length: "13,14,15,16,17,18,19 | 11".
+                Need(f, 2, 2);
+                PhonePlainStarts = [.. Words(f[0])];
+                PhonePlainLength = (int)Math.Clamp(Number(f[1]), 7, 15);
+                break;
+            case "phone.area":
+                // An area code and a subscriber number joined by one hyphen: "0 | 3-4 | 7-8" (leading digit, area code digits, subscriber digits).
+                Need(f, 3, 3);
+                PhoneAreaLead = f[0];
+                (PhoneAreaMin, PhoneAreaMax) = Range(f[1]);
+                (PhoneSubMin, PhoneSubMax) = Range(f[2]);
+                break;
             case "url.scheme":
                 Need(f, 1, 1);
                 foreach (string s in Words(f[0]))
@@ -645,6 +684,12 @@ internal sealed class RecognizerData
 
                 break;
             default:
+                if (section.StartsWith("zh.", StringComparison.Ordinal))
+                {
+                    Chinese.Add(section, f);
+                    break;
+                }
+
                 if (section.StartsWith("time.", StringComparison.Ordinal))
                 {
                     Temporal.Add(section, f);
@@ -732,6 +777,14 @@ internal sealed class RecognizerData
             return c != 0 ? c : string.CompareOrdinal(a.Text, b.Text);
         });
         Morphemes = [.. parts];
+    }
+
+    private static (int Min, int Max) Range(string s)
+    {
+        string[] p = s.Split('-');
+        return p.Length == 2 && int.TryParse(p[0], out int a) && int.TryParse(p[1], out int b) && a >= 1 && b >= a && b <= 15
+            ? (a, b)
+            : throw new RecognizerRulesException($"'{s}' is not a digit-count range such as 3-4.");
     }
 
     private static void Need(string[] f, int min, int max)
