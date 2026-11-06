@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Command-line driver for the embedding model checks: embeds a file of texts, or serves embeddings over a pipe for the MTEB
+       harness. Dev tooling; never shipped. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).EmbedTool</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).EmbedTool</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../src/OneNlp.Neural/OneNlp.Neural.csproj" />
+  </ItemGroup>
+
+</Project>

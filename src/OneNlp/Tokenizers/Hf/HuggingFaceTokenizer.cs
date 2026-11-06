@@ -77,6 +77,9 @@ internal sealed class HuggingFaceTokenizer : Tokenizer
     }
 
     /// <inheritdoc/>
+    public override bool IsSpecialToken(int id) => _added.TryGetById(id, out AddedToken? a) && a.Special;
+
+    /// <inheritdoc/>
     public override string? IdToToken(int id) => _added.TryGetById(id, out AddedToken? a) ? a.Content : _model.IdToToken(id);
 
     /// <inheritdoc/>

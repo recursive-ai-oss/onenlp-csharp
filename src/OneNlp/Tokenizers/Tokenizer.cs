@@ -38,6 +38,10 @@ public abstract class Tokenizer
     /// <summary>The number of tokens in the vocabulary, added tokens included.</summary>
     public abstract int VocabularySize { get; }
 
+    /// <summary>Whether an ID belongs to an added token declared special (for example <c>&lt;s&gt;</c>), wherever it occurs in an encoding. Always <see langword="false"/> for formats without added tokens.</summary>
+    /// <param name="id">The token ID.</param>
+    public virtual bool IsSpecialToken(int id) => false;
+
     /// <summary>Loads a tokenizer from a file, choosing the format from the file name.</summary>
     /// <param name="path">
     /// <c>tokenizer.json</c> or another <c>.json</c> (Hugging Face), <c>.model</c> (SentencePiece), <c>vocab.txt</c> or another <c>.txt</c>

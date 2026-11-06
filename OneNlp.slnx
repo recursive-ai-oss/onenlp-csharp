@@ -3,6 +3,7 @@
     <Project Path="src/OneNlp/OneNlp.csproj" />
     <Project Path="src/OneNlp.Neural/OneNlp.Neural.csproj" />
     <Project Path="src/OneNlp.Models.English/OneNlp.Models.English.csproj" />
+    <Project Path="src/OneNlp.Models.Embeddings/OneNlp.Models.Embeddings.csproj" />
     <Project Path="src/OneNlp.Models.French/OneNlp.Models.French.csproj" />
     <Project Path="src/OneNlp.Models.German/OneNlp.Models.German.csproj" />
     <Project Path="src/OneNlp.Models.Spanish/OneNlp.Models.Spanish.csproj" />
@@ -25,6 +26,7 @@
     <Project Path="tools/OneNlp.Eval/OneNlp.Eval.csproj" />
     <Project Path="tools/OneNlp.LangId/OneNlp.LangId.csproj" />
     <Project Path="tools/OneNlp.Parity/OneNlp.Parity.csproj" />
+    <Project Path="tools/embeddings/OneNlp.EmbedTool/OneNlp.EmbedTool.csproj" />
   </Folder>
   <Folder Name="/recipes/">
     <Project Path="recipes/en/parser/OneNlp.Recipe.EnParser.csproj" />

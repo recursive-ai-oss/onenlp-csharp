@@ -1,0 +1,12 @@
+<Project>
+  <!-- The files this package embeds: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
+       To use other weights, replace the rows (and PROVENANCE.md and the notices); no code changes. Weights are never committed. -->
+  <ItemGroup>
+    <EmbeddingsWeight Include="bge-small-en-v1.5.onnx" Size="133053834" Sha256="1ac91573ff264b7aa5840b5b3fd4f98547d9a015d863c3385aae2c1fd362ee18"
+                      Source="BAAI/bge-small-en-v1.5 revision 5c38ec7c405ec4b44b94cc5a9bb96e735b38267a, exported to ONNX (opset 17, fp32) by tools/accurate/export_onnx.py" />
+    <EmbeddingsWeight Include="tokenizer.json" Size="711396" Sha256="d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66" Source="same revision, unchanged" />
+    <EmbeddingsWeight Include="modules.json" Size="349" Sha256="84e40c8e006c9b1d6c122e02cba9b02458120b5fb0c87b746c41e0207cf642cf" Source="same revision, unchanged" />
+    <EmbeddingsWeight Include="pooling.json" Size="190" Sha256="d1caf60c96f5fba2157c0c26b76d80818fad6cf0b8eb5e73ec372ff9818eba5c" Source="same revision, 1_Pooling/config.json" />
+    <EmbeddingsWeight Include="sentence_bert_config.json" Size="52" Sha256="84e39fda68ccbff05bfa723ae9c0e70e23e2ec373b76e0f8c6e71af72a693cbf" Source="same revision, unchanged" />
+  </ItemGroup>
+</Project>
