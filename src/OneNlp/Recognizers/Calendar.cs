@@ -97,6 +97,12 @@ internal static class CivilCalendar
                 return rule.Month == 2 && rule.Day == 29 && !DateTime.IsLeapYear(year) ? null : new DateTime(year, rule.Month, rule.Day);
             case HolidayKind.Nth:
                 return NthWeekday(year, rule.Month, rule.Weekday, rule.N)?.AddDays(rule.Plus);
+            case HolidayKind.FixedNotSunday:
+            {
+                var fixedDay = new DateTime(year, rule.Month, rule.Day);
+                return fixedDay.DayOfWeek == DayOfWeek.Sunday ? fixedDay.AddDays(-1) : fixedDay;
+            }
+
             case HolidayKind.Easter:
                 return Easter(year).AddDays(rule.Plus);
             case HolidayKind.Table:

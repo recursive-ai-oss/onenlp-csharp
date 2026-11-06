@@ -1,0 +1,182 @@
+# Date and time vocabulary, Italian (it-IT). Same sections as the English file; the roles added for French and German are described in docs/recognizers.md.
+#
+# Dates are day first (il 3 marzo 2026; 03/04/2026 is 3 April). A form starting with "=" is case-sensitive, the others are matched without regard
+# to case.
+
+[time.region]
+it
+
+[time.flag]
+no-lone-day
+bare-hour-24
+bare-range-24
+word-hour
+
+[time.month]
+1 | gennaio, =gen.
+2 | febbraio, =feb.
+3 | marzo
+4 | aprile, =apr.
+5 | maggio, =mag.
+6 | giugno, =giu.
+7 | luglio, =lug.
+8 | agosto, =ago.
+9 | settembre, =set., =sett.
+10 | ottobre, =ott.
+11 | novembre, =nov.
+12 | dicembre, =dic.
+
+[time.weekday]
+1 | lunedì, lunedi | lunedì
+2 | martedì, martedi | martedì
+3 | mercoledì, mercoledi | mercoledì
+4 | giovedì, giovedi | giovedì
+5 | venerdì, venerdi | venerdì
+6 | sabato | sabati
+7 | domenica | domeniche
+
+[time.unit]
+second | secondo, secondi, sec | 1 | 0
+minute | minuto, minuti, min | 60 | 0
+hour | ora, ore | 3600 | 0
+day | giorno, giorni, giornata, giornate | 86400 | 0
+week | settimana, settimane | 604800 | 0
+week | quindicina, quindicine | 1209600 | 0
+month | mese, mesi | 0 | 1
+quarter | trimestre, trimestri | 0 | 3
+year | anno, anni | 0 | 12
+decade | decennio, decenni | 0 | 120
+business day | giorno lavorativo, giorni lavorativi, giorno feriale, giorni feriali | 0 | 0
+
+[time.season]
+spring | primavera | 3 | 3
+summer | estate | 6 | 3
+fall | autunno | 9 | 3
+winter | inverno | 12 | 3
+
+[time.daypart]
+morning | mattina, mattino, mattinata | 6 | 12
+afternoon | pomeriggio | 12 | 18
+evening | sera, serata | 18 | 24
+night | notte, nottata | 20 | 24
+
+[time.word]
+today | oggi
+tomorrow | domani
+yesterday | ieri
+dayaftertomorrow | dopodomani, dopo domani
+daybeforeyesterday | l'altro ieri, ieri l'altro, altroieri
+tonight | stasera, stanotte, questa sera, questa notte
+noon | mezzogiorno
+midnight | mezzanotte
+this | questo, questa, quest', questi, queste
+next | prossimo, prossima
+last | scorso, scorsa, ultimo, ultima
+nextpost | prossimo, prossima, successivo, successiva
+lastpost | scorso, scorsa, passato, passata, precedente
+ago | fa
+later | più tardi, dopo
+in | tra, fra
+at | a, ad, alle, all', allo, verso le
+on | il, lo, la, l'
+of | di, del, della, dell', dei, delle, degli, d'
+and | e le, e alle, e, ed
+rangeto | a, al, alle, all', allo, fino a, fino al, fino alle, -, –, —
+from | da, dal, dalle, dall', dallo, dai, dagli, dalla
+between | tra le, fra le, tra, fra
+every | ogni, tutti i, tutte le, tutti gli, tutte
+each | ogni
+early | inizio, inizio di, inizio del, inizi
+mid | metà, metà di, metà del
+late | fine, fine di, fine del
+after | dopo
+before | prima di, prima del, prima della
+half | semestre, semestri, metà
+quarter | trimestre, trimestri
+article | un, una, uno, un'
+the | il, lo, la, l', i, gli, le
+determiner | il, lo, la, l', i, gli, le
+approx | circa, verso, intorno a, intorno alle, attorno a, all'incirca, più o meno, quasi
+weekend | weekend, week-end, fine settimana
+zonebase | =UTC, =GMT
+quarterprefix | =T, =Q
+halfprefix | =S, =H
+hourmark | h
+hourword | ore
+plus15 | e un quarto, e quindici
+plus30 | e mezza, e mezzo, e trenta
+minus15 | meno un quarto, meno il quarto
+minus | meno
+daypartprefix | di, del, della, dell'
+decadeprefix | anni, gli anni, negli anni
+
+[time.recurrence]
+P1D | day | quotidiano, quotidiana, quotidianamente, giornaliero, giornaliera, giornalmente
+P1W | week | settimanale, settimanalmente
+P1M | month | mensile, mensilmente
+P3M | quarter | trimestrale, trimestralmente
+P1Y | year | annuale, annualmente
+PT1H | hour | orario
+
+[time.zone]
+=UTC, =GMT | 0 | z
+=WET | 0
+=WEST | 60
+=CET | 60
+=CEST | 120
+=EET | 120
+=EEST | 180
+=BST | 60
+=MSK | 180
+=EST | -300
+=EDT | -240
+=CST | -360
+=CDT | -300
+=MST | -420
+=MDT | -360
+=PST | -480
+=PDT | -420
+
+# Sources: the national public holidays of Italy (Legge 260/1949 as amended: 1 January, 6 January, Easter Monday, 25 April, 1 May, 2 June,
+# 15 August, 1 November, 8 December, 25 and 26 December); the other entries are customary dates.
+[time.holiday]
+Capodanno, Primo dell'anno | fixed 01-01 | it
+Epifania, Befana | fixed 01-06 | it
+San Valentino | fixed 02-14 | it
+Giovedì grasso | easter -52 | it
+Martedì grasso, Carnevale | easter -47 | it
+Mercoledì delle Ceneri | easter -46 | it
+Domenica delle Palme | easter -7 | it
+Giovedì santo | easter -3 | it
+Venerdì santo | easter -2 | it
+Sabato santo | easter -1 | it
+Pasqua, Domenica di Pasqua | easter 0 | it
+Pasquetta, Lunedì dell'Angelo, Lunedì di Pasqua | easter 1 | it
+Festa della Liberazione, Liberazione | fixed 04-25 | it
+Festa del Lavoro, Festa dei lavoratori, Primo maggio | fixed 05-01 | it
+Ascensione | easter 39 | it
+Pentecoste | easter 49 | it
+Corpus Domini | easter 60 | it
+Festa della mamma, Festa della Mamma | nth 2 sun 5 | it
+Festa della Repubblica | fixed 06-02 | it
+Ferragosto, Assunzione | fixed 08-15 | it
+Halloween | fixed 10-31 | it
+Ognissanti, Tutti i Santi | fixed 11-01 | it
+Giorno dei morti, Commemorazione dei defunti | fixed 11-02 | it
+Immacolata, Immacolata Concezione | fixed 12-08 | it
+Vigilia di Natale | fixed 12-24 | it
+Natale | fixed 12-25 | it
+Santo Stefano | fixed 12-26 | it
+San Silvestro, Silvestro | fixed 12-31 | it
+Festa del papà, Festa del Papà, San Giuseppe | fixed 03-19 | it
+Festa della donna | fixed 03-08 | it
+
+# "gli anni Novanta": the name of the decade.
+[time.decade]
+Trenta | 30
+Quaranta | 40
+Cinquanta | 50
+Sessanta | 60
+Settanta | 70
+Ottanta | 80
+Novanta | 90

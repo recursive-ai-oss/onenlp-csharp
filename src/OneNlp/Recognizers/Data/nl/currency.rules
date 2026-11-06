@@ -1,0 +1,55 @@
+# Currency rules, Dutch. Same format as the English file (see there).
+#
+# [currency.symbol]: form | ISO 4217 code | prefix, suffix or both | confidence (optional).
+# [currency.name]:   forms, comma-separated | ISO 4217 code | value of one in the currency (optional) | confidence (optional).
+
+[currency.symbol]
+$ | USD | both | 0.9
+US$ | USD | prefix
+A$ | AUD | prefix
+C$ | CAD | prefix
+CA$ | CAD | prefix
+€ | EUR | both
+£ | GBP | both
+¥ | JPY | both | 0.7
+￥ | JPY | both | 0.7
+₹ | INR | both
+₩ | KRW | both
+₽ | RUB | both
+₺ | TRY | both
+₪ | ILS | both
+
+[currency.name]
+euro, euro's | EUR | 1 | 0.95
+eurocent, cent, centen | EUR | 0.01 | 0.7
+dollar, dollars, amerikaanse dollar, us-dollar | USD | 1 | 0.9
+canadese dollar | CAD
+australische dollar | AUD
+nieuw-zeelandse dollar | NZD
+zwitserse frank | CHF
+pond sterling, ponden sterling | GBP | 1 | 0.95
+penny, pence | GBP | 0.01 | 0.7
+yen | JPY
+yuan, renminbi | CNY
+roepie, roepies | INR
+roebel, roebels | RUB
+won | KRW
+mexicaanse peso | MXN
+rand | ZAR
+turkse lira | TRY
+zweedse kroon, zweedse kronen | SEK
+noorse kroon, noorse kronen | NOK
+deense kroon, deense kronen | DKK
+sjekel, sjekels | ILS
+baht | THB
+dirham | AED | 1 | 0.8
+zloty | PLN
+forint | HUF
+[currency.code]
+AED, AFN, ALL, AMD, ANG, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYN, BZD
+CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, FKP, GBP, GEL
+GHS, GIP, GMD, GNF, GTQ, GYD, HKD, HNL, HTG, HUF, IDR, ILS, INR, IQD, IRR, ISK, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD
+KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MXV, MYR, MZN, NAD, NGN, NIO
+NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SHP, SLE, SOS, SRD
+SSP, STN, SVC, SYP, SZL, THB, TJS, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, UYI, UYU, UYW, UZS, VED, VES, VND, VUV
+WST, XAD, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XCG, XDR, XOF, XPD, XPF, XPT, XSU, XUA, YER, ZAR, ZMW, ZWG

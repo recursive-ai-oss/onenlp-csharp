@@ -1,0 +1,69 @@
+# Units that follow a number, Italian. Fields: canonical name | dimension | surface forms, comma-separated | confidence (optional).
+# A form starting with "=" is case-sensitive; the others are matched without regard to case. Canonical names are the English ones.
+
+[unit]
+millimeter | length | mm, millimetro, millimetri
+centimeter | length | cm, centimetro, centimetri
+meter | length | =m, metro, metri
+kilometer | length | km, chilometro, chilometri
+inch | length | pollice, pollici
+foot | length | piede, piedi
+yard | length | iarda, iarde
+mile | length | miglio, miglia
+nautical mile | length | miglio nautico, miglia nautiche
+
+milligram | mass | mg, milligrammo, milligrammi
+gram | mass | =g, grammo, grammi
+kilogram | mass | kg, chilo, chili, chilogrammo, chilogrammi
+tonne | mass | tonnellata, tonnellate, =t
+pound | mass | lb, lbs
+ounce | mass | oncia, once
+
+milliliter | volume | ml, millilitro, millilitri
+centiliter | volume | cl, centilitro, centilitri
+deciliter | volume | dl, decilitro, decilitri
+liter | volume | =l, =L, litro, litri
+hectoliter | volume | hl, ettolitro, ettolitri
+gallon | volume | gallone, galloni
+cubic meter | volume | m3, m³, metro cubo, metri cubi
+
+square meter | area | m2, m², mq, metro quadrato, metri quadrati, metro quadro, metri quadri
+square kilometer | area | km2, km², kmq, chilometro quadrato, chilometri quadrati
+square centimeter | area | cm2, cm², centimetro quadrato, centimetri quadrati
+acre | area | acro, acri
+hectare | area | ha, ettaro, ettari
+
+kilometer per hour | speed | km/h, kmh, chilometro orario, chilometri orari, chilometri all'ora, chilometri l'ora
+mile per hour | speed | mph, miglia orarie, miglia all'ora
+meter per second | speed | m/s, metri al secondo, metro al secondo
+knot | speed | nodo, nodi, kn, kt, kts
+
+bit | information | bit
+byte | information | byte, =B
+kilobyte | information | =KB, =kB, kilobyte
+megabyte | information | =MB, megabyte
+gigabyte | information | =GB, gigabyte
+terabyte | information | =TB, terabyte
+petabyte | information | =PB, petabyte
+kilobit | information | =Kb, kbit, kilobit
+megabit | information | =Mb, mbit, megabit
+gigabit | information | =Gb, gbit, gigabit
+
+watt | power | watt, =W
+kilowatt | power | =kW, kilowatt
+megawatt | power | =MW, megawatt
+horsepower | power | cv, hp, cavallo vapore, cavalli vapore
+
+celsius | temperature | °c, ºC, ˚C, ° c, gradi celsius, grado celsius, gradi centigradi, grado centigrado, celsius, centigradi
+fahrenheit | temperature | °f, ºF, ˚F, ° f, gradi fahrenheit, grado fahrenheit, fahrenheit
+kelvin | temperature | kelvin, gradi kelvin
+degree | temperature | grado, gradi, °, º, ˚ | 0.6
+
+[unit.compound]
+kilometer | meter | 1000
+meter | centimeter | 100
+centimeter | millimeter | 10
+meter | millimeter | 1000
+kilogram | gram | 1000
+gram | milligram | 1000
+liter | milliliter | 1000
