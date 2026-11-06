@@ -135,7 +135,7 @@ public static class Nlp
 
     /// <summary>Finds numbers, ordinals, percentages, measures and amounts of money in a text of the given language (see <see cref="Quantities(string)"/>).</summary>
     /// <param name="text">The text; may be empty.</param>
-    /// <param name="language">English, French, German, Spanish or Portuguese: the languages with built-in rules.</param>
+    /// <param name="language">English, French, German, Spanish, Portuguese, Turkish or Hindi: the languages with built-in rules.</param>
     /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>. French and German read <c>1 234,56 €</c> and <c>18.000 EUR</c> with the decimal comma and grouped thousands of their country.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
@@ -150,7 +150,7 @@ public static class Nlp
 
     /// <summary>Finds plain numbers and ordinals in a text of the given language (see <see cref="Numbers(string)"/>).</summary>
     /// <param name="text">The text; may be empty.</param>
-    /// <param name="language">English, French, German, Spanish or Portuguese.</param>
+    /// <param name="language">English, French, German, Spanish, Portuguese, Turkish or Hindi.</param>
     /// <returns>The results in text order, with UTF-16 offsets into <paramref name="text"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
@@ -168,7 +168,7 @@ public static class Nlp
 
     /// <summary>Finds the address-like sequences in a text of the given language (see <see cref="Sequences(string)"/>).</summary>
     /// <param name="text">The text; may be empty.</param>
-    /// <param name="language">English, French, German, Spanish or Portuguese.</param>
+    /// <param name="language">English, French, German, Spanish, Portuguese, Turkish or Hindi.</param>
     /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
@@ -188,7 +188,7 @@ public static class Nlp
     /// <summary>Finds dates, times, ranges, durations and recurrences in a text of the given language (see <see cref="Dates(string, DateTimeOffset)"/>).</summary>
     /// <param name="text">The text; may be empty.</param>
     /// <param name="reference">The moment relative expressions are resolved against; wall-clock expressions are read in its offset.</param>
-    /// <param name="language">English, French, German, Spanish or Portuguese. French and German read <c>04/05/2026</c> as 4 May and use the holidays of France and Germany.</param>
+    /// <param name="language">English, French, German, Spanish, Portuguese, Turkish or Hindi. French and German read <c>04/05/2026</c> as 4 May and use the holidays of France and Germany.</param>
     /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>. Empty when there are none.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
@@ -209,7 +209,7 @@ public static class Nlp
     /// <summary>Resolves the first date, time or range in a text of the given language to a stretch of time (see <see cref="ParseDate(string, DateTimeOffset)"/>).</summary>
     /// <param name="text">The text; may be empty.</param>
     /// <param name="reference">The moment relative expressions are resolved against; wall-clock expressions are read in its offset.</param>
-    /// <param name="language">English, French, German, Spanish or Portuguese.</param>
+    /// <param name="language">English, French, German, Spanish, Portuguese, Turkish or Hindi.</param>
     /// <returns>The range (start inclusive, end exclusive), or <see langword="null"/> when the text holds no date or time.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>

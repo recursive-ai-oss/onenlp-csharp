@@ -1,0 +1,62 @@
+# Units that follow a number, Turkish. Fields: canonical name | dimension | surface forms, comma-separated | confidence (optional).
+# A form starting with "=" is case-sensitive; the others are matched without regard to case. Canonical names are the English ones.
+
+[unit]
+millimeter | length | mm, milimetre
+centimeter | length | cm, santimetre
+meter | length | =m, metre
+kilometer | length | km, kilometre
+inch | length | inç
+foot | length | fit, ayağ
+yard | length | yarda
+mile | length | mil
+nautical mile | length | deniz mili
+
+milligram | mass | mg, miligram
+gram | mass | =g, gram
+kilogram | mass | kg, kilo, kilogram
+tonne | mass | ton
+pound | mass | lb, lbs, libre
+ounce | mass | ons
+
+milliliter | volume | ml, mililitre
+centiliter | volume | cl, santilitre
+deciliter | volume | dl, desilitre
+liter | volume | =l, =L, litre
+cubic meter | volume | m3, m³, metreküp
+
+square meter | area | m2, m², metrekare
+square kilometer | area | km2, km², kilometrekare
+square centimeter | area | cm2, cm², santimetrekare
+hectare | area | ha, hektar
+
+kilometer per hour | speed | km/saat, km/sa, km/h, kmh, saatte kilometre
+mile per hour | speed | mph
+meter per second | speed | m/s, m/sn, saniyede metre
+knot | speed | knot, kt
+
+byte | information | byte, bayt, =B
+kilobyte | information | =KB, =kB, kilobayt
+megabyte | information | =MB, megabayt
+gigabyte | information | =GB, gigabayt
+terabyte | information | =TB, terabayt
+petabyte | information | =PB, petabayt
+
+watt | power | vat, watt, =W
+kilowatt | power | =kW, kilovat, kilowatt
+megawatt | power | =MW, megavat, megawatt
+horsepower | power | hp, beygir gücü, bg
+
+celsius | temperature | °c, ºC, ˚C, ° c, santigrat derece, santigrat, derece celsius, derece santigrat
+fahrenheit | temperature | °f, ºF, ˚F, ° f, derece fahrenheit, fahrenhayt
+kelvin | temperature | kelvin
+degree | temperature | derece, °, º, ˚ | 0.6
+
+[unit.compound]
+kilometer | meter | 1000
+meter | centimeter | 100
+centimeter | millimeter | 10
+meter | millimeter | 1000
+kilogram | gram | 1000
+gram | milligram | 1000
+liter | milliliter | 1000

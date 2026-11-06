@@ -1,0 +1,37 @@
+# Currency rules, Turkish. Same format as the other languages (see docs/recognizers.md).
+#
+# [currency.symbol]: form | ISO 4217 code | prefix, suffix or both | confidence (optional).
+# [currency.name]:   forms, comma-separated | ISO 4217 code | value of one in the currency (optional) | confidence (optional).
+
+[currency.symbol]
+$ | USD | both | 0.9
+US$ | USD | prefix
+€ | EUR | both
+£ | GBP | both
+¥ | JPY | both | 0.7
+￥ | JPY | both | 0.7
+₹ | INR | both
+₽ | RUB | both
+₺ | TRY | both
+=TL | TRY | suffix
+
+[currency.name]
+lira, liralar, türk lirası, türk liraları | TRY | 1 | 0.9
+kuruş | TRY | 0.01 | 0.7
+euro, euros, avro, avrolar | EUR | 1 | 0.95
+dolar, dolarlar, amerikan doları, abd doları | USD | 1 | 0.9
+sterlin, ingiliz sterlini, pound | GBP | 1 | 0.8
+yen | JPY
+yuan | CNY
+rupi | INR
+ruble, rubl | RUB
+frank, isviçre franı | CHF | 1 | 0.6
+
+[currency.code]
+AED, AFN, ALL, AMD, ANG, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYN, BZD
+CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, FKP, GBP, GEL
+GHS, GIP, GMD, GNF, GTQ, GYD, HKD, HNL, HTG, HUF, IDR, ILS, INR, IQD, IRR, ISK, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD
+KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MXV, MYR, MZN, NAD, NGN, NIO
+NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SHP, SLE, SOS, SRD
+SSP, STN, SVC, SYP, SZL, THB, TJS, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, UYI, UYU, UYW, UZS, VED, VES, VND, VUV
+WST, XAD, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XCG, XDR, XOF, XPD, XPF, XPT, XSU, XUA, YER, ZAR, ZMW, ZWG
