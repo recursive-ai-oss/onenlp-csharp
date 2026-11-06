@@ -32,7 +32,7 @@ Er kwamen ongeveer [[duizend|number|1000]] mensen naar de conferentie.
 We hebben [[tweehonderd|number|200]] stoelen nodig voor de zaal.
 Er zijn nog [[tachtig|number|80]] plaatsen in de bus.
 De score kwam in de laatste ronde op [[4.500,75|number|4500.75]].
-Ze verkochten [[tweeduizend vijfhonderd|number|2500]] kaartjes op één dag.
+Ze verkochten [[tweeduizend vijfhonderd|number|2500]] kaartjes in totaal.
 Het rapport somt [[achtentwintig|number|28]] kostenposten op.
 We kregen [[honderdtachtig|number|180]] antwoorden op de enquête.
 Zij heeft [[drieëntwintig|number|23]] planten op het balkon.
@@ -60,15 +60,15 @@ De verkoop is met [[12%|percentage|12]] gestegen in de periode.
 De werkloosheid daalde naar [[3,5%|percentage|3.5]] in de peiling.
 Ongeveer [[twaalf procent|percentage|12]] van de ondervraagden weigerde te antwoorden.
 De test slaagde met [[99,9%|percentage|99.9]] nauwkeurigheid.
-De inflatie steeg in een maand met [[0,5 procent|percentage|0.5]].
+De inflatie steeg in [[een maand|duration|P1M]] met [[0,5 procent|percentage|0.5]].
 De batterij staat weer op [[100%|percentage|100]] op de telefoon.
 Ongeveer [[7%|percentage|7]] van het personeel werkt thuis.
-De lening heeft een rente van [[4,25%|percentage|4.25]] over tien jaar.
+De lening heeft een rente van [[4,25%|percentage|4.25]] en een looptijd van [[tien jaar|duration|P10Y]].
 Ze gaf [[honderd procent|percentage|100]] op de training.
-De index verloor [[3%|percentage|3]] in één handelsdag.
+De index verloor [[3%|percentage|3]] in een enkele handel.
 Slechts [[vijfentachtig procent|percentage|85]] van de stoelen was bezet.
 Aan de kassa krijg je [[15 procent|percentage|15]] korting.
-Het saldo daalt elk jaar met [[2 %|percentage|2]].
+Het saldo daalt [[elk jaar|set|P1Y|year]] met [[2 %|percentage|2]].
 
 # ---- dimensions
 Het pad is in totaal [[12 kilometer|dimension|12 kilometer]] lang.
@@ -93,27 +93,27 @@ Het perceel meet in totaal [[200 vierkante meter|dimension|200 square meter]].
 Het is [[25 °C|temperature|25 celsius]] in de schaduw.
 De thermometer wijst [[72 °F|temperature|72 fahrenheit]] aan op de veranda.
 Water kookt bij [[100 graden Celsius|temperature|100 celsius]] op zeeniveau.
-Buiten is het 's nachts [[-5 °C|temperature|-5 celsius]] nu.
-Aan de kust wordt het morgen [[20 graden|temperature|20 degree]].
+Buiten is het nu [[-5 °C|temperature|-5 celsius]].
+Aan de kust wordt het [[morgen|date|2026-03-19|day]] [[20 graden|temperature|20 degree]].
 De oven staat op [[180°C|temperature|180 celsius]] voor het bakken.
 De temperatuur in het lab is constant [[293 K|temperature|293 kelvin]].
 Zet de oven op [[200 graden Celsius|temperature|200 celsius]] en wacht.
 Hij had [[38,5 °C|temperature|38.5 celsius]] koorts toen hij thuiskwam.
 De diepvries staat permanent op [[-18 °C|temperature|-18 celsius]].
-In New York was het gisteren [[30 graden Fahrenheit|temperature|30 fahrenheit]].
+In New York was het [[gisteren|date|2026-03-17|day]] [[30 graden Fahrenheit|temperature|30 fahrenheit]].
 
 # ---- ages
 De jongen, [[5 jaar oud|age|5 year]], slaapt al.
 Een mevrouw van [[90 jaar oud|age|90 year]] woont op de begane grond.
 Een puppy van [[18 maanden oud|age|18 month]] zoekt een gezin.
 Een baby van [[3 weken oud|age|3 week]] is opgenomen in het ziekenhuis.
-Twee kinderen van [[12 jaar oud|age|12 year]] wonnen de prijs.
+Kinderen van [[12 jaar oud|age|12 year]] wonnen de prijs.
 Een [[40-jarige|age|40 year]] man is door de politie gehoord.
 Het katje, [[7 dagen oud|age|7 day]], heeft zijn ogen geopend.
 Een [[65-jarige|age|65 year]] klant stelde de vraag.
 De tweeling, [[2 jaar oud|age|2 year]], kruipt door het huis.
 Een getuige van [[30 jaar oud|age|30 year]] is ondervraagd.
-Het [[5-jarige|age|5 year]] kind tekent de hele dag.
+Het [[5-jarige|age|5 year]] kind tekent de hele tijd.
 
 # ---- money
 Het kaartje kost [[20 €|currency|20 EUR]] bij de ingang.
@@ -128,9 +128,9 @@ Het is [[50 cent|currency|0.5 EUR]] per stuk.
 De prijs is [[5 miljoen euro|currency|5000000 EUR]] voor alles.
 Hij is haar [[€ 1.200|currency|1200 EUR]] huur schuldig.
 Het kaartje kost [[$15|currency|15 USD]] in Chicago.
-Het basisabonnement kost maar [[9,99 euro|currency|9.99 EUR]] per maand.
+Het basisabonnement kost maar [[9,99 euro|currency|9.99 EUR]] in totaal.
 De kosten zijn [[vijftien euro|currency|15 EUR]] per dossier.
-Het lidmaatschap kost [[£20|currency|20 GBP]] per jaar.
+Het lidmaatschap kost [[£20|currency|20 GBP]] in totaal.
 Hij kreeg [[tweeduizend euro|currency|2000 EUR]] bonus.
 De terugbetaling was maar [[75 cent|currency|0.75 EUR]].
 
@@ -179,7 +179,7 @@ Bel terug naar [[+31 (0)20 555 0123|phone]] als het nodig is.
 De fax is al lang [[(020) 555 0123|phone]].
 Ons kantoor in Antwerpen is op [[+32 3 555 01 23|phone]] bereikbaar.
 Kies [[+31 6 1234 5678|phone]] voor het noodgeval.
-De directe lijn is al jaren [[010 555 0178|phone]].
+De directe lijn is al lang [[010 555 0178|phone]].
 De klantenservice is bereikbaar op [[+31 30 555 0199|phone]].
 
 # ---- hashtags and mentions
@@ -188,11 +188,11 @@ Het trefwoord [[#zomer2026|hashtag]] staat bovenaan de lijst.
 Voeg [[#nieuwigheden|hashtag]] en [[#dotnet|hashtag]] toe aan het bericht.
 Deel met [[#vrijdag_foto|hashtag]] op het netwerk.
 De draad [[#Utrecht2026|hashtag]] blijft rustig.
-De draad [[#goedemorgen|hashtag]] komt elke week terug.
+De draad [[#goedemorgen|hashtag]] komt [[elke week|set|P1W|week]] terug.
 Voeg [[#recept_van_de_dag|hashtag]] toe aan je bericht.
 De meningen staan onder [[#reacties|hashtag]] en [[#kwaliteit|hashtag]] op dezelfde plek.
 Het thema [[#Rotterdam2027|hashtag]] wint aan kracht.
-De uitdaging [[#marathon_2026|hashtag]] begint morgen.
+De uitdaging [[#marathon_2026|hashtag]] begint [[morgen|date|2026-03-19|day]].
 Bedankt [[@recursiveai|mention]] voor de snelle verbetering.
 Vraag het aan [[@jane_doe|mention]] en [[@dotnet|mention]] voor het vervolg.
 Meld [[@maria_g|mention]] op de draad.
@@ -202,7 +202,7 @@ Bedankt [[@jan_de_vries|mention]] voor het zorgvuldig nalezen.
 Stuur de link naar [[@piet_75|mention]] voor de vergadering.
 Waarschuw [[@support_nl|mention]] en [[@admin|mention]] over het probleem.
 Deze draad is gestart door [[@het_kleine_team|mention]] op het platform.
-Antwoord [[@sanne_b|mention]] vanavond nog.
+Antwoord [[@sanne_b|mention]] meteen.
 
 # ---- GUIDs
 Het pakket [[0f8fad5b-d9cb-469f-a165-70867728950e|guid]] is bezorgd.
@@ -222,13 +222,13 @@ Haar verjaardag valt op [[20 juni 2026|date|2026-06-20|day]] zoals altijd.
 Lever het formulier in voor [[15-04-2026|date|2026-04-15|day]] alstublieft.
 Hij is geboren op [[15 april 1990|date|1990-04-15|day]] in Utrecht.
 Het feest is op [[5 mei|date|2026-05-05|day]] in de club.
-De huur eindigt op [[1 december 2026|date|2026-12-01|day]] om twaalf uur.
+De huur eindigt op [[1 december 2026|date|2026-12-01|day]] voor iedereen.
 We zien elkaar [[vrijdag 27 maart|date|2026-03-27|day]] op de gebruikelijke plek.
 Het museum heropent op [[3 april|date|2026-04-03|day]] na de werkzaamheden.
 Het contract begint op [[1 januari 2027|date|2027-01-01|day]] zoals afgesproken.
 De schrikkeldag [[29 februari 2028|date|2028-02-29|day]] komt snel dichterbij.
 Het rapport is gedateerd [[2026-04-15|date|2026-04-15|day]] in de kop.
-De optocht is op [[14 juli|date|2026-07-14|day]] zoals ieder jaar.
+De optocht is op [[14 juli|date|2026-07-14|day]] zoals altijd.
 Hij tekende op [[3 maart 2026|date|2026-03-03|day]] voor getuigen.
 Haar papieren verlopen op [[31 december 2026|date|2026-12-31|day]] zonder uitzondering.
 Ze is verhuisd op [[12 augustus 2019|date|2019-08-12|day]] vanwege haar werk.
@@ -330,7 +330,7 @@ Het gesprek is om [[15:00 CET|time|T15:00+01:00|minute]] op de lijn.
 Het venster opent om [[12:00 UTC|time|T12:00Z|minute]] voor alle teams.
 Afspraak om [[half vier|time|T15:30|minute]] voor het stadhuis.
 Het café opent om [[half één|time|T12:30|minute]] in het centrum.
-De les begint om [[acht uur 's ochtends|time|T08:00|hour]] in lokaal drie.
+De les begint om [[acht uur 's ochtends|time|T08:00|hour]] in het lokaal.
 Wacht op ze [[rond 15:00|time|T15:00|minute|approx]] of iets later.
 De video stopte om [[23:59:59|time|T23:59:59|second]] precies.
 We zien elkaar om [[kwart over drie|time|T15:15|minute]] in het gebruikelijke café.
@@ -360,7 +360,7 @@ De pauze is [[van 12:00 tot 13:30|timerange|T12:00/T13:30|minute]] in de kantine
 Het café is open [[van 7 tot 11 uur|timerange|T07:00/T11:00|hour]] op de hoek.
 De zaal is gereserveerd [[van 10:00 tot 12:30|timerange|T10:00/T12:30|minute]] voor het team.
 Bel ons [[tussen 9:00 en 11:30|timerange|T09:00/T11:30|minute]] op kantoor.
-De loketten zijn [[9:00-17:00|timerange|T09:00/T17:00|minute]] open op werkdagen.
+De loketten zijn [[9:00-17:00|timerange|T09:00/T17:00|minute]] open doordeweeks.
 Het zwembad is [[van 18:00 tot 20:00|timerange|T18:00/T20:00|minute]] dicht voor de lessen.
 De markt is [[van 6 tot 13 uur|timerange|T06:00/T13:00|hour]] op het plein.
 Bezoek is mogelijk [[van 14 tot 18 uur|timerange|T14:00/T18:00|hour]] alleen.
@@ -398,14 +398,14 @@ Wacht [[een uur|duration|3600]] en probeer het dan opnieuw.
 # ---- sets
 De cursus is [[elke maandag|set|XXXX-WXX-1|day]] in het bijgebouw.
 Ze rent [[elke dag|set|P1D|day]] zonder uitzondering.
-Het team komt [[elke week|set|P1W|week]] samen in zaal drie.
+Het team komt [[elke week|set|P1W|week]] samen in de grote zaal.
 De facturen worden [[elke maand|set|P1M|month]] door de bank verstuurd.
 Ze bezoekt haar moeder [[om de twee weken|set|P2W|week]] met de trein.
 Het overleg is [[elke maandag om 9:00|set|XXXX-WXX-1T09:00|minute]] in de kantoortuin.
 De kermis komt [[elk jaar|set|P1Y|year]] terug op hetzelfde veld.
 Het afval wordt [[elke dag|set|P1D|day]] opgehaald in de stad.
 Het koor repeteert [[elke vrijdag|set|XXXX-WXX-5|day]] na het werk.
-De pomp draait [[elke 3 uur|set|PT3H|hour]] tijdens de nacht.
+De pomp draait [[elke 3 uur|set|PT3H|hour]] tijdens de rit.
 De krant verschijnt [[dagelijks|set|P1D|day]] in de regio.
 De brief gaat [[elke woensdag om 14:00|set|XXXX-WXX-3T14:00|minute]] naar de abonnees.
 Het bulletin komt [[wekelijks|set|P1W|week]] op de lijst.

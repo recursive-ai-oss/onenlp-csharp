@@ -10,6 +10,7 @@ nl
 daypart-direct
 no-lone-day
 bare-hour-24
+bare-range-24
 
 [time.month]
 1 | januari, =jan., =jan

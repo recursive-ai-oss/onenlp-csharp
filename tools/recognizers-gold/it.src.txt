@@ -33,7 +33,7 @@ Servono [[duecento|number|200]] sedie per la sala.
 Restano [[ottanta|number|80]] posti sul pullman.
 Il punteggio ha raggiunto [[4.500,75|number|4500.75]] nell'ultimo turno.
 Ha mangiato [[tre quarti|number|0.75]] della torta da solo.
-Hanno venduto [[duemilacinquecento|number|2500]] biglietti in un giorno.
+Hanno venduto [[duemilacinquecento|number|2500]] biglietti in [[un giorno|duration|86400]].
 Il rapporto elenca [[ventotto|number|28]] voci di spesa.
 Abbiamo ricevuto [[centottanta|number|180]] risposte al sondaggio.
 
@@ -60,15 +60,15 @@ Il [[50 per cento|percentage|50]] degli elettori è rimasto a casa.
 La disoccupazione è scesa al [[3,5%|percentage|3.5]] nel sondaggio.
 Circa il [[dodici per cento|percentage|12]] degli intervistati ha rifiutato di rispondere.
 Il test è riuscito con il [[99,9%|percentage|99.9]] di precisione.
-L'inflazione ha guadagnato lo [[0,5 per cento|percentage|0.5]] in un mese.
+L'inflazione ha guadagnato lo [[0,5 per cento|percentage|0.5]] in [[un mese|duration|P1M]].
 La batteria è di nuovo al [[100%|percentage|100]] sul telefono.
 Circa il [[7%|percentage|7]] del personale lavora da casa.
-Il prestito ha un tasso del [[4,25%|percentage|4.25]] su dieci anni.
+Il prestito ha un tasso del [[4,25%|percentage|4.25]] su [[dieci anni|duration|P10Y]].
 Ha dato il [[cento per cento|percentage|100]] in allenamento.
 L'indice ha perso il [[3%|percentage|3]] in una sola seduta.
 Solo l'[[ottantacinque per cento|percentage|85]] dei posti era occupato.
 Alla cassa si applica uno sconto del [[15 per cento|percentage|15]].
-Il saldo cala del [[2 %|percentage|2]] ogni anno.
+Il saldo cala del [[2 %|percentage|2]] [[ogni anno|set|P1Y|year]].
 
 # ---- dimensions
 Il sentiero è lungo [[12 chilometri|dimension|12 kilometer]] in tutto.
@@ -93,21 +93,21 @@ Il terreno misura [[200 metri quadrati|dimension|200 square meter]] in tutto.
 Ci sono [[25 °C|temperature|25 celsius]] all'ombra.
 Il termometro segna [[72 °F|temperature|72 fahrenheit]] in veranda.
 L'acqua bolle a [[100 gradi Celsius|temperature|100 celsius]] a livello del mare.
-Di notte fuori ci sono [[-5 °C|temperature|-5 celsius]] ormai.
-Sulla costa ci saranno [[20 gradi|temperature|20 degree]] domani.
+Fuori ci sono [[-5 °C|temperature|-5 celsius]] ormai.
+Sulla costa ci saranno [[20 gradi|temperature|20 degree]] [[domani|date|2026-03-19|day]].
 Il forno è regolato a [[180°C|temperature|180 celsius]] per la cottura.
 La temperatura del laboratorio è di [[293 K|temperature|293 kelvin]] costanti.
 Impostate il forno a [[200 gradi centigradi|temperature|200 celsius]] e aspettate.
 Ha avuto [[38,5 °C|temperature|38.5 celsius]] di febbre rientrando.
 Il congelatore sta a [[-18 °C|temperature|-18 celsius]] in permanenza.
-A New York c'erano [[30 gradi Fahrenheit|temperature|30 fahrenheit]] ieri.
+A New York c'erano [[30 gradi Fahrenheit|temperature|30 fahrenheit]] [[ieri|date|2026-03-17|day]].
 
 # ---- ages
 Il bambino, [[di 5 anni|age|5 year]], dorme già.
 Una signora [[di 90 anni|age|90 year]] abita al piano terra.
 Un cucciolo [[di 18 mesi|age|18 month]] cerca una famiglia.
 Una neonata [[di 3 settimane|age|3 week]] è stata ricoverata all'ospedale.
-Due ragazzi [[di 12 anni|age|12 year]] hanno vinto il premio.
+I ragazzi [[di 12 anni|age|12 year]] hanno vinto il premio.
 Un uomo [[di 40 anni|age|40 year]] è stato sentito dalla polizia.
 Il gattino, [[di 7 giorni|age|7 day]], ha aperto gli occhi.
 Una cliente [[di 65 anni|age|65 year]] ha posto la domanda.
@@ -128,9 +128,9 @@ Fanno [[50 centesimi|currency|0.5 EUR]] al pezzo.
 Il prezzo è di [[5 milioni di euro|currency|5000000 EUR]] per tutto.
 Gli deve [[1.200 €|currency|1200 EUR]] di affitto.
 Il biglietto costa [[$15|currency|15 USD]] a Chicago.
-L'abbonamento base costa solo [[9,99 euro|currency|9.99 EUR]] al mese.
+L'abbonamento base costa solo [[9,99 euro|currency|9.99 EUR]] in tutto.
 Le spese sono di [[quindici euro|currency|15 EUR]] a pratica.
-La quota d'iscrizione è di [[£20|currency|20 GBP]] all'anno.
+La quota d'iscrizione è di [[£20|currency|20 GBP]] in tutto.
 Ha ricevuto [[duemila euro|currency|2000 EUR]] di premio.
 Il rimborso è stato di [[75 centesimi|currency|0.75 EUR]] soltanto.
 
@@ -188,11 +188,11 @@ La parola chiave [[#estate2026|hashtag]] è in cima all'elenco.
 Aggiungete [[#novità|hashtag]] e [[#dotnet|hashtag]] al post.
 Condividete con [[#venerdì_foto|hashtag]] sul social.
 Il tema [[#Roma2026|hashtag]] resta tranquillo.
-Il filo [[#buongiorno|hashtag]] torna ogni settimana.
+Il filo [[#buongiorno|hashtag]] torna [[ogni settimana|set|P1W|week]].
 Aggiungete [[#ricetta_del_giorno|hashtag]] alla pubblicazione.
 I pareri sono raccolti sotto [[#opinioni|hashtag]] e [[#qualità|hashtag]] nello stesso posto.
 Il tema [[#Torino2027|hashtag]] sta salendo.
-La sfida [[#maratona_2026|hashtag]] parte domani.
+La sfida [[#maratona_2026|hashtag]] parte [[domani|date|2026-03-19|day]].
 Grazie a [[@recursiveai|mention]] per la correzione rapida.
 Chiedete a [[@jane_doe|mention]] e a [[@dotnet|mention]] per il seguito.
 Segnalate [[@maria_g|mention]] sul filo.
@@ -202,7 +202,7 @@ Grazie a [[@marco_rossi|mention]] per la rilettura attenta.
 Inviate il link a [[@pietro_75|mention]] prima della riunione.
 Avvisate [[@supporto_it|mention]] e [[@admin|mention]] del problema.
 Questo filo è stato lanciato da [[@la_piccola_squadra|mention]] sulla piattaforma.
-Rispondete a [[@giulia_b|mention]] entro sera.
+Rispondete a [[@giulia_b|mention]] subito.
 
 # ---- GUIDs
 Il pacco [[0f8fad5b-d9cb-469f-a165-70867728950e|guid]] è stato consegnato.
@@ -222,13 +222,13 @@ Il suo compleanno cade [[il 20 giugno 2026|date|2026-06-20|day]] come sempre.
 Consegnate il modulo entro [[il 15/04/2026|date|2026-04-15|day]] per favore.
 È nato [[il 15 aprile 1990|date|1990-04-15|day]] a Torino.
 La festa si tiene [[il 5 maggio|date|2026-05-05|day]] al circolo.
-L'affitto scade [[il 1º dicembre 2026|date|2026-12-01|day]] a mezzogiorno.
+L'affitto scade [[il 1º dicembre 2026|date|2026-12-01|day]] per tutti.
 Ci vediamo [[venerdì 27 marzo|date|2026-03-27|day]] nel solito posto.
 Il museo riapre [[il 3 aprile|date|2026-04-03|day]] dopo i lavori.
 Il contratto inizia [[il 1 gennaio 2027|date|2027-01-01|day]] come concordato.
 Il giorno bisestile [[29 febbraio 2028|date|2028-02-29|day]] arriva presto.
 Il rapporto è datato [[2026-04-15|date|2026-04-15|day]] nell'intestazione.
-La parata si tiene [[il 14 luglio|date|2026-07-14|day]] come ogni anno.
+La parata si tiene [[il 14 luglio|date|2026-07-14|day]] come da tradizione.
 Ha firmato [[il 3 marzo 2026|date|2026-03-03|day]] davanti ai testimoni.
 I documenti scadono [[il 31 dicembre 2026|date|2026-12-31|day]] senza eccezioni.
 Si è trasferita [[il 12 agosto 2019|date|2019-08-12|day]] per lavoro.
@@ -272,7 +272,7 @@ Il club si riunisce [[il terzo giovedì di aprile|date|2026-04-16|day]] al centr
 L'audit si tiene [[l'ultimo venerdì di marzo|date|2026-03-27|day]] come previsto.
 La sfilata è per [[la festa della Repubblica|date|2026-06-02|day]] a Roma.
 Il corteo parte per [[la festa della Liberazione|date|2026-04-25|day]] dalla piazza.
-I negozi sono chiusi per [[l'Immacolata|date|2026-12-08|day]] come ogni anno.
+I negozi sono chiusi per [[l'Immacolata|date|2026-12-08|day]] come da tradizione.
 La befana arriva con [[l'Epifania|date|2027-01-06|day]] per i bambini.
 Si pranza in famiglia a [[Santo Stefano|date|2026-12-26|day]] come da tradizione.
 
@@ -316,7 +316,7 @@ Il programma crescerà negli [[anni 2030|daterange|2030-01-01/2040-01-01|decade]
 # ---- times
 La riunione comincia alle [[15:00|time|T15:00|minute]] precise.
 Le porte aprono alle [[15:30|time|T15:30|minute]] come al solito.
-Il treno parte alle [[15.45|time|T15:45|minute]] dal binario uno.
+Il treno parte alle [[15.45|time|T15:45|minute]] dalla stazione centrale.
 Il pranzo è servito a [[mezzogiorno|time|T12:00|hour]] in albergo.
 Il server si riavvia a [[mezzanotte|time|T00:00|hour]] nella baia.
 La sveglia suona alle [[7:05|time|T07:05|minute]] nell'appartamento.
@@ -329,7 +329,7 @@ La chiamata è alle [[15:00 CET|time|T15:00+01:00|minute]] sulla linea.
 La finestra si apre alle [[12:00 UTC|time|T12:00Z|minute]] per tutte le squadre.
 Appuntamento alle [[tre e mezza del pomeriggio|time|T15:30|minute]] davanti al municipio.
 Il bar apre a [[mezzogiorno e mezzo|time|T12:30|minute]] in centro.
-Il corso comincia alle [[otto di mattina|time|T08:00|hour]] in aula tre.
+Il corso comincia alle [[otto di mattina|time|T08:00|hour]] nell'aula grande.
 Aspettali [[verso le 15:00|time|T15:00|minute|approx]] o poco dopo.
 Il video si è fermato alle [[23:59:59|time|T23:59:59|second]] precise.
 Ci vediamo alle [[3 del pomeriggio|time|T15:00|hour]] al solito bar.
@@ -396,14 +396,14 @@ Aspetta [[un'ora|duration|3600]] poi riprova.
 # ---- sets
 Il corso si tiene [[ogni lunedì|set|XXXX-WXX-1|day]] nell'annesso.
 Corre [[ogni giorno|set|P1D|day]] senza eccezioni.
-La squadra si riunisce [[ogni settimana|set|P1W|week]] nella sala tre.
+La squadra si riunisce [[ogni settimana|set|P1W|week]] nella sala grande.
 Le fatture partono [[ogni mese|set|P1M|month]] dalla banca.
 Va a trovare la madre [[ogni due settimane|set|P2W|week]] in treno.
 Il punto è [[ogni lunedì alle 9:00|set|XXXX-WXX-1T09:00|minute]] nell'open space.
 La fiera torna [[ogni anno|set|P1Y|year]] nello stesso campo.
 I rifiuti sono ritirati [[tutti i giorni|set|P1D|day]] in città.
 Il coro prova [[tutti i venerdì|set|XXXX-WXX-5|day]] dopo il lavoro.
-La pompa gira [[ogni 3 ore|set|PT3H|hour]] durante la notte.
+La pompa gira [[ogni 3 ore|set|PT3H|hour]] a turno.
 Il giornale esce [[quotidianamente|set|P1D|day]] in regione.
 La lettera parte [[ogni mercoledì alle 14:00|set|XXXX-WXX-3T14:00|minute]] per gli abbonati.
 Il bollettino esce [[settimanalmente|set|P1W|week]] sulla lista.
@@ -442,13 +442,13 @@ Il fondo vale [[tre milioni|number|3000000]] di euro.
 Il punteggio è sceso di [[-3|number|-3]] punti.
 Ha ordinato [[sei|number|6]] caffè per la squadra.
 Il museo ha ricevuto [[quindicimila|number|15000]] visitatori.
-Il prezzo è cambiato [[due|number|2]] volte in un giorno.
+Il prezzo è cambiato [[due|number|2]] volte in [[un giorno|duration|86400]].
 Ha letto [[centouno|number|101]] pagine in una sera.
 Su quella nave c'erano [[milleduecento|number|1200]] passeggeri.
 Hanno speso [[1.000.000|number|1000000]] in pubblicità.
 La squadra ha segnato [[diciannove|number|19]] punti.
 Il percorso ha [[sessantotto|number|68]] curve.
-Ha letto [[ottocento|number|800]] pagine in una settimana.
+Ha letto [[ottocento|number|800]] pagine in [[una settimana|duration|604800]].
 Alla sagra sono venute [[duemila|number|2000]] persone.
 
 # ---- ordinals
@@ -461,7 +461,7 @@ Questo è il suo [[dodicesimo|ordinal|12]] romanzo.
 Siamo alla [[8ª|ordinal|8]] riunione del mese.
 Ha chiuso al [[2º|ordinal|2]] posto del girone.
 Ricorre il [[cinquantesimo|ordinal|50]] anniversario del club.
-La [[venticinquesima|ordinal|25]] edizione parte domani.
+La [[venticinquesima|ordinal|25]] edizione parte [[domani|date|2026-03-19|day]].
 
 # ---- percentages
 Il [[18%|percentage|18]] dei voti è andato perso.
@@ -489,13 +489,13 @@ La stanza sta a [[68 °F|temperature|68 fahrenheit]] in inverno.
 Il ghiaccio fonde a [[0 °C|temperature|0 celsius]] di norma.
 Il vino va servito a [[12 gradi|temperature|12 degree]] più o meno.
 Il motore ha raggiunto i [[90 gradi Celsius|temperature|90 celsius]] in salita.
-Domani ci saranno [[-2 °C|temperature|-2 celsius]] sulle cime.
+[[Domani|date|2026-03-19|day]] ci saranno [[-2 °C|temperature|-2 celsius]] sulle cime.
 
 # ---- ages
 Un ragazzo [[di 16 anni|age|16 year]] ha vinto la gara.
 Una bambina [[di 6 mesi|age|6 month]] dorme tranquilla.
 Un nonno [[di 85 anni|age|85 year]] racconta storie al bar.
-Una signora ha [[70 anni di età|age|70 year]] e cammina ogni giorno.
+Una signora ha [[70 anni di età|age|70 year]] e cammina [[ogni giorno|set|P1D|day]].
 
 # ---- money
 Il pranzo è costato [[15 €|currency|15 EUR]] a testa.
@@ -508,8 +508,8 @@ Il resto è di [[35 centesimi|currency|0.35 EUR]] soltanto.
 Il premio è di [[mille euro|currency|1000 EUR]] al vincitore.
 
 # ---- sequences
-Scrivete a [[ufficio.stampa@esempio.it|email]] entro venerdì sera.
-Il portale è su [[https://portale.esempio.it/accesso|url]] dal mese scorso.
+Scrivete a [[ufficio.stampa@esempio.it|email]] con calma.
+Il portale è su [[https://portale.esempio.it/accesso|url]] da tempo.
 Il server di prova ha l'indirizzo [[10.1.2.3|ip]] in rete.
 Chiamate lo [[055 555 0147|phone]] per le informazioni.
 Seguite [[#festa2026|hashtag]] e scrivete a [[@comune_bologna|mention]] per i dettagli.
@@ -525,7 +525,7 @@ Il lavoro finisce [[il 30 aprile|date|2026-04-30|day]] senza proroghe.
 Il rapporto uscì [[il 18/06/2019|date|2019-06-18|day]] in tarda sera.
 Passo a trovarti [[domani|date|2026-03-19|day]] dopo pranzo.
 Si sono visti [[ieri|date|2026-03-17|day]] per un caffè.
-Il biglietto scade [[tra 10 giorni|date|2026-03-28|day]] a mezzanotte.
+Il biglietto scade [[tra 10 giorni|date|2026-03-28|day]] senza proroghe.
 Ha scritto [[2 settimane fa|date|2026-03-04|day]] senza risposta.
 Il mercato apre [[sabato prossimo|date|2026-03-28|day|alt=2026-03-21]] in piazza.
 Faremo festa a [[Pasqua|date|2026-04-05|day]] tutti insieme.
@@ -539,7 +539,7 @@ Il saldo arriva [[il mese prossimo|daterange|2026-04-01/2026-05-01|month]] in ba
 Il progetto parte a [[settembre 2026|daterange|2026-09-01/2026-10-01|month]] con poche persone.
 Il museo ha aperto nel [[2019|daterange|2019-01-01/2020-01-01|year]] dopo i restauri.
 Il report del [[secondo trimestre 2026|daterange|2026-04-01/2026-07-01|quarter]] è in ritardo.
-La mostra resta aperta [[dal 2 al 20 maggio|daterange|2026-05-02/2026-05-21|day]] ogni giorno.
+La mostra resta aperta [[dal 2 al 20 maggio|daterange|2026-05-02/2026-05-21|day]] con ingresso libero.
 Andiamo in montagna [[la prossima estate|daterange|2026-06-01/2026-09-01|season|approx]] con i cugini.
 Il gruppo è nato a [[fine 2019|daterange|2019-09-01/2020-01-01|year|approx]] in cantina.
 Ci sentiamo a [[metà maggio|daterange|2026-05-11/2026-05-21|month|approx]] per il saldo.
@@ -567,7 +567,7 @@ Il bando resta aperto per [[15 giorni|duration|1296000]] dalla pubblicazione.
 Prende la medicina [[ogni 8 ore|set|PT8H|hour]] dopo i pasti.
 Si allena [[ogni martedì|set|XXXX-WXX-2|day]] in palestra.
 Il giornale esce [[ogni sabato|set|XXXX-WXX-6|day]] in edicola.
-Fa il bucato [[ogni settimana|set|P1W|week]] di sabato.
+Fa il bucato [[ogni settimana|set|P1W|week]] senza fretta.
 Il report è [[annuale|set|P1Y|year]] per legge.
 
 # ---- nothing

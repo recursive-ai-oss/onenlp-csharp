@@ -9,6 +9,8 @@ it
 [time.flag]
 no-lone-day
 bare-hour-24
+bare-range-24
+word-hour
 
 [time.month]
 1 | gennaio, =gen.
@@ -78,10 +80,10 @@ in | tra, fra
 at | a, ad, alle, all', allo, verso le
 on | il, lo, la, l'
 of | di, del, della, dell', dei, delle, degli, d'
-and | e, ed
+and | e le, e alle, e, ed
 rangeto | a, al, alle, all', allo, fino a, fino al, fino alle, -, –, —
 from | da, dal, dalle, dall', dallo, dai, dagli, dalla
-between | tra, fra
+between | tra le, fra le, tra, fra
 every | ogni, tutti i, tutte le, tutti gli, tutte
 each | ogni
 early | inizio, inizio di, inizio del, inizi

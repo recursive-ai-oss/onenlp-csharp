@@ -51,7 +51,7 @@ internal sealed class TemporalData
         "plus15", "plus30", "minus15", "minus", "clockcue", "halfbefore", "plusquarter", "minusquarter", "daypartprefix", "decadeprefix", "decadesuffix", "decadeword",
     };
 
-    private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct", "no-lone-day", "bare-hour-24", "determiner-inside-only" };
+    private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct", "no-lone-day", "bare-hour-24", "determiner-inside-only", "bare-range-24", "word-hour" };
 
     private static readonly string[] WeekdayCodes = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
