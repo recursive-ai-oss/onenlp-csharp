@@ -16,9 +16,10 @@ public static class TurkishModel
     /// <summary>The NuGet package id.</summary>
     public const string PackageId = "RecursiveAI.OneNlp.Models.Turkish";
 
-    // The three saved pipelines, in pipeline order: tagging (sentencizer, tagger, morphologizer, lemmatizer), parser, entities.
-    // Each has its own fast encoder; they are separate files because they are separate training parts of one recipe.
-    private static readonly string[] Parts = ["tagging.onenlp", "parser.onenlp", "ner.onenlp"];
+    // The four saved pipelines, in pipeline order: the multiword-token splitter (the tokenizer, no components), tagging (sentencizer, tagger,
+    // morphologizer, lemmatizer), parser, entities. Each has its own fast encoder; they are separate files because they are separate
+    // training parts of one recipe.
+    private static readonly string[] Parts = ["splitter.onenlp", "tagging.onenlp", "parser.onenlp", "ner.onenlp"];
 
     /// <summary>
     /// Makes the <see cref="Nlp"/> verbs use this model for Turkish text. Safe to call more than once and from any thread. Needed only when the

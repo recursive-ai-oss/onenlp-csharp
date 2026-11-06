@@ -100,9 +100,9 @@ public static class PipelineFile
     {
         ArgumentNullException.ThrowIfNull(pipeline);
         ArgumentNullException.ThrowIfNull(stream);
-        if (pipeline.Tokenizer is not (RuleWordTokenizer or UaxWordTokenizer or NeuralWordSegmenter))
+        if (pipeline.Tokenizer is not (RuleWordTokenizer or UaxWordTokenizer or NeuralWordSegmenter or NeuralMultiwordSplitter { Inner: RuleWordTokenizer or UaxWordTokenizer }))
         {
-            throw new NotSupportedException("Only a pipeline with the rule word tokenizer, the UAX #29 word tokenizer or a trained word segmenter can be saved so far.");
+            throw new NotSupportedException("Only a pipeline with the rule word tokenizer, the UAX #29 word tokenizer, a trained word segmenter or a multiword splitter over the first two can be saved so far.");
         }
 
         (List<ITrainableComponent> heads, List<IEncoder> encoders) = StateModule.Collect(pipeline);
@@ -287,6 +287,19 @@ public static class PipelineFile
             case "uax":
                 string data = JsonSettings.String(e, "data", 16);
                 return new UaxWordTokenizer(SegmentationData.ByName(data));
+            case "mwt":
+                // A multiword splitter: the surface tokenizer (rule or uax) it wraps, and a tagger over one of the file's encoders with the labels B and I.
+                JsonElement innerJson = JsonSettings.Property(e, "inner");
+                IWordTokenizer inner = JsonSettings.String(innerJson, "kind", 16) switch
+                {
+                    "rule" => new RuleWordTokenizer(),
+                    "uax" => new UaxWordTokenizer(SegmentationData.ByName(JsonSettings.String(innerJson, "data", 16))),
+                    _ => throw new InvalidDataException("The inner tokenizer of a multiword splitter must be 'rule' or 'uax'."),
+                };
+                int splitterEncoder = JsonSettings.Int(e, "encoder", 0, encoders.Count - 1);
+                var splitterHead = HeadRegistry.Create(Tagger.ComponentKind, NeuralMultiwordSplitter.HeadName, encoders[splitterEncoder], JsonSettings.Property(e, "head")) as Tagger
+                    ?? throw new InvalidDataException("The splitter's head must be a tagger.");
+                return new NeuralMultiwordSplitter(inner, splitterHead) { MinCutPercent = JsonSettings.OptionalInt(e, "minCutPercent", 50, 99, 50) };
             case "segmenter":
                 // A trained word segmenter: its tagger reads one of the file's encoders and holds the labels B and I.
                 int encoderIndex = JsonSettings.Int(e, "encoder", 0, encoders.Count - 1);
@@ -294,7 +307,7 @@ public static class PipelineFile
                     ?? throw new InvalidDataException("The segmenter's head must be a tagger.");
                 return new NeuralWordSegmenter(head);
             default:
-                throw new InvalidDataException("Unsupported tokenizer kind; known kinds are 'rule', 'uax' and 'segmenter'.");
+                throw new InvalidDataException("Unsupported tokenizer kind; known kinds are 'rule', 'uax', 'segmenter' and 'mwt'.");
         }
     }
 
@@ -342,6 +355,31 @@ public static class PipelineFile
             {
                 w.WriteString("kind", "uax");
                 w.WriteString("data", uax.Data.Name);
+            }
+            else if (pipeline.Tokenizer is NeuralMultiwordSplitter splitter)
+            {
+                w.WriteString("kind", "mwt");
+                w.WriteStartObject("inner");
+                if (splitter.Inner is UaxWordTokenizer innerUax)
+                {
+                    w.WriteString("kind", "uax");
+                    w.WriteString("data", innerUax.Data.Name);
+                }
+                else
+                {
+                    w.WriteString("kind", "rule");
+                }
+
+                w.WriteEndObject();
+                if (splitter.MinCutPercent != 50)
+                {
+                    w.WriteNumber("minCutPercent", splitter.MinCutPercent);
+                }
+
+                w.WriteNumber("encoder", encoders.FindIndex(e => ReferenceEquals(e, splitter.Head.Encoder)));
+                w.WriteStartObject("head");
+                splitter.Head.WriteConfig(w);
+                w.WriteEndObject();
             }
             else if (pipeline.Tokenizer is NeuralWordSegmenter segmenter)
             {

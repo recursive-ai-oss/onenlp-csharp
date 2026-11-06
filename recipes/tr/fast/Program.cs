@@ -8,6 +8,7 @@ namespace RecursiveAI.OneNlp.Recipes.Turkish;
 
 // Turkish fast-tier recipe. One program for the three parts of the Turkish pipeline and for scoring them:
 //
+//   train-splitter --train F.conllu --dev F.conllu --out DIR [options]   multiword-token splitter: a B/I tagger over the characters of a token
 //   train-tagging --train F.conllu --dev F.conllu --out DIR [options]     tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer
 //   train-parser  --train F.conllu --dev F.conllu --out DIR [options]     biaffine dependency parser with sentence starts
 //   ner-convert IN.iob2 OUT.jsonl                                         Turkish-WikiNER to JSON Lines (PERSON, ORG, GPE and LOC kept)
@@ -28,7 +29,7 @@ internal static partial class Program
         {
             if (args.Length == 0)
             {
-                Console.Error.WriteLine("usage: train-tagging|train-parser|ner-convert|ner-train|ner-eval|predict|segment|speed ... (see the comment at the top of Program.cs)");
+                Console.Error.WriteLine("usage: train-splitter|train-tagging|train-parser|ner-convert|ner-train|ner-eval|predict|segment|speed ... (see the comment at the top of Program.cs)");
                 return 2;
             }
 
@@ -39,6 +40,7 @@ internal static partial class Program
 
             return args[0] switch
             {
+                "train-splitter" => TrainSplitter(args),
                 "train-tagging" => TrainTagging(args),
                 "train-parser" => TrainParser(args),
                 "ner-convert" when args.Length == 3 => NerConvert(args[1], args[2]),
@@ -66,8 +68,9 @@ internal static partial class Program
     private static FastEncoder MakeEncoder(string[] args, ulong seed) => new(
         width: Num(args, "width", 256), depth: Num(args, "depth", 2), normRows: Num(args, "norm-rows", 32768), prefixRows: Num(args, "prefix-rows", 32768),
         suffixRows: Num(args, "suffix-rows", 32768), shapeRows: Num(args, "shape-rows", 32768), seed: seed, prefixLength: Num(args, "prefix", 3),
-        suffixLength: Num(args, "suffix", 3), casedRows: Num(args, "cased-rows", 0), embedWidth: Num(args, "embed-width", 64), plain: false,
-        hashes: Num(args, "hashes", 1), turkicCase: Num(args, "turkic", 1) == 1);
+        suffixLength: Num(args, "suffix", 3), casedRows: Num(args, "cased-rows", 0), embedWidth: Num(args, "embed-width", 64), plain: Num(args, "plain", 0) == 1,
+        hashes: Num(args, "hashes", 1), turkicCase: Num(args, "turkic", 1) == 1, relu: Num(args, "relu", 0) == 1,
+        recurrentLayers: Num(args, "recurrent", 0), recurrentSize: Num(args, "recurrent-size", 0));
 
     private sealed class Progress(Action<TrainProgress> handler) : IProgress<TrainProgress>
     {
