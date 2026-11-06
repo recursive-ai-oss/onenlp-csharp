@@ -652,7 +652,7 @@ internal sealed partial class Scan
 
         // Italian "le sei del mattino", "tre e mezza del pomeriggio": an hour written as a word, then the part of the day. Only where the
         // rule data allows it (flag word-hour): in other languages it would also read English "five in the afternoon" differently.
-        if (_td!.Flags.Contains("word-hour") && _items[i].Kind == ItemKind.Word && _cardinals.TryGetValue(Span(i), out Cardinal hc)
+        if (_td!.Flags.Contains("word-hour") && i < _items.Count && _items[i].Kind == ItemKind.Word && _cardinals.TryGetValue(Span(i), out Cardinal hc)
             && hc.Kind is CardinalKind.Unit or CardinalKind.Teen && hc.Value is >= 1 and <= 12)
         {
             int we = i + 1;
