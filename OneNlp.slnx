@@ -9,6 +9,13 @@
     <Project Path="src/OneNlp.Models.Turkish/OneNlp.Models.Turkish.csproj" />
     <Project Path="src/OneNlp.Models.Portuguese/OneNlp.Models.Portuguese.csproj" />
     <Project Path="src/OneNlp.Models.Dutch/OneNlp.Models.Dutch.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large/OneNlp.Models.Multilingual.Large.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Encoder1/OneNlp.Models.Multilingual.Large.Encoder1.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Encoder2/OneNlp.Models.Multilingual.Large.Encoder2.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable1/OneNlp.Models.Multilingual.Large.TokenTable1.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable2/OneNlp.Models.Multilingual.Large.TokenTable2.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable3/OneNlp.Models.Multilingual.Large.TokenTable3.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable4/OneNlp.Models.Multilingual.Large.TokenTable4.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/OneNlp.Tests/OneNlp.Tests.csproj" />

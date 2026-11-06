@@ -1,0 +1,6 @@
+<Project>
+  <!-- The slice of weights this package packs: name, size, sha256. A pack fails when the file is missing or differs. Weights are never committed. -->
+  <ItemGroup>
+    <LargeWeight Include="encoder-layers.ckpt.part1" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+  </ItemGroup>
+</Project>

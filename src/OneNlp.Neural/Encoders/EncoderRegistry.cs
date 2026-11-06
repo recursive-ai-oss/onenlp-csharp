@@ -20,6 +20,7 @@ public static class EncoderRegistry
         [FastEncoder.EncoderKind] = FastEncoder.FromSettings,
         [TransformerEncoder.EncoderKind] = TransformerEncoder.FromSettings,
         [TrainableTransformerEncoder.EncoderKind] = TrainableTransformerEncoder.FromSettings,
+        [SharedEncoder.EncoderKind] = SharedEncoder.FromSettings,
     };
 
     /// <summary>Registers an encoder kind.</summary>

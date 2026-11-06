@@ -1,0 +1,18 @@
+<Project>
+  <!-- The weights this package packs itself (the heads of each language, the encoder's settings and the tokenizer); the encoder's layers and
+       the token table are in the parts, each with its own manifest. Name, size and sha256; a pack fails when a file is missing or differs.
+       Weights are never committed. -->
+  <ItemGroup>
+    <LargeWeight Include="heads/en.onenlp" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+    <LargeWeight Include="heads/de.onenlp" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+    <LargeWeight Include="heads/fr.onenlp" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+    <LargeWeight Include="heads/es.onenlp" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+    <LargeWeight Include="heads/pt.onenlp" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+    <LargeWeight Include="heads/it.onenlp" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+    <LargeWeight Include="heads/nl.onenlp" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+    <LargeWeight Include="heads/tr.onenlp" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+    <LargeWeight Include="heads/zh.onenlp" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+    <LargeWeight Include="encoder.json" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+    <LargeWeight Include="tokenizer.json" Size="0" Sha256="0000000000000000000000000000000000000000000000000000000000000000" />
+  </ItemGroup>
+</Project>

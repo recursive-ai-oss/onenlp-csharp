@@ -23,6 +23,9 @@ public static class ModelPackages
 
     private static readonly ConcurrentDictionary<string, Entry> Entries = new(StringComparer.Ordinal);
 
+    // Pipelines of the accurate-tier packages: used for a language only when no fast-tier package registered one.
+    private static readonly ConcurrentDictionary<string, Entry> Fallbacks = new(StringComparer.Ordinal);
+
     /// <summary>Registers the pipeline of a model package for a language. A second call for the same language and package is ignored.</summary>
     /// <param name="language">The language the pipeline analyzes; must be known.</param>
     /// <param name="packageId">The NuGet package id, named in messages.</param>
@@ -45,9 +48,30 @@ public static class ModelPackages
         }
     }
 
-    /// <summary>Whether a model package is registered for a language.</summary>
+    /// <summary>
+    /// Registers the pipeline of a package that serves a language only when no other package has registered one: the accurate tier, which
+    /// the <see cref="Nlp"/> verbs use for a language whose fast-tier package is not referenced. A fast-tier package registered with
+    /// <see cref="Register"/> always wins, in whichever order the two register.
+    /// </summary>
+    /// <param name="language">The language the pipeline analyzes; must be known.</param>
+    /// <param name="packageId">The NuGet package id, named in messages.</param>
+    /// <param name="create">Builds the pipeline; called at most once, on first use, only if the language has no regular registration. It must be safe to call from any thread.</param>
+    /// <exception cref="ArgumentException"><paramref name="language"/> is <see cref="Language.Unknown"/>, or <paramref name="packageId"/> is empty.</exception>
+    public static void RegisterFallback(Language language, string packageId, Func<Pipeline> create)
+    {
+        if (language == Language.Unknown)
+        {
+            throw new ArgumentException("A model package is registered for a known language.", nameof(language));
+        }
+
+        ArgumentException.ThrowIfNullOrEmpty(packageId);
+        ArgumentNullException.ThrowIfNull(create);
+        Fallbacks.GetOrAdd(language.Code, _ => new Entry(packageId, create));
+    }
+
+    /// <summary>Whether a model package is registered for a language, as its model or as the fallback.</summary>
     /// <param name="language">The language.</param>
-    public static bool IsRegistered(Language language) => Entries.ContainsKey(language.Code);
+    public static bool IsRegistered(Language language) => Entries.ContainsKey(language.Code) || Fallbacks.ContainsKey(language.Code);
 
     /// <summary>Gets the shared pipeline of the package registered for a language, loading it on first use.</summary>
     /// <param name="language">The language.</param>
@@ -55,7 +79,7 @@ public static class ModelPackages
     /// <exception cref="InvalidOperationException">No package is registered for the language. The message names the package to add.</exception>
     public static Pipeline Get(Language language)
     {
-        if (!Entries.TryGetValue(language.Code, out Entry? entry))
+        if (!Entries.TryGetValue(language.Code, out Entry? entry) && !Fallbacks.TryGetValue(language.Code, out entry))
         {
             throw new InvalidOperationException(MissingMessage(language));
         }
@@ -65,7 +89,7 @@ public static class ModelPackages
 
     internal static bool TryGet(Language language, out Pipeline pipeline)
     {
-        if (Entries.TryGetValue(language.Code, out Entry? entry))
+        if (Entries.TryGetValue(language.Code, out Entry? entry) || Fallbacks.TryGetValue(language.Code, out entry))
         {
             pipeline = entry.Pipeline.Value;
             return true;

@@ -409,6 +409,113 @@ public sealed class TrainableTransformerEncoder : IEncoder
         return LoadOnnx(TransformerEncoder.Resolve(JsonSettings.String(s, "model", 1024)), TransformerEncoder.Resolve(JsonSettings.String(s, "tokenizer", 1024)), options, sha);
     }
 
+    /// <summary>
+    /// Rebuilds a ModernBERT-family encoder from its parts, without the exported ONNX file: the settings a saved pipeline records, the shape,
+    /// the tokenizer, the frozen token table (in row-range pieces) and the weights of the layers (a OneModel checkpoint of <see cref="Weights"/>).
+    /// A model package that ships a fine-tuned encoder in several files loads it this way.
+    /// </summary>
+    /// <param name="settings">The settings object <see cref="WriteSettings"/> wrote (family <c>modernbert</c>, pooling, window sizes, rotary bases, epsilon, head count).</param>
+    /// <param name="vocabularySize">Rows of the token table.</param>
+    /// <param name="width">Hidden width.</param>
+    /// <param name="layers">Number of transformer layers.</param>
+    /// <param name="feedForwardWidth">Inner width of each half of the gated feed-forward.</param>
+    /// <param name="tokenizerJson">The model's <c>tokenizer.json</c>; read to the end, not closed.</param>
+    /// <param name="tableParts">The token table as little-endian float32 rows, split into consecutive pieces in row order; each piece is read to the end, not closed. Together exactly <c>vocabularySize * width * 4</c> bytes.</param>
+    /// <param name="layerWeights">The checkpoint of the layers; read to the end, not closed.</param>
+    /// <returns>The encoder in evaluation mode. The caller disposes it. It has no model file to refer to, so a pipeline that uses it is saved through <see cref="SharedEncoder"/>.</returns>
+    /// <exception cref="InvalidDataException">The settings, the table's length or the checkpoint do not fit.</exception>
+    public static TrainableTransformerEncoder FromParts(JsonElement settings, int vocabularySize, int width, int layers, int feedForwardWidth, Stream tokenizerJson, IReadOnlyList<Stream> tableParts, Stream layerWeights)
+    {
+        ArgumentNullException.ThrowIfNull(tokenizerJson);
+        ArgumentNullException.ThrowIfNull(tableParts);
+        ArgumentNullException.ThrowIfNull(layerWeights);
+        if (JsonSettings.String(settings, "family", 16) != "modernbert")
+        {
+            throw new InvalidDataException("Only the ModernBERT family can be rebuilt from parts.");
+        }
+
+        var o = new TrainableTransformerOptions
+        {
+            Family = TransformerFamily.ModernBert,
+            Pooling = JsonSettings.String(settings, "pooling", 16) == "first" ? SubwordPooling.FirstPiece : SubwordPooling.Mean,
+            MaxLength = JsonSettings.Int(settings, "maxLength", 2, MaxLengthLimit),
+            Heads = JsonSettings.Int(settings, "heads", 1, 1024),
+            GlobalEvery = JsonSettings.Int(settings, "globalEvery", 1, 1024),
+            LocalWindow = JsonSettings.Int(settings, "localWindow", 2, MaxLengthLimit),
+            GlobalRopeTheta = Real(settings, "ropeThetaGlobal"),
+            LocalRopeTheta = Real(settings, "ropeThetaLocal"),
+            NormEpsilon = Real(settings, "normEpsilon"),
+            PositionOffset = JsonSettings.Int(settings, "positionOffset", 0, MaxLengthLimit),
+            MaxBatchPieces = JsonSettings.Int(settings, "maxBatchPieces", 2, 1 << 24),
+        };
+
+        var config = new ModernBertConfig
+        {
+            VocabularySize = vocabularySize,
+            Width = width,
+            Layers = layers,
+            Heads = o.Heads,
+            FeedForwardWidth = feedForwardWidth,
+            GlobalEvery = o.GlobalEvery,
+            LocalWindow = o.LocalWindow,
+            GlobalRopeTheta = o.GlobalRopeTheta,
+            LocalRopeTheta = o.LocalRopeTheta,
+            NormEpsilon = o.NormEpsilon,
+        };
+
+        Tokenizer tokenizer = Tokenizer.FromStream(tokenizerJson, TokenizerFormat.HuggingFaceJson);
+        tokenizer.Padding = null;
+        tokenizer.Truncation = null;
+
+        Tensor table = Tensor.Zeros(DType.F32, Shape.Create(vocabularySize, width));
+        ModernBertModule? module = null;
+        try
+        {
+            Span<byte> bytes = System.Runtime.InteropServices.MemoryMarshal.AsBytes(table.MutableData<float>());
+            int filled = 0;
+            foreach (Stream part in tableParts)
+            {
+                // Bounds: a read never runs past the end of the table; a piece that has more left over is rejected below.
+                int n;
+                while (filled < bytes.Length && (n = part.Read(bytes[filled..])) > 0)
+                {
+                    filled += n;
+                }
+
+                if (part.ReadByte() >= 0)
+                {
+                    throw new InvalidDataException("The token table pieces hold more than vocabularySize * width * 4 bytes.");
+                }
+            }
+
+            if (filled != bytes.Length)
+            {
+                throw new InvalidDataException($"The token table pieces hold {filled} bytes where {bytes.Length} are needed.");
+            }
+
+            module = new ModernBertModule(config, o.Seed, table);
+            table = default;
+            Checkpoint.Load(layerWeights, module);
+            module.Eval();
+            string resolved = Resolved(TransformerFamily.ModernBert, o, config.Heads, config.GlobalEvery, config.LocalWindow, config.GlobalRopeTheta, config.LocalRopeTheta, config.NormEpsilon, o.PositionOffset);
+            ModernBertModule m = module;
+            module = null;
+            return new TrainableTransformerEncoder(m, (ids, lengths) => m.Forward(ids, lengths), width, TransformerFamily.ModernBert, tokenizer, "parts", "parts", null, o, resolved);
+        }
+        catch (Exception e) when (e is CheckpointException or ArgumentException)
+        {
+            throw new InvalidDataException("The encoder parts do not fit together: " + e.Message, e);
+        }
+        finally
+        {
+            module?.Dispose();
+            if (!table.IsEmpty)
+            {
+                table.Dispose();
+            }
+        }
+    }
+
     // The head count of a distilled student is not in its weights; its export writes <model>.config.json beside the model. 0 when absent.
     private static int ConfigHeads(string modelPath)
     {

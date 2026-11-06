@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>$(PackagePrefix)$(LibName).Models.Multilingual.Large</AssemblyName>
+    <RootNamespace>$(PackagePrefix)$(LibName).Models.Multilingual.Large</RootNamespace>
+    <PackageId>$(PackagePrefix)$(LibName).Models.Multilingual.Large</PackageId>
+    <Description>spaCy-class NLP for .NET: the base-size accurate-tier model (fine-tuned mmBERT-base) for English, German, French, Spanish, Portuguese, Italian, Dutch, Turkish and Chinese. Tags, morphology, lemmas, dependency parse and entities for the Nlp verbs; the Nlp verbs use it for these languages when no fast-tier package is referenced. About 1.3 GB, split over several packages. No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <PackageTags>$(PackageTags);multilingual;model</PackageTags>
+    <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <LargeWeightsDir Condition="'$(LargeWeightsDir)' == ''">$(ONENLP_MLLARGE_WEIGHTS)</LargeWeightsDir>
+  </PropertyGroup>
+
+  <Import Project="weights.manifest.props" />
+
+  <ItemGroup>
+    <!-- The registration file is shipped, not compiled here. -->
+    <Compile Remove="contentFiles/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../OneNlp.Neural/OneNlp.Neural.csproj" />
+    <ProjectReference Include="../OneNlp.Models.Multilingual.Large.Parts/Encoder1/OneNlp.Models.Multilingual.Large.Encoder1.csproj" />
+    <ProjectReference Include="../OneNlp.Models.Multilingual.Large.Parts/Encoder2/OneNlp.Models.Multilingual.Large.Encoder2.csproj" />
+    <ProjectReference Include="../OneNlp.Models.Multilingual.Large.Parts/TokenTable1/OneNlp.Models.Multilingual.Large.TokenTable1.csproj" />
+    <ProjectReference Include="../OneNlp.Models.Multilingual.Large.Parts/TokenTable2/OneNlp.Models.Multilingual.Large.TokenTable2.csproj" />
+    <ProjectReference Include="../OneNlp.Models.Multilingual.Large.Parts/TokenTable3/OneNlp.Models.Multilingual.Large.TokenTable3.csproj" />
+    <ProjectReference Include="../OneNlp.Models.Multilingual.Large.Parts/TokenTable4/OneNlp.Models.Multilingual.Large.TokenTable4.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="PACKAGE.md" Pack="true" PackagePath="/" />
+    <None Include="PROVENANCE.md" Pack="true" PackagePath="/" />
+    <None Include="weights.manifest.props" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-MIT" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-APACHE" Pack="true" PackagePath="/" />
+    <None Include="../OneNlp.Models.Multilingual.Large.Parts/THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+    <!-- Compiled into the referencing project: the module initializer that registers the model (docs/model-packages.md). -->
+    <Content Include="contentFiles/OneNlpModelsMultilingualLargeRegistration.cs" Pack="true" PackagePath="contentFiles/cs/any/" BuildAction="Compile" PackageCopyToOutput="false" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+  <!-- With a weights directory (property LargeWeightsDir or environment variable ONENLP_MLLARGE_WEIGHTS): check every file against the manifest
+       and embed it. Without one the project still builds (for development), but cannot be packed. -->
+  <Target Name="EmbedLargeWeights" BeforeTargets="AssignTargetPaths" Condition="'$(LargeWeightsDir)' != ''">
+    <ItemGroup>
+      <_Weight Include="@(LargeWeight)" Path="$([MSBuild]::EnsureTrailingSlash('$(LargeWeightsDir)'))%(Identity)" WeightName="%(Identity)" />
+    </ItemGroup>
+    <Error Condition="!Exists('%(_Weight.Path)')" Text="Weights file '%(_Weight.WeightName)' is missing from '$(LargeWeightsDir)'. Put the files listed in src/OneNlp.Models.Multilingual.Large/weights.manifest.props there." />
+    <GetFileHash Files="@(_Weight->'%(Path)')" Algorithm="SHA256" HashEncoding="hex">
+      <Output TaskParameter="Items" ItemName="_WeightHashed" />
+    </GetFileHash>
+    <Error Condition="!$([System.String]::Equals('%(_WeightHashed.FileHash)', '%(_WeightHashed.Sha256)', System.StringComparison.OrdinalIgnoreCase))"
+           Text="Weights file '%(_WeightHashed.WeightName)' does not match the manifest: sha256 %(_WeightHashed.FileHash), expected %(_WeightHashed.Sha256). Use the weights listed in weights.manifest.props, or update the manifest and PROVENANCE.md together." />
+    <ItemGroup>
+      <EmbeddedResource Include="@(_WeightHashed)" LogicalName="weights/%(_WeightHashed.WeightName)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="RequireLargeWeightsToPack" BeforeTargets="GenerateNuspec" Condition="'$(LargeWeightsDir)' == ''">
+    <Error Text="Packing needs the weights: set the environment variable ONENLP_MLLARGE_WEIGHTS (or the property LargeWeightsDir) to the directory that holds the files listed in weights.manifest.props, and the same for the parts." />
+  </Target>
+
+</Project>
