@@ -20,6 +20,8 @@ public sealed class Recognizer
     private static readonly Lazy<Recognizer> EnglishRules = new(() => LoadEmbedded(Language.English));
     private static readonly Lazy<Recognizer> FrenchRules = new(() => LoadEmbedded(Language.French));
     private static readonly Lazy<Recognizer> GermanRules = new(() => LoadEmbedded(Language.German));
+    private static readonly Lazy<Recognizer> SpanishRules = new(() => LoadEmbedded(Language.Spanish));
+    private static readonly Lazy<Recognizer> PortugueseRules = new(() => LoadEmbedded(Language.Portuguese));
 
     private readonly RecognizerData _data;
 
@@ -38,12 +40,18 @@ public sealed class Recognizer
     /// <summary>The recognizer for German, from the rules built into this package.</summary>
     public static Recognizer German => GermanRules.Value;
 
+    /// <summary>The recognizer for Spanish (Spain by default; pass region <c>mx</c> in the context for Mexican number and holiday conventions), from the rules built into this package.</summary>
+    public static Recognizer Spanish => SpanishRules.Value;
+
+    /// <summary>The recognizer for Portuguese (Brazil by default; pass region <c>pt</c> for Portugal), from the rules built into this package.</summary>
+    public static Recognizer Portuguese => PortugueseRules.Value;
+
     /// <summary>The language the rules are for; <see cref="Language.Unknown"/> for rules loaded without one.</summary>
     public Language Language { get; }
 
     /// <summary>Returns the recognizer for a language from the rules built into this package.</summary>
     /// <param name="language">The language.</param>
-    /// <exception cref="NotSupportedException">No rules for the language are built in. English, French and German are; <see cref="FromRules"/> loads rules from a file.</exception>
+    /// <exception cref="NotSupportedException">No rules for the language are built in. English, French, German, Spanish and Portuguese are; <see cref="FromRules"/> loads rules from a file.</exception>
     public static Recognizer For(Language language)
     {
         if (language == Language.English)
@@ -61,8 +69,18 @@ public sealed class Recognizer
             return German;
         }
 
+        if (language == Language.Spanish)
+        {
+            return Spanish;
+        }
+
+        if (language == Language.Portuguese)
+        {
+            return Portuguese;
+        }
+
         throw new NotSupportedException(
-            $"No built-in recognizer rules for language '{language.Code}'. English ('en'), French ('fr') and German ('de') are built in; load rules with Recognizer.FromRules.");
+            $"No built-in recognizer rules for language '{language.Code}'. English ('en'), French ('fr'), German ('de'), Spanish ('es') and Portuguese ('pt') are built in; load rules with Recognizer.FromRules.");
     }
 
     /// <summary>Compiles recognizer rules from rule data.</summary>

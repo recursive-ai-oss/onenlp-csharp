@@ -494,7 +494,7 @@ El billete de tren sale por [[39,90 €|currency|39.9 EUR]] solamente.
 Ganó [[2.500.000 €|currency|2500000 EUR]] en el sorteo.
 Vendió su reloj por [[300 euros|currency|300 EUR]] sin dudar.
 El café cuesta [[1,20 euros|currency|1.2 EUR]] en la barra.
-La cuenta asciende a [[75 dólares|currency|75 USD]] para dos personas.
+La cuenta asciende a [[75 dólares|currency|75 USD]] para [[dos|number|2]] personas.
 El piso cuesta [[250.000 EUR|currency|250000 EUR]] netos.
 Recibieron [[diez mil euros|currency|10000 EUR]] de subvención.
 El viaje cuesta [[€8|currency|8 EUR]] desde la estación.
@@ -529,7 +529,7 @@ Se marchó [[hace 10 días|date|2026-03-08|day]] de viaje.
 La entrega está prevista [[dentro de un mes|date|2026-04-18|day]] en casa del cliente.
 Los niños volvieron [[hace dos años|date|2024-03-18|day]] a España.
 Las vacaciones empiezan en [[Navidad de 2026|date|2026-12-25|day]] para los colegios.
-El desfile es [[el Día de la Hispanidad|date|2026-10-12|day]] cada año.
+El desfile es [[el Día de la Hispanidad|date|2026-10-12|day]] [[cada año|set|P1Y|year]].
 La misa es [[el Domingo de Resurrección|date|2026-04-05|day]] en la catedral.
 
 # ---- date ranges
@@ -587,3 +587,40 @@ El gato duerme al sol en el alféizar de la ventana.
 Preparamos una sopa de verduras para cenar.
 El jardinero poda los rosales con paciencia.
 Esta historia me ha conmovido mucho.
+
+# ---- extra development items (more shapes of the same types)
+Compraron [[un millón doscientos mil|number|1200000]] de acciones.
+Hay [[veintitrés|number|23]] sillas libres.
+Vale [[3 456,78|number|3456.78]] en total.
+Quedó en el puesto [[vigésimo tercero|ordinal|23]] de la lista.
+Es la [[decimoquinta|ordinal|15]] edición del festival.
+Es el [[1.º|ordinal|1]] intento del equipo.
+La bolsa subió un [[12,5 %|percentage|12.5]] [[esta semana|daterange|2026-03-16/2026-03-23|week]].
+Cuesta [[1.234,56 €|currency|1234.56 EUR]] con envío.
+Pagó [[veinte dólares|currency|20 USD]] por el libro.
+La caja pesa [[5 kg|dimension|5 kilogram]] en total.
+El piso tiene [[100 metros cuadrados|dimension|100 square meter]] útiles.
+La asamblea es [[el 3/4/2026|date|2026-04-03|day]] en la sala grande.
+Viajaremos [[el 15 de agosto|date|2026-08-15|day]] hacia la costa.
+Salimos [[el próximo viernes|date|2026-03-27|day]] sin falta.
+Llega [[pasado mañana|date|2026-03-20|day]] a primera hora.
+Fue [[anteayer|date|2026-03-16|day]] a la oficina.
+Se casaron [[hace tres semanas|date|2026-02-25|day]] en Toledo.
+Volvemos [[dentro de dos semanas|date|2026-04-01|day]] a casa.
+Cenamos en familia [[Nochebuena de 2026|date|2026-12-24|day]] como siempre.
+El calendario marca [[el 26 de marzo de 2027|date|2027-03-26|day]] para la fecha.
+La fiesta fue en [[los años 90|daterange|1990-01-01/2000-01-01|decade]] en Valencia.
+El proyecto se cerró [[la semana pasada|daterange|2026-03-09/2026-03-16|week]] por fin.
+Se publicó [[el mes pasado|daterange|2026-02-01/2026-03-01|month]] en la revista.
+Se celebra [[este año|daterange|2026-01-01/2027-01-01|year]] en mayo.
+Se celebró [[el segundo trimestre de 2026|daterange|2026-04-01/2026-07-01|quarter]] sin incidentes.
+Las vacaciones son [[del 3 al 7 de mayo|daterange|2026-05-03/2026-05-08|day]] en la sierra.
+La cita es a [[las tres y media de la tarde|time|T15:30|minute]] en la plaza.
+Sale a [[las 7 de la tarde|time|T19:00|hour]] desde la estación.
+El concierto termina a [[las 9:15 p. m.|time|T21:15|minute]] en el parque.
+La clase dura [[dos horas y media|duration|9000]] sin pausa.
+Hizo una pausa de [[media hora|duration|1800]] antes de seguir.
+El curso dura [[3 semanas|duration|1814400]] por completo.
+La junta se reúne [[cada lunes|set|XXXX-WXX-1|day]] en la oficina.
+Llama [[todos los días|set|P1D|day]] a su madre.
+Revisan las cuentas [[cada tres meses|set|P3M|month]] en la sede.

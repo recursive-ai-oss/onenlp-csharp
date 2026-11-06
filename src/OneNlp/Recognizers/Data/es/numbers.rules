@@ -1,0 +1,256 @@
+# Number rules for Spanish (es-ES; es-MX differs in the digit separators, see decimal.mx and group.mx).
+#
+# Format: [section] headers, then one rule per line, fields separated by "|". "#" starts a comment.
+# Words are matched without regard to case. Hundreds are words of their own (doscientos), tens join a unit with "y" (treinta y cinco).
+# Not supported: "mil millones" (a thousand millions) as one scale word; write 7.900 millones in digits.
+
+[number.digits]
+system | iberian
+decimal | ,
+group | space nbsp nnbsp .
+decimal.mx | .
+group.mx | space nbsp nnbsp ,
+negative | -−
+
+[number.cardinal]
+cero | unit | 0
+un | unit | 1
+uno | unit | 1
+una | unit | 1
+dos | unit | 2
+tres | unit | 3
+cuatro | unit | 4
+cinco | unit | 5
+seis | unit | 6
+siete | unit | 7
+ocho | unit | 8
+nueve | unit | 9
+diez | teen | 10
+once | teen | 11
+doce | teen | 12
+trece | teen | 13
+catorce | teen | 14
+quince | teen | 15
+dieciséis | teen | 16
+dieciseis | teen | 16
+diecisiete | teen | 17
+dieciocho | teen | 18
+diecinueve | teen | 19
+veintiuno | teen | 21
+veintiún | teen | 21
+veintiun | teen | 21
+veintiuna | teen | 21
+veintidós | teen | 22
+veintidos | teen | 22
+veintitrés | teen | 23
+veintitres | teen | 23
+veinticuatro | teen | 24
+veinticinco | teen | 25
+veintiséis | teen | 26
+veintiseis | teen | 26
+veintisiete | teen | 27
+veintiocho | teen | 28
+veintinueve | teen | 29
+veinte | tens | 20
+treinta | tens | 30
+cuarenta | tens | 40
+cincuenta | tens | 50
+sesenta | tens | 60
+setenta | tens | 70
+ochenta | tens | 80
+noventa | tens | 90
+cien | hundreds | 100
+ciento | hundreds | 100
+doscientos | hundreds | 200
+doscientas | hundreds | 200
+trescientos | hundreds | 300
+trescientas | hundreds | 300
+cuatrocientos | hundreds | 400
+cuatrocientas | hundreds | 400
+quinientos | hundreds | 500
+quinientas | hundreds | 500
+seiscientos | hundreds | 600
+seiscientas | hundreds | 600
+setecientos | hundreds | 700
+setecientas | hundreds | 700
+ochocientos | hundreds | 800
+ochocientas | hundreds | 800
+novecientos | hundreds | 900
+novecientas | hundreds | 900
+mil | bare-scale | 1000
+millón | scale | 1000000
+millon | scale | 1000000
+millones | scale | 1000000
+billón | scale | 1000000000000
+billon | scale | 1000000000000
+billones | scale | 1000000000000
+trillón | scale | 1000000000000000000
+trillones | scale | 1000000000000000000
+docena | multiplier | 12
+docenas | multiplier | 12
+
+[number.ordinal]
+primero | 1
+primera | 1
+primer | 1
+segundo | 2 | not-after-number
+segunda | 2 | not-after-number
+tercero | 3
+tercera | 3
+tercer | 3
+cuarto | 4
+cuarta | 4
+quinto | 5
+quinta | 5
+sexto | 6
+sexta | 6
+séptimo | 7
+séptima | 7
+septimo | 7
+septima | 7
+octavo | 8
+octava | 8
+noveno | 9
+novena | 9
+décimo | 10
+décima | 10
+decimo | 10
+decima | 10
+undécimo | 11
+undécima | 11
+undecimo | 11
+undecima | 11
+duodécimo | 12
+duodécima | 12
+duodecimo | 12
+duodecima | 12
+decimotercero | 13
+decimotercera | 13
+decimocuarto | 14
+decimocuarta | 14
+decimoquinto | 15
+decimoquinta | 15
+decimosexto | 16
+decimosexta | 16
+decimoséptimo | 17
+decimoséptima | 17
+decimoseptimo | 17
+decimoseptima | 17
+decimoctavo | 18
+decimoctava | 18
+decimonoveno | 19
+decimonovena | 19
+vigésimo | 20
+vigésima | 20
+vigesimo | 20
+vigesima | 20
+trigésimo | 30
+trigésima | 30
+trigesimo | 30
+trigesima | 30
+cuadragésimo | 40
+cuadragésima | 40
+cuadragesimo | 40
+cuadragesima | 40
+quincuagésimo | 50
+quincuagésima | 50
+quincuagesimo | 50
+quincuagesima | 50
+sexagésimo | 60
+sexagésima | 60
+sexagesimo | 60
+sexagesima | 60
+septuagésimo | 70
+septuagésima | 70
+septuagesimo | 70
+septuagesima | 70
+octogésimo | 80
+octogésima | 80
+octogesimo | 80
+octogesima | 80
+nonagésimo | 90
+nonagésima | 90
+nonagesimo | 90
+nonagesima | 90
+centésimo | 100
+centésima | 100
+centesimo | 100
+centesima | 100
+milésimo | 1000
+milésima | 1000
+milesimo | 1000
+milesima | 1000
+millonésimo | 1000000
+millonésima | 1000000
+millonesimo | 1000000
+millonesima | 1000000
+decimoprimero | 11
+decimoprimera | 11
+decimosegundo | 12
+decimosegunda | 12
+
+# The denominator a fraction word stands for: "tres cuartos" is 3/4.
+[number.fraction]
+tercio | 3
+tercios | 3
+cuartos | 4
+quintos | 5
+sextos | 6
+séptimos | 7
+octavos | 8
+novenos | 9
+décimos | 10
+centésimos | 100
+milésimos | 1000
+
+# "un", "una" and "uno" count only inside a longer number ("treinta y uno", "un millón"); alone they are the article or a pronoun.
+[number.lone-skip]
+un, uno, una
+
+[number.connector]
+y
+
+[number.negative]
+menos
+
+[number.point]
+coma
+
+[number.suffix]
+k | 1000 | any
+M | 1000000 | money
+MM | 1000000000 | money
+
+# A number written with an ending: 1.º 1.ª 1.er 3.er 2º 2ª 1er.
+[number.ordinal-suffix]
+º | 0123456789 | any
+ª | 0123456789 | any
+.º | 0123456789 | any
+.ª | 0123456789 | any
+.er | 13 | not-teen
+er | 13 | not-teen
+.o | 0123456789 | any
+.a | 0123456789 | any
+
+[percent]
+%, por ciento, porciento, por cien, ％
+
+[age.unit]
+year | año, años
+month | mes, meses
+week | semana, semanas
+day | día, días, dia, dias
+
+# "82 años de edad" is an age, "82 años" alone is a length of time.
+[age.suffix]
+de edad
+
+[number.not-number]
+uno | after | de, entre
+segundo | before | por
+primera | after | hora
+primero | after | hora
+
+# National numbers written as space-separated groups: Spanish numbers have nine digits and start with 6, 7, 8 or 9 ("913 45 67 89").
+[phone.space-start]
+6789 | 9 | 9

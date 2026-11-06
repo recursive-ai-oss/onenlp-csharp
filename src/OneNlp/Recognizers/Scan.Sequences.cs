@@ -928,8 +928,9 @@ internal sealed partial class Scan
 
         if (sep == ' ' || sep == '\u00A0')
         {
-            // Space-separated digits are only phone-like with a national trunk prefix: "020 7183 8750".
-            return _t[starts[0]] == '0' && count >= 2 && digits is >= 9 and <= 11 && sizes.All(s => s is >= 2 and <= 5);
+            // Space-separated digits are only phone-like with a national trunk prefix ("020 7183 8750") or, where the rule data says so, the first digits of national numbers (Spain "913 45 67 89").
+            return _d.PhoneSpaceStarts.Contains(_t[starts[0]], StringComparison.Ordinal) && count >= 2 && digits >= _d.PhoneSpaceMinDigits && digits <= _d.PhoneSpaceMaxDigits
+                && sizes.All(s => s is >= 2 and <= 5);
         }
 
         if (count == 2)

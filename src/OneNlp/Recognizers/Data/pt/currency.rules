@@ -1,0 +1,64 @@
+# Currency rules, Portuguese (Brazil and Portugal). Same format as the French file (see there and docs/recognizers.md).
+#
+# [currency.symbol]: form | ISO 4217 code | prefix, suffix or both | confidence (optional).
+# [currency.name]:   forms, comma-separated | ISO 4217 code | value of one in the currency (optional) | confidence (optional).
+
+[currency.symbol]
+$ | USD | both | 0.9
+US$ | USD | prefix
+R$ | BRL | prefix
+A$ | AUD | prefix
+C$ | CAD | prefix
+CA$ | CAD | prefix
+€ | EUR | both
+£ | GBP | both
+¥ | JPY | both | 0.7
+￥ | JPY | both | 0.7
+₹ | INR | both
+₩ | KRW | both
+₽ | RUB | both
+₺ | TRY | both
+₪ | ILS | both
+
+[currency.name]
+euro, euros | EUR | 1 | 0.95
+cêntimo, cêntimos, centimo, centimos | EUR | 0.01 | 0.7
+eurocêntimo, eurocêntimos | EUR | 0.01
+real, reais | BRL | 1 | 0.7
+real brasileiro, reais brasileiros | BRL
+centavo, centavos | BRL | 0.01 | 0.6
+dólar, dólares, dolar, dolares, dólar americano, dólares americanos, dólar norte-americano, dólares norte-americanos | USD | 1 | 0.9
+dólar canadense, dólares canadenses, dólar canadiano, dólares canadianos | CAD
+dólar australiano, dólares australianos | AUD
+dólar neozelandês, dólares neozelandeses | NZD
+franco suíço, francos suíços | CHF
+libra esterlina, libras esterlinas | GBP
+pêni, pence | GBP | 0.01 | 0.7
+iene, ienes | JPY
+yuan, yuans, renminbi | CNY
+rupia, rupias | INR
+rublo, rublos | RUB
+won, wons | KRW
+peso mexicano, pesos mexicanos | MXN
+peso argentino, pesos argentinos | ARS
+peso chileno, pesos chilenos | CLP
+peso colombiano, pesos colombianos | COP
+rand, rands | ZAR
+lira turca, liras turcas | TRY
+coroa sueca, coroas suecas | SEK
+coroa norueguesa, coroas norueguesas | NOK
+coroa dinamarquesa, coroas dinamarquesas | DKK
+xéquel, xéqueis, shekel, shekels | ILS
+baht, bahts | THB
+dirham, dirhams | AED | 1 | 0.8
+zloty, zlotys | PLN
+florim, florins, forint, forints | HUF
+
+[currency.code]
+AED, AFN, ALL, AMD, ANG, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYN, BZD
+CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, FKP, GBP, GEL
+GHS, GIP, GMD, GNF, GTQ, GYD, HKD, HNL, HTG, HUF, IDR, ILS, INR, IQD, IRR, ISK, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD
+KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MXV, MYR, MZN, NAD, NGN, NIO
+NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SHP, SLE, SOS, SRD
+SSP, STN, SVC, SYP, SZL, THB, TJS, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, UYI, UYU, UYW, UZS, VED, VES, VND, VUV
+WST, XAD, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XCG, XDR, XOF, XPD, XPF, XPT, XSU, XUA, YER, ZAR, ZMW, ZWG

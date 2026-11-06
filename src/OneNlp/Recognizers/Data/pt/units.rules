@@ -1,0 +1,74 @@
+# Units that follow a number, Portuguese (Brazil and Portugal). Fields: canonical name | dimension | surface forms, comma-separated | confidence (optional).
+# A form starting with "=" is case-sensitive; the others are matched without regard to case. Canonical names are the English ones.
+# Short forms that are also common words (m, t, l) are case-sensitive.
+
+[unit]
+millimeter | length | mm, milímetro, milímetros, milimetro, milimetros
+centimeter | length | cm, centímetro, centímetros, centimetro, centimetros
+meter | length | =m, metro, metros
+kilometer | length | km, quilômetro, quilômetros, quilómetro, quilómetros, quilometro, quilometros
+micrometer | length | mícron, mícrons, micron, microns, µm, μm, micrômetro, micrômetros, micrómetro, micrómetros
+inch | length | polegada, polegadas
+foot | length | pé, pés
+yard | length | jarda, jardas
+mile | length | milha, milhas
+nautical mile | length | milha náutica, milhas náuticas
+
+milligram | mass | mg, miligrama, miligramas
+gram | mass | =g, grama, gramas
+kilogram | mass | kg, quilo, quilos, quilograma, quilogramas, kilo, kilos
+microgram | mass | µg, μg, micrograma, microgramas
+tonne | mass | tonelada, toneladas, =t
+pound | mass | libra, libras, lb, lbs
+ounce | mass | onça, onças
+
+milliliter | volume | ml, mililitro, mililitros
+centiliter | volume | cl, centilitro, centilitros
+deciliter | volume | dl, decilitro, decilitros
+liter | volume | =l, =L, litro, litros
+hectoliter | volume | hl, hectolitro, hectolitros
+gallon | volume | galão, galões, galao, galoes
+cubic meter | volume | m3, m³, metro cúbico, metros cúbicos
+cubic centimeter | volume | cm3, cm³, centímetro cúbico, centímetros cúbicos
+
+square meter | area | m2, m², metro quadrado, metros quadrados
+square kilometer | area | km2, km², quilômetro quadrado, quilômetros quadrados, quilómetro quadrado, quilómetros quadrados
+square centimeter | area | cm2, cm², centímetro quadrado, centímetros quadrados
+square foot | area | pé quadrado, pés quadrados
+acre | area | acre, acres
+hectare | area | ha, hectare, hectares
+
+kilometer per hour | speed | km/h, kmh, quilômetro por hora, quilômetros por hora, quilómetro por hora, quilómetros por hora
+mile per hour | speed | mph, milha por hora, milhas por hora
+meter per second | speed | m/s, metro por segundo, metros por segundo
+knot | speed | nó, nós, kt, kts
+
+bit | information | bit, bits
+byte | information | byte, bytes, =B
+kilobyte | information | =KB, =kB, kilobyte, kilobytes, quilobyte, quilobytes
+megabyte | information | =MB, megabyte, megabytes
+gigabyte | information | =GB, gigabyte, gigabytes
+terabyte | information | =TB, terabyte, terabytes
+petabyte | information | =PB, petabyte, petabytes
+kilobit | information | kbit, kilobit, kilobits
+megabit | information | mbit, megabit, megabits
+gigabit | information | gbit, gigabit, gigabits
+
+watt | power | watt, watts, =W
+kilowatt | power | =kW, quilowatt, quilowatts, kilowatt, kilowatts
+megawatt | power | =MW, megawatt, megawatts
+horsepower | power | cv, hp, cavalo-vapor, cavalos-vapor, cavalo de potência, cavalos de potência
+
+celsius | temperature | °c, ºC, ˚C, ° c, graus celsius, grau celsius, graus centígrados, graus centigrados, graus c, celsius, centígrado, centigrado
+fahrenheit | temperature | °f, ºF, ˚F, ° f, graus fahrenheit, grau fahrenheit, graus f, fahrenheit
+kelvin | temperature | kelvin, kelvins, graus kelvin
+degree | temperature | grau, graus, °, º, ˚ | 0.6
+
+[unit.compound]
+kilometer | meter | 1000
+meter | centimeter | 100
+centimeter | millimeter | 10
+meter | millimeter | 1000
+kilogram | gram | 1000
+gram | milligram | 1000
+liter | milliliter | 1000
