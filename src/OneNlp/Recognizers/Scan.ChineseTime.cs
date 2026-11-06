@@ -940,7 +940,7 @@ internal sealed partial class Scan
     // ---- amounts of time ---------------------------------------------------------------------------------------------------------
 
     /// <summary>An amount: digits (with a decimal point), a Chinese numeral, or 半 (a half).</summary>
-    private bool ZAmount(int p, out decimal amount, out int end)
+    private bool ZAmount(int p, out decimal amount, out int end, bool afterGap = false)
     {
         amount = 0;
         end = p;
@@ -951,7 +951,7 @@ internal sealed partial class Scan
             return true;
         }
 
-        if (p > 0 && (_t[p - 1] == '\u7B2C' || (IsNumeralChar(_t[p - 1]) && IsNumeralChar(_t[p]))))
+        if (p > 0 && !afterGap && (_t[p - 1] == '\u7B2C' || (IsNumeralChar(_t[p - 1]) && IsNumeralChar(_t[p]))))
         {
             return false;
         }
@@ -983,16 +983,18 @@ internal sealed partial class Scan
         while (true)
         {
             int q = p;
+            bool afterGap = false;
             if (parts.Count > 0)
             {
                 // 两年零三个月: a gap word between terms.
                 if (Z.Role("gap", _t, q, out int gl))
                 {
                     q += gl;
+                    afterGap = true;
                 }
             }
 
-            if (!ZAmount(q, out decimal amount, out int ae))
+            if (!ZAmount(q, out decimal amount, out int ae, afterGap))
             {
                 break;
             }
