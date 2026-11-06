@@ -380,3 +380,37 @@ Regions: `it` and `nl` (they pick the holiday rows). Holiday sources are statute
 - Dutch `uur` is a weak hour word: `8 uur` is a time only with a part of the day, a tail or a range around it.
 - `vanmiddag`, `vanavond` and `vannacht` are cut as `van` (this) plus `middag`, `avond`, `nacht`.
 - Compound measures past two terms are not read.
+
+## Turkish and Hindi
+
+Turkish (`tr`) and Hindi (`hi`) are data sets on the same engine (`Data/<lang>/{numbers,units,currency,datetime}.rules`). Use `Recognizer.For(Language.Turkish)` or `Language.Hindi`, or the `Nlp` recognizer verbs with a `Language` argument. The other languages' results are unchanged (their test predictions are byte-identical to before).
+
+### Numbers
+
+- **`number.digits | system`** takes `devanagari` digits (read as ASCII digits of the same value; Indian grouping `12,34,567`, lakh and crore as scale words) and `native-digits`. **`case | turkic`** folds `İ`/`I` to `i`/`ı` before matching, with offsets unchanged.
+- Number words follow the language: Turkish compounds are separate words (`yüz yirmi üç bin dört yüz elli`); `on bir` (tens plus unit) is accepted. Hindi has an irregular table for 1 to 100 (generated into `numbers.rules`) and the scale words `सौ`, `हज़ार`, `लाख`, `करोड़`, `अरब`, `खरब`. A decimal number before a scale word multiplies (`1.5 करोड़`).
+- **Digit ordinals** take an apostrophe ending in Turkish (`5'inci`); the ending is outside the number.
+- **`[percent.prefix]`**: percent before the number (Turkish `%12`, `yüzde on iki`).
+
+### Dates and times
+
+Day first. Case endings after an apostrophe (`3 Mart'ta`, `20.03.2026'da`) are outside the span. New items:
+
+| Item | Meaning |
+|---|---|
+| holiday rule `table YYYY-MM-DD ...` | a pinned list of dates, for observances that follow the lunar calendar; years not listed have no date |
+| regions `tr`, `in` | pick the holiday rows (national days; Ramazan and Kurban Bayramı 2025-2030 from the Diyanet lists; Hindi gazetted holidays 2026 and 2027) |
+| roles `earlypost`, `midpost`, `latepost` | the part of a period named after it: `2021 başında`, `Mayıs ortasında`, `2022 के मध्य`, `मई की शुरुआत`: a year or month, an optional `of` word, then the part. They give an approximate range, as `early 2021` does |
+| a season after the year | `2021 baharında`, `2025 के पतझड़` |
+| role `nodate` | phrases that must not be read as a weekday (`pazar yerinde`, the market) |
+| roles `plushalf`, `plusquarter`, `minusquarter` | Hindi `साढ़े तीन बजे`, `सवा चार`, `पौने पाँच` |
+| role `rangetail` | the words that close a range after its second end (`10 Nisan'a kadar`, `16:00 तक`, `arasında`) |
+| flags `daypart-first`, `dot-clock`, `bare-hour-range`, `spoken-hour-mark` | `akşam 7`, `saat 15.30`, a range of bare hours (`9-17`), a spoken hour with its mark |
+| `phone.space-start` | Hindi: ten-digit mobile numbers in two groups, and landlines with a trunk 0 (`0141 234 5678`) |
+
+### Limits (Turkish and Hindi)
+
+- Ramazan and Kurban Bayramı are listed for 2025-2030 only. Hindi lunar holidays are listed for 2026 and 2027 only (Bakrid is left out: the published lists disagree).
+- Inflected forms of Turkish month and weekday names are listed in the rule data, not derived: a rare case ending is not read.
+- Hindi `रात` reads as evening to midnight (18:00-24:00) and `कल` as tomorrow unless a past word is nearby.
+- Early, middle and late parts are only read after a four-digit year or a month name.

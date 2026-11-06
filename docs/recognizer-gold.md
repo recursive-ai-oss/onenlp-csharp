@@ -168,3 +168,18 @@ The test files were edited once after their first hash (it `3d15d452…`, nl `e1
 Conventions beyond the English ones: a preposition, also fused with an article (`nel`, `dal`, `alle`, `in`, `op`), is outside the span, except where it belongs to the construct (`tra 3 giorni`, `3 giorni fa`, `over 3 dagen`, `dalle 8 alle 12`, `van 8 tot 12 uur`); an Italian age includes `di` (`di 82 anni`); a Dutch age is `N jaar oud` or `N-jarige`.
 
 Run the comparators with `tools/oracles/comparators_lang.sh <lang> <it-it|nl-nl> <gold|test> <out>` (Microsoft.Recognizers.Text 1.8.13), Duckling with `tools/oracles/duckling_lang.sh <lang> <it_IT|nl_NL> ...` (information only), and ours with `tools/oracles/score_dev.sh <lang> <out> [gold|test]`. Results, with paired 95% intervals: `testdata/recognizers/{it,nl}/comparators/`.
+
+## Turkish and Hindi
+
+`testdata/recognizers/{tr,hi}/` hold the gold sets in the same schema, written for these languages (never copied from a comparator): `test.jsonl` and `gold.jsonl` (development). Sources: `tools/recognizers-gold/{tr,hi}.src.txt`, built by `build.py --lang tr|hi`. The test splits were hashed before any rule was written and have not changed; only the development split guided the rules.
+
+| File | sha256 |
+|---|---|
+| `tr/test.jsonl` (316 items, 327 sentences) | `4876a7eb3dd2af542a00da5f682414102c1fb176ed8a6958cec96a3aa42be19a` |
+| `hi/test.jsonl` (324 items, 335 sentences) | `f4358d9849ea40f25d93e73fe4b698415aa84b29efd541d54ba3b372b006a68f` |
+| `tr/gold.jsonl` (dev) | `3cc32a3de4f4fbcb090901b98623b43a8d6e42b0719b535cee4f9e6b9f9c8756` |
+| `hi/gold.jsonl` (dev) | `896be443c66c8a3cea3c739e916243d7d63b843500807df2b31ea91bd73cd559` |
+
+Conventions beyond the English ones: a case ending after an apostrophe (`'da`, `'inci`) is outside the span; a Hindi postposition (`को`, `में`, `पर`, `से`) is outside the span, except the ones that frame a range (`से ... तक`) and the age endings (`का`, `की`, `के`), which are inside; `बजे` is inside a clock time; the closing words of a worded range (`arasında`, `kadar`, `तक`) are inside the range only when the range is worded; `रात` is evening 18:00-24:00; `कल` is tomorrow. Early, middle and late parts and seasons are approximate ranges.
+
+Comparators: `tools/oracles/comparators_lang.sh <lang> <tr-tr|hi-in> <gold|test> <out>`; Duckling `tools/oracles/duckling_lang.sh <lang> <tr_TR|hi_IN> ...` (information only); ours `tools/oracles/score_dev.sh <lang> <out> [gold|test]`; `tools/oracles/regress_check.sh <other tree> <out> <langs>` compares test predictions with another build byte for byte.
