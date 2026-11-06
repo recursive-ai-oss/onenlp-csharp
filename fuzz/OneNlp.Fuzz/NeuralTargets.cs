@@ -162,6 +162,7 @@ internal static class NeuralTargets
     {
         File.WriteAllBytes(Path.Combine(dir, "seed-pipeline"), TinyPipelineBytes());
         File.WriteAllBytes(Path.Combine(dir, "seed-segmenter"), TinySegmenterBytes());
+        File.WriteAllBytes(Path.Combine(dir, "seed-splitter"), TinySplitterBytes());
     }
 
     internal static void SeedPipelineConfig(string dir)
@@ -172,6 +173,9 @@ internal static class NeuralTargets
         byte[] segmenter = TinySegmenterBytes();
         ulong segmenterConfigLength = BinaryPrimitives.ReadUInt64LittleEndian(segmenter.AsSpan(16));
         File.WriteAllBytes(Path.Combine(dir, "seed-segmenter-config"), segmenter.AsSpan(HeaderSize, (int)segmenterConfigLength).ToArray());
+        byte[] splitter = TinySplitterBytes();
+        ulong splitterConfigLength = BinaryPrimitives.ReadUInt64LittleEndian(splitter.AsSpan(16));
+        File.WriteAllBytes(Path.Combine(dir, "seed-splitter-config"), splitter.AsSpan(HeaderSize, (int)splitterConfigLength).ToArray());
     }
 
     private static void RunPipeline(byte[] file)
@@ -250,6 +254,42 @@ internal static class NeuralTargets
         using Pipeline training = Pipeline.Blank(Language.Chinese).Add(new Tagger(encoder, TokenColumn.Tag, NeuralWordSegmenter.HeadName) { OwnsEncoder = true });
         _ = training.Train(examples, new TrainOptions { Epochs = 1, BatchWords = 40, DevFraction = 0, Seed = 1 });
         using var holder = new Pipeline(new NeuralWordSegmenter((Tagger)training.Components[0]), Language.Chinese);
+        using var stream = new MemoryStream();
+        PipelineFile.Save(holder, stream);
+        return stream.ToArray();
+    }
+
+    // A pipeline whose tokenizer is a multiword-token splitter (the "mwt" tokenizer kind of the file format).
+    private static byte[] TinySplitterBytes()
+    {
+        var encoder = new FastEncoder(width: 8, depth: 1, normRows: 16, prefixRows: 8, suffixRows: 16, shapeRows: 8, seed: 1, recurrentLayers: 1, recurrentSize: 4);
+        var strings = new StringStore();
+        var examples = new List<Example>();
+        foreach (string[] tokens in new[] { new[] { "vardır", "ok" }, new[] { "güzeldir" }, new[] { "yok", "kitaptır" } })
+        {
+            Doc doc = NeuralMultiwordSplitter.MakeWindow(strings, tokens, out int[] first);
+            var tags = new string[doc.Length];
+            Array.Fill(tags, NeuralMultiwordSplitter.BeginLabel);
+            for (int k = 0; k < tokens.Length; k++)
+            {
+                if (NeuralMultiwordSplitter.IsCandidate(tokens[k]) && tokens[k].Length > 5)
+                {
+                    string[] t = NeuralMultiwordSplitter.Tags(tokens[k].Length, [tokens[k].Length - 3, 3]);
+                    Array.Copy(t, 0, tags, first[k], t.Length);
+                }
+            }
+
+            for (int u = 0; u < tags.Length; u++)
+            {
+                doc.SetAnnotation(TokenColumn.Tag, u, tags[u]);
+            }
+
+            examples.Add(Example.FromReference(doc));
+        }
+
+        using Pipeline training = Pipeline.Blank(Language.Turkish).Add(new Tagger(encoder, TokenColumn.Tag, NeuralMultiwordSplitter.HeadName) { OwnsEncoder = true });
+        _ = training.Train(examples, new TrainOptions { Epochs = 1, BatchWords = 40, DevFraction = 0, Seed = 1 });
+        using var holder = new Pipeline(new NeuralMultiwordSplitter(new UaxWordTokenizer(RecursiveAI.OneNlp.Segmentation.SegmentationData.TurkishWhole), (Tagger)training.Components[0]), Language.Turkish);
         using var stream = new MemoryStream();
         PipelineFile.Save(holder, stream);
         return stream.ToArray();
