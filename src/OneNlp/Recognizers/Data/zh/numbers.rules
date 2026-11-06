@@ -1,0 +1,76 @@
+# Number rules for Chinese (zh, Mainland China). Chinese writes no spaces, so the numerals are single characters that the recognizer
+# combines by position (三百二十五, 一千零五, 三万五千) instead of words it looks up in a table.
+#
+# Format: [section] headers, then one rule per line, fields separated by "|". "#" starts a comment.
+
+[number.digits]
+system | chinese
+decimal | .
+group | ,
+negative | -−
+
+# Digits, in the plain and the financial (capital) forms, 零 and 〇 for zero, 两 for two before a unit.
+[zh.digit]
+零, 〇 | 0
+一, 壹 | 1
+二, 贰, 貳, 两, 兩 | 2
+三, 叁, 參 | 3
+四, 肆 | 4
+五, 伍 | 5
+六, 陆, 陸 | 6
+七, 柒 | 7
+八, 捌 | 8
+九, 玖 | 9
+
+# Ten, hundred, thousand.
+[zh.small]
+十, 拾 | 10
+百, 佰 | 100
+千, 仟 | 1000
+
+# Ten thousand and a hundred million: a group of four digits is counted in them (三亿五千万).
+[zh.big]
+万, 萬 | 10000
+亿, 億 | 100000000
+
+[zh.word]
+point | 点
+negative | 负
+ordinal | 第
+percent | 百分之
+hundred | 百
+fraction | 分之
+# A single numeral character (三, 十, 两) is a number only before one of these counting words: 三个人, 两只猫. Not 统一, 一些, 之一.
+classifier | 个, 只, 条, 位, 名, 件, 本, 张, 次, 天, 种, 家, 台, 辆, 把, 双, 对, 套, 份, 场, 间, 座, 首, 部, 头, 瓶, 杯, 口, 人, 页, 篇, 封, 支, 根, 颗, 粒, 棵, 朵, 片, 道, 项, 段, 局, 层, 届, 批, 组, 圈, 例, 辈
+# A small unit of money is not money before these characters: 三角形, 三毛钱 stays.
+notmoney | 形, 色, 度, 板
+rangeto | 到, 至, -, ~, ～, —, –, －
+from | 从, 自
+every | 每个, 每
+everyother | 每隔
+daily | 天天
+later | 后, 以后, 之后, 过后
+ago | 前, 以前, 之前
+gap | 零, 又, 加
+andahalf | 个半
+firsthalf | 上半年
+secondhalf | 下半年
+quarter | 季度
+weekend | 周末
+monthearly | 初, 上旬
+monthmid | 中旬
+monthlate | 下旬, 底, 末
+
+[percent]
+%, ％
+
+# Telephone numbers: mobile numbers are eleven digits starting 13 to 19 (written together or as 3-4-4), landlines an area code
+# (0 and two or three more digits) and seven or eight digits joined by a hyphen.
+[phone.plain]
+13, 14, 15, 16, 17, 18, 19 | 11
+
+[phone.area]
+0 | 3-4 | 7-8
+
+[phone.space-start]
+1 | 11 | 11

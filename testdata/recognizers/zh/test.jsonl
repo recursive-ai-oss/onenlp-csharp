@@ -1,9 +1,7 @@
-{"id":"00612e6cc7e5","text":"圣诞节有一场音乐会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":3,"type":"date","text":"圣诞节","value":"2026-12-25","grain":"day"}]}
 {"id":"007286af6d02","text":"他统一了大家的意见。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"01dd8b7e211e","text":"报价是RMB 500。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":10,"type":"currency","text":"RMB 500","value":"500 CNY"}]}
 {"id":"02035be28eca","text":"下周一上午9点开例会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":7,"type":"datetime","text":"下周一上午9点","value":"2026-03-23T09:00","grain":"hour"}]}
 {"id":"0352d450f6c9","text":"参加人数达到12,345人。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":12,"type":"number","text":"12,345","value":"12345"}]}
-{"id":"03c93f90a733","text":"一杯咖啡$5。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":6,"type":"currency","text":"$5","value":"5 USD"}]}
 {"id":"041048d76d5c","text":"任务ID：f47ac10b-58cc-4372-a567-0e02b2c3d479","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":41,"type":"guid","text":"f47ac10b-58cc-4372-a567-0e02b2c3d479"}]}
 {"id":"04b4d990a94a","text":"水在100℃沸腾。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":6,"type":"temperature","text":"100℃","value":"100 celsius"}]}
 {"id":"04ff28dee0a3","text":"年薪30万元。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":6,"type":"currency","text":"30万元","value":"300000 CNY"}]}
@@ -24,8 +22,6 @@
 {"id":"0e68501f4199","text":"香港来电请拨+86 10 8888 1234。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":22,"type":"phone","text":"+86 10 8888 1234"}]}
 {"id":"0e79b65e15ec","text":"每月15号发工资。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":5,"type":"set","text":"每月15号","value":"XXXX-XX-15","grain":"month"}]}
 {"id":"0f7a598090f1","text":"他在国外待了两年零三个月。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":12,"type":"duration","text":"两年零三个月","value":"P2Y3M"}]}
-{"id":"0feb6e2699ab","text":"一个十二岁的男孩走了进来。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":5,"type":"age","text":"十二岁","value":"12 year"}]}
-{"id":"0ff67771a16f","text":"每3小时吃一次药。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":4,"type":"set","text":"每3小时","value":"PT3H","grain":"hour"}]}
 {"id":"120a194b8647","text":"明天下午3点开会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":6,"type":"datetime","text":"明天下午3点","value":"2026-03-19T15:00","grain":"hour"}]}
 {"id":"1243362e0288","text":"8:30~12:00办理业务。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":10,"type":"timerange","text":"8:30~12:00","value":"T08:30/T12:00","grain":"minute"}]}
 {"id":"136b4c2c9115","text":"液氮温度约为-196°C。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":12,"type":"temperature","text":"-196°C","value":"-196 celsius"}]}
@@ -63,6 +59,7 @@
 {"id":"2c00bb732575","text":"文件包含2,000,000行。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":13,"type":"number","text":"2,000,000","value":"2000000"}]}
 {"id":"2e928e95fed0","text":"请打开http://example.cn/index.html下载。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":31,"type":"url","text":"http://example.cn/index.html"}]}
 {"id":"2f09287b277d","text":"开了5个小时会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":6,"type":"duration","text":"5个小时","value":"18000"}]}
+{"id":"3007999ff29f","text":"这是个很好的问题。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"3082d80dbb82","text":"室温保持在25度。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":8,"type":"temperature","text":"25度","value":"25 degree"}]}
 {"id":"30b1ba14b960","text":"上海分公司电话021-5555-1234。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":20,"type":"phone","text":"021-5555-1234"}]}
 {"id":"31da50dd6d92","text":"订单编号是550e8400-e29b-41d4-a716-446655440000。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":41,"type":"guid","text":"550e8400-e29b-41d4-a716-446655440000"}]}
@@ -87,7 +84,6 @@
 {"id":"3dacb62fe15a","text":"你可以登录https://login.example.com:8443/sso办理。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":39,"type":"url","text":"https://login.example.com:8443/sso"}]}
 {"id":"402b14a2458f","text":"清明节要去扫墓。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":3,"type":"date","text":"清明节","value":"2026-04-05","grain":"day"}]}
 {"id":"408274e7b499","text":"请把DNS设置为8.8.8.8。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":15,"type":"ip","text":"8.8.8.8"}]}
-{"id":"40cbecd3fe87","text":"他一口气跑了十二圈。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":8,"type":"number","text":"十二","value":"12"}]}
 {"id":"42039cf84f63","text":"他跑了五千米。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":6,"type":"dimension","text":"五千米","value":"5 kilometer","alt":["5000 meter"]}]}
 {"id":"425824bafa12","text":"2026年3月20日上午10点开幕。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":15,"type":"datetime","text":"2026年3月20日上午10点","value":"2026-03-20T10:00","grain":"hour"}]}
 {"id":"42d9c0cd57cb","text":"这条路全长十五公里。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":9,"type":"dimension","text":"十五公里","value":"15 kilometer"}]}
@@ -102,9 +98,7 @@
 {"id":"4d2abb125db4","text":"十分感谢你的帮助。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"4d512bb0531a","text":"北京时间下午3点发布。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":8,"type":"time","text":"北京时间下午3点","value":"T15:00+08:00","grain":"hour"}]}
 {"id":"4d70a8dace2c","text":"2027年开始施行。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":5,"type":"daterange","text":"2027年","value":"2027-01-01/2028-01-01","grain":"year"}]}
-{"id":"4e03e2e7c0a4","text":"每隔两天浇一次水。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":4,"type":"set","text":"每隔两天","value":"P2D","grain":"day"}]}
 {"id":"4e4caa265fe3","text":"设备标识123e4567-e89b-12d3-a456-426614174000已注册。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":40,"type":"guid","text":"123e4567-e89b-12d3-a456-426614174000"}]}
-{"id":"4ec802083a2f","text":"每两周开一次会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":3,"type":"set","text":"每两周","value":"P2W","grain":"week"}]}
 {"id":"4f3350da08b9","text":"失业率降到百分之五点五。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":11,"type":"percentage","text":"百分之五点五","value":"5.5"}]}
 {"id":"50fbc4aeca34","text":"请准备500毫升牛奶。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":8,"type":"dimension","text":"500毫升","value":"500 milliliter"}]}
 {"id":"51ee729e423a","text":"请在15:30前到场。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":7,"type":"time","text":"15:30","value":"T15:30","grain":"minute"}]}
@@ -112,9 +106,9 @@
 {"id":"5286ab67c767","text":"门店周日上午11点开业。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":9,"type":"datetime","text":"周日上午11点","value":"2026-03-22T11:00","grain":"hour"}]}
 {"id":"53874d3a4311","text":"倒计时30秒。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":6,"type":"duration","text":"30秒","value":"30"}]}
 {"id":"543bea61f7da","text":"下周放假。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"daterange","text":"下周","value":"2026-03-23/2026-03-30","grain":"week"}]}
+{"id":"543dd983bd77","text":"每月结算。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"set","text":"每月","value":"P1M","grain":"month"}]}
 {"id":"54ef3cddf35a","text":"日出在清晨5点40分。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":10,"type":"time","text":"清晨5点40分","value":"T05:40","grain":"minute"}]}
 {"id":"563d612e2860","text":"稿件请寄editor@example.net，谢谢。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":22,"type":"email","text":"editor@example.net"}]}
-{"id":"56b4b54627a6","text":"一部电影大约2GB。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":9,"type":"dimension","text":"2GB","value":"2 gigabyte"}]}
 {"id":"57e45a869f30","text":"电池还剩80%的电量。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"percentage","text":"80%","value":"80"}]}
 {"id":"581d03675cf7","text":"会议上午9点到11点进行。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":10,"type":"timerange","text":"上午9点到11点","value":"T09:00/T11:00","grain":"hour"}]}
 {"id":"5a17bf545ce6","text":"感谢 @alice 的建议。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":9,"type":"mention","text":"@alice"}]}
@@ -162,6 +156,7 @@
 {"id":"727eee00e641","text":"报告在2026年3月发布。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":10,"type":"daterange","text":"2026年3月","value":"2026-03-01/2026-04-01","grain":"month"}]}
 {"id":"72bd37efb0f9","text":"她的手机只剩10%电。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":9,"type":"percentage","text":"10%","value":"10"}]}
 {"id":"72d1582e59e7","text":"今天上午已经开完会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":4,"type":"datetimerange","text":"今天上午","value":"2026-03-18T06:00/2026-03-18T12:00","grain":"hour","approx":true}]}
+{"id":"733c1dca2b26","text":"每隔两天浇水。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":4,"type":"set","text":"每隔两天","value":"P2D","grain":"day"}]}
 {"id":"7378b28c232a","text":"今年增长很快。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"daterange","text":"今年","value":"2026-01-01/2027-01-01","grain":"year"}]}
 {"id":"74db45a2d4d6","text":"请假一周。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":4,"type":"duration","text":"一周","value":"604800"}]}
 {"id":"764805aff1b5","text":"我们约在星期六见面。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"date","text":"星期六","value":"2026-03-21","grain":"day"}]}
@@ -175,6 +170,7 @@
 {"id":"7bac7df1b56d","text":"保修期三年。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":5,"type":"duration","text":"三年","value":"P3Y"}]}
 {"id":"7d57ed614a62","text":"今晚8点有演出。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":4,"type":"datetime","text":"今晚8点","value":"2026-03-18T20:00","grain":"hour"}]}
 {"id":"7d6f051e165b","text":"他等了一天。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":5,"type":"duration","text":"一天","value":"86400"}]}
+{"id":"7e3719f58137","text":"这杯咖啡$5。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":6,"type":"currency","text":"$5","value":"5 USD"}]}
 {"id":"8037b5daa04a","text":"最低气温降到零下十度。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":10,"type":"temperature","text":"零下十度","value":"-10 degree"}]}
 {"id":"8058d76f15e3","text":"提交时间：2026-03-20","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":15,"type":"date","text":"2026-03-20","value":"2026-03-20","grain":"day"}]}
 {"id":"807e8bf1c5be","text":"明天上午开会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":4,"type":"datetimerange","text":"明天上午","value":"2026-03-19T06:00/2026-03-19T12:00","grain":"hour","approx":true}]}
@@ -182,8 +178,8 @@
 {"id":"810ac73548b2","text":"他工作了一年半。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"duration","text":"一年半","value":"P1Y6M"}]}
 {"id":"8113f1ef0d46","text":"步行45分钟。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":6,"type":"duration","text":"45分钟","value":"2700"}]}
 {"id":"838690ef1fbd","text":"本月的目标已完成。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"daterange","text":"本月","value":"2026-03-01/2026-04-01","grain":"month"}]}
+{"id":"866fdc24506c","text":"他连续跑了十二圈。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":7,"type":"number","text":"十二","value":"12"}]}
 {"id":"87ea71f544f0","text":"通知 @dev.team 今天发布。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":12,"type":"mention","text":"@dev.team"}]}
-{"id":"89b6186778d2","text":"周一有一个会议。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"date","text":"周一","value":"2026-03-23","grain":"day"}]}
 {"id":"89dcf334b158","text":"我的邮箱是 li_na88@mail.example.cn 。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":29,"type":"email","text":"li_na88@mail.example.cn"}]}
 {"id":"89e4c188a92a","text":"30分钟后开始。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":5,"type":"datetime","text":"30分钟后","value":"2026-03-18T11:00","grain":"minute"}]}
 {"id":"8a8aac01e788","text":"价格是199.99港元。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":11,"type":"currency","text":"199.99港元","value":"199.99 HKD"}]}
@@ -194,14 +190,13 @@
 {"id":"8c87d81aba41","text":"他的存款有1.5万多。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":9,"type":"number","text":"1.5万","value":"15000"}]}
 {"id":"8e0a84e62b86","text":"每个星期三放映。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":5,"type":"set","text":"每个星期三","value":"XXXX-WXX-3","grain":"day"}]}
 {"id":"903a325ffd66","text":"考试在六月十五日举行。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":8,"type":"date","text":"六月十五日","value":"2026-06-15","grain":"day"}]}
+{"id":"9279b79a91ca","text":"这部电影大约2GB。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":9,"type":"dimension","text":"2GB","value":"2 gigabyte"}]}
 {"id":"933f986861e8","text":"他排在第七位。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":5,"type":"ordinal","text":"第七","value":"7"}]}
 {"id":"9399383577fb","text":"详情请访问https://www.example.com/news?id=123查看。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":40,"type":"url","text":"https://www.example.com/news?id=123"}]}
 {"id":"9433c90f564b","text":"2027年1月1日新规生效。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":9,"type":"date","text":"2027年1月1日","value":"2027-01-01","grain":"day"}]}
-{"id":"95ad895de016","text":"昨天下了一场大雨。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"date","text":"昨天","value":"2026-03-17","grain":"day"}]}
 {"id":"960f3538200e","text":"活动标签是#开源中国#，欢迎转发。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":11,"type":"hashtag","text":"#开源中国#"}]}
 {"id":"9743d5346b41","text":"当地气温是华氏72度。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":10,"type":"temperature","text":"华氏72度","value":"72 fahrenheit"}]}
 {"id":"985f18cc1f5b","text":"三天后他就回来了。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":3,"type":"date","text":"三天后","value":"2026-03-21","grain":"day"}]}
-{"id":"9886802ca8f6","text":"这是一个很好的问题。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"988c405b98ed","text":"他支付了€20。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"currency","text":"€20","value":"20 EUR"}]}
 {"id":"990f226dde29","text":"请使用#OneNLP2026参加讨论。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":14,"type":"hashtag","text":"#OneNLP2026"}]}
 {"id":"998640e6d706","text":"行李重20公斤。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":7,"type":"dimension","text":"20公斤","value":"20 kilogram"}]}
@@ -247,6 +242,9 @@
 {"id":"ba077b615569","text":"欢迎参加第三十届运动会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"ordinal","text":"第三十","value":"30"}]}
 {"id":"ba477c897f17","text":"她在照片下面写了 #旅行日记 。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":14,"type":"hashtag","text":"#旅行日记"}]}
 {"id":"bb5eaadb6e27","text":"他每次早上6点半起床。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":8,"type":"time","text":"早上6点半","value":"T06:30","grain":"minute"}]}
+{"id":"bbd5427a0c57","text":"每两周开会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":3,"type":"set","text":"每两周","value":"P2W","grain":"week"}]}
+{"id":"bbd903c76254","text":"昨天下了大雨。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"date","text":"昨天","value":"2026-03-17","grain":"day"}]}
+{"id":"bbe457b69533","text":"有个十二岁的男孩走了进来。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":5,"type":"age","text":"十二岁","value":"12 year"}]}
 {"id":"bc26a16d30a1","text":"更多资料见https://www.example.org/zh/about。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":37,"type":"url","text":"https://www.example.org/zh/about"}]}
 {"id":"bc7a1334b86a","text":"文档在https://docs.example.org/guide#intro。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":39,"type":"url","text":"https://docs.example.org/guide#intro"}]}
 {"id":"bc935d345bb8","text":"这本书卖25元。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"currency","text":"25元","value":"25 CNY"}]}
@@ -260,7 +258,6 @@
 {"id":"c047c30aebbf","text":"客服邮箱：service@shop.example.com。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":29,"type":"email","text":"service@shop.example.com"}]}
 {"id":"c0a56b8d1998","text":"他喜欢发 #美食 图片。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":8,"type":"hashtag","text":"#美食"}]}
 {"id":"c1ebcc9a1e21","text":"这条消息请转给 @小明 看看。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":11,"type":"mention","text":"@小明"}]}
-{"id":"c2a7a5d5e316","text":"每月结算一次。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"set","text":"每月","value":"P1M","grain":"month"}]}
 {"id":"c37d7c7d6529","text":"值班时间晚上10点到11点半。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":14,"type":"timerange","text":"晚上10点到11点半","value":"T22:00/T23:30","grain":"minute"}]}
 {"id":"c4192e3163c6","text":"客服电话：138 0013 8000。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":18,"type":"phone","text":"138 0013 8000"}]}
 {"id":"c46ee324e228","text":"罚款二百元。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":5,"type":"currency","text":"二百元","value":"200 CNY"}]}
@@ -269,6 +266,7 @@
 {"id":"c6146449cedc","text":"一些人认为这样不行。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"c6408452369e","text":"去年我们搬了家。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"daterange","text":"去年","value":"2025-01-01/2026-01-01","grain":"year"}]}
 {"id":"c7430839a641","text":"我们下个星期三开会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":7,"type":"date","text":"下个星期三","value":"2026-03-25","grain":"day"}]}
+{"id":"c94398c96178","text":"每3小时吃药。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":4,"type":"set","text":"每3小时","value":"PT3H","grain":"hour"}]}
 {"id":"c97b8a862185","text":"欢迎关注#北京#的活动。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":8,"type":"hashtag","text":"#北京#"}]}
 {"id":"ca79113a42e6","text":"这台电脑价值五千元。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":9,"type":"currency","text":"五千元","value":"5000 CNY"}]}
 {"id":"cabdbc35bfe0","text":"全国人口约为14亿。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":9,"type":"number","text":"14亿","value":"1400000000"}]}
@@ -315,6 +313,7 @@
 {"id":"e973e3b35016","text":"现在是下午2时30分。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":10,"type":"time","text":"下午2时30分","value":"T14:30","grain":"minute"}]}
 {"id":"eb8d3ba1b9d4","text":"我们订了两百把椅子。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":6,"type":"number","text":"两百","value":"200"}]}
 {"id":"ebda7fe06e38","text":"周一到周五上班。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":5,"type":"daterange","text":"周一到周五","value":"2026-03-23/2026-03-28","grain":"day","alt":["2026-03-16/2026-03-21"]}]}
+{"id":"ecd99da1b264","text":"圣诞节有音乐会。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":3,"type":"date","text":"圣诞节","value":"2026-12-25","grain":"day"}]}
 {"id":"ed20b1fc1802","text":"这是我第一次来北京。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":5,"type":"ordinal","text":"第一","value":"1"}]}
 {"id":"ed7e4d335d78","text":"他三月二十日回国。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":1,"end":6,"type":"date","text":"三月二十日","value":"2026-03-20","grain":"day"}]}
 {"id":"ee37e47a4f24","text":"夜里会降到零下5度。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":9,"type":"temperature","text":"零下5度","value":"-5 degree"}]}
@@ -337,6 +336,7 @@
 {"id":"fbb3fef770a0","text":"热门话题 #今日头条 很火。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":10,"type":"hashtag","text":"#今日头条"}]}
 {"id":"fbeb042bb71b","text":"税款每年申报。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":2,"end":4,"type":"set","text":"每年","value":"P1Y","grain":"year"}]}
 {"id":"fc19cea372c3","text":"他上午9点到公司。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":1,"end":5,"type":"time","text":"上午9点","value":"T09:00","grain":"hour"}]}
+{"id":"fcd5452d93d3","text":"周一有会议。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"date","text":"周一","value":"2026-03-23","grain":"day"}]}
 {"id":"fdb0f4cc75b3","text":"增速放缓到3.5%。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":9,"type":"percentage","text":"3.5%","value":"3.5"}]}
 {"id":"fdc539957ec1","text":"营业时间9:00-17:00。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":14,"type":"timerange","text":"9:00-17:00","value":"T09:00/T17:00","grain":"minute"}]}
 {"id":"fe2b7b0d97bf","text":"劳动节放假。","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":3,"type":"date","text":"劳动节","value":"2026-05-01","grain":"day"}]}

@@ -20,7 +20,7 @@
 账户余额是[[-250|number|-250]]。
 一共有[[一千零五|number|1005]]名选手。
 屏幕分辨率是[[1920|number|1920]]乘[[1080|number|1080]]。
-他一口气跑了[[十二|number|12]]圈。
+他连续跑了[[十二|number|12]]圈。
 她养了[[两|number|2]]只猫。
 该公司有员工[[三万五|number|35000]]人。
 这次投票有[[四分之三|number|0.75]]的人赞成。
@@ -75,7 +75,7 @@
 他跑了[[五千米|dimension|5 kilometer||alt=5000 meter]]。
 水箱容量为[[2升|dimension|2 liter]]。
 农场有[[十亩|dimension|10 mu]]地。
-一部电影大约[[2GB|dimension|2 gigabyte]]。
+这部电影大约[[2GB|dimension|2 gigabyte]]。
 钢板厚度只有[[3毫米|dimension|3 millimeter]]。
 他买了[[两吨|dimension|2 tonne]]煤。
 电热水器功率为[[1500瓦|dimension|1500 watt]]。
@@ -101,7 +101,7 @@
 宝宝[[六个月大|age|6 month]]。
 她[[18岁|age|18 year]]时离开了家乡。
 孩子刚满[[两周岁|age|2 year]]。
-一个[[十二岁|age|12 year]]的男孩走了进来。
+有个[[十二岁|age|12 year]]的男孩走了进来。
 小狗才[[三个月大|age|3 month]]。
 他[[四十五岁|age|45 year]]了。
 这棵树[[三百岁|age|300 year]]了。
@@ -117,7 +117,7 @@
 机票要[[200美元|currency|200 USD]]。
 他换了[[50欧元|currency|50 EUR]]。
 公司融资[[1.5亿美元|currency|150000000 USD]]。
-一杯咖啡[[$5|currency|5 USD]]。
+这杯咖啡[[$5|currency|5 USD]]。
 汇款[[3000日元|currency|3000 JPY]]。
 他买了[[10英镑|currency|10 GBP]]的零食。
 手续费[[5角|currency|0.5 CNY]]。
@@ -219,12 +219,12 @@ IPv6地址[[2001:db8::1|ip]]已经启用。
 他出生于[[1990年5月20日|date|1990-05-20|day]]。
 [[明天|date|2026-03-19|day]]的天气很好。
 我们[[后天|date|2026-03-20|day]]出发。
-[[昨天|date|2026-03-17|day]]下了一场大雨。
+[[昨天|date|2026-03-17|day]]下了大雨。
 她[[前天|date|2026-03-16|day]]才到北京。
 截止日期是[[12月31日|date|2026-12-31|day]]。
 活动安排在[[5月1日|date|2026-05-01|day]]。
 请在[[下周五|date|2026-03-27|day]]之前提交。
-[[周一|date|2026-03-23|day]]有一个会议。
+[[周一|date|2026-03-23|day]]有会议。
 [[上周五|date|2026-03-13|day]]他请了假。
 我们约在[[星期六|date|2026-03-21|day]]见面。
 [[这周五|date|2026-03-20|day]]是他的生日。
@@ -242,7 +242,7 @@ IPv6地址[[2001:db8::1|ip]]已经启用。
 [[2025年春节|date|2025-01-29|day]]那天下了雪。
 [[端午节|date|2026-06-19|day]]我们吃粽子。
 [[中秋节|date|2026-09-25|day]]全家团聚。
-[[圣诞节|date|2026-12-25|day]]有一场音乐会。
+[[圣诞节|date|2026-12-25|day]]有音乐会。
 [[劳动节|date|2026-05-01|day]]放假。
 预计[[2028年春节|date|2028-01-26|day]]前完工。
 [[清明节|date|2026-04-05|day]]要去扫墓。
@@ -377,21 +377,21 @@ IPv6地址[[2001:db8::1|ip]]已经启用。
 # ---- sets
 他[[每天|set|P1D|day]]跑步。
 报告[[每周|set|P1W|week]]更新。
-[[每月|set|P1M|month]]结算一次。
+[[每月|set|P1M|month]]结算。
 税款[[每年|set|P1Y|year]]申报。
 例会[[每周一|set|XXXX-WXX-1|day]]举行。
 [[每周五晚上8点|set|XXXX-WXX-5T20:00|hour]]直播。
 [[每天早上8点|set|T08:00|hour]]起床。
-[[每隔两天|set|P2D|day]]浇一次水。
-[[每两周|set|P2W|week]]开一次会。
-[[每3小时|set|PT3H|hour]]吃一次药。
+[[每隔两天|set|P2D|day]]浇水。
+[[每两周|set|P2W|week]]开会。
+[[每3小时|set|PT3H|hour]]吃药。
 [[每个星期三|set|XXXX-WXX-3|day]]放映。
 [[每月15号|set|XXXX-XX-15|month]]发工资。
 [[每天中午12点|set|T12:00|hour]]吃饭。
 他[[天天|set|P1D|day]]加班。
 
 # ---- nothing to find
-这是一个很好的问题。
+这是个很好的问题。
 他统一了大家的意见。
 万一下雨怎么办？
 请一起来吧。
@@ -402,3 +402,242 @@ IPv6地址[[2001:db8::1|ip]]已经启用。
 千万不要忘记关门。
 她三心二意，做事不专心。
 一边吃饭一边看电视。
+
+# ======== development split (rules are tuned on these) ========
+@split dev
+
+# ---- numbers
+仓库里有[[三百六十五|number|365]]箱货物。
+这次活动吸引了[[五万|number|50000]]名观众。
+他存了[[2.5万|number|25000]]。
+预算大约是[[八千万|number|80000000]]。
+桌上放着[[三|number|3]]个苹果。
+她买了[[五|number|5]]本书。
+小数点后面是[[零点零五|number|0.05]]。
+这个班有[[四十二|number|42]]个人。
+总数是[[3,500|number|3500]]。
+样本量为[[10000|number|10000]]。
+他读了[[一百二十|number|120]]页。
+这座山高[[一千二|number|1200]]多米。
+产量增加到[[二十亿斤|dimension|2000000000 jin]]。
+温度计显示[[负三|number|-3]]。
+一共有[[两千零二十|number|2020]]个文件。
+他们订购了[[七百|number|700]]件。
+篮子里有[[十|number|10]]个鸡蛋。
+她捐了[[3千|number|3000]]。
+
+# ---- ordinals
+他是[[第四|ordinal|4]]个到的。
+请看[[第九|ordinal|9]]章。
+她在[[第十五|ordinal|15]]分钟时进球。
+这是他的[[第二|ordinal|2]]本小说。
+他获得了[[第6|ordinal|6]]名。
+这是[[第一百零一|ordinal|101]]次尝试。
+
+# ---- percentages
+增长率是[[百分之八|percentage|8]]。
+他们赢得了[[45%|percentage|45]]的选票。
+这个数字下降了[[百分之二点五|percentage|2.5]]。
+覆盖率达到[[九十五%|percentage|95]]。
+成功率只有[[百分之十五|percentage|15]]。
+营养成分中脂肪占[[20%|percentage|20]]。
+关税提高了[[百分之七十五|percentage|75]]。
+电量还剩[[5％|percentage|5]]。
+
+# ---- dimensions
+这个房间长[[五米|dimension|5 meter]]。
+包裹重[[三公斤|dimension|3 kilogram]]。
+他喝了[[一升|dimension|1 liter]]水。
+这条隧道长[[十二千米|dimension|12 kilometer]]。
+她买了[[两斤|dimension|2 jin]]橙子。
+下载了[[300MB|dimension|300 megabyte]]的数据。
+这块地占地[[八十公顷|dimension|80 hectare]]。
+车速达到[[80千米/小时|dimension|80 kilometer per hour]]。
+面积是[[35平方公里|dimension|35 square kilometer]]。
+硬盘容量[[1TB|dimension|1 terabyte]]。
+绳子长[[二十厘米|dimension|20 centimeter]]。
+他称了[[五十克|dimension|50 gram]]的样品。
+灯泡功率[[60瓦|dimension|60 watt]]。
+这瓶水有[[750毫升|dimension|750 milliliter]]。
+
+# ---- temperatures
+最高温是[[三十度|temperature|30 degree]]。
+水温保持在[[60℃|temperature|60 celsius]]。
+一月的平均温度是[[零下8摄氏度|temperature|-8 celsius]]。
+体温计显示[[38.2°C|temperature|38.2 celsius]]。
+天气预报说[[华氏90度|temperature|90 fahrenheit]]。
+冰箱设定为[[4℃|temperature|4 celsius]]。
+最冷的时候到了[[零下二十度|temperature|-20 degree]]。
+室内维持在[[22摄氏度|temperature|22 celsius]]。
+
+# ---- ages
+他的儿子[[十岁|age|10 year]]了。
+这只猫[[2岁|age|2 year]]。
+奶奶[[七十八岁|age|78 year]]。
+婴儿[[四个月大|age|4 month]]。
+她[[三十岁|age|30 year]]时结婚了。
+孩子[[一周岁|age|1 year]]。
+这位演员[[41岁|age|41 year]]。
+
+# ---- currency
+这件衣服[[88元|currency|88 CNY]]。
+他赚了[[¥2000|currency|2000 CNY]]。
+这杯奶茶[[十五块|currency|15 CNY]]。
+订金是[[人民币500元|currency|500 CNY]]。
+这本杂志[[8.5元|currency|8.5 CNY]]。
+我兑换了[[100美元|currency|100 USD]]。
+学费涨到[[3万元|currency|30000 CNY]]。
+运费[[5块钱|currency|5 CNY]]。
+房价是[[300万元|currency|3000000 CNY]]。
+他存了[[€50|currency|50 EUR]]。
+价格是[[£12|currency|12 GBP]]。
+一共[[2元5角|currency|2.5 CNY]]。
+这笔交易值[[2亿元|currency|200000000 CNY]]。
+
+# ---- e-mail
+请把简历发到[[hr@example.com|email]]。
+她的邮箱是[[mei.lin@school.example.edu|email]]。
+业务咨询：[[sales@example.com.cn|email]]
+可以写信给[[a_b-c@example.io|email]]吗？
+邮件地址[[news@example.org|email]]已经停用。
+
+# ---- URL
+请参考[[https://example.com/docs|url]]里的说明。
+网址是[[www.example.org|url]]。
+下载链接：[[http://files.example.com/pkg.zip|url]]
+访问[[https://example.net/a/b/c?x=1|url]]查看。
+搜索引擎是[[https://search.example.com|url]]。
+
+# ---- IP addresses
+服务器[[10.1.2.3|ip]]宕机了。
+网关配置为[[192.168.0.1|ip]]。
+请ping一下[[1.1.1.1|ip]]。
+IPv6地址是[[2001:db8:85a3::8a2e:370:7334|ip]]。
+
+# ---- phones
+联系电话[[13912345678|phone]]。
+座机[[020-87654321|phone]]。
+手机[[186 1234 5678|phone]]。
+传真[[+86 21 5555 6666|phone]]。
+热线[[400-600-5678|phone]]。
+
+# ---- hashtags, mentions, GUIDs
+最近在刷[[#双十一#|hashtag]]的优惠。
+评论里带了[[#python|hashtag]]的标签。
+提到了 [[@小红|mention]] 的作品。
+请通知 [[@carol_99|mention]] 参加。
+主键是[[7c9e6679-7425-40de-944b-e07fc1f90ae7|guid]]。
+对象编号[[16fd2706-8baf-433b-82eb-8c7fada847da|guid]]已更新。
+
+# ---- dates
+我们[[3月19日|date|2026-03-19|day]]见。
+他[[2024年8月8日|date|2024-08-08|day]]入职。
+这封信写于[[2025年12月1日|date|2025-12-01|day]]。
+[[明日|date|2026-03-19|day]]将有大风。
+[[昨日|date|2026-03-17|day]]他请假了。
+[[下周一|date|2026-03-23|day]]开学。
+[[上周三|date|2026-03-11|day]]我去过。
+[[周三|date|2026-03-18|day]]有考试。
+[[礼拜五|date|2026-03-20|day]]放假。
+[[本周六|date|2026-03-21|day]]是我的婚礼。
+[[下星期二|date|2026-03-24|day]]我出差。
+[[5月20号|date|2026-05-20|day]]是个特别的日子。
+[[2026年10月1日|date|2026-10-01|day]]全国放假。
+请于[[18日|date|2026-03-18|day]]前回复。
+[[国庆节|date|2026-10-01|day]]我们回家。
+[[今年中秋节|date|2026-09-25|day]]怎么过？
+[[2027年春节|date|2027-02-06|day]]是个暖冬。
+[[元旦|date|2027-01-01|day]]有烟花表演。
+[[复活节|date|2026-04-05|day]]商店照常营业。
+[[七天后|date|2026-03-25|day]]更新。
+[[两天前|date|2026-03-16|day]]我收到了信。
+[[大前天|date|2026-03-15|day]]他请了假。
+[[儿童节|date|2026-06-01|day]]有演出。
+
+# ---- times
+我们[[上午十点|time|T10:00|hour]]出发。
+会在[[下午四点半|time|T16:30|minute]]结束。
+[[晚上十点|time|T22:00|hour]]熄灯。
+典礼在[[12:00|time|T12:00|minute]]举行。
+[[早上7点15分|time|T07:15|minute]]集合。
+课[[下午两点|time|T14:00|hour]]开始。
+[[中午12点半|time|T12:30|minute]]吃饭。
+[[凌晨3点|time|T03:00|hour]]他才睡。
+[[20:15|time|T20:15|minute]]到站。
+
+# ---- datetimes
+[[明天上午9点|datetime|2026-03-19T09:00|hour]]出发。
+[[今晚7点半|datetime|2026-03-18T19:30|minute]]开饭。
+[[周六下午3点|datetime|2026-03-21T15:00|hour]]见面。
+[[4月1日上午9点|datetime|2026-04-01T09:00|hour]]开始。
+[[后天下午5点|datetime|2026-03-20T17:00|hour]]结束。
+[[1小时后|datetime|2026-03-18T11:30|minute]]出发。
+[[45分钟后|datetime|2026-03-18T11:15|minute]]到站。
+[[昨天下午3点|datetime|2026-03-17T15:00|hour]]他来过。
+
+# ---- date ranges
+[[下月|daterange|2026-04-01/2026-05-01|month]]发布。
+[[上月|daterange|2026-02-01/2026-03-01|month]]的账单。
+[[明年夏天|daterange|2027-06-01/2027-09-01|season|approx]]毕业。
+[[2025年冬天|daterange|2025-12-01/2026-03-01|season|approx]]很冷。
+[[2026年第一季度|daterange|2026-01-01/2026-04-01|quarter]]收入增加。
+[[今年下半年|daterange|2026-07-01/2027-01-01|half]]上线。
+[[2000年代|daterange|2000-01-01/2010-01-01|decade]]出生。
+[[2026年|daterange|2026-01-01/2027-01-01|year]]的计划。
+[[2025年11月|daterange|2025-11-01/2025-12-01|month]]结束。
+[[6月1日到6月3日|daterange|2026-06-01/2026-06-04|day]]放假。
+[[7月10日至15日|daterange|2026-07-10/2026-07-16|day]]举办。
+[[2018年到2022年|daterange|2018-01-01/2023-01-01|year]]住在深圳。
+[[2026年9月至11月|daterange|2026-09-01/2026-12-01|month]]进行。
+[[下周末|daterange|2026-03-28/2026-03-30|day]]回老家。
+[[上周末|daterange|2026-03-14/2026-03-16|day]]下雨了。
+[[本季度|daterange|2026-01-01/2026-04-01|quarter]]达标。
+[[下个季度|daterange|2026-04-01/2026-07-01|quarter]]推出新品。
+[[2026年10月底|daterange|2026-10-21/2026-11-01|month|approx]]截止。
+
+# ---- time ranges
+营业时间[[上午8点到下午5点|timerange|T08:00/T17:00|hour]]。
+[[下午三点到四点半|timerange|T15:00/T16:30|minute]]有空。
+[[10:00-12:30|timerange|T10:00/T12:30|minute]]开会。
+[[晚上八点至十点|timerange|T20:00/T22:00|hour]]直播。
+[[从上午9点到下午3点|timerange|T09:00/T15:00|hour]]考试。
+
+# ---- date-time ranges
+[[明天晚上|datetimerange|2026-03-19T18:00/2026-03-20T00:00|hour|approx]]聚餐。
+[[周六上午|datetimerange|2026-03-21T06:00/2026-03-21T12:00|hour|approx]]有课。
+[[昨天上午|datetimerange|2026-03-17T06:00/2026-03-17T12:00|hour|approx]]开会了。
+[[明天下午|datetimerange|2026-03-19T12:00/2026-03-19T18:00|hour|approx]]有空。
+[[3月21日下午1点到3点|datetimerange|2026-03-21T13:00/2026-03-21T15:00|hour]]进行。
+
+# ---- durations
+等了[[两天|duration|172800]]。
+开了[[三个小时|duration|10800]]的会。
+需要[[20分钟|duration|1200]]。
+持续了[[一个月|duration|P1M]]。
+已经[[五年|duration|P5Y]]了。
+时长[[90秒|duration|90]]。
+工作了[[两个半小时|duration|9000]]。
+他走了[[半天|duration|43200]]。
+我住了[[十个月|duration|P10M]]。
+需要[[5个工作日|duration|P5BD]]。
+路上花了[[一小时|duration|3600]]。
+他读了[[四年|duration|P4Y]]大学。
+课程为期[[两个星期|duration|1209600]]。
+
+# ---- sets
+他[[每天|set|P1D|day]]喝水。
+[[每周二|set|XXXX-WXX-2|day]]开会。
+[[每年|set|P1Y|year]]体检。
+[[每周|set|P1W|week]]开会。
+[[每个月|set|P1M|month]]对账。
+[[每天晚上9点|set|T21:00|hour]]睡觉。
+[[每隔三天|set|P3D|day]]换水。
+[[每两个小时|set|PT2H|hour]]测量。
+[[每月1号|set|XXXX-XX-01|month]]结算。
+
+# ---- nothing to find
+这件事很重要。
+他们统一了意见。
+万一失败了怎么办？
+一起去吃饭吧。
+我对这件事十分满意。

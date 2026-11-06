@@ -1,0 +1,33 @@
+# Currency rules for Chinese. 元, 块 and 圆 are yuan (with 角 and 分 one tenth and one hundredth of it). The alphabetic ISO 4217 codes are
+# listed so that "USD 5" works as in every language.
+
+[currency.symbol]
+¥ | CNY | prefix | 0.9
+￥ | CNY | prefix | 0.9
+$ | USD | prefix | 0.9
+US$ | USD | prefix
+€ | EUR | prefix
+£ | GBP | prefix
+=RMB | CNY | both
+人民币 | CNY | prefix
+
+[currency.name]
+元, 块, 圆, 块钱, 元钱, 人民币 | CNY | 1
+角, 毛, 角钱, 毛钱 | CNY | 0.1
+分钱 | CNY | 0.01
+美元, 美金 | USD | 1
+欧元 | EUR | 1
+英镑 | GBP | 1
+日元, 日圆 | JPY | 1
+港元, 港币 | HKD | 1
+韩元 | KRW | 1
+澳元, 澳大利亚元 | AUD | 1
+加元, 加拿大元 | CAD | 1
+卢布 | RUB | 1
+新台币, 台币 | TWD | 1
+瑞士法郎 | CHF | 1
+新加坡元 | SGD | 1
+印度卢比 | INR | 1
+
+[currency.code]
+USD, EUR, GBP, JPY, CNY, HKD, KRW, AUD, CAD, CHF, SGD, RUB, INR, TWD, NZD, SEK, NOK, DKK, MXN, BRL, THB
