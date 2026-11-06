@@ -5,6 +5,7 @@
 {"id":"1dd84276ab77","text":"बाग़ में अठारह पेड़ लगे हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":14,"type":"number","text":"अठारह","value":"18"}]}
 {"id":"24d471187e69","text":"कमरे में पाँच कुर्सियाँ हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":13,"type":"number","text":"पाँच","value":"5"}]}
 {"id":"252f4dcd21e2","text":"40 प्रतिशत छात्र पास हुए।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":10,"type":"percentage","text":"40 प्रतिशत","value":"40"}]}
+{"id":"259198478b78","text":"यह 2025 के पतझड़ में हुआ।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":16,"type":"daterange","text":"2025 के पतझड़","value":"2025-09-01/2025-12-01","grain":"season","approx":true}]}
 {"id":"2a9f923425aa","text":"पेंटिंग 1.5 करोड़ रुपये में बिकी।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":23,"type":"currency","text":"1.5 करोड़ रुपये","value":"15000000 INR"}]}
 {"id":"2b48428f9821","text":"टैग #vasant2026 और खाता @pariyojana_dal।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":15,"type":"hashtag","text":"#vasant2026"},{"start":24,"end":39,"type":"mention","text":"@pariyojana_dal"}]}
 {"id":"2d29c2314bca","text":"स्वतंत्रता दिवस की तैयारी चल रही है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":15,"type":"date","text":"स्वतंत्रता दिवस","value":"2026-08-15","grain":"day"}]}
@@ -21,9 +22,11 @@
 {"id":"495e476fc062","text":"पानी का तापमान 40 डिग्री है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":24,"type":"temperature","text":"40 डिग्री","value":"40 degree"}]}
 {"id":"4affff920b9b","text":"बीसवीं सदी बीत गई।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":6,"type":"ordinal","text":"बीसवीं","value":"20"}]}
 {"id":"4c997c7c7214","text":"सर्वर 10.20.30.40 पर है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":17,"type":"ip","text":"10.20.30.40"}]}
+{"id":"4db9c6e5cf6d","text":"मेला जून के अंत में लगेगा।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":15,"type":"daterange","text":"जून के अंत","value":"2026-06-21/2026-07-01","grain":"month","approx":true}]}
 {"id":"4ecf810a5044","text":"बिल्ली 9 महीने की है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":17,"type":"age","text":"9 महीने की","value":"9 month"}]}
 {"id":"52fc958338fb","text":"दोनों तरफ़ सौ लोग थे।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":11,"end":13,"type":"number","text":"सौ","value":"100"}]}
 {"id":"53468dd3a56a","text":"तालिका 2 GB जगह लेती है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":11,"type":"dimension","text":"2 GB","value":"2 gigabyte"}]}
+{"id":"57661eb5795a","text":"चुनाव 2021 की शुरुआत में हुए।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":20,"type":"daterange","text":"2021 की शुरुआत","value":"2021-01-01/2021-05-01","grain":"year","approx":true}]}
 {"id":"5a1233662ec8","text":"दाम 15% बढ़े।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"percentage","text":"15%","value":"15"}]}
 {"id":"5fcabd426afd","text":"उसने इक्कीस किताबें पढ़ीं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":11,"type":"number","text":"इक्कीस","value":"21"}]}
 {"id":"666f8212cff3","text":"बाग़ 7वीं गली में है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":9,"type":"ordinal","text":"7वीं","value":"7"}]}
@@ -46,6 +49,7 @@
 {"id":"9d2c72cf304e","text":"जन्म 3/11/1985 का है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":14,"type":"date","text":"3/11/1985","value":"1985-11-03","grain":"day"}]}
 {"id":"9f2bf6110c81","text":"कल हम निकलेंगे।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"date","text":"कल","value":"2026-03-19","grain":"day"}]}
 {"id":"a03a3379d604","text":"नगर में चौंसठ मंदिर हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":13,"type":"number","text":"चौंसठ","value":"64"}]}
+{"id":"a35fe5e9ef69","text":"काम 2022 के मध्य में पूरा हुआ।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":16,"type":"daterange","text":"2022 के मध्य","value":"2022-05-01/2022-09-01","grain":"year","approx":true}]}
 {"id":"a7a67110cb87","text":"रिपोर्ट हर हफ़्ते आती है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":17,"type":"set","text":"हर हफ़्ते","value":"P1W","grain":"week"}]}
 {"id":"a81110b8987a","text":"सूरज निकला और सब जाग गए।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"b03c063995a6","text":"पता www.udaharan.org/khabar है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":27,"type":"url","text":"www.udaharan.org/khabar"}]}
@@ -69,7 +73,7 @@
 {"id":"f17542a72ad0","text":"गलियारे में 1,500 कुर्सियाँ थीं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":12,"end":17,"type":"number","text":"1,500","value":"1500"}]}
 {"id":"f3971df7cef4","text":"शहर 40 किमी दूर है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":11,"type":"dimension","text":"40 किमी","value":"40 kilometer"}]}
 {"id":"f49a0b40e3fe","text":"इमारत की 12वीं मंज़िल पर।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":14,"type":"ordinal","text":"12वीं","value":"12"}]}
-{"id":"fd13e710951f","text":"पहली कक्षा पहली मंज़िल पर है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":4,"type":"ordinal","text":"पहली","value":"1"}]}
+{"id":"fd13e710951f","text":"पहली कक्षा पहली मंज़िल पर है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":4,"type":"ordinal","text":"पहली","value":"1"},{"start":11,"end":15,"type":"ordinal","text":"पहली","value":"1"}]}
 {"id":"fd169d0b2fbc","text":"मैंने एक कप चाय पी।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
 {"id":"fe6941dd7fae","text":"योजना पिछले महीने बदली।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":17,"type":"daterange","text":"पिछले महीने","value":"2026-02-01/2026-03-01","grain":"month"}]}
 {"id":"ffc563f08ee1","text":"सूची में तैंतीस नाम हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":15,"type":"number","text":"तैंतीस","value":"33"}]}

@@ -622,7 +622,7 @@ day | दिन
 [age.word]
 year | वर्षीय
 
-# Indian mobile numbers have ten digits and start with 6 to 9; they are often written in two groups of five (98765 43210).
+# Indian mobile numbers have ten digits and start with 6 to 9, landlines a trunk 0 and an area code (0141 234 5678); they are often written in two groups of five (98765 43210).
 [phone.space-start]
-6789 | 10 | 10
+06789 | 10 | 11
 

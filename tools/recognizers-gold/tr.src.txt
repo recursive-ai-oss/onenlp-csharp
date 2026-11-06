@@ -402,13 +402,13 @@ Mağazaya [[üç milyon|number|3000000]] kişi girdi.
 Sıcaklık farkı [[-3|number|-3]] oldu.
 Fırından [[iki düzine|number|24]] ekmek çıktı.
 Takım [[on bir|number|11]] oyuncuyla sahaya çıktı.
-Her iki tarafta [[yüz|number|100]] kişi vardı.
+Her [[iki|number|2]] tarafta [[yüz|number|100]] kişi vardı.
 Dosya [[5.000.000|number|5000000]] satır içeriyor.
 Odada [[beş|number|5]] sandalye var.
 Sergiyi [[bin dokuz yüz|number|1900]] kişi gezdi.
 
 # ---- ordinals
-Birinci sınıf [[birinci|ordinal|1]] katta.
+[[Birinci|ordinal|1]] sınıf [[birinci|ordinal|1]] katta.
 Bahçe [[7'nci|ordinal|7]] sokakta.
 [[Yirminci|ordinal|20]] yüzyıl bitti.
 Sevgili [[onuncu|ordinal|10]] yıldönümünü kutladı.
@@ -491,3 +491,11 @@ Rapor [[her hafta|set|P1W|week]] geliyor.
 # ---- nothing
 Güneş doğdu ve herkes uyandı.
 Bir bardak çay içtim.
+
+@ref 2026-03-18T10:30:00
+@split dev
+Seçim [[2021 başında|daterange|2021-01-01/2021-05-01|year|approx]] yapıldı.
+Proje [[2022 ortasında|daterange|2022-05-01/2022-09-01|year|approx]] bitti.
+Bu [[2019 sonunda|daterange|2019-09-01/2020-01-01|year|approx]] oldu.
+Toplantı [[2021 baharında|daterange|2021-03-01/2021-06-01|season|approx]] yapılacak.
+Fuar [[Eylül sonunda|daterange|2026-09-21/2026-10-01|month|approx]] açılacak.

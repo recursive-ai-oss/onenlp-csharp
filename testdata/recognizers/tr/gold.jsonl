@@ -9,6 +9,7 @@
 {"id":"2317eb594a96","text":"Ders saat 16:45'te.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":15,"type":"time","text":"saat 16:45","value":"T16:45","grain":"minute"}]}
 {"id":"24951ff222a5","text":"Plan geçen ay değişti.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":13,"type":"daterange","text":"geçen ay","value":"2026-02-01/2026-03-01","grain":"month"}]}
 {"id":"24b76221d3de","text":"Numara 0242 123 45 67.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":21,"type":"phone","text":"0242 123 45 67"}]}
+{"id":"26324b5ae53a","text":"Proje 2022 ortasında bitti.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":20,"type":"daterange","text":"2022 ortasında","value":"2022-05-01/2022-09-01","grain":"year","approx":true}]}
 {"id":"27861d6fa1db","text":"Bina 12'nci katında.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":11,"type":"ordinal","text":"12'nci","value":"12"}]}
 {"id":"2a02636e0f86","text":"Yirminci yüzyıl bitti.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":8,"type":"ordinal","text":"Yirminci","value":"20"}]}
 {"id":"2e63fd8f6a5f","text":"Sevgili onuncu yıldönümünü kutladı.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":14,"type":"ordinal","text":"onuncu","value":"10"}]}
@@ -27,18 +28,21 @@
 {"id":"4b2b301b31ae","text":"4 yaşında bir kız çocuğu kayboldu.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":9,"type":"age","text":"4 yaşında","value":"4 year"}]}
 {"id":"5025fdb58bf9","text":"Bahçe 7'nci sokakta.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":11,"type":"ordinal","text":"7'nci","value":"7"}]}
 {"id":"59ac6a7697c1","text":"Rapor her hafta geliyor.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":15,"type":"set","text":"her hafta","value":"P1W","grain":"week"}]}
-{"id":"61bac523bae4","text":"Birinci sınıf birinci katta.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":21,"type":"ordinal","text":"birinci","value":"1"}]}
+{"id":"60124a1ff0fd","text":"Bu 2019 sonunda oldu.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":15,"type":"daterange","text":"2019 sonunda","value":"2019-09-01/2020-01-01","grain":"year","approx":true}]}
+{"id":"61bac523bae4","text":"Birinci sınıf birinci katta.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":7,"type":"ordinal","text":"Birinci","value":"1"},{"start":14,"end":21,"type":"ordinal","text":"birinci","value":"1"}]}
 {"id":"63ef9bfda2c4","text":"Pil %80 dolu.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"percentage","text":"%80","value":"80"}]}
 {"id":"6afdd8af9b61","text":"Çanta €80.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":9,"type":"currency","text":"€80","value":"80 EUR"}]}
 {"id":"6b3cc45ecef2","text":"Öğrencilerin yüzde 40'ı sınavı geçti.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":13,"end":21,"type":"percentage","text":"yüzde 40","value":"40"}]}
 {"id":"73cdc3e56fe4","text":"Adres www.ornek.org/haber.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":25,"type":"url","text":"www.ornek.org/haber"}]}
 {"id":"7a2ae850144a","text":"Nem %62,5 seviyesinde.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":9,"type":"percentage","text":"%62,5","value":"62.5"}]}
 {"id":"7a4b3858cdaf","text":"Kitabın iki yüz elli sayfası okundu.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":20,"type":"number","text":"iki yüz elli","value":"250"}]}
+{"id":"82e65f9fd400","text":"Fuar Eylül sonunda açılacak.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":18,"type":"daterange","text":"Eylül sonunda","value":"2026-09-21/2026-10-01","grain":"month","approx":true}]}
 {"id":"86a3f513f410","text":"Bebek 2 haftalık.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":16,"type":"age","text":"2 haftalık","value":"2 week"}]}
 {"id":"872b650b2157","text":"Yazın: mert.kaya@ornek.com.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":26,"type":"email","text":"mert.kaya@ornek.com"}]}
 {"id":"8a0bb089fb7b","text":"Tablo 1,5 milyon dolar'a satıldı.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":22,"type":"currency","text":"1,5 milyon dolar","value":"1500000 USD"}]}
 {"id":"8df680f0ea3e","text":"Etiket #bahar2026 ve hesap @proje_ekibi.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":17,"type":"hashtag","text":"#bahar2026"},{"start":27,"end":39,"type":"mention","text":"@proje_ekibi"}]}
 {"id":"8f45639e89f3","text":"Ölçüm 2,718 çıktı.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":11,"type":"number","text":"2,718","value":"2.718"}]}
+{"id":"95bb5812504e","text":"Seçim 2021 başında yapıldı.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":18,"type":"daterange","text":"2021 başında","value":"2021-01-01/2021-05-01","grain":"year","approx":true}]}
 {"id":"95e075b5b62c","text":"Sıcaklık farkı -3 oldu.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":17,"type":"number","text":"-3","value":"-3"}]}
 {"id":"9645e85ce438","text":"Takım her Salı çalışıyor.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":14,"type":"set","text":"her Salı","value":"XXXX-WXX-2","grain":"day"}]}
 {"id":"98598d08a904","text":"Kâr yüzde beş oldu.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":13,"type":"percentage","text":"yüzde beş","value":"5"}]}
@@ -47,7 +51,7 @@
 {"id":"ac6177bdfe24","text":"Dışarıda 30 °C var.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":14,"type":"temperature","text":"30 °C","value":"30 celsius"}]}
 {"id":"ad9fdc871d95","text":"Koridor 15 metre uzunluğunda.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":16,"type":"dimension","text":"15 metre","value":"15 meter"}]}
 {"id":"ae9596de3626","text":"Çocuğun boyu 110 cm.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":13,"end":19,"type":"dimension","text":"110 cm","value":"110 centimeter"}]}
-{"id":"af2329e0dbd0","text":"Her iki tarafta yüz kişi vardı.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":16,"end":19,"type":"number","text":"yüz","value":"100"}]}
+{"id":"af2329e0dbd0","text":"Her iki tarafta yüz kişi vardı.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"number","text":"iki","value":"2"},{"start":16,"end":19,"type":"number","text":"yüz","value":"100"}]}
 {"id":"b0b382876bbf","text":"Sunucu 10.20.30.40 adresinde.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":18,"type":"ip","text":"10.20.30.40"}]}
 {"id":"b122085a535c","text":"Mağazada yüzde 30 indirim var.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":17,"type":"percentage","text":"yüzde 30","value":"30"}]}
 {"id":"b14bbd2fba39","text":"Yol 4 saat sürdü.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":10,"type":"duration","text":"4 saat","value":"14400"}]}
@@ -60,6 +64,7 @@
 {"id":"d597d864cfa9","text":"Ekip gelecek hafta izinli.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":18,"type":"daterange","text":"gelecek hafta","value":"2026-03-23/2026-03-30","grain":"week"}]}
 {"id":"d5de19793186","text":"3'üncü sınıf öğrencileri geziye gitti.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":6,"type":"ordinal","text":"3'üncü","value":"3"}]}
 {"id":"dcb6b822fbd7","text":"Şehir 40 km uzakta.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":11,"type":"dimension","text":"40 km","value":"40 kilometer"}]}
+{"id":"dd20e23558e9","text":"Toplantı 2021 baharında yapılacak.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":23,"type":"daterange","text":"2021 baharında","value":"2021-03-01/2021-06-01","grain":"season","approx":true}]}
 {"id":"def61d49218b","text":"4 gün önce aradı.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":10,"type":"date","text":"4 gün önce","value":"2026-03-14","grain":"day"}]}
 {"id":"df860b8b2a40","text":"Etkinlik Ağustos 2026'de.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":21,"type":"daterange","text":"Ağustos 2026","value":"2026-08-01/2026-09-01","grain":"month"}]}
 {"id":"e0811b418168","text":"Sen yarın akşam gel.","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":15,"type":"datetimerange","text":"yarın akşam","value":"2026-03-19T18:00/2026-03-20T00:00","grain":"hour","approx":true}]}

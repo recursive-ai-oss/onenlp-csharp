@@ -1100,7 +1100,7 @@ internal sealed partial class Scan
         int last = ItemIndexAt(literalEnd) - 1;
         int nx = last >= 0 ? Next(last, false) : -1;
         if (nx >= 0 && _items[nx].Kind == ItemKind.Word && _cardinals.TryGetValue(Span(nx), out Cardinal sc)
-            && sc.Kind is CardinalKind.Scale or CardinalKind.Multiplier && TryMultiply(value, sc.Value, out decimal product))
+            && sc.Kind is CardinalKind.Scale or CardinalKind.Multiplier or CardinalKind.BareScale && TryMultiply(value, sc.Value, out decimal product))
         {
             int e = _items[nx].End;
             _numbers.Add(new NumberCandidate { Start = start, End = e, Value = product });

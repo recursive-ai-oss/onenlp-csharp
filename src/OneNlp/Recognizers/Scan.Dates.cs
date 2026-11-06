@@ -855,6 +855,8 @@ internal sealed partial class Scan
 
         QuarterOrHalf(i, a, nr, r);
         PartOfPeriod(i, a, nr, r);
+        PostPartOfPeriod(i, a, nr, r);
+        YearThenSeason(i, r);
 
         // The 1990s
         int d = i;
@@ -1042,6 +1044,101 @@ internal sealed partial class Scan
             DateTime s = first.AddDays(part * 10);
             DateTime end = part == 2 ? first.AddMonths(1) : s.AddDays(10);
             r.Add(Per(i, e, s, end, Granularity.Month, true, needsRef));
+        }
+    }
+
+    /// <summary>The part follows the period: <c>2021 başında</c>, <c>Mayıs ortasında</c>, <c>2022 के मध्य</c>.</summary>
+    private void PostPartOfPeriod(int i, DateTime a, bool nr, List<Cand> r)
+    {
+        int ye;
+        int k;
+        bool needs = false;
+        DateTime first;
+        Granularity g;
+        if (YearAt(i, out ye, out int y))
+        {
+            first = new DateTime(y, 1, 1);
+            g = Granularity.Year;
+        }
+        else if (Find(i, "month", out int mn, out TWord mw))
+        {
+            ye = i + mn;
+            first = Instance(0, mw.A, 1, a);
+            needs = nr;
+            g = Granularity.Month;
+        }
+        else
+        {
+            return;
+        }
+
+        // The part word may itself begin with the linking word (Hindi "की शुरुआत"), so try it directly before skipping "of".
+        k = ye;
+        int part = -1;
+        int pn = 0;
+        for (int tries = 0; tries < 2 && part < 0; tries++)
+        {
+            if (tries == 1)
+            {
+                if (!Is(ye, "of", out int on))
+                {
+                    break;
+                }
+
+                k = ye + on;
+            }
+
+            if (Is(k, "earlypost", out pn))
+            {
+                part = 0;
+            }
+            else if (Is(k, "midpost", out pn))
+            {
+                part = 1;
+            }
+            else if (Is(k, "latepost", out pn))
+            {
+                part = 2;
+            }
+        }
+
+        if (part < 0)
+        {
+            return;
+        }
+
+        int e = k + pn;
+        if (g == Granularity.Year)
+        {
+            var s = new DateTime(first.Year, (part * 4) + 1, 1);
+            r.Add(Per(i, e, s, part == 2 ? new DateTime(first.Year + 1, 1, 1) : s.AddMonths(4), Granularity.Year, true, false));
+        }
+        else
+        {
+            DateTime s = first.AddDays(part * 10);
+            DateTime end = part == 2 ? first.AddMonths(1) : s.AddDays(10);
+            r.Add(Per(i, e, s, end, Granularity.Month, true, needs));
+        }
+    }
+
+    /// <summary>The year comes first: <c>2021 baharında</c>, <c>2025 के पतझड़</c>.</summary>
+    private void YearThenSeason(int i, List<Cand> r)
+    {
+        if (!YearAt(i, out int ye, out int y))
+        {
+            return;
+        }
+
+        int k = ye;
+        if (Is(k, "of", out int on))
+        {
+            k += on;
+        }
+
+        if (Find(k, "season", out int n, out TWord sw))
+        {
+            var s = new DateTime(y, sw.A, 1);
+            r.Add(Per(i, k + n, s, s.AddMonths(sw.B), Granularity.Season, true, false));
         }
     }
 

@@ -59,6 +59,9 @@ internal sealed class TemporalData
 
         // Turkish and Hindi: the words that close a range after its second end ("10 Nisan'a kadar", "16:00 तक", "... arasında").
         "rangetail",
+
+        // Turkish and Hindi: the early, middle and late part named after the period ("2021 başında", "2022 के मध्य").
+        "earlypost", "midpost", "latepost",
     };
 
     private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct", "no-lone-day", "bare-hour-24", "determiner-inside-only", "of-before-year", "daypart-first", "dot-clock", "bare-hour-range", "spoken-hour-mark" };
