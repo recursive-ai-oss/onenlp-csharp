@@ -38,7 +38,7 @@ public sealed partial class Doc
     /// <returns>
     /// The document. Tokens come from <c>tokens</c> by <c>start</c> and <c>end</c>; missing annotations stay unset, a missing
     /// <c>head</c> makes the token its own head, and a missing <c>conf</c> is 1. <c>ents</c> and <c>sents</c> are read from their
-    /// character offsets, which must fall on token boundaries. <c>spans</c>, <c>cats</c>, <c>user_data</c> and unknown fields are
+    /// character offsets, which must fall on token boundaries. <c>cats</c> and <c>spans</c> are read into <see cref="Doc.Cats"/> and <see cref="Doc.Spans"/>; <c>user_data</c> and unknown fields are
     /// ignored, because a <see cref="Doc"/> does not store them.
     /// </returns>
     /// <exception cref="ArgumentNullException"><paramref name="json"/> is <see langword="null"/>.</exception>

@@ -17,6 +17,7 @@ count, bytes, SHA-256 of each file, source URLs, fetch time). Training code is g
 """
 import argparse
 import csv
+import datetime
 import hashlib
 import io
 import json
@@ -95,6 +96,7 @@ def banking77(out, eval_out):
 
 
 def list_records(first_url, budget):
+    """Yields the <record> elements of one OAI-PMH listing, following resumption tokens."""
     last = 0.0
     failures = 0
     url = first_url
@@ -107,12 +109,13 @@ def list_records(first_url, budget):
             body = fetch(url)
             failures = 0
         except urllib.error.HTTPError as e:
-            if e.code == 503:
-                time.sleep(float(e.headers.get("Retry-After", "30")) + 1)
-                continue
-            raise
+            # 503 with Retry-After is the service's own pacing; a 503 without it is a gateway timeout and is simply tried again.
+            failures += 1
+            if e.code != 503 or failures > 6:
+                raise
+            time.sleep(float(e.headers.get("Retry-After", "30")) + 1)
+            continue
         except (TimeoutError, urllib.error.URLError, ConnectionError):
-            # The service is slow to start a large listing; the same request is simply tried again (at most 6 times in a row).
             failures += 1
             if failures > 6:
                 raise
@@ -130,14 +133,30 @@ def list_records(first_url, budget):
         url = OAI + "?" + urllib.parse.urlencode({"verb": "ListRecords", "resumptionToken": token.text}) if token is not None and token.text else None
 
 
+def days(start):
+    """Calendar days from <start> (YYYY-MM-DD) on, up to yesterday. One listing per day keeps each answer small: the service times out on
+    a large window (a gateway timeout after minutes), but answers a one-day window in seconds."""
+    d = datetime.date.fromisoformat(start)
+    end = datetime.date.today() - datetime.timedelta(days=1)
+    while d <= end:
+        yield d.isoformat()
+        d += datetime.timedelta(days=1)
+
+
 def norm(s):
     return " ".join(s.split())
 
 
 def arxiv(out, eval_out, start, max_records, min_label_docs):
-    url = OAI + "?" + urllib.parse.urlencode({"verb": "ListRecords", "metadataPrefix": "arXiv", "set": "cs", "from": start})
     records, seen = [], set()
-    for rec in list_records(url, lambda: len(records) < max_records):
+
+    def all_days():
+        for day in days(start):
+            url = OAI + "?" + urllib.parse.urlencode({"verb": "ListRecords", "metadataPrefix": "arXiv", "set": "cs", "from": day, "until": day})
+            print("day", day, "records", len(records), file=sys.stderr, flush=True)
+            yield from list_records(url, lambda: len(records) < max_records)
+
+    for rec in all_days():
         meta = rec.find("o:metadata/a:arXiv", NS)
         if meta is None:
             continue
@@ -149,8 +168,8 @@ def arxiv(out, eval_out, start, max_records, min_label_docs):
             continue
         seen.add(ident)
         records.append((ident, title + ". " + abstract, cats))
-        if len(records) % 5000 == 0:
-            print("records", len(records), file=sys.stderr, flush=True)
+        if len(records) >= max_records:
+            break
     bucket = lambda i: int(sha256_bytes(i.encode("utf-8"))[:8], 16) % 20
     split = {"train": [], "dev": [], "test": []}
     for r in records:
@@ -166,7 +185,7 @@ def arxiv(out, eval_out, start, max_records, min_label_docs):
 
     # A document with none of the kept labels stays: it is a negative for every label, as in the full task.
     manifest = {
-        "dataset": "arXiv cs metadata (title + abstract -> cs.* categories)", "source": OAI + "?verb=ListRecords&metadataPrefix=arXiv&set=cs&from=" + start,
+        "dataset": "arXiv cs metadata (title + abstract -> cs.* categories)", "source": OAI + "?verb=ListRecords&metadataPrefix=arXiv&set=cs&from=<day>&until=<day>, one listing per day from " + start + " on",
         "licence": "CC0 1.0 for all arXiv metadata (info.arxiv.org/help/license/index.html, 'Metadata license'); paper text not used",
         "labels": labels, "label_train_counts": {c: counts[c] for c in labels}, "min_label_docs": min_label_docs,
         "split": "sha256(arXiv id)[:8] mod 20: 0 test, 1 dev, else train",
