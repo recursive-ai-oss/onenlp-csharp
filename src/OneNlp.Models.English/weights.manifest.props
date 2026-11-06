@@ -2,7 +2,7 @@
   <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
        To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
   <ItemGroup>
-    <EnglishWeight Include="english.onenlp" Size="94743982" Sha256="d62f2199b06d26f5fdff0e7a8b4bd150ea017484997665a6458f5c0e0e033255"
-                   Recipe="recipes/en/fast-tagging, recipes/en/parser, recipes/en/ner, assembled by recipes/en/assemble" Data="UD English-EWT r2.18 and UNER English-EWT commit 8ed072de (CC BY-SA 4.0)" Contents="tagger, morphologizer, lemmatizer (tagging encoder); parser with sentence starts (parser encoder); entity recognizer (NER encoder)" />
+    <EnglishWeight Include="english.onenlp" Size="126202180" Sha256="1414ec7920de0c25b679a557a5508dc7e10429aeeff319aa71f5ba173ec61e48"
+                   Recipe="recipes/en/selftrain (tagging, entities), recipes/en/parser, assembled by recipes/en/assemble" Data="UD English-EWT r2.18 and UNER English-EWT commit 8ed072de (CC BY-SA 4.0), plus FineWeb (ODC-By 1.0) and Wikipedia (CC BY-SA 3.0) text labelled by our previous English model" Contents="tagger, morphologizer, lemmatizer (tagging encoder); parser with sentence starts (parser encoder); entity recognizer (NER encoder)" />
   </ItemGroup>
 </Project>

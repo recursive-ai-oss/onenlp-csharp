@@ -300,7 +300,9 @@ public sealed class Parser : TrainableHead
         if (depRows.Count > 0)
         {
             int classes = _labels.Length;
-            ReadOnlySpan<float> logits = module.LabelScores(p, depRows.ToArray(), headRows.ToArray()).Data<float>();
+            ReadOnlySpan<float> logits = GradMode.IsEnabled
+                ? module.LabelScores(p, depRows.ToArray(), headRows.ToArray()).Data<float>()
+                : module.LabelScoresFast(p, depRows.ToArray(), headRows.ToArray(), total);
             for (int i = 0; i < depRows.Count; i++)
             {
                 bool isRoot = headRows[i] == total;
@@ -529,9 +531,15 @@ public sealed class Parser : TrainableHead
         private readonly Linear _relPair;
         private readonly Linear _boundary;
         private readonly int _recurrentSize;
+        private readonly int _recurrentLayers;
         private readonly Recurrent? _lstm;
+        private volatile LstmInference? _lstmFast;
+        private readonly object _lstmLock = new();
         private readonly Embedding _rootArc;
         private readonly Embedding _rootRel;
+        private readonly FrozenLinear _relPairFast;
+        private volatile BilinearInference? _bilinearFast;
+        private readonly object _bilinearLock = new();
 
         public ParserModule(int width, int arcSize, int labelSize, int contextLayers, int recurrentSize, int recurrentLayers, int labels, bool labelBilinear, Generator generator)
         {
@@ -539,6 +547,7 @@ public sealed class Parser : TrainableHead
             _labels = labels;
             _labelSize = labelSize;
             _recurrentSize = recurrentSize;
+            _recurrentLayers = recurrentLayers;
             _window = new Linear[contextLayers];
             for (int i = 0; i < contextLayers; i++)
             {
@@ -563,6 +572,7 @@ public sealed class Parser : TrainableHead
             }
 
             _relPair = RegisterModule("rel_pair", new Linear(2 * labelSize, labels, generator));
+            _relPairFast = new FrozenLinear(_relPair);
             _boundary = RegisterModule("boundary", new Linear(top, 2, generator));
             _rootArc = RegisterModule("root_arc", new Embedding(1, arcSize, generator));
             _rootRel = RegisterModule("root_rel", new Embedding(1, labelSize, generator));
@@ -614,6 +624,24 @@ public sealed class Parser : TrainableHead
         // the batch (packed-sequence semantics of Ops.Lstm: the reverse direction starts at the document's own end).
         private Tensor Recurrence(Tensor x, EncodedBatch batch, Tensor zero)
         {
+            if (!GradMode.IsEnabled)
+            {
+                // Prediction: the same network walked document by document without tensor operations (see LstmInference).
+                int rows = x.Shape[0];
+                var docStarts = new int[batch.DocCount];
+                var docLengths = new int[batch.DocCount];
+                for (int doc = 0; doc < docStarts.Length; doc++)
+                {
+                    docStarts[doc] = batch.Start(doc);
+                    docLengths[doc] = batch.Length(doc);
+                }
+
+                float[] result = FastLstm().Run(x.Data<float>(), rows, docStarts, docLengths);
+                Tensor fast = Tensor.FromSpan<float>(result, Shape.Create(rows, 2 * _recurrentSize));
+                ActivationScope.Track(fast);
+                return fast;
+            }
+
             int n = x.Shape[0];
             int docs = batch.DocCount;
             int longest = 0;
@@ -639,6 +667,35 @@ public sealed class Parser : TrainableHead
             Tensor padded = Ops.Embedding(Ops.Concat([x, zero], 0), IntTensor(gather)).Reshape(longest, docs, _width);
             Tensor outputs = _lstm!.Forward(padded, lengths).Reshape(longest * docs, 2 * _recurrentSize);
             return Ops.Embedding(outputs, IntTensor(scatter));
+        }
+
+        // The inference copy of the LSTM weights, rebuilt when they change (the storage version counters tell).
+        private LstmInference FastLstm()
+        {
+            List<(string Name, Tensor Tensor)> parameters = _lstm!.NamedParameters();
+            long stamp = 0;
+            foreach ((string _, Tensor t) in parameters)
+            {
+                stamp += t.Version;
+            }
+
+            LstmInference? fast = _lstmFast;
+            if (fast is not null && fast.Stamp == stamp)
+            {
+                return fast;
+            }
+
+            lock (_lstmLock)
+            {
+                fast = _lstmFast;
+                if (fast is null || fast.Stamp != stamp)
+                {
+                    fast = LstmInference.Create(parameters, _recurrentSize, _recurrentLayers, stamp);
+                    _lstmFast = fast;
+                }
+
+                return fast;
+            }
         }
 
         public Tensor Boundary(Tensor x) => _boundary.Forward(x);
@@ -667,6 +724,60 @@ public sealed class Parser : TrainableHead
 
             ActivationScope.Track(mask);
             return bilinear + bias + mask;
+        }
+
+        // Prediction without tensor operations: the same scores as LabelScores from row-wise kernels. l[i, c] = (U_c d) . h + W [d; h] + b, where the
+        // products U_c d for every class come from one pass of d over the transposed bilinear weights.
+        public float[] LabelScoresFast(Projections p, int[] depRows, int[] headRows, int total)
+        {
+            int count = depRows.Length;
+            int size = _labelSize;
+            ReadOnlySpan<float> dep = p.RelDep.Data<float>();
+            ReadOnlySpan<float> head = p.RelHead.Data<float>();
+            ReadOnlySpan<float> root = _rootRel.Weight.Data<float>();
+            RowClassifier pair = _relPairFast.Get();
+            BilinearInference? bilinear = _relBilinear is null ? null : FastBilinear();
+            var result = new float[count * _labels];
+            float[] joined = new float[2 * size];
+            float[] pairScores = new float[pair.Stride];
+            float[] products = bilinear is null ? Array.Empty<float>() : new float[bilinear.Stride];
+            for (int i = 0; i < count; i++)
+            {
+                ReadOnlySpan<float> d = dep.Slice(depRows[i] * size, size);
+                ReadOnlySpan<float> h = headRows[i] == total ? root[..size] : head.Slice(headRows[i] * size, size);
+                d.CopyTo(joined);
+                h.CopyTo(joined.AsSpan(size));
+                pair.Logits(joined, pairScores);
+                bilinear?.Products(d, products);
+                for (int c = 0; c < _labels; c++)
+                {
+                    result[(i * _labels) + c] = bilinear is null ? pairScores[c] : RowKernels.Dot(products.AsSpan(c * size, size), h, size) + pairScores[c];
+                }
+            }
+
+            return result;
+        }
+
+        private BilinearInference FastBilinear()
+        {
+            long stamp = _relBilinear!.Weight.Version;
+            BilinearInference? fast = _bilinearFast;
+            if (fast is not null && fast.Stamp == stamp)
+            {
+                return fast;
+            }
+
+            lock (_bilinearLock)
+            {
+                fast = _bilinearFast;
+                if (fast is null || fast.Stamp != stamp)
+                {
+                    fast = new BilinearInference(_relBilinear.Weight, stamp);
+                    _bilinearFast = fast;
+                }
+
+                return fast;
+            }
         }
 
         // Label scores [M, labels] for arcs (dependent row, head row); head row == the batch's token count means the artificial root.

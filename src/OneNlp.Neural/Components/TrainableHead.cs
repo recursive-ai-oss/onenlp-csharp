@@ -12,7 +12,8 @@ namespace RecursiveAI.OneNlp.Neural.Components;
 /// <see cref="Process"/> and <see cref="ProcessBatch"/>.
 /// </summary>
 /// <remarks>
-/// A head's module is not thread-safe, so calls to <see cref="ProcessBatch"/> on one head take turns. Different heads, and different
+/// A head's module is not thread-safe, so the prediction step of calls to <see cref="ProcessBatch"/> on one head takes turns (and with an encoder other
+/// than <see cref="FastEncoder"/>, so does the encoding). Different heads, and different
 /// pipelines, run in parallel.
 /// </remarks>
 public abstract class TrainableHead : ITrainableComponent, IDisposable
@@ -101,6 +102,23 @@ public abstract class TrainableHead : ITrainableComponent, IDisposable
         }
 
         Doc[] batch = [.. nonEmpty];
+        if (Encoder is FastEncoder)
+        {
+            // The fast encoder is safe to call from several threads (its per-thread cache and rebuilt tables take care of themselves), and
+            // encoding is most of the work, so only the head's own weights and caches are taken in turns.
+            Encoder.Weights?.Eval();
+            using NoGradScope fastNoGrad = GradMode.NoGrad();
+            using var fastScope = new ActivationScope();
+            EncodedBatch fastEncoded = Encoder.Encode(batch);
+            lock (_gate)
+            {
+                Weights.Eval();
+                Predict(fastEncoded, batch);
+            }
+
+            return;
+        }
+
         lock (_gate)
         {
             Encoder.Weights?.Eval();
