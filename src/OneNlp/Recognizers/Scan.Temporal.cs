@@ -70,6 +70,7 @@ internal sealed partial class Scan
             try
             {
                 ExpressionsAt(i, cands);
+                AddRangeTails(cands);
                 if (it.Kind == ItemKind.Word && !_td!.Flags.Contains("determiner-inside-only") && Is(i, "determiner", out int dn) && i + dn < _items.Count && GapOk(_items[i + dn - 1].End, _items[i + dn].Start))
                 {
                     // "le 20 mars", "la semaine prochaine", "den Muttertag": a determiner is part of the expression it introduces.
@@ -90,6 +91,34 @@ internal sealed partial class Scan
             foreach (Cand c in cands)
             {
                 Emit(c);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Turkish "6 Nisan'dan 10 Nisan'a kadar", "14:00 ile 16:00 arasında", Hindi "6 अप्रैल से 10 अप्रैल तक": a word after the second end closes the range
+    /// and belongs to it. The longer reading is added next to the shorter one; overlaps then keep the longer.
+    /// </summary>
+    private void AddRangeTails(List<Cand> cands)
+    {
+        int count = cands.Count;
+        for (int x = 0; x < count; x++)
+        {
+            Cand c = cands[x];
+            if (c.V.Kind is not (TemporalKind.DateRange or TemporalKind.TimeRange or TemporalKind.DateTimeRange) || c.E >= _items.Count
+                || !GapOk(_items[c.E - 1].End, _items[c.E].Start) || !Is(c.E, "rangetail", out int tn))
+            {
+                continue;
+            }
+
+            // Only a worded join ("ile", "'dan", "से") takes the tail into the span; with a dash the range is complete without it ("09:00-17:00 arasında").
+            for (int y = c.S; y < c.E; y++)
+            {
+                if (Is(y, "rangeto") && !(_items[y].Kind == ItemKind.Other && _items[y].End - _items[y].Start == 1 && _t[_items[y].Start] is '-' or '–' or '—'))
+                {
+                    cands.Add(c with { E = c.E + tn });
+                    break;
+                }
             }
         }
     }
@@ -389,6 +418,8 @@ internal sealed partial class Scan
     {
         int start = i;
         bool approx = false;
+        var leadClocks = new List<Cand>();
+        DaypartFirst(i, leadClocks);
 
         // Spanish and Portuguese "las 15:00", "às dez da manhã": the article (or fused preposition and article) that introduces a clock time is part of it.
         bool articled = false;
@@ -411,6 +442,8 @@ internal sealed partial class Scan
             SpokenClock(i, clocks);
         }
 
+        clocks.AddRange(leadClocks);
+
         foreach (Cand c in clocks)
         {
             TemporalValue v = c.V;
@@ -423,6 +456,47 @@ internal sealed partial class Scan
                 withZone.ZoneIsZ = z;
                 r.Add(new Cand(start, ze, withZone, c.C));
             }
+        }
+    }
+
+    /// <summary>
+    /// Turkish "sabah 8", "akşam saat 5", Hindi "सुबह 8 बजे", "शाम 5 बजे": the part of the day comes before the hour and decides am or pm. A bare
+    /// hour counts only when punctuation or an apostrophe follows ("akşam 5'te"), so "sabah 8 kişi" is not a time.
+    /// </summary>
+    private void DaypartFirst(int i, List<Cand> r)
+    {
+        if (!_td!.Flags.Contains("daypart-first") || !Find(i, "daypart", out int dn, out TWord part) || i + dn >= _items.Count
+            || !GapOk(_items[i + dn - 1].End, _items[i + dn].Start))
+        {
+            return;
+        }
+
+        int j = i + dn;
+        if (Is(j, "hourarticle", out int an) && j + an < _items.Count && GapOk(_items[j + an - 1].End, _items[j + an].Start))
+        {
+            j += an;
+        }
+
+        var tail = new List<Cand>();
+        ClockMarked(j, tail);
+        ClockAt(j, tail, true);
+        foreach (Cand c in tail)
+        {
+            TemporalValue t = c.V;
+            if (t.Kind != TemporalKind.Time || (t.Bare && c.E < _items.Count && _items[c.E].Kind != ItemKind.Other))
+            {
+                continue;
+            }
+
+            int h = t.Start.Hour;
+            if (h is >= 1 and <= 12)
+            {
+                h = part.A >= 18 && h == 12 ? 0 : part.A >= 12 ? (h % 12) + 12 : h % 12;
+            }
+
+            TemporalValue v = TemporalValue.Clock(h, t.Start.Minute, t.Start.Second, t.Grain ?? Granularity.Hour);
+            v.Meridiem = true;
+            r.Add(new Cand(i, c.E, v));
         }
     }
 
@@ -464,7 +538,8 @@ internal sealed partial class Scan
             return;
         }
 
-        if (Find(i, "halfbefore", out int hn, out _) || Find(i, "plusquarter", out hn, out _) || Find(i, "minusquarter", out hn, out _))
+        if (Find(i, "halfbefore", out int hn, out _) || Find(i, "plusquarter", out hn, out _) || Find(i, "minusquarter", out hn, out _)
+            || Find(i, "plushalf", out hn, out _))
         {
             SpokenHour(i, hn, r);
             return;
@@ -665,8 +740,14 @@ internal sealed partial class Scan
 
         bool half = Is(i, "halfbefore");
         bool minusQuarter = !half && Is(i, "minusquarter");
+        bool plusHalf = Is(i, "plushalf");
         TemporalValue t;
-        if (half)
+        if (plusHalf)
+        {
+            // Hindi "साढ़े तीन" is 3:30.
+            t = TemporalValue.Clock(h % 12, 30, 0, Granularity.Minute);
+        }
+        else if (half)
         {
             // 12:30 for "halb eins"; otherwise the half hour before the stated hour.
             t = TemporalValue.Clock(h == 1 ? 12 : h - 1, 30, 0, Granularity.Minute);
@@ -681,6 +762,11 @@ internal sealed partial class Scan
         }
 
         t.Meridiem = true;
+        if (_td!.Flags.Contains("spoken-hour-mark") && HourMark(e, out int markEnd, out bool weakMark) && !weakMark)
+        {
+            e = markEnd;
+        }
+
         r.Add(new Cand(i, e, t));
     }
 
@@ -727,6 +813,20 @@ internal sealed partial class Scan
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Turkish "saat 15.30", "09.00": with the <c>dot-clock</c> flag a dot between an hour and two minute digits is a clock separator when the hour has two
+    /// digits or follows <c>saat</c>, and no further dot-digit group follows (that would be a date, <c>15.04.2026</c>).
+    /// </summary>
+    private bool DotClock(int i, int dot)
+    {
+        if (!_td!.Flags.Contains("dot-clock") || (Ch(dot + 2, '.') && Tch(dot + 1, dot + 2)) || (i > 0 && Ch(i - 1, '.') && Tch(i - 1, i)))
+        {
+            return false;
+        }
+
+        return _items[i].End - _items[i].Start == 2 || (i > 0 && Is(i - 1, "hourarticle") && GapOk(_items[i - 1].End, _items[i].Start));
     }
 
     private void ClockAt(int i, List<Cand> r, bool allowBare)
@@ -809,7 +909,8 @@ internal sealed partial class Scan
             }
         }
 
-        if (!colon && Ch(k, '.') && Tch(i, k) && Dig(k + 1, 2) && Tch(k, k + 1) && (Meridiem(k + 2, out _, out _) || HourMark(k + 2, out _, out _)))
+        if (!colon && Ch(k, '.') && Tch(i, k) && Dig(k + 1, 2) && Tch(k, k + 1)
+            && (Meridiem(k + 2, out _, out _) || HourMark(k + 2, out _, out _) || DotClock(i, k)))
         {
             // British "3.30pm": a dot is a time separator only with am/pm after it, because "3.30" alone is a decimal.
             colon = true;
@@ -882,6 +983,7 @@ internal sealed partial class Scan
         {
             TemporalValue t = TemporalValue.Clock(h, 0, 0, Granularity.Hour);
             t.Bare = true;
+            t.Clock24 = h >= 13 && _td!.Flags.Contains("bare-hour-range");
             r.Add(new Cand(i, k, t));
         }
     }
@@ -921,7 +1023,7 @@ internal sealed partial class Scan
             }
 
             var seconds = new List<Cand>();
-            TimeAt(k + n, seconds, framed && _td!.Flags.Contains("bare-range-24"));
+            TimeAt(k + n, seconds, _td!.Flags.Contains("bare-hour-range") || (framed && _td!.Flags.Contains("bare-range-24")));
             foreach (Cand b in seconds)
             {
                 TemporalValue? range = JoinTimes(a.V, b.V, framed, framed && _td!.Flags.Contains("bare-range-24"));

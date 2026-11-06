@@ -292,7 +292,7 @@ public class RecognizerTests
     }
 
     [Fact]
-    public void OtherLanguagesAreNotBuiltIn() => Assert.Throws<NotSupportedException>(() => Recognizer.For(Language.Turkish));
+    public void OtherLanguagesAreNotBuiltIn() => Assert.Throws<NotSupportedException>(() => Recognizer.For(Language.FromCode("ja")));
 
     [Fact]
     public void HappyPathVerbsFilterByKind()

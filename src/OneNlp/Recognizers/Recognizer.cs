@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text;
 
 namespace RecursiveAI.OneNlp.Recognizers;
 
@@ -22,6 +23,8 @@ public sealed class Recognizer
     private static readonly Lazy<Recognizer> GermanRules = new(() => LoadEmbedded(Language.German));
     private static readonly Lazy<Recognizer> SpanishRules = new(() => LoadEmbedded(Language.Spanish));
     private static readonly Lazy<Recognizer> PortugueseRules = new(() => LoadEmbedded(Language.Portuguese));
+    private static readonly Lazy<Recognizer> TurkishRules = new(() => LoadEmbedded(Language.Turkish));
+    private static readonly Lazy<Recognizer> HindiRules = new(() => LoadEmbedded(Language.Hindi));
     private static readonly Lazy<Recognizer> ItalianRules = new(() => LoadEmbedded(Language.Italian));
     private static readonly Lazy<Recognizer> DutchRules = new(() => LoadEmbedded(Language.Dutch));
     private static readonly Lazy<Recognizer> ChineseRules = new(() => LoadEmbedded(Language.Chinese));
@@ -54,6 +57,12 @@ public sealed class Recognizer
     /// <summary>The recognizer for Dutch, from the rules built into this package.</summary>
     public static Recognizer Dutch => DutchRules.Value;
 
+    /// <summary>The recognizer for Turkish (Turkey), from the rules built into this package.</summary>
+    public static Recognizer Turkish => TurkishRules.Value;
+
+    /// <summary>The recognizer for Hindi (India), from the rules built into this package.</summary>
+    public static Recognizer Hindi => HindiRules.Value;
+
     /// <summary>The recognizer for Chinese (Mainland China conventions: simplified characters, the State Council holiday table), from the rules built into this package.</summary>
     public static Recognizer Chinese => ChineseRules.Value;
 
@@ -62,7 +71,7 @@ public sealed class Recognizer
 
     /// <summary>Returns the recognizer for a language from the rules built into this package.</summary>
     /// <param name="language">The language.</param>
-    /// <exception cref="NotSupportedException">No rules for the language are built in. English, French, German, Spanish, Portuguese, Italian, Dutch and Chinese are; <see cref="FromRules"/> loads rules from a file.</exception>
+    /// <exception cref="NotSupportedException">No rules for the language are built in. English, French, German, Spanish, Portuguese, Italian, Dutch, Turkish, Hindi and Chinese are; <see cref="FromRules"/> loads rules from a file.</exception>
     public static Recognizer For(Language language)
     {
         if (language == Language.English)
@@ -90,7 +99,17 @@ public sealed class Recognizer
             return Portuguese;
         }
 
-        if (language == Language.Italian)
+        if (language == Language.Turkish)
+        {
+            return Turkish;
+        }
+
+        if (language == Language.Hindi)
+        {
+            return Hindi;
+        }
+
+                if (language == Language.Italian)
         {
             return Italian;
         }
@@ -106,7 +125,7 @@ public sealed class Recognizer
         }
 
         throw new NotSupportedException(
-            $"No built-in recognizer rules for language '{language.Code}'. English ('en'), French ('fr'), German ('de'), Spanish ('es'), Portuguese ('pt'), Italian ('it'), Dutch ('nl') and Chinese ('zh') are built in; load rules with Recognizer.FromRules.");
+            $"No built-in recognizer rules for language '{language.Code}'. English ('en'), French ('fr'), German ('de'), Spanish ('es'), Portuguese ('pt'), Italian ('it'), Dutch ('nl'), Turkish ('tr'), Hindi ('hi') and Chinese ('zh') are built in; load rules with Recognizer.FromRules.");
     }
 
     /// <summary>Compiles recognizer rules from rule data.</summary>
@@ -147,8 +166,44 @@ public sealed class Recognizer
             return [];
         }
 
-        var scan = new Scan(_data, text, context);
-        return scan.Run();
+        if (!NeedsFolding(text))
+        {
+            return new Scan(_data, text, context).Run();
+        }
+
+        // Devanagari digits are read as the ASCII digits of the same value and the dotted capital I as a plain one (Turkish); each is one UTF-16
+        // unit, so offsets do not move. The matched text is taken from the caller's string afterwards.
+        var folded = new StringBuilder(text.Length);
+        foreach (char c in text)
+        {
+            folded.Append(_data.DevanagariDigits && c is >= '\u0966' and <= '\u096F' ? (char)('0' + (c - '\u0966')) : _data.TurkicCase && c == '\u0130' ? 'I' : c);
+        }
+
+        List<Recognition> found = new Scan(_data, folded.ToString(), context).Run();
+        for (int i = 0; i < found.Count; i++)
+        {
+            found[i] = found[i] with { Text = text.Substring(found[i].Start, found[i].End - found[i].Start) };
+        }
+
+        return found;
+    }
+
+    private bool NeedsFolding(string text)
+    {
+        if (!_data.DevanagariDigits && !_data.TurkicCase)
+        {
+            return false;
+        }
+
+        foreach (char c in text)
+        {
+            if ((_data.DevanagariDigits && c is >= '\u0966' and <= '\u096F') || (_data.TurkicCase && c == '\u0130'))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static Recognizer LoadEmbedded(Language language)

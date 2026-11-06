@@ -1,0 +1,58 @@
+# Units that follow a number, Hindi. Fields: canonical name | dimension | surface forms, comma-separated | confidence (optional).
+# A form starting with "=" is case-sensitive; the others are matched without regard to case. Canonical names are the English ones.
+# Text is in NFC: a letter with a nukta is the base letter and U+093C.
+
+[unit]
+millimeter | length | mm, मिमी, मिलीमीटर
+centimeter | length | cm, सेमी, सेंटीमीटर, सेन्टीमीटर
+meter | length | =m, मीटर, मी
+kilometer | length | km, किमी, किलोमीटर, कि.मी.
+inch | length | इंच
+foot | length | फ़ुट, फीट, फुट
+yard | length | गज़, गज
+mile | length | मील
+
+milligram | mass | mg, मिलीग्राम
+gram | mass | =g, ग्राम
+kilogram | mass | kg, किलो, किलोग्राम, किग्रा
+tonne | mass | टन
+pound | mass | पाउंड, lb, lbs
+
+milliliter | volume | ml, मिली, मिलीलीटर
+liter | volume | =l, =L, लीटर, ली
+cubic meter | volume | m3, m³, घन मीटर
+
+square meter | area | m2, m², वर्ग मीटर
+square kilometer | area | km2, km², वर्ग किलोमीटर
+square centimeter | area | cm2, cm², वर्ग सेंटीमीटर
+hectare | area | हेक्टेयर
+acre | area | एकड़
+
+kilometer per hour | speed | km/h, kmh, किमी/घंटा, किलोमीटर प्रति घंटा, किमी/घण्टा
+mile per hour | speed | mph, मील प्रति घंटा
+meter per second | speed | m/s, मीटर प्रति सेकंड
+
+byte | information | बाइट, =B
+kilobyte | information | =KB, =kB, किलोबाइट
+megabyte | information | =MB, मेगाबाइट
+gigabyte | information | =GB, गीगाबाइट
+terabyte | information | =TB, टेराबाइट
+
+watt | power | वाट, watt, =W
+kilowatt | power | =kW, किलोवाट
+megawatt | power | =MW, मेगावाट
+horsepower | power | hp, अश्वशक्ति
+
+celsius | temperature | °c, ºC, ˚C, ° c, डिग्री सेल्सियस, डिग्री सेल्सीयस, सेल्सियस
+fahrenheit | temperature | °f, ºF, ˚F, ° f, डिग्री फ़ारेनहाइट, फ़ारेनहाइट
+kelvin | temperature | केल्विन, kelvin
+degree | temperature | डिग्री, °, º, ˚ | 0.6
+
+[unit.compound]
+kilometer | meter | 1000
+meter | centimeter | 100
+centimeter | millimeter | 10
+meter | millimeter | 1000
+kilogram | gram | 1000
+gram | milligram | 1000
+liter | milliliter | 1000

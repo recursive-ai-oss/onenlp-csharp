@@ -1,0 +1,98 @@
+# Number rules for Turkish (tr-TR).
+#
+# Format: [section] headers, then one rule per line, fields separated by "|". "#" starts a comment.
+# Words are matched without regard to case. Turkish number words are separate words that add and multiply as in English: "yirmi üç" (23),
+# "üç yüz yirmi dört" (324), "iki bin beş yüz" (2500). "on" is a tens word here ("on beş" is 15). Suffixes after an apostrophe ("2026'da", "yüzde 50'si")
+# are left outside the number. Not supported: "buçuk" (and a half), "yarım", fractions such as "üçte bir".
+
+[number.digits]
+system | english
+decimal | ,
+group | space nbsp nnbsp .
+negative | -−
+case | turkic
+
+[number.cardinal]
+sıfır | unit | 0
+bir | unit | 1
+iki | unit | 2
+üç | unit | 3
+dört | unit | 4
+beş | unit | 5
+altı | unit | 6
+yedi | unit | 7
+sekiz | unit | 8
+dokuz | unit | 9
+on | tens | 10
+yirmi | tens | 20
+otuz | tens | 30
+kırk | tens | 40
+elli | tens | 50
+altmış | tens | 60
+yetmiş | tens | 70
+seksen | tens | 80
+doksan | tens | 90
+yüz | bare-scale | 100
+bin | bare-scale | 1000
+milyon | scale | 1000000
+milyar | scale | 1000000000
+trilyon | scale | 1000000000000
+düzine | multiplier | 12
+
+[number.ordinal]
+birinci | 1
+ikinci | 2
+üçüncü | 3
+dördüncü | 4
+beşinci | 5
+altıncı | 6
+yedinci | 7
+sekizinci | 8
+dokuzuncu | 9
+onuncu | 10
+yirminci | 20
+otuzuncu | 30
+kırıncı | 40
+kırkincı | 40
+ellinci | 50
+altmışıncı | 60
+yetmişinci | 70
+sekseninci | 80
+doksanıncı | 90
+yüzüncü | 100
+bininci | 1000
+milyonuncu | 1000000
+
+# "bir" counts only inside a longer number ("yüz bir", "bir milyon"); alone it is the article "a".
+[number.lone-skip]
+bir
+
+[number.negative]
+eksi
+
+[number.point]
+virgül
+
+# A digit ordinal takes the ending after an apostrophe, whose vowels follow the last syllable of the spoken number: 1'inci, 2'nci, 3'üncü.
+[number.ordinal-suffix]
+'inci | 0123456789 | any
+'ıncı | 0123456789 | any
+'uncu | 0123456789 | any
+'üncü | 0123456789 | any
+'nci | 0123456789 | any
+'ncı | 0123456789 | any
+'ncu | 0123456789 | any
+'ncü | 0123456789 | any
+
+# The sign comes first: %12, yüzde 12.
+[percent.prefix]
+%, yüzde
+
+# Ages: the unit word carries the "-yaşında" meaning, so "5 yaşında" is an age and "5 yıl" is a length of time.
+[age.word]
+year | yaşında, yaşındaki, yaşlı, yaş
+month | aylık
+week | haftalık
+day | günlük
+
+# Turkish phone numbers: 0 and an area or operator code (0212 345 67 89, 0532 123 45 67).

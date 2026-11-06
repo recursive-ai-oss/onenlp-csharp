@@ -643,7 +643,7 @@ internal sealed partial class Scan
 
                     terminal = true;
                 }
-                else if (!(cur % 100 == 0 || (cur % 100 >= 20 && cur % 10 == 0)))
+                else if (!(cur % 100 == 0 || (cur % 100 >= 20 && cur % 10 == 0) || (cur % 100 == 10 && last == Piece.Tens)))
                 {
                     // French dix-sept, dix-huit, dix-neuf (also soixante-dix-sept): a unit from seven to nine follows "dix".
                     if (!(sys == NumberSystem.French && last == Piece.Teen && cur % 10 == 0 && v >= 7))
@@ -1119,8 +1119,9 @@ internal sealed partial class Scan
             return literalEnd + 1;
         }
 
-        // Spanish and Portuguese "1.º", "3.ª", "1.er": an ordinal ending written after a dot is a rule row of the form ".º".
-        if (plainInteger && !negative && q == literalEnd && literalEnd + 1 < n && t[literalEnd] == '.' && _d.OrdinalSuffixes.Count > 0 && char.IsLetter(t[literalEnd + 1]))
+        // Spanish and Portuguese "1.º", "3.ª", "1.er": an ordinal ending written after a dot is a rule row of the form ".º"; Turkish "5'inci"
+        // writes it after an apostrophe, a row of the form "'inci".
+        if (plainInteger && !negative && q == literalEnd && literalEnd + 1 < n && t[literalEnd] is '.' or '\'' or '\u2019' && _d.OrdinalSuffixes.Count > 0 && char.IsLetter(t[literalEnd + 1]))
         {
             int r = literalEnd + 1;
             while (r < n && Lexer.IsWordChar(t[r]))
@@ -1174,7 +1175,7 @@ internal sealed partial class Scan
         int last = ItemIndexAt(literalEnd) - 1;
         int nx = last >= 0 ? Next(last, false) : -1;
         if (nx >= 0 && _items[nx].Kind == ItemKind.Word && _cardinals.TryGetValue(Span(nx), out Cardinal sc)
-            && sc.Kind is CardinalKind.Scale or CardinalKind.Multiplier && TryMultiply(value, sc.Value, out decimal product))
+            && sc.Kind is CardinalKind.Scale or CardinalKind.Multiplier or CardinalKind.BareScale && TryMultiply(value, sc.Value, out decimal product))
         {
             int e = _items[nx].End;
             _numbers.Add(new NumberCandidate { Start = start, End = e, Value = product });
@@ -1392,6 +1393,11 @@ internal sealed partial class Scan
 
     private bool OrdinalSuffixOk(string literal, ReadOnlySpan<char> letters)
     {
+        if (letters.Length > 0 && letters[0] == '\u2019')
+        {
+            letters = string.Concat("'", letters[1..].ToString());
+        }
+
         char lastDigit = literal[^1];
         bool teen = literal.Length >= 2 && literal[^2] == '1';
         foreach (OrdinalSuffix rule in _d.OrdinalSuffixes)
@@ -1448,6 +1454,7 @@ internal sealed partial class Scan
             }
 
             EmitPrefixMoney(c);
+            EmitPrefixPercent(c);
             EmitSuffixed(c);
             EmitAgePrefixed(c);
         }
@@ -1491,6 +1498,32 @@ internal sealed partial class Scan
             PrefixEntry e = entries[0];
             _found.Add(MakeQuantity(start, c.End, QuantityKind.Money, value, null, null, e.Iso, e.Confidence));
             return;
+        }
+    }
+
+    /// <summary>Turkish "%12" and "yüzde 12": a percent sign or word before the number, and the span includes it.</summary>
+    private void EmitPrefixPercent(NumberCandidate c)
+    {
+        if (c.Attached || c.MoneyOnly || _d.PercentPrefixes.Count == 0)
+        {
+            return;
+        }
+
+        int k = ItemIndexAt(c.Start);
+        if (k <= 0 || !GapOk(_items[k - 1].End, c.Start))
+        {
+            return;
+        }
+
+        for (int n = Math.Min(_d.PercentPrefixes.MaxItems, k); n >= 1; n--)
+        {
+            _sb.Clear();
+            Lexer.AppendKey(_sb, _t, _items, k - n, n);
+            if (_d.PercentPrefixes.TryGet(_sb.ToString(), out _))
+            {
+                _found.Add(MakeQuantity(_items[k - n].Start, c.End, QuantityKind.Percent, c.Value, "percent", "percent", null, 1f));
+                return;
+            }
         }
     }
 

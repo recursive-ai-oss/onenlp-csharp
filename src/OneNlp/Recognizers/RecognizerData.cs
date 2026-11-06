@@ -112,6 +112,15 @@ internal sealed class RecognizerData
 
     internal NumberSystem System { get; private set; } = NumberSystem.English;
 
+    /// <summary>Whether Devanagari digits (U+0966 to U+096F) are read as the ASCII digits of the same value (<c>native-digits | devanagari</c>).</summary>
+    internal bool DevanagariDigits { get; private set; }
+
+    /// <summary>Whether the capital dotted I (U+0130) is read as a plain I, so that <c>İki</c> matches <c>iki</c> (<c>case | turkic</c>).</summary>
+    internal bool TurkicCase { get; private set; }
+
+    /// <summary>Percent signs and words written before the number (Turkish <c>%12</c>, <c>yüzde 12</c>).</summary>
+    internal FormTable<bool> PercentPrefixes { get; } = new();
+
     /// <summary>Decimal separators for regions that write numbers differently from the language's default (<c>decimal.mx</c>).</summary>
     internal Dictionary<string, char> RegionDecimal { get; } = new(StringComparer.OrdinalIgnoreCase);
 
@@ -341,7 +350,7 @@ internal sealed class RecognizerData
     private static readonly HashSet<string> Sections = new(StringComparer.Ordinal)
     {
         "number.digits", "number.cardinal", "number.ordinal", "number.fraction", "number.article", "number.connector", "number.negative",
-        "number.point", "number.suffix", "number.ordinal-suffix", "percent", "unit", "unit.compound", "number.not-number", "currency.context", "age.unit", "age.suffix", "age.prefix", "age.word", "number.lone-skip", "number.part", "number.ordinal-ending", "number.ordinal-dot-word", "currency.symbol",
+        "number.point", "number.suffix", "number.ordinal-suffix", "percent", "percent.prefix", "unit", "unit.compound", "number.not-number", "currency.context", "age.unit", "age.suffix", "age.prefix", "age.word", "number.lone-skip", "number.part", "number.ordinal-ending", "number.ordinal-dot-word", "currency.symbol",
         "currency.name", "currency.code", "url.scheme", "url.tld", "url.tld.bare", "time.month", "time.weekday", "time.unit", "time.season",
         "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday", "time.flag", "time.region", "time.glue", "time.decade", "phone.space-start", "phone.plain", "phone.area", "zh.digit", "zh.small", "zh.big", "zh.word", "zh.relday", "zh.relperiod",
         "zh.weekday", "zh.season", "zh.daypart", "zh.unit", "zh.holiday", "zh.lunar", "zh.zone", "zh.unit-prefix",
@@ -390,8 +399,24 @@ internal sealed class RecognizerData
                     case "negative":
                         NegativeSigns = f[1];
                         break;
+                    case "case":
+                        TurkicCase = f[1] switch
+                        {
+                            "turkic" => true,
+                            "default" => false,
+                            _ => throw new RecognizerRulesException($"Unknown case rule '{f[1]}' (expected turkic or default)."),
+                        };
+                        break;
+                    case "native-digits":
+                        DevanagariDigits = f[1] switch
+                        {
+                            "devanagari" => true,
+                            "none" => false,
+                            _ => throw new RecognizerRulesException($"Unknown digit set '{f[1]}' (expected devanagari or none)."),
+                        };
+                        break;
                     default:
-                        throw new RecognizerRulesException($"Unknown key '{f[0]}' (expected decimal, group, decimal.<region>, group.<region>, negative, system or ordinal-dot).");
+                        throw new RecognizerRulesException($"Unknown key '{f[0]}' (expected decimal, group, decimal.<region>, group.<region>, negative, native-digits, case, system or ordinal-dot).");
                 }
 
                 break;
@@ -478,6 +503,14 @@ internal sealed class RecognizerData
                 foreach (string form in List(f[0]))
                 {
                     Suffixes.Add(form, new SuffixEntry(SuffixKind.Percent, "percent", "percent", 1m, 1f));
+                }
+
+                break;
+            case "percent.prefix":
+                Need(f, 1, 1);
+                foreach (string form in List(f[0]))
+                {
+                    PercentPrefixes.Add(form, true);
                 }
 
                 break;
