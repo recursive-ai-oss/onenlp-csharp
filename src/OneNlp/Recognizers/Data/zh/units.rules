@@ -1,0 +1,54 @@
+# Unit rules for Chinese: lengths, masses, volumes, areas, speeds, information, power, temperature and ages. Canonical names are the
+# English ones used by every language. Forms are matched by their longest match after a number (公里 before 米), so no spaces are assumed.
+
+[unit]
+millimeter | length | 毫米, mm
+centimeter | length | 厘米, 公分, cm
+meter | length | 米, 公尺, =m
+kilometer | length | 公里, 千米, km
+inch | length | 英寸
+foot | length | 英尺
+mile | length | 英里
+milligram | mass | 毫克, mg
+gram | mass | 克, =g
+kilogram | mass | 公斤, 千克, kg
+tonne | mass | 吨
+jin | mass | 斤
+pound | mass | 磅
+ounce | mass | 盎司
+milliliter | volume | 毫升, ml
+liter | volume | 升, 公升, =L, =l
+gallon | volume | 加仑
+cubic meter | volume | 立方米, m³
+square meter | area | 平方米, 平米, m2, m²
+square kilometer | area | 平方公里, 平方千米, km2, km²
+hectare | area | 公顷
+mu | area | 亩
+kilometer per hour | speed | 公里/小时, 千米/小时, 公里每小时, 千米每小时, 公里/时, 千米/时, km/h
+meter per second | speed | 米/秒, 米每秒, m/s
+byte | information | 字节, =B
+kilobyte | information | =KB, =kB
+megabyte | information | =MB
+gigabyte | information | =GB
+terabyte | information | =TB
+petabyte | information | =PB
+watt | power | 瓦特, 瓦, =W
+kilowatt | power | 千瓦, =kW
+megawatt | power | 兆瓦, =MW
+celsius | temperature | 摄氏度, ℃, °C, °c, ºC, ˚C
+fahrenheit | temperature | 华氏度, ℉, °F, °f, ºF, ˚F
+# Without 摄氏 or 华氏, 度 alone is a degree of unnamed scale, as in English "20 degrees".
+degree | temperature | 度
+
+# 摄氏180度, 华氏72度, 零下5度, 零下8摄氏度: a word before the number names the scale or the sign.
+[zh.unit-prefix]
+celsius | temperature | 摄氏 | 度, 摄氏度
+fahrenheit | temperature | 华氏 | 度, 华氏度
+degree | temperature | 零下 | 度 | negate
+celsius | temperature | 零下 | 摄氏度 | negate
+fahrenheit | temperature | 零下 | 华氏度 | negate
+
+# 5岁, 五岁, 两周岁, 六个月大. An age needs its unit; 5年 is a length of time.
+[age.word]
+year | 岁, 周岁, 岁大
+month | 个月大

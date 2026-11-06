@@ -909,7 +909,9 @@ internal sealed partial class Scan
 
         if (count < 2)
         {
-            return false;
+            // A national plain run of digits (a mobile number): where the rule data names how it starts and how long it is.
+            return count == 1 && !anyParen && _d.PhonePlainStarts.Length > 0 && sizes[0] == _d.PhonePlainLength
+                && _d.PhonePlainStarts.Any(p => string.CompareOrdinal(_t, starts[0], p, 0, p.Length) == 0);
         }
 
         if (anyParen)
@@ -935,6 +937,13 @@ internal sealed partial class Scan
 
         if (count == 2)
         {
+            // An area code and a subscriber number (010-12345678): the shapes the rule data names.
+            if (sep == '-' && _d.PhoneAreaLead.Length > 0 && string.CompareOrdinal(_t, starts[0], _d.PhoneAreaLead, 0, _d.PhoneAreaLead.Length) == 0
+                && sizes[0] >= _d.PhoneAreaMin && sizes[0] <= _d.PhoneAreaMax && sizes[1] >= _d.PhoneSubMin && sizes[1] <= _d.PhoneSubMax)
+            {
+                return true;
+            }
+
             return sep == '-' && sizes[0] == 3 && sizes[1] == 4;
         }
 

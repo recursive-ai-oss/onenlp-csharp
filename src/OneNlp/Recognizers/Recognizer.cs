@@ -24,6 +24,7 @@ public sealed class Recognizer
     private static readonly Lazy<Recognizer> PortugueseRules = new(() => LoadEmbedded(Language.Portuguese));
     private static readonly Lazy<Recognizer> ItalianRules = new(() => LoadEmbedded(Language.Italian));
     private static readonly Lazy<Recognizer> DutchRules = new(() => LoadEmbedded(Language.Dutch));
+    private static readonly Lazy<Recognizer> ChineseRules = new(() => LoadEmbedded(Language.Chinese));
 
     private readonly RecognizerData _data;
 
@@ -53,12 +54,15 @@ public sealed class Recognizer
     /// <summary>The recognizer for Dutch, from the rules built into this package.</summary>
     public static Recognizer Dutch => DutchRules.Value;
 
+    /// <summary>The recognizer for Chinese (Mainland China conventions: simplified characters, the State Council holiday table), from the rules built into this package.</summary>
+    public static Recognizer Chinese => ChineseRules.Value;
+
     /// <summary>The language the rules are for; <see cref="Language.Unknown"/> for rules loaded without one.</summary>
     public Language Language { get; }
 
     /// <summary>Returns the recognizer for a language from the rules built into this package.</summary>
     /// <param name="language">The language.</param>
-    /// <exception cref="NotSupportedException">No rules for the language are built in. English, French, German, Spanish, Portuguese, Italian and Dutch are; <see cref="FromRules"/> loads rules from a file.</exception>
+    /// <exception cref="NotSupportedException">No rules for the language are built in. English, French, German, Spanish, Portuguese, Italian, Dutch and Chinese are; <see cref="FromRules"/> loads rules from a file.</exception>
     public static Recognizer For(Language language)
     {
         if (language == Language.English)
@@ -96,8 +100,13 @@ public sealed class Recognizer
             return Dutch;
         }
 
+        if (language == Language.Chinese)
+        {
+            return Chinese;
+        }
+
         throw new NotSupportedException(
-            $"No built-in recognizer rules for language '{language.Code}'. English ('en'), French ('fr'), German ('de'), Spanish ('es'), Portuguese ('pt'), Italian ('it') and Dutch ('nl') are built in; load rules with Recognizer.FromRules.");
+            $"No built-in recognizer rules for language '{language.Code}'. English ('en'), French ('fr'), German ('de'), Spanish ('es'), Portuguese ('pt'), Italian ('it'), Dutch ('nl') and Chinese ('zh') are built in; load rules with Recognizer.FromRules.");
     }
 
     /// <summary>Compiles recognizer rules from rule data.</summary>
@@ -172,6 +181,12 @@ internal sealed partial class Scan
     /// <summary>Runs every rule family and settles overlaps.</summary>
     internal List<Recognition> Run()
     {
+        if (_d.IsChinese)
+        {
+            FindChinese();
+            return Resolve();
+        }
+
         FindNumbers();
         EmitQuantities();
         FindSequences();
