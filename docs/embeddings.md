@@ -9,6 +9,14 @@ float[][] batch = e.EmbedBatch(texts);                              // sorted by
 foreach (float[] x in e.EmbedMany(lazyTexts)) { }                   // streaming, in batches of e.BatchSize
 ```
 
+## Multilingual: `RecursiveAI.OneNlp.Models.Embeddings.Multilingual`
+
+`intfloat/multilingual-e5-small` (MIT, about 100 languages, 384 dimensions, mean pooling). Its ONNX file is 470 MB, over the NuGet size limit, so it is cut into three equal byte ranges carried by `...Embeddings.Multilingual.Shard1`, `.Shard2` and `.Shard3`; the thin package (tokenizer, configuration, registration, the API below) depends on all three. The ranges are joined in memory by a read-only seekable stream and handed to the loader, with no temporary file and no joined copy on disk (`tools/embeddings/make_shards.sh` cuts the file and prints the manifest rows).
+
+- **Default for `Nlp.Embed`.** The multilingual package registers with a higher priority than the English one, so when it is referenced `Nlp.Embed` uses it, also when `RecursiveAI.OneNlp.Models.Embeddings` (bge) is referenced too. To use bge anyway, call `EmbeddingsModel.Load()` from the English package and keep the embedder.
+- **Prefixes.** e5 models were trained with `query: ` in front of a search query (and of both texts of a similarity task) and `passage: ` in front of a passage. `Nlp.Embed` and `E5Embedder.Embed` use `query: `, which is right for similarity. For retrieval, `MultilingualEmbeddingsModel.Load()` returns an `E5Embedder` with `EmbedQuery`, `EmbedPassage` and their batch forms `EmbedQueries`, `EmbedPassages`. The helpers live on the model, not on `Nlp`.
+- **Checks.** Parity with sentence-transformers on the joined shards: see the table below. The consumer application (JIT and NativeAOT) works with the multilingual package alone and with both packages.
+
 ## Model directory
 
 `SentenceEmbedder.Load(dir, modelFile = "model.onnx", prefix = "")` reads, as data, what sentence-transformers publishes:
@@ -49,6 +57,7 @@ Reference: sentence-transformers 6.2.0, torch 2.15.0+cpu, CPU, float32. Inputs: 
 |---|---|---|---|---|---|
 | bge-small-en-v1.5 (5c38ec7c) | 2,103 | 0 | 4.0e-7 | 0.99999988 | 1.0000000 |
 | multilingual-e5-small (614241f6), `query: ` prefix | 2,103 | 0 | 3.2e-7 | 0.99999988 | 1.0000000 |
+| multilingual-e5-small, through the shipped package (three shards joined in memory) | 2,103 | 0 | 3.2e-7 | 0.99999988 | 1.0000000 |
 
 The vectors match to float tolerance (differences are float32 summation order). int8 against the float reference, for information: bge-small-en-v1.5 max abs diff 0.124, min cosine 0.848, mean cosine 0.966 on this deliberately hostile set.
 
@@ -83,8 +92,23 @@ Harness: `mteb` 2.27.1, run black-box through `mteb.evaluate` with a small custo
 Reading the tables:
 
 - **Ours equals sentence-transformers** in the same harness on every task to two decimals (the vectors agree to 1e-7, so the scores cannot differ).
-- **Published numbers:** STS, pair classification, clustering, retrieval and (for bge) reranking reproduce within 0.5. The bold rows do not, **and they do not for sentence-transformers either**. Banking77Classification, MTOPDomainClassification and AskUbuntuDupQuestions (e5) are where `mteb` 2.27.1 scores the same vectors differently from the older release that produced the cards: running mteb's own implementation of multilingual-e5-small (revision fd1525a9, its per-model prompts) gives 70.64 on Banking77Classification and 56.42 on AskUbuntuDupQuestions, as our wrapper does, and running bge through mteb's own sentence-transformers path gives 81.75 on Banking77 (81.76 on its `.v2`). The gap is the benchmark version, not the vectors.
+- **Published numbers:** STS, pair classification, clustering, retrieval and (for bge) reranking reproduce within 0.5. The bold rows do not, **and they do not for sentence-transformers either**. See the next section for what was tried.
 - **int8** is smaller (bge 133 MB to 34 MB) and about as fast; quality drops 0.3 to 3.8 points depending on the task (clustering and retrieval most). It is information only; fp32 is what ships.
+
+### Card-era harness (mteb 1.x), for the cells that miss
+
+The cells that miss under mteb 2.27.1 were re-run, ours and sentence-transformers 6.2.0 side by side, under two 1.x releases of `mteb` (each in its own venv; `tools/embeddings/mteb1_run.py`, `mteb1_chunk.sh`): 1.1.1 (the first release with these tasks, the closest to the era of the cards) and 1.12.94 (the last 1.12 release), both with datasets 3.2.0 and scikit-learn 1.9.1. The cards state no mteb version, so "the version that produced the card" is not knowable from the card; the datasets' revisions in the cards equal the ones these releases use for Banking77. Per-subset scores are in the result files. Under 1.1.1 STS22 and MTOPDomain would not load (the pinned dataset revisions are loader scripts, which were not run); they were run under 1.12.94 only.
+
+| Model and cell | Published | ST 2.27.1 | Ours 2.27.1 | ST 1.1.1 | Ours 1.1.1 | ST 1.12.94 | Ours 1.12.94 | Ours (1.12.94) − published |
+|---|---|---|---|---|---|---|---|---|
+| bge Banking77Classification | 85.74 | 81.75 | 81.75 | 81.75 | 81.75 | 81.75 | 81.75 | **−3.99** |
+| e5 Banking77Classification | 79.42 | 70.44 | 70.44 | 70.44 | 70.44 | 70.44 | 70.44 | **−8.97** |
+| e5 AskUbuntuDupQuestions | 57.88 | 56.42 | 56.42 | 56.42 | 56.42 | 56.42 | 56.42 | **−1.46** |
+| e5 STS22 (12 subsets) | 66.01 | 65.13 | 65.13 | not loadable | not loadable | 66.10 | 66.10 | +0.09 |
+| e5 MTOPDomainClassification (en, de, es, fr) | 88.01 | 85.59 | 85.59 | not loadable | not loadable | 85.54 | 85.54 | **−2.47** |
+
+- **STS22 now reproduces** (66.10 against 66.01): the per-subset scores agree with the card to about 0.1 on most subsets; the 2.x difference came from the harness. **Ours equals sentence-transformers** on every cell and release (STS22 differs by 7e-5 in the mean, from one subset).
+- **The other four cells do not move with the mteb release** (identical to four decimals across 1.1.1, 1.12.94 and 2.27.1 for the three classification and reranking cells). The harness release is therefore not the cause of the gap, and these cells stay below the card for sentence-transformers itself. MTOPDomain per subset, ours (ST identical): en 88.99, de 86.15, es 85.53, fr 81.50 against the card's 91.07, 87.47, 89.27, 84.23. Not investigated further: the card's numbers cannot be reproduced from the published model with the released harness, whoever computes the vectors.
 
 ## Speed (indicative)
 
@@ -100,4 +124,4 @@ One run on the shared worker (AMD Ryzen 9 7950X3D, 4 threads for both sides, loa
 
 ## Reproducing
 
-`tools/embeddings/`: `setup_venv.sh` (sentence-transformers, mteb, ONNX Runtime), `fetch_model.py` and `tools/accurate/export_onnx.py` (pinned revision to ONNX), `parity.sh`, `mteb_chunk.sh`, `speed_ort.py`, `quantize_int8.py`, and the `OneNlp.EmbedTool` console project that embeds a text file or serves vectors over a pipe.
+`tools/embeddings/`: `setup_venv.sh` (sentence-transformers, mteb, ONNX Runtime), `fetch_model.py` and `tools/accurate/export_onnx.py` (pinned revision to ONNX), `parity.sh`, `make_shards.sh`, `mteb_chunk.sh`, `mteb1_chunk.sh` (venvs: mteb 1.1.1 or 1.12.94 with `pyarrow==18.1.0 datasets==3.2.0`), `speed_ort.py`, `quantize_int8.py`, and the `OneNlp.EmbedTool` console project that embeds a text file or serves vectors over a pipe.

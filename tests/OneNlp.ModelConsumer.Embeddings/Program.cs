@@ -15,6 +15,22 @@ internal static class Program
         Check("embed error names the package", error is not null && error.Message.Contains("RecursiveAI.OneNlp.Models.Embeddings", StringComparison.Ordinal));
         Check("embed many error names the package", Capture(() => Nlp.EmbedMany(["hello"]))?.Message.Contains("RecursiveAI.OneNlp.Models.Embeddings", StringComparison.Ordinal) == true);
         Console.WriteLine(error?.Message);
+#elif MULTI
+        // The multilingual package is the default for Nlp.Embed, also when the English package is referenced too.
+        float[] de = Nlp.Embed("Wie setze ich mein Passwort zurück?");
+        float[] en = Nlp.Embed("How do I reset my password?");
+        float[] cat = Nlp.Embed("Die Katze sitzt auf dem warmen Fensterbrett.");
+        Check("dimension", de.Length == 384);
+        Check("unit length", Math.Abs(Dot(de, de) - 1f) < 1e-4f);
+        Check("cross-language neighbour closer than unrelated", Dot(de, en) > Dot(de, cat));
+        using RecursiveAI.OneNlp.Models.Embeddings.Multilingual.E5Embedder e5 = RecursiveAI.OneNlp.Models.Embeddings.Multilingual.MultilingualEmbeddingsModel.Load();
+        Check("Nlp.Embed is the query-prefixed multilingual model", Dot(e5.EmbedQuery("How do I reset my password?"), en) > 0.9999f);
+        Check("passage differs from query", Dot(e5.EmbedPassage("How do I reset my password?"), en) < 0.9999f);
+#if BOTH
+        using var bge = RecursiveAI.OneNlp.Models.Embeddings.EmbeddingsModel.Load();
+        Check("English model still loadable by hand", bge.Embed("hello").Length == 384 && Math.Abs(Dot(bge.Embed("How do I reset my password?"), en)) < 0.99f);
+#endif
+        Console.WriteLine($"sim(de, en) = {Dot(de, en):F3}, sim(de, cat) = {Dot(de, cat):F3}");
 #else
         float[] a = Nlp.Embed("how do I reset my password");
         float[] b = Nlp.Embed("I forgot my login credentials");

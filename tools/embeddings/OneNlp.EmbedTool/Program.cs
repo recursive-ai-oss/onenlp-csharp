@@ -21,7 +21,13 @@ string modelFile = Option("--model") ?? "model.onnx";
 string prefix = Option("--prefix") ?? "";
 int batch = int.TryParse(Option("--batch"), out int b) ? b : 32;
 int threads = int.TryParse(Option("--threads"), out int th) ? th : 0;
-using SentenceEmbedder embedder = SentenceEmbedder.Load(dir, modelFile, prefix, new RecursiveAI.OneModel.Graph.ModelOptions { IntraOpThreads = threads });
+// MODEL_DIR "@e5-package" runs the shipped multilingual package instead (weights joined from the shard packages; needs
+// ONENLP_EMBEDDINGS_E5_WEIGHTS set when the tool is built). Only the run command; texts get the query prefix as Nlp.Embed does.
+bool package = dir == "@e5-package";
+RecursiveAI.OneNlp.Models.Embeddings.Multilingual.E5Embedder? e5 = null;
+using SentenceEmbedder embedder = package
+    ? (e5 = RecursiveAI.OneNlp.Models.Embeddings.Multilingual.MultilingualEmbeddingsModel.Load()).Inner
+    : SentenceEmbedder.Load(dir, modelFile, prefix, new RecursiveAI.OneModel.Graph.ModelOptions { IntraOpThreads = threads });
 embedder.BatchSize = batch;
 
 if (command == "tokens")
@@ -51,12 +57,12 @@ if (command == "run")
     var ids = new int[texts.Length][];
     for (int i = 0; i < texts.Length; i++)
     {
-        ids[i] = embedder.TokenIds(texts[i]);
+        ids[i] = embedder.TokenIds(package ? RecursiveAI.OneNlp.Models.Embeddings.Multilingual.E5Embedder.QueryPrefix + texts[i] : texts[i]);
     }
 
     File.WriteAllText(outPrefix + ".ids.json", JsonSerializer.Serialize(ids, ToolJson.Default.Int32ArrayArray));
     var sw = Stopwatch.StartNew();
-    float[][] vectors = embedder.EmbedBatch(texts);
+    float[][] vectors = e5 is not null ? e5.EmbedBatch(texts) : embedder.EmbedBatch(texts);
     sw.Stop();
     using (var f = new BinaryWriter(File.Create(outPrefix + ".f32")))
     {
