@@ -2,7 +2,9 @@
   <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
        To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
   <ItemGroup>
-    <TurkishWeight Include="tagging.onenlp" Size="64673771" Sha256="700d5a0c09fa6cba7ff05524ae313f23cc74167537ccb8ca1a2b8e9e14304c95"
+    <TurkishWeight Include="splitter.onenlp" Size="3453592" Sha256="2a4d8d9a7076c4c5ef0b9135593edcaa3e405c1d4af2dddae36fca31f48e00a2"
+                  Recipe="recipes/tr/fast" Data="UD Turkish-BOUN r2.18 (CC BY-SA 4.0)" Contents="tokenizer: whole-word Turkish tokenizer and a trained multiword-token splitter" />
+    <TurkishWeight Include="tagging.onenlp" Size="76747383" Sha256="460b4b8eca237c61432dd5b5ccce116ce6386710003199b06649b1deac71131b"
                   Recipe="recipes/tr/fast" Data="UD Turkish-BOUN r2.18 (CC BY-SA 4.0)" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
     <TurkishWeight Include="parser.onenlp" Size="46299840" Sha256="3545c480763a571980a92dab1eaa5bdf69e473e5105562423333d90c5a1c8d59"
                   Recipe="recipes/tr/fast" Data="UD Turkish-BOUN r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />

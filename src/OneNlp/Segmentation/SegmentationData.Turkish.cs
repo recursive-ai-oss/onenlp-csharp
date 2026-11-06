@@ -7,6 +7,7 @@ public sealed partial class SegmentationData
 {
     private const int MaxSuffixKey = 12;
     private static SegmentationData? s_turkish;
+    private static SegmentationData? s_turkishWhole;
 
     // Month names, which an ordinal number may precede with a capital letter ("1. Ocak"); lower-case words always follow an ordinal.
     private static readonly FrozenSet<string> TurkishMonths = new[] { "ocak", "\u015fubat", "mart", "nisan", "may\u0131s", "haziran", "temmuz", "a\u011fustos", "eyl\u00fcl", "ekim", "kas\u0131m", "aral\u0131k" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
@@ -108,18 +109,29 @@ public sealed partial class SegmentationData
         return true;
     }
 
-    private static SegmentationData BuildTurkish() => new(
-        // UD Turkish-BOUN cuts a hyphen off both sides (Fransızca - Türkçe, 1 - 2), so hyphens never join.
-        keepUrlsAndEmails: true, joinHyphenated: false, hyphenPrefixes: null, digitJoiners: DigitJoinerMarks, markRuns: MarkRunChars, emoticons: [.. CommonEmoticons, ".\""],
-        specialCases: [], abbreviations: [], clitics: [], nTSuffix: false, nonFinalAbbreviations: [])
+    /// <summary>
+    /// Turkish as <see cref="Turkish"/> tokenizes it, except that no word is cut by the ending table: a copula or suffix spelled onto its word stays
+    /// part of one token. It is the inner tokenizer of a trained multiword-token splitter, which decides the cuts itself.
+    /// </summary>
+    public static SegmentationData TurkishWhole => s_turkishWhole ??= BuildTurkish(withSuffixSplits: false);
+
+    private static SegmentationData BuildTurkish(bool withSuffixSplits = true)
     {
-        Name = "turkish",
-        NumberApostrophe = true,
-        OrdinalDot = true,
-        OrdinalFollowers = TurkishMonths,
-        SuffixSplits = LoadSuffixSplits(out int longest),
-        SuffixSplitKeyLength = longest,
-    };
+        int longest = 0;
+        FrozenDictionary<string, int> splits = withSuffixSplits ? LoadSuffixSplits(out longest) : new Dictionary<string, int>().ToFrozenDictionary(StringComparer.Ordinal);
+        return new(
+            // UD Turkish-BOUN cuts a hyphen off both sides (Fransızca - Türkçe, 1 - 2), so hyphens never join.
+            keepUrlsAndEmails: true, joinHyphenated: false, hyphenPrefixes: null, digitJoiners: DigitJoinerMarks, markRuns: MarkRunChars, emoticons: [.. CommonEmoticons, ".\""],
+            specialCases: [], abbreviations: [], clitics: [], nTSuffix: false, nonFinalAbbreviations: [])
+        {
+            Name = withSuffixSplits ? "turkish" : "turkish-whole",
+            NumberApostrophe = true,
+            OrdinalDot = true,
+            OrdinalFollowers = TurkishMonths,
+            SuffixSplits = splits,
+            SuffixSplitKeyLength = longest,
+        };
+    }
 
     private static FrozenDictionary<string, int> LoadSuffixSplits(out int longest)
     {

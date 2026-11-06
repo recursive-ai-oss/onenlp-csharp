@@ -20,11 +20,11 @@ public sealed partial class SegmentationData
     private static readonly char[] GermanMarkRunChars = ['.', '-', '*', '=', '_', '~', '<', '>', '#', '$', '+', '/', '\\', '`', '\''];
     private static readonly string[] CommonEmoticons = [":-)", ":)", ":-(", ":(", ";-)", ";)", ":-D", ":D", ":-P", ":P", ":'(", ":-/", ":/", ":-O", ":O", "<3", "=)", "=D", "^_^"];
 
-    /// <summary>The name of the built-in data set: <c>none</c>, <c>neutral</c>, <c>english</c>, <c>french</c>, <c>german</c>, <c>portuguese</c>, <c>dutch</c>, <c>turkish</c> or <c>spanish</c> or <c>spanish</c>. Saved pipelines record it.</summary>
+    /// <summary>The name of the built-in data set: <c>none</c>, <c>neutral</c>, <c>english</c>, <c>french</c>, <c>german</c>, <c>portuguese</c>, <c>dutch</c>, <c>turkish</c>, <c>turkish-whole</c>, <c>spanish</c> or <c>italian</c>. Saved pipelines record it.</summary>
     public string Name { get; private init; } = string.Empty;
 
     /// <summary>Finds a built-in data set by its <see cref="Name"/>.</summary>
-    /// <param name="name"><c>none</c>, <c>neutral</c>, <c>english</c>, <c>french</c>, <c>german</c>, <c>portuguese</c>, <c>dutch</c>, <c>turkish</c> or <c>spanish</c> or <c>spanish</c>.</param>
+    /// <param name="name"><c>none</c>, <c>neutral</c>, <c>english</c>, <c>french</c>, <c>german</c>, <c>portuguese</c>, <c>dutch</c>, <c>turkish</c>, <c>turkish-whole</c>, <c>spanish</c> or <c>italian</c>.</param>
     /// <returns>The data set.</returns>
     /// <exception cref="ArgumentException">There is no such data set.</exception>
     public static SegmentationData ByName(string name) => name switch
@@ -37,9 +37,10 @@ public sealed partial class SegmentationData
         "portuguese" => Portuguese,
         "dutch" => Dutch,
         "turkish" => Turkish,
+        "turkish-whole" => TurkishWhole,
         "spanish" => Spanish,
         "italian" => Italian,
-        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral, english, french, german, portuguese, dutch, turkish, spanish or italian.", nameof(name)),
+        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral, english, french, german, portuguese, dutch, turkish, turkish-whole, spanish or italian.", nameof(name)),
     };
 
     /// <summary>No adjustments: tokens are the UAX #29 word segments that are not white space.</summary>
