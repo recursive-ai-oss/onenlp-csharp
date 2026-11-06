@@ -61,7 +61,7 @@ internal sealed class TemporalData
         "rangetail",
 
         // Turkish and Hindi: the early, middle and late part named after the period ("2021 başında", "2022 के मध्य").
-        "earlypost", "midpost", "latepost",
+        "earlypost", "midpost", "latepost", "nodate",
     };
 
     private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct", "no-lone-day", "bare-hour-24", "determiner-inside-only", "of-before-year", "daypart-first", "dot-clock", "bare-hour-range", "spoken-hour-mark" };

@@ -22,13 +22,13 @@ tr
 12 | aralık
 
 [time.weekday]
-1 | pazartesi, pazarteside, pazartesiden, pazartesiye | pazartesileri
+1 | pazartesi, pazartesiden, pazartesiye | pazartesileri
 2 | salı, salıda, salıdan, salıya | salıları
 3 | çarşamba, çarşambada, çarşambadan, çarşambaya | çarşambaları
 4 | perşembe, perşembede, perşembeden, perşembeye | perşembeleri
 5 | cuma, cumada, cumadan, cumaya | cumaları
-6 | cumartesi, cumarteside, cumartesiden, cumartesiye | cumartesileri
-7 | pazar | pazarları
+6 | cumartesi, cumartesiden, cumartesiye | cumartesileri
+7 | pazar, pazara, pazardan | pazarları
 
 [time.unit]
 second | saniye, saniyeler, sn | 1 | 0
@@ -69,9 +69,10 @@ ago | önce
 later | sonra
 every | her
 approx | yaklaşık
-earlypost | başında, başı, başlarında
-midpost | ortasında, ortası, ortalarında
-latepost | sonunda, sonu, sonlarında
+earlypost | 'ın başında, 'in başında, 'un başında, 'ün başında, ’ın başında, ’in başında, ’un başında, ’ün başında, başında, başı, başlarında
+midpost | 'ın ortasında, 'in ortasında, 'un ortasında, 'ün ortasında, ’ın ortasında, ’in ortasında, ’un ortasında, ’ün ortasında, ortasında, ortası, ortalarında
+nodate | pazar yeri, pazar yerinde, pazar yerine, pazar yerini, pazar yerleri, pazar alanı
+latepost | 'ın sonunda, 'in sonunda, 'un sonunda, 'ün sonunda, ’ın sonunda, ’in sonunda, ’un sonunda, ’ün sonunda, sonunda, sonu, sonlarında
 weekend | hafta sonu
 hourarticle | saat
 rangeto | -, –, —, ile, 'dan, 'den, 'tan, 'ten, ’dan, ’den, ’tan, ’ten

@@ -317,7 +317,7 @@ internal sealed partial class Scan
             j += n;
         }
 
-        if (!Find(j, "weekday", out int wn, out TWord wd) || wd.B == 1)
+        if (!Find(j, "weekday", out int wn, out TWord wd) || wd.B == 1 || Is(j, "nodate"))
         {
             return;
         }
