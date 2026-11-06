@@ -20,6 +20,7 @@ namespace RecursiveAI.OneNlp.Recipes.AccurateProbe;
 //           [--pooling mean|first] [--threads N] [--patience N] [--lr X] [--batch-words N] [--warmup N] [--dropout X]
 //           [--finetune [--train-embeddings] --total-steps N] [--max-steps N] [--eval-every STEPS] [--budget-seconds S] [--checkpoint-every N]
 //           With --finetune the encoder trains with the head (TrainableTransformerEncoder; warm-up and cosine decay over --total-steps).
+//           --inline-copy also writes model-inline.onenlp, holding the encoder weights in the pipeline file.
 //           --budget-seconds stops the run cleanly after that long; start it again with the same arguments to resume from DIR.
 //           UPOS tagger; prints the best development accuracy (the model-selection score).
 //   ner     --onnx M.onnx --tokenizer T.json --train F.jsonl --dev F.jsonl --out DIR [same options]
@@ -30,6 +31,8 @@ namespace RecursiveAI.OneNlp.Recipes.AccurateProbe;
 //           gold tokens in; writes PREFIX.gold.iob2 and PREFIX.pred.iob2 (one token per line, tag last) for 'OneNlp.Eval span'.
 //   speed --model M.onenlp --gold F.conllu [--model-dir D] [--threads N] [--reps N] [--batch N]
 //           times the trained components over the gold tokens of a file, in batches of --batch (default 32) documents, and prints tokens per second.
+//   rewrite --model M.onenlp --out N.onenlp [--model-dir D]
+//           saves a pipeline again; a fine-tuned transformer encoder becomes an ONNX file beside N.onenlp.
 //   convert --in F.iob2 --out F.jsonl
 //           UNER-style .iob2 to the JSON Lines the ner command reads (gold tokens, character offsets).
 //
@@ -61,6 +64,7 @@ internal static class Program
                 "predict-ner" => PredictNer(o),
                 "speed" => Speed(o),
                 "convert" => Convert(Required(o, "in"), Required(o, "out")),
+                "rewrite" => Rewrite(o),
                 _ => 2,
             };
         }
@@ -135,8 +139,22 @@ internal static class Program
         if (result.Completed)
         {
             PipelineFile.Save(owned, Path.Combine(outDir, "model.onenlp"));
+            if (o.ContainsKey("inline-copy"))
+            {
+                // The same weights inside the pipeline file (a trainable encoder), to compare with the written graph.
+                PipelineFile.Save(owned, Path.Combine(outDir, "model-inline.onenlp"), exportEncoderGraphs: false);
+            }
         }
 
+        return 0;
+    }
+
+    private static int Rewrite(Dictionary<string, string> o)
+    {
+        // Loads a pipeline whose fine-tuned encoder is inside the file and saves it again, which writes the encoder's ONNX graph beside the new file.
+        TransformerEncoder.ModelDirectory = o.GetValueOrDefault("model-dir");
+        using Pipeline pipeline = PipelineFile.Load(Required(o, "model"));
+        PipelineFile.Save(pipeline, Required(o, "out"));
         return 0;
     }
 

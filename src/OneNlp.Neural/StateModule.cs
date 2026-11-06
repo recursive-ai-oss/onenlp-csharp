@@ -42,12 +42,13 @@ internal sealed class StateModule : NnModule
     }
 
     /// <summary>The weights of encoders and heads under their stable names. Every head must be initialized.</summary>
-    public static StateModule ForWeights(IReadOnlyList<IEncoder> encoders, IReadOnlyList<ITrainableComponent> heads)
+    public static StateModule ForWeights(IReadOnlyList<IEncoder> encoders, IReadOnlyList<ITrainableComponent> heads, IEnumerable<int>? skipEncoders = null)
     {
         var state = new StateModule();
+        HashSet<int> skip = skipEncoders is null ? [] : [.. skipEncoders];
         for (int i = 0; i < encoders.Count; i++)
         {
-            if (encoders[i].Weights is { } module)
+            if (!skip.Contains(i) && encoders[i].Weights is { } module)
             {
                 state.Add("encoder" + i.ToString(CultureInfo.InvariantCulture), module);
             }
