@@ -316,3 +316,34 @@ Holidays: `fr` is the French public holidays of the Code du travail L3133-1 (1 J
 - `ce mois-ci` is not read.
 - Belgian and Swiss counting (`septante`, `nonante`, `huitante`) is read; Swiss `Franken` are francs.
 - The French and German unit tables are shorter than the English one.
+
+## Spanish and Portuguese
+
+Spanish (`es`, Spain by default) and Portuguese (`pt`, Brazil by default) are data sets on the same engine: `Data/<lang>/{numbers,units,currency,datetime}.rules`, the holidays inside `datetime.rules`, and the shared sequence rules. Use `Recognizer.For(Language.Spanish)` or the `Nlp` recognizer verbs with a `Language` argument. English, French and German results are unchanged.
+
+### Numbers
+
+- `number.digits` takes `system | iberian` and per-region separators: `decimal.mx | .` and `group.mx | space nbsp nnbsp ,` replace the defaults (`decimal | ,`, `group | space nbsp nnbsp .`) when `RecognitionContext.Region` is `mx`, so `1,234.56` is read in Mexican Spanish and `1.234,56` in Spain's.
+- **Iberian counting.** Tens above twenty join a unit with the connector (`treinta y cinco`, `trinta e cinco`; Spanish `veintiuno` to `veintinueve` are teens of their own). Hundreds are words of kind `hundreds` (`doscientos`, `quinhentos`, `cien`, `ciento`, `cento`) that open a group; `mil` is a `bare-scale`. In Portuguese the connector also links a hundred to what follows (`cento e vinte`) and a thousand to its rest (`dois mil e quinhentos`). `mil millones` as one scale word is not read; write `7.900 millones`.
+- **Ordinals.** An ordinal tens word may be followed by an ordinal unit (`vigésimo tercero`, `décimo quinto`, `décima segunda`); one-word forms (`decimoquinto`) are rows. `number.ordinal-suffix` rows may start with a dot: `.º`, `.ª`, `.er` read `1.º`, `3.ª`, `1.er`. `segundo` after `por` (`por segundo`) and before an object pronoun (Portuguese `segundo ele`) is not an ordinal, and `primera hora` is not one (`number.not-number`).
+- `age.suffix` makes `82 años de edad` / `82 anos de idade` an age; `82 años` alone is a length of time.
+- `phone.space-start | digits | min | max` lets a phone-like number be written as space-separated groups when it starts with one of the digits and has that many in all (`913 45 67 89` in Spain: `6789 | 9 | 9`). Without the section only a leading 0 and 9 to 11 digits count.
+
+### Dates and times
+
+Dates are day first. New data for `time.word` and `time.flag`:
+
+| Item | Meaning |
+|---|---|
+| `time.flag of-before-year` | the `of` word may stand between a month and its year or a holiday and its year: `12 de septiembre de 2026`, `abril de 1987`, `Navidad de 2026`; and between the last day and the month of a day range: `del 12 al 20 de agosto` |
+| `hourarticle` | the article or fused preposition and article that opens a clock time and is part of it: `las 15:00`, `la una`, `às 14:30`. With it (or a `determiner`) a spoken or digit hour is a time when a part of the day or a tail follows (`las diez de la mañana`, `las tres y media`, `às oito da noite`), or when it is above twelve (`a las 15`) |
+| `decadeprefix` | also reads two digits: `los años 80` is 1980-1990, `anos 20` is 2020-2030 (30 to 90 are the 1900s, 00 to 20 the 2000s) |
+| `daypartprefix` | also joins a date and a part of the day when it is one word: `amanhã à noite` |
+
+`noche` and `noite` are 18:00 to 24:00, `tarde` 12:00 to 18:00, `mañana` and `manhã` 06:00 to 12:00 (`mañana` alone is tomorrow). Regions for `time.region` and `RecognitionContext.Region`: `es` (default) and `mx` for Spanish, `br` (default) and `pt` for Portuguese; the region also picks the holiday rows. Holiday sources are statute facts: Spain's national holidays (Estatuto de los Trabajadores art. 37.2 and the yearly BOE list), Mexico's mandatory rest days (Ley Federal del Trabajo art. 74; the Monday holidays are `nth` rules), Brazil's (Leis 662/1949, 10.607/2002, 14.759/2023) and Portugal's (Código do Trabalho art. 234), with the Easter-based feasts (`Carnaval` -48, `Corpus Christi` +60) from the computus.
+
+### Limits (Spanish and Portuguese)
+
+- Weekdays in Portuguese are the full `segunda-feira` forms and the dotted abbreviations; a bare `quarta` or `sexta` is not a weekday.
+- `mil millones`, `una docena y media` and compound measures past two terms are not read.
+- The seasons are the northern-hemisphere meteorological ones, as for English.
