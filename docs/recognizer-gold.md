@@ -168,3 +168,20 @@ The test files were edited once after their first hash (it `3d15d452…`, nl `e1
 Conventions beyond the English ones: a preposition, also fused with an article (`nel`, `dal`, `alle`, `in`, `op`), is outside the span, except where it belongs to the construct (`tra 3 giorni`, `3 giorni fa`, `over 3 dagen`, `dalle 8 alle 12`, `van 8 tot 12 uur`); an Italian age includes `di` (`di 82 anni`); a Dutch age is `N jaar oud` or `N-jarige`.
 
 Run the comparators with `tools/oracles/comparators_lang.sh <lang> <it-it|nl-nl> <gold|test> <out>` (Microsoft.Recognizers.Text 1.8.13), Duckling with `tools/oracles/duckling_lang.sh <lang> <it_IT|nl_NL> ...` (information only), and ours with `tools/oracles/score_dev.sh <lang> <out> [gold|test]`. Results, with paired 95% intervals: `testdata/recognizers/{it,nl}/comparators/`.
+
+## Chinese
+
+`testdata/recognizers/zh/` holds the gold set in the same schema, written for Chinese (never copied from a comparator): `test.jsonl` and `gold.jsonl` (development). Source: `tools/recognizers-gold/zh.src.txt`, built by `build.py --lang zh`; only the development split guided the rules. The same author wrote the gold set and the rules, which the results below do not correct for.
+
+| File | Items | sha256 |
+|---|---:|---|
+| `zh/test.jsonl` | 338 | `4a50aa15f954234f4b800fee45fe5cfeb17642670fa60334553a2c9f2819949b` |
+| `zh/gold.jsonl` (dev) | 189 | `285eac0361893ae6defd14c2bad16c0f68f54a2777507cb81442d08a4832b922` |
+
+The test file was edited once after its first hash (`e728c157…`), before any score on it was read and without system output: incidental lone numerals (`一个`, `一杯`, `一部`, `一口气`, `一次`) were reworded in 12 sentences, because a lone numeral with a counting word is not a number in our convention.
+
+**Test reads.** The first read of the test split gave all types F1 98.8 [97.4, 99.9] against Microsoft.Recognizers.Text 49.8 [46.4, 53.0]; that read is the published row (`comparators/ours.test.score.*`, `ours-vs-recognizers.test.*`). It showed one error that the development split had no item for (`两年零三个月`, a gap word before a duration term), and a rule change followed. The post-change run (all types 99.1, duration 100) is in `comparators/post-fix/`; it is not an independent read, since the change was made after seeing the test error.
+
+Conventions beyond the English ones: measure words stay outside spans; `从` is inside a range; `北京时间` is inside a time; `岁` and `周岁` are inside an age; `斤` is the jin and `亩` the mu.
+
+Run the comparators with `tools/oracles/comparators_lang.sh zh zh-cn <gold|test> <out>` (Microsoft.Recognizers.Text 1.8.13), Duckling with `tools/oracles/duckling_lang.sh zh zh_CN ...` (information only), and ours with `tools/oracles/score_dev.sh zh <out> [gold|test]`.

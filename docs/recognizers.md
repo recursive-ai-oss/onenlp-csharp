@@ -380,3 +380,30 @@ Regions: `it` and `nl` (they pick the holiday rows). Holiday sources are statute
 - Dutch `uur` is a weak hour word: `8 uur` is a time only with a part of the day, a tail or a range around it.
 - `vanmiddag`, `vanavond` and `vannacht` are cut as `van` (this) plus `middag`, `avond`, `nacht`.
 - Compound measures past two terms are not read.
+
+## Chinese
+
+Chinese (`zh`, Mainland conventions, simplified characters) is a data set on the same engine plus a scanner for text without spaces: `Data/zh/{numbers,units,currency,datetime}.rules` (the `zh.*` sections), the shared sequence rules, and the code in `Scan.Chinese*.cs`. Use `Recognizer.Chinese`, `Recognizer.For(Language.Chinese)` or the `Nlp` recognizer verbs with `Language.Chinese`. The other languages' results are unchanged.
+
+### Numbers, measures and money
+
+- **`number.digits | system chinese`** reads numerals built from digits (`一二三`, `零`, `〇`, `两`) and place words (`十`, `百`, `千`, `万`, `亿`), with `零` as the filler (`一百零一`, `两千零二十`), mixed forms (`3万`, `2.5亿`) and decimals (`零点零五`). Fractions and percentages: `百分之五`, `三分之一`, `5%`.
+- **Ordinals** are `第` plus a number (`第三`, `第一百零一`).
+- **A lone numeral needs a counting word.** `一个`, `一杯` and `一次` are not numbers on their own; a numeral is a number when it is two or more characters, carries a digit, or stands in a construct (a measure, money, a date). The measure word stays outside the span.
+- **Measures** (`zh.unit`): length, weight, area, volume, speed, temperature (`零下二十度`, `摄氏`), age (`岁`, `周岁`, inside the span). `斤` is the jin and `亩` the mu (Chinese market units, named as such in the values).
+- **Money** (`zh.currency`): `元`, `块`, `角`, `分`, `人民币`, `美元`, symbols and ISO codes, and compounds (`三块五`, `两元五角`).
+- **Sequences** are found in a masked pass: text outside ASCII word characters is treated as a boundary, so e-mail, URL, IP and phone numbers are found directly beside Chinese characters. A hashtag is `#x#` (a pair) or `#x`.
+
+### Dates and times
+
+Rules in `zh.*` sections of `datetime.rules`: day words (`今天`, `后天`), weekdays (`周一`, `星期天`, `礼拜三`), dates in `2026年3月18日`, `3月18号` and `2026-03-18` forms, relative periods (`下个月`, `去年`, `三天前`, `两周后`), parts of the day (`早上` is 06:00-09:00, `下午`, `晚上`), clock times (`3点半`, `下午三点十分`, `15:30`), ranges (`从周一到周五`, `3点到5点`; the `从` is inside the span), durations (`两年零三个月` is `P2Y3M`; `零` between terms is a gap word, `半` is a half), sets (`每天`, `每周三`, `每个月`) and holidays. `北京时间` is inside a time span and gives the +08:00 zone.
+
+Holidays (`[zh.holiday]`): fixed ones (`国庆节`, `劳动节`, `元旦`, `儿童节`), nth-weekday ones (`母亲节`), `复活节` from the computus, and the lunar ones (`春节`, `大年初一`, `除夕`, `元宵节`, `端午节`, `中秋节`) plus `清明节`, which read the pinned table `[zh.lunar]` of Gregorian dates for **2022 to 2030**; other years do not resolve. Statutory holidays follow the State Council's Measures for National Holidays; the compensatory working days of a year's notice are not modelled.
+
+### Limits (Chinese)
+
+- `5号线` (line 5) and `三块` (three pieces or three yuan) are ambiguous; the readings follow the context words in the rules, and money is read only with a currency construct.
+- A bare `3点` is read as a clock hour as written, with no part of the day.
+- `年初` and `年底` are not read for years; `90年代` is read, a two-digit decade (`九十年代` as a number of years) is not.
+- Lunar festivals and `清明节` resolve only for 2022-2030. The 2028-2030 rows come from the astronomical calendar, not from a published notice.
+- Only simplified characters are covered by the rules and the gold set.
