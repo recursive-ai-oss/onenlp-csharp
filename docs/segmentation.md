@@ -55,6 +55,17 @@ Written from the UD Spanish guidelines and the AnCora treebank; the choices belo
 
 Development split of UD Spanish-AnCora, raw text (`recipes/es/fast segment`): tokens 99.92 [99.88, 99.95], words 99.91 [99.87, 99.94], sentences 94.89 [93.87, 95.90] (rules alone; the parser sets sentences in the pipeline). What is left: team names joined by a slash (`Reynard/Honda`, 11 tokens), quotes glued to a word, and `km.24`.
 
+## Italian data (`SegmentationData.Italian`, name `italian`)
+
+Written from the UD Italian guidelines; the tables and lists below were counted on the training and development files of UD Italian-ParlaMint and Italian-MarkIT only (`tools/fetch/it/mwt_counts.py`, `partitive_context.py`).
+
+- **Articulated prepositions** (`del dello della dell' dei degli delle`, likewise with `a`, `da`, `in`, `su`, `con`) are multiword tokens of the preposition and the article (`di` + `il`). They are cut into two pieces like the other contractions (`de`|`l`, `nell'` = `nel`|`l'`), the apostrophe also in its typographic form. `dei`, `delle` and `degli` are the partitive article, one word, after a verb or a preposition (`ci sono dei bambini`) and a contraction after a noun (`l'elenco dei bambini`): the words that precede the article as a single word in the training files are listed (`PartitiveContext`), punctuation and the start of a text count as before an article, and every other word counts as a noun.
+- **Elision:** an elided article, preposition or demonstrative keeps its apostrophe and the next word is a token of its own (`l'` `amico`, `un'` `altra`, `c'` `è`, `quest'` `anno`, `dell'` `altro`). The text of the Senate transcripts also sets the apostrophe before a space (`l' idea`): the apostrophe stays with the word then too. `po'` stays whole.
+- **Verbs with enclitic pronouns** are multiword tokens (`farlo` = `far` + `lo`, `vedersi` = `veder` + `si`, `essendoci` = `essendo` + `ci`, `accorgercene` = `accorger` + `ce` + `ne`, `affrontiamolo`, `credetemi`, `sviluppatasi`). A token is cut when it ends in a pronoun (`mi ti ci vi si lo la li le ne gli`, or `me te ce ve se` before `lo la li le ne`) and what is left is an infinitive without its final `e` (`-ar -er -ir -por`), a gerund, an imperative in `-iamo -ete -ate -ite`, or a participle before `si`. Plural nouns and adjectives end the same way (`diversi`, `parti`, `esterne`), so the pronouns that end such plurals (`mi ti ci vi ne`) need a stem of five (`-ar`) or six letters (`-er -ir`), a few short infinitives are listed (`farci`, `dirmi`), and a list of look-alikes taken from the training files stays whole.
+- **Abbreviations** keep their full stop: single letters (`J.`, `A.`), `etc.` and the usual titles (`Sig.`, `Dott.`, `Prof.`, `art.`, `pag.`). Sentences do not break after the titles.
+
+What is left on the development split (raw text, `recipes/it/fast segment`, rules alone): quotes glued to a word (`'x'`), `In` written for `nel` in the treebank, participles with a pronoun (`trasmessaci`), and partitive articles after a noun.
+
 ## Portuguese data (`SegmentationData.Portuguese`, name `portuguese`)
 
 Written from the UD Portuguese guidelines and the Portuguese-Bosque treebank; the lists below were counted on its training and development files only.

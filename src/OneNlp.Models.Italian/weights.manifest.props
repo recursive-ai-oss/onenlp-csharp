@@ -1,0 +1,12 @@
+<Project>
+  <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
+       To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
+  <ItemGroup>
+    <ItalianWeight Include="tagging.onenlp" Size="36038709" Sha256="efa8565220bb46c7232fe85287df3a3abbbaaf0663b2c82c61d370866bc5a00c"
+                  Recipe="recipes/it/fast" Data="UD Italian-ParlaMint (CC BY-SA 4.0) and Italian-MarkIT (CC BY 4.0) r2.18" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
+    <ItalianWeight Include="parser.onenlp" Size="40970122" Sha256="443df6be06ab59bebcdbaf507878e7109ff3278d389b5afd52783b0fe0853e7d"
+                  Recipe="recipes/it/fast" Data="UD Italian-ParlaMint (CC BY-SA 4.0) and Italian-MarkIT (CC BY 4.0) r2.18" Contents="biaffine dependency parser, sentence starts" />
+    <ItalianWeight Include="ner.onenlp" Size="35681976" Sha256="2f74f2e7dc93f3029cbee8889a0ced83281ef26d4eb65852d63b3c76d8b7b40e"
+                  Recipe="recipes/it/fast" Data="WikiNER Italian wp3 (CC BY 4.0 labels over Wikipedia text)" Contents="entity recognizer (PER, LOC, ORG, MISC)" />
+  </ItemGroup>
+</Project>
