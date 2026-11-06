@@ -55,6 +55,10 @@ internal static class Program
         ["zh"] = ("uner/zh", "zh_gsdsimp-ud", "uner/zh"),
     };
 
+    // For smoke runs: score and write at most this many sentences per file (0 = all).
+    private static int predictLimit;
+    private static int nerTestLimit;
+
     private static readonly Stopwatch Wall = Stopwatch.StartNew();
 
     private static int Main(string[] args)
@@ -107,6 +111,9 @@ internal static class Program
         string[] heads = Opt(args, "heads", "tagger,morphologizer,lemmatizer,parser,ner").Split(',');
         string[] nerLangs = heads.Contains("ner") ? [.. langs.Where(NerSets.ContainsKey)] : [];
         int balance = Num(args, "balance", 1);
+        predictLimit = Num(args, "predict-limit", 0);
+        nerTestLimit = Num(args, "ner-test", 3000);
+        string[] predictLangs = Opt(args, "predict-langs", string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
 
         var train = new List<Example>();
         var dev = new List<Example>();
@@ -177,7 +184,12 @@ internal static class Program
         {
             StringStore mine = stores[lang];
             Func<Doc, bool> scope = d => ReferenceEquals(d.Strings, mine);
-            foreach (string head in heads.Where(h => h != "ner"))
+            if (!Available("tagger", train, mine))
+            {
+                Console.WriteLine($"{lang}: no XPOS in the treebank, no tagger");
+            }
+
+            foreach (string head in heads.Where(h => h != "ner" && Available(h, train, mine)))
             {
                 string name = head + "-" + lang;
                 ITrainableComponent h = head switch
@@ -198,6 +210,7 @@ internal static class Program
             pipeline.Add(new ScopedHead(new EntityRecognizer(encoder, NerDecoding.Tagging, 1, 256, name: "ner-" + lang), d => ReferenceEquals(d.Strings, mine)));
         }
 
+        var hasTag = langs.ToDictionary(l => l, l => Available("tagger", train, stores[l]));
         Func<IReadOnlyList<Example>, double> score = examples =>
         {
             double total = 0;
@@ -208,7 +221,7 @@ internal static class Program
                 var metrics = new List<string>();
                 if (heads.Contains("morphologizer")) { metrics.Add("UPOS"); metrics.Add("UFeats"); }
                 // Turkish BOUN leaves XPOS empty ("_") on about half its tokens, so that row is not meaningful there.
-                if (heads.Contains("tagger") && lang != "tr") { metrics.Add("XPOS"); }
+                if (heads.Contains("tagger") && lang != "tr" && hasTag.GetValueOrDefault(lang)) { metrics.Add("XPOS"); }
                 if (heads.Contains("lemmatizer")) { metrics.Add("Lemmas"); }
                 if (heads.Contains("parser")) { metrics.Add("LAS"); }
                 var parts = new StringBuilder();
@@ -287,7 +300,7 @@ internal static class Program
             // Predictions for tools/OneNlp.Eval with the best dev weights: gold tokens and sentences (gold mode), raw text with the language's
             // tokenizer (--raw 1; the parser sets the sentences), and entities on the entity corpus's tokens.
             bool raw = Num(args, "raw", 0) == 1;
-            foreach (string lang in langs)
+            foreach (string lang in langs.Where(l => predictLangs.Length == 0 || predictLangs.Contains(l)))
             {
                 (string dir, string prefix) = Treebanks[lang];
                 string sub = split == "test" ? "eval" : "train";
@@ -458,6 +471,29 @@ internal static class Program
     }
 
     // Raw text in, ten gold sentences at a time joined by a space, as a running document. Multiword tokens are found from the pieces.
+    // Whether the treebank has the gold column a head learns from (French-GSD has no XPOS, for example).
+    private static bool Available(string head, List<Example> train, StringStore store)
+    {
+        foreach (Example e in train)
+        {
+            if (!ReferenceEquals(e.Predicted.Strings, store))
+            {
+                continue;
+            }
+
+            Doc d = e.Reference;
+            for (int i = 0; i < d.Length; i++)
+            {
+                if (head switch { "tagger" => d[i].Tag.Length > 0, "lemmatizer" => d[i].Lemma.Length > 0, _ => true })
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private static void PredictRaw(IEncoder encoder, ITrainableComponent[] heads, Pipeline tokenizer, SegmentationData data, string gold, string output)
     {
         var sb = new StringBuilder();
@@ -500,7 +536,7 @@ internal static class Program
             chunk.Clear();
         }
 
-        foreach (ConllUSentence s in ConllUReader.Read(gold))
+        foreach (ConllUSentence s in ConllUReader.Read(gold).Take(predictLimit > 0 ? predictLimit : int.MaxValue))
         {
             chunk.Add(s.Doc.Text);
             if (chunk.Count == 10)
@@ -535,7 +571,12 @@ internal static class Program
     // Entity corpus in, gold and predicted tags out as token-per-line IOB2 files for 'OneNlp.Eval span'.
     private static void PredictNer(IEncoder encoder, ITrainableComponent[] heads, string file, string lang, StringStore store, string outDir, string split)
     {
-        List<Example> examples = NerExamples(file, lang, 0, store);
+        List<Example> examples = NerExamples(file, lang, split == "test" ? nerTestLimit : 0, store);
+        if (predictLimit > 0 && examples.Count > predictLimit)
+        {
+            examples = examples.GetRange(0, predictLimit);
+        }
+
         var gold = new StringBuilder();
         var pred = new StringBuilder();
         const int Chunk = 32;
@@ -584,7 +625,7 @@ internal static class Program
 
     private static void Predict(IEncoder encoder, ITrainableComponent[] heads, string gold, StringStore store, string output)
     {
-        var sentences = ConllUReader.Read(gold, store).ToList();
+        var sentences = ConllUReader.Read(gold, store).Take(predictLimit > 0 ? predictLimit : int.MaxValue).ToList();
         var sb = new StringBuilder();
         const int Chunk = 32;
         for (int start = 0; start < sentences.Count; start += Chunk)
