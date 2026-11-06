@@ -1,0 +1,404 @@
+# Chinese recognizer gold set, authoring source. Read docs/recognizer-gold.md for the schema and the labelling rules (the section on Chinese
+# lists what differs from English).
+#
+# One sentence per line. An expression is written [[text|type|value|grain|flags]]; trailing empty fields may be dropped.
+# flags: 'approx' and/or 'alt=<value>;<value>'.
+# '@ref <ISO timestamp>' sets the reference time (UTC) for the lines below it; '@split dev|test' assigns the lines below it.
+# build.py turns this file into gold.jsonl (dev) and test.jsonl (test).
+
+@ref 2026-03-18T10:30:00
+@split test
+
+# ---- numbers
+会场里一共有[[1250|number|1250]]个座位。
+这座城市有[[三百二十万|number|3200000]]居民。
+他的存款有[[1.5万|number|15000]]多。
+全国人口约为[[14亿|number|1400000000]]。
+我们订了[[两百|number|200]]把椅子。
+书架上摆着[[二十五|number|25]]本书。
+圆周率约等于[[三点一四|number|3.14]]。
+账户余额是[[-250|number|-250]]。
+一共有[[一千零五|number|1005]]名选手。
+屏幕分辨率是[[1920|number|1920]]乘[[1080|number|1080]]。
+他一口气跑了[[十二|number|12]]圈。
+她养了[[两|number|2]]只猫。
+该公司有员工[[三万五|number|35000]]人。
+这次投票有[[四分之三|number|0.75]]的人赞成。
+这个数的平方根约是[[一点四一四|number|1.414]]。
+参加人数达到[[12,345|number|12345]]人。
+他数了[[九十九|number|99]]朵玫瑰。
+学校里有[[八千七百六十五|number|8765]]名学生。
+文件包含[[2,000,000|number|2000000]]行。
+这条消息被转发了[[3.2万|number|32000]]次。
+
+# ---- ordinals
+他在比赛中获得了[[第三|ordinal|3]]名。
+这是我[[第一|ordinal|1]]次来北京。
+请翻到[[第12|ordinal|12]]页。
+她住在[[第二十一|ordinal|21]]层。
+他是公司的[[第一百|ordinal|100]]位员工。
+这是[[第五|ordinal|5]]个问题。
+我们班[[第十|ordinal|10]]名同学是他。
+他在[[第2|ordinal|2]]轮就出局了。
+这是[[第四十二|ordinal|42]]次停电。
+她取得了[[第八|ordinal|8]]名的成绩。
+欢迎参加[[第三十|ordinal|30]]届运动会。
+他排在[[第七|ordinal|7]]位。
+
+# ---- percentages
+通货膨胀率上升了[[百分之三|percentage|3]]。
+销量增长了[[12%|percentage|12]]。
+失业率降到[[百分之五点五|percentage|5.5]]。
+电池还剩[[80%|percentage|80]]的电量。
+有[[百分之五十|percentage|50]]的人反对。
+折扣高达[[30%|percentage|30]]。
+增速放缓到[[3.5%|percentage|3.5]]。
+通过率是[[百分之一百|percentage|100]]。
+利率为[[百分之四点二五|percentage|4.25]]。
+湿度达到了[[65％|percentage|65]]。
+她的手机只剩[[10%|percentage|10]]电。
+大约[[百分之二十|percentage|20]]的学生迟到。
+税率调整为[[百分之十三|percentage|13]]。
+准确率是[[99.5%|percentage|99.5]]。
+
+# ---- dimensions
+这条路全长[[十五公里|dimension|15 kilometer]]。
+他的身高是[[1.8米|dimension|1.8 meter]]。
+行李重[[20公斤|dimension|20 kilogram]]。
+请准备[[500毫升|dimension|500 milliliter]]牛奶。
+房子面积[[120平方米|dimension|120 square meter]]。
+汽车限速[[100公里/小时|dimension|100 kilometer per hour]]。
+这个文件大小为[[5MB|dimension|5 megabyte]]。
+他体重[[七十五公斤|dimension|75 kilogram]]。
+桌子宽[[80厘米|dimension|80 centimeter]]。
+他买了[[三斤|dimension|3 jin]]苹果。
+他跑了[[五千米|dimension|5 kilometer||alt=5000 meter]]。
+水箱容量为[[2升|dimension|2 liter]]。
+农场有[[十亩|dimension|10 mu]]地。
+一部电影大约[[2GB|dimension|2 gigabyte]]。
+钢板厚度只有[[3毫米|dimension|3 millimeter]]。
+他买了[[两吨|dimension|2 tonne]]煤。
+电热水器功率为[[1500瓦|dimension|1500 watt]]。
+这批货共[[两千克|dimension|2 kilogram]]。
+
+# ---- temperatures
+最高气温达到[[28摄氏度|temperature|28 celsius]]。
+夜里会降到[[零下5度|temperature|-5 degree]]。
+水在[[100℃|temperature|100 celsius]]沸腾。
+体温是[[37.5°C|temperature|37.5 celsius]]。
+室温保持在[[25度|temperature|25 degree]]。
+当地气温是[[华氏72度|temperature|72 fahrenheit]]。
+烤箱预热到[[摄氏180度|temperature|180 celsius]]。
+最低气温降到[[零下十度|temperature|-10 degree]]。
+当地温度达到[[35℃|temperature|35 celsius]]。
+液氮温度约为[[-196°C|temperature|-196 celsius]]。
+孩子发烧到了[[三十九度|temperature|39 degree]]。
+
+# ---- ages
+他[[5岁|age|5 year]]了。
+我女儿[[三岁|age|3 year]]。
+这位老人[[九十二岁|age|92 year]]了。
+宝宝[[六个月大|age|6 month]]。
+她[[18岁|age|18 year]]时离开了家乡。
+孩子刚满[[两周岁|age|2 year]]。
+一个[[十二岁|age|12 year]]的男孩走了进来。
+小狗才[[三个月大|age|3 month]]。
+他[[四十五岁|age|45 year]]了。
+这棵树[[三百岁|age|300 year]]了。
+爷爷[[八十岁|age|80 year]]了。
+孩子[[七岁|age|7 year]]。
+
+# ---- currency
+这本书卖[[25元|currency|25 CNY]]。
+他付了[[¥100|currency|100 CNY]]。
+房租是[[3500块|currency|3500 CNY]]。
+这台电脑价值[[五千元|currency|5000 CNY]]。
+贷款金额为[[人民币100万元|currency|1000000 CNY]]。
+机票要[[200美元|currency|200 USD]]。
+他换了[[50欧元|currency|50 EUR]]。
+公司融资[[1.5亿美元|currency|150000000 USD]]。
+一杯咖啡[[$5|currency|5 USD]]。
+汇款[[3000日元|currency|3000 JPY]]。
+他买了[[10英镑|currency|10 GBP]]的零食。
+手续费[[5角|currency|0.5 CNY]]。
+罚款[[二百元|currency|200 CNY]]。
+年薪[[30万元|currency|300000 CNY]]。
+一共花了[[5元3角|currency|5.3 CNY]]。
+价格是[[199.99港元|currency|199.99 HKD]]。
+学费[[2万元|currency|20000 CNY]]。
+他支付了[[€20|currency|20 EUR]]。
+报价是[[RMB 500|currency|500 CNY]]。
+
+# ---- e-mail
+请联系[[zhang.wei@example.com|email]]获取详情。
+我的邮箱是 [[li_na88@mail.example.cn|email]] 。
+发送到[[support@example.org|email]]即可。
+客服邮箱：[[service@shop.example.com|email]]。
+稿件请寄[[editor@example.net|email]]，谢谢。
+她的工作邮箱是[[wang.fang@corp.example.com|email]]。
+有问题请写信给[[help+cn@example.com|email]]。
+报名请发邮件至[[signup@example.edu|email]]。
+如需发票，请联系[[billing@example.com|email]]。
+我们的邮箱是[[info@example.co.uk|email]]，欢迎来信。
+
+# ---- URL
+详情请访问[[https://www.example.com/news?id=123|url]]查看。
+官网是[[www.example.com|url]]，欢迎访问。
+请打开[[http://example.cn/index.html|url]]下载。
+价格见[[example.com/pricing|url]]。
+文档在[[https://docs.example.org/guide#intro|url]]。
+代码托管在[[https://code.example.com/team/project|url]]上。
+你可以登录[[https://login.example.com:8443/sso|url]]办理。
+活动页面：[[http://promo.example.net/spring/2026|url]]
+请在[[https://shop.example.com/cart?item=42&qty=2|url]]结算。
+更多资料见[[https://www.example.org/zh/about|url]]。
+
+# ---- IP addresses
+服务器地址是[[192.168.1.1|ip]]。
+路由器的网关为[[10.0.0.254|ip]]。
+请把DNS设置为[[8.8.8.8|ip]]。
+内网主机[[172.16.0.1|ip]]无法访问。
+子网掩码是[[255.255.255.0|ip]]。
+本机回环地址是[[127.0.0.1|ip]]。
+测试地址为[[203.0.113.42|ip]]。
+日志显示来自[[198.51.100.7|ip]]的请求。
+IPv6地址[[2001:db8::1|ip]]已经启用。
+链路本地地址是[[fe80::1|ip]]。
+
+# ---- phones
+请拨打手机[[13800138000|phone]]联系我。
+客服电话：[[138 0013 8000|phone]]。
+办公室电话[[010-12345678|phone]]。
+国际区号拨打[[+86 138 0013 8000|phone]]。
+上海分公司电话[[021-5555-1234|phone]]。
+前台电话[[(010) 8888 1234|phone]]。
+售后热线[[400-800-1234|phone]]。
+深圳办事处[[0755-23456789|phone]]。
+香港来电请拨[[+86 10 8888 1234|phone]]。
+我的号码是[[15912345678|phone]]。
+订餐电话[[400-820-8820|phone]]，欢迎来电。
+
+# ---- hashtags
+大家都在发[[#春节快乐#|hashtag]]这个话题。
+他的帖子带了[[#nlp|hashtag]]标签。
+欢迎关注[[#北京#|hashtag]]的活动。
+这条微博的话题是[[#世界杯#|hashtag]]。
+她在照片下面写了 [[#旅行日记|hashtag]] 。
+请使用[[#OneNLP2026|hashtag]]参加讨论。
+热门话题 [[#今日头条|hashtag]] 很火。
+活动标签是[[#开源中国#|hashtag]]，欢迎转发。
+他喜欢发 [[#美食|hashtag]] 图片。
+节日的标签是[[#中秋快乐|hashtag]]。
+
+# ---- mentions
+这条消息请转给 [[@小明|mention]] 看看。
+感谢 [[@alice|mention]] 的建议。
+请 [[@zhang_wei|mention]] 回复一下。
+欢迎 [[@李老师|mention]] 来分享。
+通知 [[@dev.team|mention]] 今天发布。
+问问 [[@王芳|mention]] 有没有空。
+已经提醒 [[@bob_li|mention]] 了。
+这个问题交给 [[@技术支持|mention]] 处理。
+感谢 [[@cindy88|mention]] 帮忙。
+请 [[@陈经理|mention]] 审批。
+
+# ---- GUIDs
+订单编号是[[550e8400-e29b-41d4-a716-446655440000|guid]]。
+设备标识[[123e4567-e89b-12d3-a456-426614174000|guid]]已注册。
+会话编号为[[9b2e7a4c-3f1d-4c8a-b6e5-0a1d2c3e4f50|guid]]。
+任务ID：[[f47ac10b-58cc-4372-a567-0e02b2c3d479|guid]]
+用户标识[[6ba7b810-9dad-11d1-80b4-00c04fd430c8|guid]]不存在。
+记录编号[[0f8fad5b-d9cb-469f-a165-70867728950e|guid]]已被删除。
+请求ID是[[c9bf9e57-1685-4c89-bafb-ff5af830be8a|guid]]。
+文件标识[[2c26b46b-68ff-4c6a-8f3d-9f1a5e7d0b11|guid]]已上传。
+令牌编号[[a8098c1a-f86e-11da-bd1a-00112444be1e|guid]]已过期。
+追踪编号[[de305d54-75b4-431b-adb2-eb6b9e546014|guid]]已记录。
+
+# ---- dates
+会议定在[[2026年4月15日|date|2026-04-15|day]]举行。
+他出生于[[1990年5月20日|date|1990-05-20|day]]。
+[[明天|date|2026-03-19|day]]的天气很好。
+我们[[后天|date|2026-03-20|day]]出发。
+[[昨天|date|2026-03-17|day]]下了一场大雨。
+她[[前天|date|2026-03-16|day]]才到北京。
+截止日期是[[12月31日|date|2026-12-31|day]]。
+活动安排在[[5月1日|date|2026-05-01|day]]。
+请在[[下周五|date|2026-03-27|day]]之前提交。
+[[周一|date|2026-03-23|day]]有一个会议。
+[[上周五|date|2026-03-13|day]]他请了假。
+我们约在[[星期六|date|2026-03-21|day]]见面。
+[[这周五|date|2026-03-20|day]]是他的生日。
+[[大后天|date|2026-03-21|day]]就要考试了。
+我们[[下个星期三|date|2026-03-25|day]]开会。
+[[2027年1月1日|date|2027-01-01|day]]新规生效。
+演出在[[3月28日|date|2026-03-28|day]]开始。
+合同于[[二〇二五年十月八日|date|2025-10-08|day]]签署。
+他[[三月二十日|date|2026-03-20|day]]回国。
+考试在[[六月十五日|date|2026-06-15|day]]举行。
+请在[[25号|date|2026-03-25|day]]前交费。
+他[[去年12月5日|date|2025-12-05|day]]搬的家。
+[[今年国庆节|date|2026-10-01|day]]我们去旅行。
+[[春节|date|2027-02-06|day]]快到了。
+[[2025年春节|date|2025-01-29|day]]那天下了雪。
+[[端午节|date|2026-06-19|day]]我们吃粽子。
+[[中秋节|date|2026-09-25|day]]全家团聚。
+[[圣诞节|date|2026-12-25|day]]有一场音乐会。
+[[劳动节|date|2026-05-01|day]]放假。
+预计[[2028年春节|date|2028-01-26|day]]前完工。
+[[清明节|date|2026-04-05|day]]要去扫墓。
+[[母亲节|date|2026-05-10|day]]我给妈妈买了花。
+学校[[教师节|date|2026-09-10|day]]不上课。
+提交时间：[[2026-03-20|date|2026-03-20|day]]
+开业日期是[[2026/04/01|date|2026-04-01|day]]。
+[[三天后|date|2026-03-21|day]]他就回来了。
+[[两周后|date|2026-04-01|day]]开始施工。
+[[一周前|date|2026-03-11|day]]我们见过面。
+[[三个月后|date|2026-06-18|day]]交付。
+[[一年前|date|2025-03-18|day]]他还在读书。
+
+# ---- times
+会议在[[下午三点半|time|T15:30|minute]]开始。
+我们[[晚上8点|time|T20:00|hour]]吃饭。
+飞机[[凌晨2点|time|T02:00|hour]]起飞。
+他[[上午9点|time|T09:00|hour]]到公司。
+午休从[[中午12点|time|T12:00|hour]]开始。
+电影[[19:45|time|T19:45|minute]]开场。
+请在[[15:30|time|T15:30|minute]]前到场。
+火车[[晚上7点45分|time|T19:45|minute]]出发。
+我们约[[下午3点一刻|time|T15:15|minute]]见面。
+他每次[[早上6点半|time|T06:30|minute]]起床。
+演出[[晚上9点整|time|T21:00|hour]]结束。
+现在是[[下午2时30分|time|T14:30|minute]]。
+闹钟定在[[7点|time|T07:00|hour|alt=T19:00]]。
+[[北京时间下午3点|time|T15:00+08:00|hour]]发布。
+会议[[上午10:30|time|T10:30|minute]]开始。
+她[[中午11点半|time|T11:30|minute]]下班。
+汇款在[[15时|time|T15:00|hour]]到账。
+他[[下午5点|time|T17:00|hour]]下班。
+日出在[[清晨5点40分|time|T05:40|minute]]。
+
+# ---- datetimes
+[[明天下午3点|datetime|2026-03-19T15:00|hour]]开会。
+[[今晚8点|datetime|2026-03-18T20:00|hour]]有演出。
+[[后天上午10点半|datetime|2026-03-20T10:30|minute]]面试。
+[[2026年3月20日上午10点|datetime|2026-03-20T10:00|hour]]开幕。
+[[周五下午两点|datetime|2026-03-20T14:00|hour]]见。
+我们[[4月3日晚上7点|datetime|2026-04-03T19:00|hour]]见面。
+[[昨天晚上9点|datetime|2026-03-17T21:00|hour]]她还在加班。
+[[明天早上8点|datetime|2026-03-19T08:00|hour]]出发。
+考试在[[6月15日9:00|datetime|2026-06-15T09:00|minute]]开始。
+[[下周一上午9点|datetime|2026-03-23T09:00|hour]]开例会。
+[[30分钟后|datetime|2026-03-18T11:00|minute]]开始。
+[[两小时后|datetime|2026-03-18T12:30|minute]]回来。
+[[10分钟前|datetime|2026-03-18T10:20|minute]]他刚走。
+[[今天下午5点|datetime|2026-03-18T17:00|hour]]截止。
+门店[[周日上午11点|datetime|2026-03-22T11:00|hour]]开业。
+
+# ---- date ranges
+[[下个月|daterange|2026-04-01/2026-05-01|month]]我要出差。
+[[上个月|daterange|2026-02-01/2026-03-01|month]]销量最高。
+[[本月|daterange|2026-03-01/2026-04-01|month]]的目标已完成。
+[[今年|daterange|2026-01-01/2027-01-01|year]]增长很快。
+[[明年|daterange|2027-01-01/2028-01-01|year]]他想去日本。
+[[去年|daterange|2025-01-01/2026-01-01|year]]我们搬了家。
+[[下周|daterange|2026-03-23/2026-03-30|week]]放假。
+[[上周|daterange|2026-03-09/2026-03-16|week]]下了雪。
+[[本周|daterange|2026-03-16/2026-03-23|week]]很忙。
+我们[[这个周末|daterange|2026-03-21/2026-03-23|day]]去爬山。
+[[明年春天|daterange|2027-03-01/2027-06-01|season|approx]]花会开。
+[[2026年夏天|daterange|2026-06-01/2026-09-01|season|approx]]很热。
+[[2026年第二季度|daterange|2026-04-01/2026-07-01|quarter]]销售增长。
+[[今年上半年|daterange|2026-01-01/2026-07-01|half]]业绩不错。
+[[1990年代|daterange|1990-01-01/2000-01-01|decade]]出生的人已经成家。
+[[2027年|daterange|2027-01-01/2028-01-01|year]]开始施行。
+报告在[[2026年3月|daterange|2026-03-01/2026-04-01|month]]发布。
+[[4月6日到4月10日|daterange|2026-04-06/2026-04-11|day]]放假。
+[[5月1日至5日|daterange|2026-05-01/2026-05-06|day]]休息。
+展览[[从4月1日到4月15日|daterange|2026-04-01/2026-04-16|day]]举行。
+[[2020年到2024年|daterange|2020-01-01/2025-01-01|year]]他住在上海。
+[[2026年6月至8月|daterange|2026-06-01/2026-09-01|month]]是旺季。
+项目将在[[2026年3月底|daterange|2026-03-21/2026-04-01|month|approx]]完成。
+[[去年下半年|daterange|2025-07-01/2026-01-01|half]]他入职了。
+[[2026年秋天|daterange|2026-09-01/2026-12-01|season|approx]]开学。
+[[上个季度|daterange|2025-10-01/2026-01-01|quarter]]利润下降。
+[[周一到周五|daterange|2026-03-23/2026-03-28|day|alt=2026-03-16/2026-03-21]]上班。
+[[2026年4月上旬|daterange|2026-04-01/2026-04-11|month|approx]]开始招生。
+
+# ---- time ranges
+会议[[上午9点到11点|timerange|T09:00/T11:00|hour]]进行。
+营业时间[[9:00-17:00|timerange|T09:00/T17:00|minute]]。
+[[下午两点至五点|timerange|T14:00/T17:00|hour]]有空。
+我们[[晚上七点到九点|timerange|T19:00/T21:00|hour]]吃饭。
+[[从早上8点到中午12点|timerange|T08:00/T12:00|hour]]上课。
+课程[[下午1点到3点半|timerange|T13:00/T15:30|minute]]。
+[[8:30~12:00|timerange|T08:30/T12:00|minute]]办理业务。
+[[上午10点至12点|timerange|T10:00/T12:00|hour]]开放。
+值班时间[[晚上10点到11点半|timerange|T22:00/T23:30|minute]]。
+[[9点至17点|timerange|T09:00/T17:00|hour]]营业。
+[[中午12点到下午1点|timerange|T12:00/T13:00|hour]]休息。
+
+# ---- date-time ranges
+[[明天上午|datetimerange|2026-03-19T06:00/2026-03-19T12:00|hour|approx]]开会。
+[[周五晚上|datetimerange|2026-03-20T18:00/2026-03-21T00:00|hour|approx]]聚会。
+[[今晚|datetimerange|2026-03-18T18:00/2026-03-19T00:00|hour|approx]]有雨。
+[[昨天下午|datetimerange|2026-03-17T12:00/2026-03-17T18:00|hour|approx]]他来过。
+[[3月20日上午9点到11点|datetimerange|2026-03-20T09:00/2026-03-20T11:00|hour]]进行。
+[[明天下午两点到四点|datetimerange|2026-03-19T14:00/2026-03-19T16:00|hour]]面试。
+[[今天上午|datetimerange|2026-03-18T06:00/2026-03-18T12:00|hour|approx]]已经开完会。
+[[后天晚上|datetimerange|2026-03-20T18:00/2026-03-21T00:00|hour|approx]]会下雪。
+[[下周三下午|datetimerange|2026-03-25T12:00/2026-03-25T18:00|hour|approx]]有空。
+[[今天下午|datetimerange|2026-03-18T12:00/2026-03-18T18:00|hour|approx]]出发。
+[[4月3日下午|datetimerange|2026-04-03T12:00/2026-04-03T18:00|hour|approx]]演出。
+[[昨晚|datetimerange|2026-03-17T18:00/2026-03-18T00:00|hour|approx]]下雨了。
+
+# ---- durations
+等了[[三天|duration|259200]]。
+项目持续[[两周|duration|1209600]]。
+开了[[5个小时|duration|18000]]会。
+步行[[45分钟|duration|2700]]。
+倒计时[[30秒|duration|30]]。
+住了[[三个月|duration|P3M]]。
+学了[[两年|duration|P2Y]]中文。
+他工作了[[一年半|duration|P1Y6M]]。
+休息[[半小时|duration|1800]]。
+开车[[一个半小时|duration|5400]]。
+假期共[[十天|duration|864000]]。
+审批需要[[10个工作日|duration|P10BD]]。
+租期[[半年|duration|P6M]]。
+他在国外待了[[两年零三个月|duration|P2Y3M]]。
+煮[[一刻钟|duration|900]]即可。
+培训[[3个星期|duration|1814400]]。
+请假[[一周|duration|604800]]。
+路程大约[[十五分钟|duration|900]]。
+他睡了[[八个小时|duration|28800]]。
+保修期[[三年|duration|P3Y]]。
+他等了[[一天|duration|86400]]。
+
+# ---- sets
+他[[每天|set|P1D|day]]跑步。
+报告[[每周|set|P1W|week]]更新。
+[[每月|set|P1M|month]]结算一次。
+税款[[每年|set|P1Y|year]]申报。
+例会[[每周一|set|XXXX-WXX-1|day]]举行。
+[[每周五晚上8点|set|XXXX-WXX-5T20:00|hour]]直播。
+[[每天早上8点|set|T08:00|hour]]起床。
+[[每隔两天|set|P2D|day]]浇一次水。
+[[每两周|set|P2W|week]]开一次会。
+[[每3小时|set|PT3H|hour]]吃一次药。
+[[每个星期三|set|XXXX-WXX-3|day]]放映。
+[[每月15号|set|XXXX-XX-15|month]]发工资。
+[[每天中午12点|set|T12:00|hour]]吃饭。
+他[[天天|set|P1D|day]]加班。
+
+# ---- nothing to find
+这是一个很好的问题。
+他统一了大家的意见。
+万一下雨怎么办？
+请一起来吧。
+一些人认为这样不行。
+十分感谢你的帮助。
+这个办法行不通。
+我们一起去公园玩。
+千万不要忘记关门。
+她三心二意，做事不专心。
+一边吃饭一边看电视。
