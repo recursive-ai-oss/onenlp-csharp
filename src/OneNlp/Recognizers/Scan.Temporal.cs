@@ -388,6 +388,15 @@ internal sealed partial class Scan
     {
         int start = i;
         bool approx = false;
+
+        // Spanish and Portuguese "las 15:00", "às dez da manhã": the article (or fused preposition and article) that introduces a clock time is part of it.
+        bool articled = false;
+        if ((Is(i, "hourarticle", out int arn) || Is(i, "determiner", out arn)) && i + arn < _items.Count && GapOk(_items[i + arn - 1].End, _items[i + arn].Start))
+        {
+            articled = true;
+            i += arn;
+        }
+
         if (Is(i, "approx", out int an) && i + an < _items.Count)
         {
             approx = true;
@@ -396,6 +405,11 @@ internal sealed partial class Scan
 
         var clocks = new List<Cand>();
         ClockAt(i, clocks, allowBare);
+        if (articled)
+        {
+            SpokenClock(i, clocks);
+        }
+
         foreach (Cand c in clocks)
         {
             TemporalValue v = c.V;
@@ -537,6 +551,87 @@ internal sealed partial class Scan
 
         TemporalValue t = TemporalValue.Clock(h, m, 0, grain);
         t.Clock24 = true;
+        t.Meridiem = part;
+        r.Add(new Cand(i, e, t));
+    }
+
+    /// <summary>
+    /// An hour written as a digit or a number word after an article, <c>las diez de la mañana</c>, <c>las tres y media</c>, <c>às oito da noite</c>,
+    /// <c>las 15</c>. Without a part of the day or a tail (<c>y media</c>), only an hour above twelve is a time: "las 7" alone is not.
+    /// </summary>
+    private void SpokenClock(int i, List<Cand> r)
+    {
+        int h;
+        int e;
+        if (Dig(i) && _items[i].End - _items[i].Start <= 2)
+        {
+            h = Val(i);
+            e = i + 1;
+        }
+        else if (Num(i, out e, out decimal hv, out bool hOrd) && !hOrd && hv is >= 1 and <= 23 && hv == decimal.Truncate(hv))
+        {
+            h = (int)hv;
+        }
+        else
+        {
+            return;
+        }
+
+        if (h > 23 || (Ch(e, ':') && Tch(e - 1, e)))
+        {
+            return;
+        }
+
+        int m = 0;
+        bool tail = false;
+        Granularity grain = Granularity.Hour;
+        if (Is(e, "plus15", out int pn))
+        {
+            m = 15;
+            e += pn;
+            tail = true;
+        }
+        else if (Is(e, "plus30", out pn))
+        {
+            m = 30;
+            e += pn;
+            tail = true;
+        }
+        else if (Is(e, "minus15", out pn))
+        {
+            h = (h + 23) % 24;
+            m = 45;
+            e += pn;
+            tail = true;
+        }
+        else if (Is(e, "minus", out pn) && Num(e + pn, out int le, out decimal lv, out bool lOrd) && !lOrd && lv is >= 1 and <= 29 && lv == decimal.Truncate(lv))
+        {
+            h = (h + 23) % 24;
+            m = 60 - (int)lv;
+            e = le;
+            tail = true;
+        }
+
+        if (tail)
+        {
+            grain = Granularity.Minute;
+        }
+
+        bool part = false;
+        if (DaypartPhrase(e, out int de, out TWord daypart) && h is >= 1 and <= 12)
+        {
+            h = daypart.A >= 12 ? (h % 12) + 12 : h % 12;
+            e = de;
+            part = true;
+        }
+
+        if (!part && !tail && h < 13)
+        {
+            return;
+        }
+
+        TemporalValue t = TemporalValue.Clock(h, m, 0, grain);
+        t.Clock24 = !part;
         t.Meridiem = part;
         r.Add(new Cand(i, e, t));
     }

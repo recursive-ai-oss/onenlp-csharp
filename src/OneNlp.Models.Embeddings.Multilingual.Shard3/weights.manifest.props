@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <EmbeddingsWeight Include="model.onnx.part3" Size="156742959" Sha256="addc49739f924d1896e7bf91b19ff6133c767740f5895f3acaa46669c0408573"
+                      Source="bytes 313485918 to 470228876 of the ONNX export (opset 17, fp32) of intfloat/multilingual-e5-small revision 614241f622f53c4eeff9890bdc4f31cfecc418b3 (whole file sha256 44596df6490c32f931399169bc62e21d7c8edd2143e21cdf4d275fa752f23e78)" />
+  </ItemGroup>
+</Project>

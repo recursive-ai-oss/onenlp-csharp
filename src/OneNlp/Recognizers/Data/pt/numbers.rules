@@ -1,0 +1,224 @@
+# Number rules for Portuguese (pt-BR; pt-PT shares the written forms; the short scale words follow Brazil: bilhão is 10^9, bilião 10^12).
+#
+# Format: [section] headers, then one rule per line, fields separated by "|". "#" starts a comment.
+# Words are matched without regard to case. Hundreds are words of their own (duzentos), and "e" joins tens to a unit (trinta e cinco),
+# the hundreds to what follows (cento e vinte) and a thousand to its rest (dois mil e quinhentos).
+
+[number.digits]
+system | iberian
+decimal | ,
+group | space nbsp nnbsp .
+negative | -−
+
+[number.cardinal]
+zero | unit | 0
+um | unit | 1
+uma | unit | 1
+dois | unit | 2
+duas | unit | 2
+três | unit | 3
+tres | unit | 3
+quatro | unit | 4
+cinco | unit | 5
+seis | unit | 6
+sete | unit | 7
+oito | unit | 8
+nove | unit | 9
+dez | teen | 10
+onze | teen | 11
+doze | teen | 12
+treze | teen | 13
+catorze | teen | 14
+quatorze | teen | 14
+quinze | teen | 15
+dezesseis | teen | 16
+dezasseis | teen | 16
+dezessete | teen | 17
+dezassete | teen | 17
+dezoito | teen | 18
+dezenove | teen | 19
+dezanove | teen | 19
+vinte | tens | 20
+trinta | tens | 30
+quarenta | tens | 40
+cinquenta | tens | 50
+cinqüenta | tens | 50
+sessenta | tens | 60
+setenta | tens | 70
+oitenta | tens | 80
+noventa | tens | 90
+cem | hundreds | 100
+cento | hundreds | 100
+duzentos | hundreds | 200
+duzentas | hundreds | 200
+trezentos | hundreds | 300
+trezentas | hundreds | 300
+quatrocentos | hundreds | 400
+quatrocentas | hundreds | 400
+quinhentos | hundreds | 500
+quinhentas | hundreds | 500
+seiscentos | hundreds | 600
+seiscentas | hundreds | 600
+setecentos | hundreds | 700
+setecentas | hundreds | 700
+oitocentos | hundreds | 800
+oitocentas | hundreds | 800
+novecentos | hundreds | 900
+novecentas | hundreds | 900
+mil | bare-scale | 1000
+milhão | scale | 1000000
+milhao | scale | 1000000
+milhões | scale | 1000000
+milhoes | scale | 1000000
+bilhão | scale | 1000000000
+bilhao | scale | 1000000000
+bilhões | scale | 1000000000
+bilhoes | scale | 1000000000
+bilião | scale | 1000000000000
+biliao | scale | 1000000000000
+biliões | scale | 1000000000000
+trilhão | scale | 1000000000000
+trilhao | scale | 1000000000000
+trilhões | scale | 1000000000000
+dúzia | multiplier | 12
+duzia | multiplier | 12
+dúzias | multiplier | 12
+duzias | multiplier | 12
+
+[number.ordinal]
+primeiro | 1
+primeira | 1
+segundo | 2 | not-after-number
+segunda | 2 | not-after-number
+terceiro | 3
+terceira | 3
+quarto | 4
+quarta | 4
+quinto | 5
+quinta | 5
+sexto | 6
+sexta | 6
+sétimo | 7
+sétima | 7
+setimo | 7
+setima | 7
+oitavo | 8
+oitava | 8
+nono | 9
+nona | 9
+décimo | 10
+décima | 10
+decimo | 10
+decima | 10
+vigésimo | 20
+vigésima | 20
+vigesimo | 20
+vigesima | 20
+trigésimo | 30
+trigésima | 30
+trigesimo | 30
+trigesima | 30
+quadragésimo | 40
+quadragésima | 40
+quadragesimo | 40
+quadragesima | 40
+quinquagésimo | 50
+quinquagésima | 50
+quinquagesimo | 50
+quinquagesima | 50
+qüinquagésimo | 50
+qüinquagésima | 50
+sexagésimo | 60
+sexagésima | 60
+sexagesimo | 60
+sexagesima | 60
+septuagésimo | 70
+septuagésima | 70
+septuagesimo | 70
+septuagesima | 70
+setuagésimo | 70
+setuagésima | 70
+octogésimo | 80
+octogésima | 80
+octogesimo | 80
+octogesima | 80
+nonagésimo | 90
+nonagésima | 90
+nonagesimo | 90
+nonagesima | 90
+centésimo | 100
+centésima | 100
+centesimo | 100
+centesima | 100
+milésimo | 1000
+milésima | 1000
+milesimo | 1000
+milesima | 1000
+milionésimo | 1000000
+milionésima | 1000000
+milionesimo | 1000000
+milionesima | 1000000
+
+[number.fraction]
+terço | 3
+terços | 3
+quartos | 4
+quintos | 5
+sextos | 6
+sétimos | 7
+oitavos | 8
+nonos | 9
+décimos | 10
+centésimos | 100
+milésimos | 1000
+
+# "um" and "uma" count only inside a longer number ("trinta e um", "um milhão"); alone they are the article.
+[number.lone-skip]
+um, uma
+
+[number.connector]
+e
+
+[number.negative]
+menos
+
+[number.point]
+vírgula
+
+[number.suffix]
+k | 1000 | any
+M | 1000000 | money
+MM | 1000000000 | money
+
+# A number written with an ending: 1.º 1.ª 2º 2ª 3.os.
+[number.ordinal-suffix]
+º | 0123456789 | any
+ª | 0123456789 | any
+.º | 0123456789 | any
+.ª | 0123456789 | any
+.o | 0123456789 | any
+.a | 0123456789 | any
+
+[percent]
+%, por cento, porcento, por cem, ％
+
+[age.unit]
+year | ano, anos
+month | mês, mes, meses
+week | semana, semanas
+day | dia, dias
+
+# "82 anos de idade" is an age, "82 anos" alone is a length of time.
+[age.suffix]
+de idade
+
+[number.not-number]
+um | after | de, dos, das
+segundo | before | por
+primeira | after | hora
+primeiro | after | hora
+segundo | after | a, o, as, os, ele, ela, eles, elas, me, nos, nós, esse, este
+
+# National numbers written as space-separated groups: Portuguese (Portugal) numbers have nine digits and start with 2 or 9 ("21 123 45 67").
+[phone.space-start]
+29 | 9 | 9

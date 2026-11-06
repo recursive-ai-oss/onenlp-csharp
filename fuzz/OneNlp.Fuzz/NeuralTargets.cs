@@ -158,13 +158,20 @@ internal static class NeuralTargets
         }
     }
 
-    internal static void SeedPipelineFile(string dir) => File.WriteAllBytes(Path.Combine(dir, "seed-pipeline"), TinyPipelineBytes());
+    internal static void SeedPipelineFile(string dir)
+    {
+        File.WriteAllBytes(Path.Combine(dir, "seed-pipeline"), TinyPipelineBytes());
+        File.WriteAllBytes(Path.Combine(dir, "seed-segmenter"), TinySegmenterBytes());
+    }
 
     internal static void SeedPipelineConfig(string dir)
     {
         byte[] file = TinyPipelineBytes();
         ulong configLength = BinaryPrimitives.ReadUInt64LittleEndian(file.AsSpan(16));
         File.WriteAllBytes(Path.Combine(dir, "seed-config"), file.AsSpan(HeaderSize, (int)configLength).ToArray());
+        byte[] segmenter = TinySegmenterBytes();
+        ulong segmenterConfigLength = BinaryPrimitives.ReadUInt64LittleEndian(segmenter.AsSpan(16));
+        File.WriteAllBytes(Path.Combine(dir, "seed-segmenter-config"), segmenter.AsSpan(HeaderSize, (int)segmenterConfigLength).ToArray());
     }
 
     private static void RunPipeline(byte[] file)
@@ -218,6 +225,33 @@ internal static class NeuralTargets
         _ = pipeline.Train(examples, new TrainOptions { Epochs = 1, BatchWords = 40, DevFraction = 0, Seed = 1 });
         using var stream = new MemoryStream();
         PipelineFile.Save(pipeline, stream);
+        return stream.ToArray();
+    }
+
+    // A pipeline whose tokenizer is a trained word segmenter (the "segmenter" tokenizer kind of the file format).
+    private static byte[] TinySegmenterBytes()
+    {
+        var encoder = new FastEncoder(width: 8, depth: 1, normRows: 16, prefixRows: 8, suffixRows: 16, shapeRows: 8, seed: 1, neighbourRows: 8, recurrentLayers: 1, recurrentSize: 4);
+        var strings = new StringStore();
+        var examples = new List<Example>();
+        foreach (string text in new[] { "我们喜欢学习", "中文和数据", "我们的数据" })
+        {
+            TokenBoundary[] units = NeuralWordSegmenter.Units(text);
+            var doc = new Doc(strings, text, units);
+            string[] tags = NeuralWordSegmenter.Tags(units, [0, 2], out _);
+            for (int u = 0; u < tags.Length; u++)
+            {
+                doc.SetAnnotation(TokenColumn.Tag, u, tags[u]);
+            }
+
+            examples.Add(Example.FromReference(doc));
+        }
+
+        using Pipeline training = Pipeline.Blank(Language.Chinese).Add(new Tagger(encoder, TokenColumn.Tag, NeuralWordSegmenter.HeadName) { OwnsEncoder = true });
+        _ = training.Train(examples, new TrainOptions { Epochs = 1, BatchWords = 40, DevFraction = 0, Seed = 1 });
+        using var holder = new Pipeline(new NeuralWordSegmenter((Tagger)training.Components[0]), Language.Chinese);
+        using var stream = new MemoryStream();
+        PipelineFile.Save(holder, stream);
         return stream.ToArray();
     }
 

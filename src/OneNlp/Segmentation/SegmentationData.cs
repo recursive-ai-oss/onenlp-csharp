@@ -38,7 +38,8 @@ public sealed partial class SegmentationData
         "dutch" => Dutch,
         "turkish" => Turkish,
         "spanish" => Spanish,
-        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral, english, french, german, portuguese, dutch, turkish or spanish.", nameof(name)),
+        "italian" => Italian,
+        _ => throw new ArgumentException($"Unknown segmentation data '{name}'; expected none, neutral, english, french, german, portuguese, dutch, turkish, spanish or italian.", nameof(name)),
     };
 
     /// <summary>No adjustments: tokens are the UAX #29 word segments that are not white space.</summary>
@@ -140,6 +141,13 @@ public sealed partial class SegmentationData
     /// </summary>
     public static SegmentationData Spanish { get; } = CreateSpanish();
 
+    /// <summary>
+    /// Italian: the neutral defaults plus UD Italian tokenization. Articulated prepositions (<c>della</c>, <c>nell'</c>) and infinitives or gerunds with
+    /// enclitic pronouns (<c>farlo</c>, <c>vedersi</c>) are cut into one piece for each word of the multiword token the treebank annotates; elided
+    /// articles and prepositions (<c>l'</c>, <c>un'</c>, <c>c'</c>) are tokens of their own. <see cref="TryMatchMultiword"/> gives the words of such a token.
+    /// </summary>
+    public static SegmentationData Italian { get; } = CreateItalian();
+
     private SegmentationData(
         bool keepUrlsAndEmails, bool joinHyphenated, string[]? hyphenPrefixes, char[] digitJoiners, char[] markRuns, string[] emoticons, Dictionary<string, int[]> specialCases,
         string[] abbreviations, string[] clitics, bool nTSuffix, string[] nonFinalAbbreviations)
@@ -205,5 +213,5 @@ public sealed partial class SegmentationData
     /// <returns>The data; never <see langword="null"/>.</returns>
     public static SegmentationData For(Language language) =>
         language == Language.English ? English : language == Language.French ? French : language == Language.German ? German
-        : language == Language.Portuguese ? Portuguese : language == Language.Dutch ? Dutch : language == Language.Turkish ? Turkish : language == Language.Spanish ? Spanish : Neutral;
+        : language == Language.Portuguese ? Portuguese : language == Language.Dutch ? Dutch : language == Language.Turkish ? Turkish : language == Language.Spanish ? Spanish : language == Language.Italian ? Italian : Neutral;
 }

@@ -1,0 +1,190 @@
+# Date and time vocabulary, Spanish (es-ES; es-MX is selected with region "mx"). Same sections as the French file; the roles are described in docs/recognizers.md.
+#
+# Dates are day first (el 3 de marzo de 2026, 03/04/2026 is 3 April). A form starting with "=" is case-sensitive, the others are matched without regard to case.
+# An article that starts an expression is inside its span ("el 20 de marzo", "las 15:00"); a preposition is outside ("a las 15:00", "en abril").
+
+[time.region]
+es
+
+[time.month]
+1 | enero, =ene., =ene
+2 | febrero, =feb., =feb
+3 | marzo, =mar.
+4 | abril, =abr., =abr
+5 | mayo
+6 | junio, =jun., =jun
+7 | julio, =jul., =jul
+8 | agosto, =ago., =ago
+9 | septiembre, setiembre, =sept., =sep., =sept, =set.
+10 | octubre, =oct., =oct
+11 | noviembre, =nov., =nov
+12 | diciembre, =dic., =dic
+
+[time.weekday]
+1 | lunes, =lun. | lunes
+2 | martes, =mar. | martes
+3 | miércoles, miercoles, =mié., =mie. | miércoles, miercoles
+4 | jueves, =jue. | jueves
+5 | viernes, =vie. | viernes
+6 | sábado, sabado, =sáb., =sab. | sábados, sabados
+7 | domingo, =dom. | domingos
+
+[time.unit]
+second | segundo, segundos, seg | 1 | 0
+minute | minuto, minutos, min | 60 | 0
+hour | hora, horas | 3600 | 0
+day | día, días, dia, dias, jornada, jornadas | 86400 | 0
+week | semana, semanas | 604800 | 0
+week | quincena, quincenas | 1209600 | 0
+month | mes, meses | 0 | 1
+quarter | trimestre, trimestres | 0 | 3
+year | año, años, ano, anos | 0 | 12
+decade | década, décadas, decada, decadas | 0 | 120
+business day | día hábil, días hábiles, día laborable, días laborables, dia habil, dias habiles, dia laborable, dias laborables | 0 | 0
+
+[time.season]
+spring | primavera | 3 | 3
+summer | verano | 6 | 3
+fall | otoño, otono | 9 | 3
+winter | invierno | 12 | 3
+
+[time.daypart]
+morning | mañana, mañanas, manana, madrugada | 6 | 12
+afternoon | tarde, tardes | 12 | 18
+evening | noche, noches | 18 | 24
+
+[time.meridiem]
+am | am, a. m., a.m., a. m, a.m
+pm | pm, p. m., p.m., p. m, p.m
+
+[time.word]
+today | hoy
+tomorrow | mañana, manana
+yesterday | ayer
+dayaftertomorrow | pasado mañana, pasado manana
+daybeforeyesterday | anteayer, antes de ayer, antier
+tonight | esta noche
+noon | mediodía, medio día, mediodia
+midnight | medianoche, media noche
+this | este, esta, estos, estas, ese, esa
+next | próximo, próxima, proximo, proxima, siguiente, entrante
+nextpost | próximo, próxima, proximo, proxima, que viene, siguiente, entrante
+last | pasado, pasada, último, última, anterior
+lastpost | pasado, pasada, anterior
+agoprefix | hace
+later | más tarde, mas tarde, después, despues
+in | dentro de, en, por, durante
+at | a, al
+on | el
+of | de, del
+and | y, e
+rangeto | a, al, hasta, hasta el, -, –, —
+from | de, del, desde, desde el, a partir de, a partir del
+between | entre
+every | todos los, todas las, cada
+each | cada
+early | principios, principios de, principios del, comienzos de, inicios de
+mid | mediados, mediados de, mediados del
+late | finales, finales de, finales del, fines de
+after | después de, despues de, tras, después del
+before | antes de, antes del
+half | semestre, semestres, mitad, media, medio
+quarter | trimestre, trimestres
+article | un, una
+the | el, la, los, las
+determiner | el, la, los, las
+hourarticle | la, las
+approx | aproximadamente, alrededor de, hacia, cerca de, en torno a, sobre, unos, unas
+weekend | fin de semana, finde, fines de semana
+zonebase | =UTC, =GMT
+quarterprefix | =T
+halfprefix | =S
+hourmark | h, hs, hrs
+hourword | horas, hora
+oclock | en punto
+plus15 | y cuarto, y quince
+plus30 | y media, y treinta, y medio
+andhalf | y medio, y media
+minus15 | menos cuarto, menos un cuarto
+minus | menos
+clockcue | es, son, serán, sera
+daypartprefix | de la, de, por la, en la, a la, durante la
+decadeprefix | años, anos
+
+[time.recurrence]
+P1D | day | diario, diaria, diariamente, cotidiano, cotidiana
+P1W | week | semanal, semanales, semanalmente
+P1M | month | mensual, mensuales, mensualmente
+P3M | quarter | trimestral, trimestrales, trimestralmente
+P1Y | year | anual, anuales, anualmente
+PT1H | hour | horario, horaria
+
+[time.zone]
+=UTC, =GMT | 0 | z
+=WET | 0
+=WEST | 60
+=CET | 60
+=CEST | 120
+=EET | 120
+=EEST | 180
+=MSK | 180
+=EST | -300
+=EDT | -240
+=CST | -360
+=CDT | -300
+=MST | -420
+=MDT | -360
+=PST | -480
+=PDT | -420
+
+# Sources: Spain's national holidays (Estatuto de los Trabajadores art. 37.2, with the yearly list published in the BOE);
+# Mexico's mandatory rest days (Ley Federal del Trabajo art. 74); the Christian feasts count from Easter; the rest are customary dates.
+[time.holiday]
+Año Nuevo, Ano Nuevo, Día de Año Nuevo | fixed 01-01 | es,mx
+Reyes, Día de Reyes, Reyes Magos, Epifanía, Epifania, Día de los Reyes Magos | fixed 01-06 | es,mx
+Día de la Candelaria, Candelaria | fixed 02-02 | es,mx
+San Valentín, San Valentin, Día de San Valentín, Día de los Enamorados | fixed 02-14 | es,mx
+Día de la Constitución, Día de la Constitucion | nth 1 mon 2 | mx
+Natalicio de Benito Juárez, Día de Benito Juárez | nth 3 mon 3 | mx
+Día de la Mujer, Día Internacional de la Mujer | fixed 03-08 | es,mx
+San José, San Jose, Día de San José | fixed 03-19 | es
+Martes de Carnaval, Martes de Carnestolendas | easter -47 | es,mx
+Carnaval, Carnavales | easter -48 | es,mx
+Miércoles de Ceniza, Miercoles de Ceniza | easter -46 | es,mx
+Domingo de Ramos | easter -7 | es,mx
+Jueves Santo | easter -3 | es,mx
+Viernes Santo | easter -2 | es,mx
+Sábado Santo, Sabado Santo, Sábado de Gloria | easter -1 | es,mx
+Domingo de Resurrección, Domingo de Resurreccion, Domingo de Pascua, Pascua, Pascua de Resurrección | easter 0 | es,mx
+Lunes de Pascua | easter 1 | es,mx
+Día del Trabajo, Día del Trabajador, Día Internacional del Trabajo, Primero de Mayo, 1 de Mayo | fixed 05-01 | es,mx
+Cinco de Mayo | fixed 05-05 | es,mx
+Día de la Madre | nth 1 sun 5 | es
+Día de la Madre | fixed 05-10 | mx
+Día del Padre | fixed 03-19 | es
+Día del Padre | nth 3 sun 6 | mx
+Ascensión, Ascension, Jueves de la Ascensión | easter 39 | es,mx
+Pentecostés, Pentecostes, Domingo de Pentecostés | easter 49 | es,mx
+Corpus Christi, Corpus | easter 60 | es,mx
+Día de San Juan, San Juan | fixed 06-24 | es
+Santiago Apóstol, Día de Santiago | fixed 07-25 | es
+Asunción, Asuncion, Asunción de la Virgen, Día de la Asunción | fixed 08-15 | es
+Día de la Independencia, Grito de Dolores | fixed 09-16 | mx
+Día de la Hispanidad, Dia de la Hispanidad, Fiesta Nacional, Fiesta Nacional de España, Día del Pilar | fixed 10-12 | es
+Halloween, Noche de Brujas | fixed 10-31 | es,mx
+Todos los Santos, Día de Todos los Santos | fixed 11-01 | es,mx
+Día de Muertos, Día de los Muertos, Día de los Difuntos, Día de Difuntos | fixed 11-02 | es,mx
+Día de la Revolución, Dia de la Revolucion | nth 3 mon 11 | mx
+Día de Acción de Gracias, Accion de Gracias | nth 4 thu 11 | es,mx
+Día de la Constitución Española, Día de la Constitución | fixed 12-06 | es
+Inmaculada Concepción, Inmaculada, Día de la Inmaculada | fixed 12-08 | es
+Día de la Virgen de Guadalupe, Virgen de Guadalupe | fixed 12-12 | mx
+Nochebuena, Noche Buena | fixed 12-24 | es,mx
+Navidad, Día de Navidad | fixed 12-25 | es,mx
+Día de los Santos Inocentes, Santos Inocentes | fixed 12-28 | es,mx
+Nochevieja, Noche Vieja, Fin de Año | fixed 12-31 | es,mx
+
+[time.flag]
+no-lone-day
+bare-hour-24
+of-before-year

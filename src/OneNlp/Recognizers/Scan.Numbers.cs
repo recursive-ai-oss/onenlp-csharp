@@ -30,6 +30,10 @@ internal sealed partial class Scan
     private readonly HashSet<string>.AlternateLookup<ReadOnlySpan<char>> _loneSkip;
     private readonly Dictionary<string, OrdinalWord>.AlternateLookup<ReadOnlySpan<char>> _ordinalStems;
 
+    // The decimal and group separators of the caller's region (Mexican Spanish writes 1,234.56 where Spain writes 1.234,56).
+    private readonly char _dec;
+    private readonly string _groupChars;
+
     internal Scan(RecognizerData data, string text, RecognitionContext context = default)
     {
         _d = data;
@@ -43,6 +47,7 @@ internal sealed partial class Scan
         _points = data.PointWords.GetAlternateLookup<ReadOnlySpan<char>>();
         _loneSkip = data.LoneSkip.GetAlternateLookup<ReadOnlySpan<char>>();
         _ordinalStems = data.OrdinalStems.GetAlternateLookup<ReadOnlySpan<char>>();
+        data.NumberFormat(context.Region, out _dec, out _groupChars);
         Lexer.Lex(text, _items);
         if (data.Temporal.Glue.Count > 0)
         {
@@ -148,7 +153,7 @@ internal sealed partial class Scan
             {
                 end = ScanDigits(it.Start, -1);
             }
-            else if (it.Kind == ItemKind.Other && _t[it.Start] == _d.DecimalSeparator && it.End - it.Start == 1
+            else if (it.Kind == ItemKind.Other && _t[it.Start] == _dec && it.End - it.Start == 1
                 && i + 1 < _items.Count && _items[i + 1].Kind == ItemKind.Digits && _items[i + 1].Start == it.End)
             {
                 end = ScanDigits(it.Start, -1);
@@ -319,7 +324,9 @@ internal sealed partial class Scan
                 }
 
                 ordinal = true;
-                terminal = true;
+
+                // Spanish and Portuguese write "vigésimo tercero": an ordinal tens word may be followed by an ordinal unit.
+                terminal = !(_d.System == NumberSystem.Iberian && o.Value is >= 10 and < 100 && o.Value % 10 == 0);
             }
             else if ((_d.System is NumberSystem.German or NumberSystem.Italian) && TryCompoundAfter(cur, lastScale, w, out decimal compound, out bool compoundOrdinal))
             {
@@ -369,6 +376,20 @@ internal sealed partial class Scan
                     break;
                 }
 
+                if (_d.System == NumberSystem.Iberian && last == Piece.Tens && cur % 100 is >= 20 and <= 90)
+                {
+                    // "treinta y cinco", "trinta e cinco": the connector links tens to a unit from one to nine.
+                    int uk = Next(n, true);
+                    if (uk >= 0 && _items[uk].Kind == ItemKind.Word && _cardinals.TryGetValue(Span(uk), out Cardinal uc)
+                        && uc.Kind == CardinalKind.Unit && uc.Value != 0)
+                    {
+                        i = uk;
+                        continue;
+                    }
+
+                    break;
+                }
+
                 // "and" only links the hundreds or a scale word to what follows: "one hundred and five", "two thousand and ten".
                 int k = Next(n, false);
                 if (last is (Piece.Hundred or Piece.Scale) && cur % 100 == 0 && k >= 0 && _items[k].Kind == ItemKind.Word && StartsLowerPart(Span(k)))
@@ -398,7 +419,7 @@ internal sealed partial class Scan
     }
 
     private bool StartsLowerPart(ReadOnlySpan<char> w) =>
-        (_cardinals.TryGetValue(w, out Cardinal c) && c.Kind is CardinalKind.Unit or CardinalKind.Teen or CardinalKind.Tens)
+        (_cardinals.TryGetValue(w, out Cardinal c) && c.Kind is CardinalKind.Unit or CardinalKind.Teen or CardinalKind.Tens or CardinalKind.Hundreds)
         || (TryOrdinal(w, out OrdinalWord o) && o.Value < 100);
 
     /// <summary>An ordinal word as written, or a stem with one of the endings of the language (German <c>dritte</c>, <c>dritten</c>, <c>dritter</c>).</summary>
@@ -661,6 +682,16 @@ internal sealed partial class Scan
                 cur += v;
                 last = Piece.Tens;
                 return true;
+            case CardinalKind.Hundreds:
+                // Spanish and Portuguese: "doscientos", "quinhentos", "cien" are whole hundreds that open a group.
+                if (cur != 0)
+                {
+                    return false;
+                }
+
+                cur = v;
+                last = Piece.Hundred;
+                return true;
             case CardinalKind.Multiplier:
             {
                 decimal g = cur > 0 ? cur : (article && !any ? 1 : 0);
@@ -738,7 +769,7 @@ internal sealed partial class Scan
         if (v < 20)
         {
             // "first" .. "nineteenth": a unit may also follow tens ("twenty-first").
-            bool ok = cur % 100 == 0 || (v < 10 && cur % 100 >= 20 && cur % 10 == 0);
+            bool ok = cur % 100 == 0 || (v < 10 && cur % 100 >= 20 && cur % 10 == 0) || (sys == NumberSystem.Iberian && v < 10 && cur % 100 == 10);
             if (!ok && sys == NumberSystem.French)
             {
                 // soixante-dixieme, quatre-vingt-onzieme, dix-septieme
@@ -914,8 +945,8 @@ internal sealed partial class Scan
     {
         string t = _t;
         int n = t.Length;
-        char dec = _d.DecimalSeparator;
-        string groupChars = _d.GroupSeparators;
+        char dec = _dec;
+        string groupChars = _groupChars;
         char grp = '\0';
         int p = pos;
         bool grouped = false;
@@ -1086,6 +1117,22 @@ internal sealed partial class Scan
         {
             _numbers.Add(new NumberCandidate { Start = start, End = literalEnd + 1, Value = value, Ordinal = true });
             return literalEnd + 1;
+        }
+
+        // Spanish and Portuguese "1.º", "3.ª", "1.er": an ordinal ending written after a dot is a rule row of the form ".º".
+        if (plainInteger && !negative && q == literalEnd && literalEnd + 1 < n && t[literalEnd] == '.' && _d.OrdinalSuffixes.Count > 0 && char.IsLetter(t[literalEnd + 1]))
+        {
+            int r = literalEnd + 1;
+            while (r < n && Lexer.IsWordChar(t[r]))
+            {
+                r++;
+            }
+
+            if ((r >= n || !IsDigit(t[r])) && OrdinalSuffixOk(literal, t.AsSpan(literalEnd, r - literalEnd)))
+            {
+                _numbers.Add(new NumberCandidate { Start = start, End = r, Value = value, Ordinal = true });
+                return r;
+            }
         }
 
         if (q > literalEnd)
@@ -1373,7 +1420,7 @@ internal sealed partial class Scan
         }
 
         // "v1.5", "a.5": a dot inside a name is not a decimal point.
-        return !(c == _d.DecimalSeparator && pos >= 2 && char.IsLetterOrDigit(_t[pos - 2]));
+        return !(c == _dec && pos >= 2 && char.IsLetterOrDigit(_t[pos - 2]));
     }
 
     private static bool SignPrevOk(char c) =>

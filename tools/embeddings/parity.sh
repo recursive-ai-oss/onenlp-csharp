@@ -9,5 +9,6 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 P=$OUT/parity-$NAME; mkdir -p "$OUT"
 [ -e "$P.ref.json" ] || "$ST_VENV/bin/python" "$HERE/parity_reference.py" --corpus "$CORPUS" --repo "$REPO" --revision "$REV" --out "$P" --prefix "$PFX" > "$P.ref.log"
 TAG=ours; [ "$MF" = model.onnx ] || TAG=ours-${MF%.onnx}
-dotnet "$TOOL" run "$MODELS/$NAME" "$P.texts.jsonl" "$P.$TAG" --model "$MF" --prefix "$PFX" --time
+# SRC=@e5-package runs the shipped multilingual package (shards joined) instead of a model directory
+dotnet "$TOOL" run "${SRC:-$MODELS/$NAME}" "$P.texts.jsonl" "$P.$TAG" --model "$MF" --prefix "$PFX" --time
 "$ST_VENV/bin/python" "$HERE/parity_compare.py" "$P" --ours "$TAG" | tee "$P.$TAG.compare.json"

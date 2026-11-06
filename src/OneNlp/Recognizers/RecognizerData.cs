@@ -24,6 +24,9 @@ internal enum CardinalKind
 
     /// <summary>A scale word that may stand alone for one of itself: French <c>cent</c>, <c>mille</c>; German <c>hundert</c>, <c>tausend</c>.</summary>
     BareScale,
+
+    /// <summary>A hundreds word that stands for a whole number of hundreds: Spanish <c>doscientos</c> (200), Portuguese <c>quinhentos</c> (500).</summary>
+    Hundreds,
 }
 
 /// <summary>How number words combine. English is additive and multiplicative in the short scale; the others need rules of their own.</summary>
@@ -39,6 +42,12 @@ internal enum NumberSystem
 
     /// <summary>Italian: like German, whole numbers below a million are one word, but the tens come before the units (<c>trecentoventiquattro</c>, <c>ventitré</c>).</summary>
     Italian,
+
+    /// <summary>
+    /// Spanish and Portuguese: tens are joined to the unit by a connector (<c>treinta y cinco</c>, <c>trinta e cinco</c>), hundreds are words of their
+    /// own (<c>doscientos</c>), and an ordinal tens word may be followed by an ordinal unit (<c>vigésimo tercero</c>, <c>décimo quinto</c>).
+    /// </summary>
+    Iberian,
 }
 
 internal readonly record struct Cardinal(CardinalKind Kind, decimal Value);
@@ -99,6 +108,22 @@ internal sealed class RecognizerData
     internal string GroupSeparators { get; private set; } = ",";
 
     internal NumberSystem System { get; private set; } = NumberSystem.English;
+
+    /// <summary>Decimal separators for regions that write numbers differently from the language's default (<c>decimal.mx</c>).</summary>
+    internal Dictionary<string, char> RegionDecimal { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Group separators for regions that differ from the language's default (<c>group.mx</c>).</summary>
+    internal Dictionary<string, string> RegionGroups { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Digits a phone-like number written as space-separated groups may start with (<c>phone.space-start</c>), and the least and most digits it has.
+    /// Without a rule, only a national trunk prefix 0 and 9 to 11 digits count.
+    /// </summary>
+    internal string PhoneSpaceStarts { get; private set; } = "0";
+
+    internal int PhoneSpaceMinDigits { get; private set; } = 9;
+
+    internal int PhoneSpaceMaxDigits { get; private set; } = 11;
 
     /// <summary>A whole number followed by a dot and a word is an ordinal (German <c>3. März</c>).</summary>
     internal bool OrdinalDot { get; private set; }
@@ -167,6 +192,27 @@ internal sealed class RecognizerData
     internal TemporalData Temporal { get; } = new();
 
     internal HashSet<string> BareTlds { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>The decimal and group separators for a caller's region: the language's own unless the data names a different convention for the region.</summary>
+    internal void NumberFormat(string? region, out char decimalSeparator, out string groupSeparators)
+    {
+        decimalSeparator = DecimalSeparator;
+        groupSeparators = GroupSeparators;
+        if (region is null)
+        {
+            return;
+        }
+
+        if (RegionDecimal.TryGetValue(region, out char d))
+        {
+            decimalSeparator = d;
+        }
+
+        if (RegionGroups.TryGetValue(region, out string? g))
+        {
+            groupSeparators = g;
+        }
+    }
 
     private readonly List<(string Canonical, string[] Forms)> _ageUnits = [];
     private readonly List<string> _ageSuffixes = [];
@@ -273,7 +319,7 @@ internal sealed class RecognizerData
         "number.digits", "number.cardinal", "number.ordinal", "number.fraction", "number.article", "number.connector", "number.negative",
         "number.point", "number.suffix", "number.ordinal-suffix", "percent", "unit", "unit.compound", "number.not-number", "currency.context", "age.unit", "age.suffix", "age.prefix", "age.word", "number.lone-skip", "number.part", "number.ordinal-ending", "number.ordinal-dot-word", "currency.symbol",
         "currency.name", "currency.code", "url.scheme", "url.tld", "url.tld.bare", "time.month", "time.weekday", "time.unit", "time.season",
-        "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday", "time.flag", "time.region", "time.glue", "time.decade",
+        "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday", "time.flag", "time.region", "time.glue", "time.decade", "phone.space-start",
     };
 
     private void Apply(string section, string[] f)
@@ -287,6 +333,12 @@ internal sealed class RecognizerData
                     case "decimal":
                         DecimalSeparator = OneChar(f[1]);
                         break;
+                    case var k when k.StartsWith("decimal.", StringComparison.Ordinal):
+                        RegionDecimal[k[8..]] = OneChar(f[1]);
+                        break;
+                    case var k when k.StartsWith("group.", StringComparison.Ordinal):
+                        RegionGroups[k[6..]] = Groups(f[1]);
+                        break;
                     case "group":
                         GroupSeparators = Groups(f[1]);
                         break;
@@ -297,7 +349,8 @@ internal sealed class RecognizerData
                             "french" => NumberSystem.French,
                             "german" or "dutch" => NumberSystem.German,
                             "italian" => NumberSystem.Italian,
-                            _ => throw new RecognizerRulesException($"Unknown number system '{f[1]}' (expected english, french, german, dutch or italian)."),
+                            "iberian" => NumberSystem.Iberian,
+                            _ => throw new RecognizerRulesException($"Unknown number system '{f[1]}' (expected english, french, german, dutch, italian or iberian)."),
                         };
                         break;
                     case "ordinal-dot":
@@ -312,7 +365,7 @@ internal sealed class RecognizerData
                         NegativeSigns = f[1];
                         break;
                     default:
-                        throw new RecognizerRulesException($"Unknown key '{f[0]}' (expected decimal, group, negative, system or ordinal-dot).");
+                        throw new RecognizerRulesException($"Unknown key '{f[0]}' (expected decimal, group, decimal.<region>, group.<region>, negative, system or ordinal-dot).");
                 }
 
                 break;
@@ -326,6 +379,7 @@ internal sealed class RecognizerData
                     "scale" => CardinalKind.Scale,
                     "multiplier" => CardinalKind.Multiplier,
                     "bare-scale" => CardinalKind.BareScale,
+                    "hundreds" => CardinalKind.Hundreds,
                     _ => throw new RecognizerRulesException($"Unknown cardinal kind '{f[1]}'."),
                 }, Number(f[2]));
                 break;
@@ -526,6 +580,12 @@ internal sealed class RecognizerData
                     CurrencyCodes.Add(code);
                 }
 
+                break;
+            case "phone.space-start":
+                Need(f, 3, 3);
+                PhoneSpaceStarts = f[0];
+                PhoneSpaceMinDigits = (int)Math.Clamp(Number(f[1]), 7, 15);
+                PhoneSpaceMaxDigits = (int)Math.Clamp(Number(f[2]), PhoneSpaceMinDigits, 15);
                 break;
             case "url.scheme":
                 Need(f, 1, 1);

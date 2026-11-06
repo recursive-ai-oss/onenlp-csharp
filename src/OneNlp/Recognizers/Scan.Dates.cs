@@ -408,6 +408,17 @@ internal sealed partial class Scan
         return true;
     }
 
+    /// <summary>Spanish and Portuguese "12 de septiembre de 2026": with the <c>of-before-year</c> flag, the word "of" between a month and its year is skipped.</summary>
+    private int SkipOfBeforeYear(int k)
+    {
+        if (_td!.Flags.Contains("of-before-year") && Is(k, "of", out int n) && Dig(k + n, 4) && GapOk(_items[k + n - 1].End, _items[k + n].Start))
+        {
+            return k + n;
+        }
+
+        return k;
+    }
+
     private bool YearAt(int k, out int end, out int year)
     {
         end = k;
@@ -458,7 +469,7 @@ internal sealed partial class Scan
             int k = i + n;
             if (DayNum(k, out int de, out int d, out _) && GapOk(_items[k - 1].End, _items[k].Start) && d <= 31)
             {
-                int yk = de;
+                int yk = SkipOfBeforeYear(de);
                 if (Ch(yk, ',') && Tch(yk - 1, yk))
                 {
                     yk++;
@@ -514,7 +525,7 @@ internal sealed partial class Scan
             {
                 int m = mw2.A;
                 int me = k + mn;
-                int yk = me;
+                int yk = SkipOfBeforeYear(me);
                 if (Ch(yk, ',') && Tch(yk - 1, yk))
                 {
                     yk++;
@@ -574,7 +585,7 @@ internal sealed partial class Scan
                 }
 
                 HolidayRule rule = _td!.Holidays[w.A];
-                int e = j + h.N;
+                int e = SkipOfBeforeYear(j + h.N);
                 if (mode == 0 && j == i && YearAt(e, out int ye, out int y) && CivilCalendar.Holiday(rule, y) is DateTime dated)
                 {
                     r.Add(Day(i, ye, dated, false));
@@ -860,11 +871,26 @@ internal sealed partial class Scan
         }
 
         // French "les années 1990" and German "1990er Jahre": the same decade as "the 1990s".
-        if (Is(i, "decadeprefix", out int dpn) && Dig(i + dpn, 4) && GapOk(_items[i + dpn - 1].End, _items[i + dpn].Start) && Val(i + dpn) % 10 == 0
-            && Val(i + dpn) is >= 1000 and <= 2990 && FreeRight(i + dpn + 1))
+        // Spanish and Portuguese "los años 80", "anos 90": two digits after the prefix; 30 to 90 are the 1900s, 00 to 20 the 2000s. The article may start the expression.
+        int di = i;
+        if (Is(i, "determiner", out int dtn) && Is(i + dtn, "decadeprefix"))
         {
-            var s = new DateTime(Val(i + dpn), 1, 1);
-            r.Add(Per(i, i + dpn + 1, s, s.AddYears(10), Granularity.Decade, false, false));
+            di = i + dtn;
+        }
+
+        if (Is(di, "decadeprefix", out int dpn2) && Dig(di + dpn2, 2) && GapOk(_items[di + dpn2 - 1].End, _items[di + dpn2].Start) && Val(di + dpn2) % 10 == 0
+            && FreeRight(di + dpn2 + 1))
+        {
+            int yy = Val(di + dpn2);
+            var s2 = new DateTime(yy >= 30 ? 1900 + yy : 2000 + yy, 1, 1);
+            r.Add(Per(i, di + dpn2 + 1, s2, s2.AddYears(10), Granularity.Decade, false, false));
+        }
+
+        if (Is(di, "decadeprefix", out int dpn) && Dig(di + dpn, 4) && GapOk(_items[di + dpn - 1].End, _items[di + dpn].Start) && Val(di + dpn) % 10 == 0
+            && Val(di + dpn) is >= 1000 and <= 2990 && FreeRight(di + dpn + 1))
+        {
+            var s = new DateTime(Val(di + dpn), 1, 1);
+            r.Add(Per(i, di + dpn + 1, s, s.AddYears(10), Granularity.Decade, false, false));
         }
         else if (Is(i, "decadeprefix", out int dq) && DecadeName(i + dq, out int decadeEnd, out int decadeYear))
         {
@@ -1351,14 +1377,24 @@ internal sealed partial class Scan
             m += dn;
         }
 
-        if (!DayNum(m, out int e2, out int d2, out _) || d2 < d1 || e2 >= _items.Count || !GapOk(_items[e2 - 1].End, _items[e2].Start)
-            || !Find(e2, "month", out int mn, out TWord mw))
+        if (!DayNum(m, out int e2, out int d2, out _) || d2 < d1)
+        {
+            return;
+        }
+
+        // Spanish and Portuguese "del 12 al 20 de agosto": "de" stands between the last day and the month.
+        if (_td!.Flags.Contains("of-before-year") && Is(e2, "of", out int ofn))
+        {
+            e2 += ofn;
+        }
+
+        if (e2 >= _items.Count || !GapOk(_items[e2 - 1].End, _items[e2].Start) || !Find(e2, "month", out int mn, out TWord mw))
         {
             return;
         }
 
         int me = e2 + mn;
-        int yk = me;
+        int yk = SkipOfBeforeYear(me);
         if (Ch(yk, ',') && Tch(yk - 1, yk))
         {
             yk++;
@@ -1505,6 +1541,11 @@ internal sealed partial class Scan
                 if (Is(pk, "in", out int inn) && Is(pk + inn, "the", out int th))
                 {
                     pk += inn + th;
+                }
+                else if (Is(pk, "daypartprefix", out int dpp))
+                {
+                    // Portuguese "amanhã à noite": the preposition and article come as one word.
+                    pk += dpp;
                 }
 
                 if (Find(pk, "daypart", out int dn, out TWord part) && GapOk(_items[pk - 1].End, _items[pk].Start))
