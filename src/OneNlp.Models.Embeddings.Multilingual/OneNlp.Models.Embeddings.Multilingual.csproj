@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>$(PackagePrefix)$(LibName).Models.Embeddings.Multilingual</AssemblyName>
+    <RootNamespace>$(PackagePrefix)$(LibName).Models.Embeddings.Multilingual</RootNamespace>
+    <PackageId>$(PackagePrefix)$(LibName).Models.Embeddings.Multilingual</PackageId>
+    <Description>spaCy-class NLP for .NET: a multilingual sentence embedder (multilingual-e5-small, MIT, about 100 languages) for Nlp.Embed and SentenceEmbedder. Weights are exported from the authors' published model; nothing is trained here. No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <PackageTags>$(PackageTags);embeddings;sentence-embeddings;multilingual;model</PackageTags>
+    <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- The tokenizer and configuration files are embedded here; the ONNX file is carried by three shard packages. -->
+  <Import Project="EmbedWeights.targets" />
+
+  <ItemGroup>
+    <!-- The registration file is shipped, not compiled here. -->
+    <Compile Remove="contentFiles/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../OneNlp.Neural/OneNlp.Neural.csproj" />
+    <ProjectReference Include="../OneNlp.Models.Embeddings.Multilingual.Shard1/OneNlp.Models.Embeddings.Multilingual.Shard1.csproj" />
+    <ProjectReference Include="../OneNlp.Models.Embeddings.Multilingual.Shard2/OneNlp.Models.Embeddings.Multilingual.Shard2.csproj" />
+    <ProjectReference Include="../OneNlp.Models.Embeddings.Multilingual.Shard3/OneNlp.Models.Embeddings.Multilingual.Shard3.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="PACKAGE.md" Pack="true" PackagePath="/" />
+    <None Include="PROVENANCE.md" Pack="true" PackagePath="/" />
+    <None Include="weights.manifest.props" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-MIT" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-APACHE" Pack="true" PackagePath="/" />
+    <None Include="THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+    <Content Include="contentFiles/OneNlpModelsEmbeddingsMultilingualRegistration.cs" Pack="true" PackagePath="contentFiles/cs/any/" BuildAction="Compile" PackageCopyToOutput="false" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+</Project>

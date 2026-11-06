@@ -12,14 +12,18 @@
     <PublishAot>true</PublishAot>
     <IsAotCompatible>true</IsAotCompatible>
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
-    <WithModel Condition="'$(WithModel)' == ''">true</WithModel>
-    <DefineConstants Condition="'$(WithModel)' != 'true'">$(DefineConstants);NO_MODEL</DefineConstants>
+    <!-- Which model packages are referenced: none, en, multi or both. -->
+    <Models Condition="'$(Models)' == ''">en</Models>
+    <DefineConstants Condition="'$(Models)' == 'none'">$(DefineConstants);NO_MODEL</DefineConstants>
+    <DefineConstants Condition="'$(Models)' == 'multi' Or '$(Models)' == 'both'">$(DefineConstants);MULTI</DefineConstants>
+    <DefineConstants Condition="'$(Models)' == 'both'">$(DefineConstants);BOTH</DefineConstants>
     <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ONENLP_CONSUMER_FEED)</RestoreAdditionalProjectSources>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="RecursiveAI.OneNlp" VersionOverride="$(Version)" />
-    <PackageReference Include="RecursiveAI.OneNlp.Models.Embeddings" VersionOverride="$(Version)" Condition="'$(WithModel)' == 'true'" />
+    <PackageReference Include="RecursiveAI.OneNlp.Models.Embeddings" VersionOverride="$(Version)" Condition="'$(Models)' == 'en' Or '$(Models)' == 'both'" />
+    <PackageReference Include="RecursiveAI.OneNlp.Models.Embeddings.Multilingual" VersionOverride="$(Version)" Condition="'$(Models)' == 'multi' Or '$(Models)' == 'both'" />
   </ItemGroup>
 
 </Project>

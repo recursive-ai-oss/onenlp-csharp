@@ -4,6 +4,10 @@
     <Project Path="src/OneNlp.Neural/OneNlp.Neural.csproj" />
     <Project Path="src/OneNlp.Models.English/OneNlp.Models.English.csproj" />
     <Project Path="src/OneNlp.Models.Embeddings/OneNlp.Models.Embeddings.csproj" />
+    <Project Path="src/OneNlp.Models.Embeddings.Multilingual/OneNlp.Models.Embeddings.Multilingual.csproj" />
+    <Project Path="src/OneNlp.Models.Embeddings.Multilingual.Shard1/OneNlp.Models.Embeddings.Multilingual.Shard1.csproj" />
+    <Project Path="src/OneNlp.Models.Embeddings.Multilingual.Shard2/OneNlp.Models.Embeddings.Multilingual.Shard2.csproj" />
+    <Project Path="src/OneNlp.Models.Embeddings.Multilingual.Shard3/OneNlp.Models.Embeddings.Multilingual.Shard3.csproj" />
     <Project Path="src/OneNlp.Models.French/OneNlp.Models.French.csproj" />
     <Project Path="src/OneNlp.Models.German/OneNlp.Models.German.csproj" />
     <Project Path="src/OneNlp.Models.Spanish/OneNlp.Models.Spanish.csproj" />
