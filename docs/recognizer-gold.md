@@ -151,3 +151,20 @@ Run the comparators with `tools/oracles/comparators_lang.sh <lang> <culture> <go
 Every type has at least 10 test items. Conventions beyond the English ones: a preposition, also fused with an article (`no`, `na`, `do`, `pelo`), is outside the span, except where it belongs to the construct (`dentro de 5 días`, `hace 10 días`, `daqui a 5 dias`, `de 8 h a 12 h`, `das 8h às 12h`); an article that starts the expression is inside it (`el 20 de marzo`, `las 15:00`, `o Dia das Mães`); the fused `às`/`à` before a clock time is inside; ages are `N años de edad` / `N anos de idade` only; `noche`/`noite` is 18:00-24:00. The Spanish gold is Spain's (decimal comma, dot or space grouping); the Portuguese gold is Brazil's, with a few European forms.
 
 Run the comparators with `tools/oracles/comparators_lang.sh <lang> <es-es|pt-br> <gold|test> <out>` (Microsoft.Recognizers.Text 1.8.13; its unit names are mapped in `map_raw.py`), Duckling with `tools/oracles/duckling_lang.sh <lang> <es_ES|pt_PT> ...` (information only), and ours with `tools/oracles/score_dev.sh <lang> <out> [gold|test]`. Results, with paired 95% intervals: `testdata/recognizers/{es,pt}/comparators/`.
+
+## Italian and Dutch
+
+`testdata/recognizers/{it,nl}/` hold the gold sets in the same schema, written for these languages (never copied from a comparator): `test.jsonl` and `gold.jsonl` (development). Sources: `tools/recognizers-gold/{it,nl}.src.txt`, built by `build.py --lang it|nl`; only the development split guided the rules.
+
+| File | Items | Sentences | sha256 |
+|---|---:|---:|---|
+| `it/test.jsonl` | 368 | 370 | `e4fadcf947a4032543205e7948a006e09f6e2cd3453d609ce2de6602e782d865` |
+| `nl/test.jsonl` | 369 | 372 | `0d78115506a09c2261050f0530647b80c400b0428100e745b74d8aa8816fed1b` |
+| `it/gold.jsonl` (dev) | | | `61f613054ce3c69f429be959343ea11640ff7b3b76d75baf7f1d534f261ceb27` |
+| `nl/gold.jsonl` (dev) | | | `d196c8d32d99ed7edffcdac60bb44a0c8e53bd32b76faf48002b1bd51776a8aa` |
+
+The test files were edited once after their first hash (it `3d15d452…`, nl `e1a04260…`), before any score on them was read and without system output: three Italian durations were reworded because `di N anni` reads as an age, incidental dates, durations and sets were labelled or reworded, and the Dutch determiner `de` was moved outside the span in `de derde donderdag van april`, `de laatste vrijdag van maart` and `de eerste maandag van mei`.
+
+Conventions beyond the English ones: a preposition, also fused with an article (`nel`, `dal`, `alle`, `in`, `op`), is outside the span, except where it belongs to the construct (`tra 3 giorni`, `3 giorni fa`, `over 3 dagen`, `dalle 8 alle 12`, `van 8 tot 12 uur`); an Italian age includes `di` (`di 82 anni`); a Dutch age is `N jaar oud` or `N-jarige`.
+
+Run the comparators with `tools/oracles/comparators_lang.sh <lang> <it-it|nl-nl> <gold|test> <out>` (Microsoft.Recognizers.Text 1.8.13), Duckling with `tools/oracles/duckling_lang.sh <lang> <it_IT|nl_NL> ...` (information only), and ours with `tools/oracles/score_dev.sh <lang> <out> [gold|test]`. Results, with paired 95% intervals: `testdata/recognizers/{it,nl}/comparators/`.

@@ -745,6 +745,31 @@ internal sealed partial class Scan
             return;
         }
 
+        // Italian "le sei del mattino", "tre e mezza del pomeriggio": an hour written as a word, then the part of the day. Only where the
+        // rule data allows it (flag word-hour): in other languages it would also read English "five in the afternoon" differently.
+        if (_td!.Flags.Contains("word-hour") && i < _items.Count && _items[i].Kind == ItemKind.Word && _cardinals.TryGetValue(Span(i), out Cardinal hc)
+            && hc.Kind is CardinalKind.Unit or CardinalKind.Teen && hc.Value is >= 1 and <= 12)
+        {
+            int we = i + 1;
+            int wm = 0;
+            if (Is(we, "plus30", out int wp) && GapOk(_items[we - 1].End, _items[we].Start))
+            {
+                wm = 30;
+                we += wp;
+            }
+            else if (Is(we, "plus15", out wp) && GapOk(_items[we - 1].End, _items[we].Start))
+            {
+                wm = 15;
+                we += wp;
+            }
+
+            if (DaypartPhrase(we, out int wd, out TWord wpart))
+            {
+                int hh = (int)hc.Value;
+                r.Add(new Cand(i, wd, Mark(TemporalValue.Clock(wpart.A >= 12 ? (hh % 12) + 12 : hh % 12, wm, 0, wm > 0 ? Granularity.Minute : Granularity.Hour), meridiem: true)));
+            }
+        }
+
         if (Find(i, "midnight", out n, out _))
         {
             int ne = i + n;
@@ -895,24 +920,32 @@ internal sealed partial class Scan
             }
 
             var seconds = new List<Cand>();
-            TimeAt(k + n, seconds, false);
+            TimeAt(k + n, seconds, framed && _td!.Flags.Contains("bare-range-24"));
             foreach (Cand b in seconds)
             {
-                TemporalValue? range = JoinTimes(a.V, b.V, framed);
+                TemporalValue? range = JoinTimes(a.V, b.V, framed, framed && _td!.Flags.Contains("bare-range-24"));
                 if (range is not null)
                 {
-                    r.Add(new Cand(i, b.E, range));
+                    // "van 8 tot 12 uur": the hour word after the second end belongs to the range.
+                    int rangeEnd = b.E;
+                    if (rangeEnd < _items.Count && Is(rangeEnd, "hourword", out int hwn) && GapOk(_items[rangeEnd - 1].End, _items[rangeEnd].Start))
+                    {
+                        rangeEnd += hwn;
+                    }
+
+                    r.Add(new Cand(i, rangeEnd, range));
                 }
             }
         }
     }
 
-    private static TemporalValue? JoinTimes(TemporalValue a, TemporalValue b, bool framed)
+    /// <summary>Joins the two ends of a range of times. <paramref name="bareRange"/>: both ends may be bare hours on the 24-hour clock (Italian <c>dalle 8 alle 12</c>).</summary>
+    private static TemporalValue? JoinTimes(TemporalValue a, TemporalValue b, bool framed, bool bareRange)
     {
         DateTime start = a.Start;
         if (a.Bare || (!a.Meridiem && !a.Clock24 && b.Meridiem))
         {
-            if (b.Clock24 && !b.Meridiem)
+            if ((b.Clock24 && !b.Meridiem) || (bareRange && b.Bare && !b.Meridiem))
             {
                 // "de 9 a 17h", "von 9 bis 17 Uhr": the second end is on the 24-hour clock, so the first hour is read as written.
                 start = a.Start;

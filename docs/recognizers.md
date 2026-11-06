@@ -347,3 +347,36 @@ Dates are day first. New data for `time.word` and `time.flag`:
 - Weekdays in Portuguese are the full `segunda-feira` forms and the dotted abbreviations; a bare `quarta` or `sexta` is not a weekday.
 - `mil millones`, `una docena y media` and compound measures past two terms are not read.
 - The seasons are the northern-hemisphere meteorological ones, as for English.
+
+## Italian and Dutch
+
+Italian (`it`) and Dutch (`nl`) are data sets on the same engine: `Data/<lang>/{numbers,units,currency,datetime}.rules`, the holidays inside `datetime.rules`, and the shared sequence rules. Use `Recognizer.For(Language.Italian)` or the `Nlp` recognizer verbs with a `Language` argument. The other languages' results are unchanged.
+
+### Numbers
+
+- **`number.digits | system`** takes `italian` and `dutch` besides the earlier names. `dutch` is an alias of `german` (one word below a million, units before tens: `vierentwintig`, `tweeduizend vijfhonderd`). `italian` is one word too, but the tens come before the units (`ventitré`, `trecentoventiquattro`).
+- **`[number.part]`** lists the elided stems that only occur inside a compound: `vent` (twenty, in `ventuno`, `ventotto`), `cent` (in `centotto`), `trent`, `quarant`, and so on, each with its kind and value. A stem is never read alone.
+- A compound word may follow a round thousand (`tweeduizend vijfhonderd`, `duemilacinquecento`), and a teen may precede `honderd` (`twaalfhonderd` is 1200).
+- Decimal comma and dot or space grouping, as for French and German: the CLDR conventions, written as data.
+
+### Dates and times
+
+Dates are day first. New sections and flags:
+
+| Item | Meaning |
+|---|---|
+| `[time.glue]` | splits glued words before reading them: `zaterdagavond` is `zaterdag` + `avond`. Rows are `first words | second words` |
+| `[time.decade]` | names decades (`Trenta | 30`); a two-digit decade after `anni '90` or `anni 90` is read too |
+| `time.flag bare-range-24` | a range of bare hours is a time range when the hours are plausible clock times: `dalle 8 alle 12` |
+| `time.flag word-hour` | a spoken hour with a part of the day is a time: `sei del mattino` |
+| `hourword` | also after the second end of a range: `van 8 tot 12 uur` |
+| holiday rule `fixed-not-sunday MM-DD` | the date, moved to the day before when it falls on a Sunday. Used for Koningsdag (27 April; 26 April when 27 April is a Sunday) |
+
+Regions: `it` and `nl` (they pick the holiday rows). Holiday sources are statute facts: the Italian public holidays (Legge 27 maggio 1949, n. 260, as amended by later laws) and the Dutch general holidays (Algemene termijnenwet art. 3), with the Easter-based feasts from the computus. Customary dates (Ferragosto, Sinterklaasavond, Festa della mamma) are `fixed` or `nth` rows.
+
+### Limits (Italian and Dutch)
+
+- `di N anni` always reads as an age in Italian, so `un contratto di 5 anni` is an age; write `per 5 anni` for a duration.
+- Dutch `uur` is a weak hour word: `8 uur` is a time only with a part of the day, a tail or a range around it.
+- `vanmiddag`, `vanavond` and `vannacht` are cut as `van` (this) plus `middag`, `avond`, `nacht`.
+- Compound measures past two terms are not read.

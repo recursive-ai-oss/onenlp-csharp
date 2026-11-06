@@ -40,6 +40,9 @@ internal enum NumberSystem
     /// <summary>German: whole numbers below a million are written as one word, units before tens (<c>dreihundertvierundzwanzig</c>).</summary>
     German,
 
+    /// <summary>Italian: like German, whole numbers below a million are one word, but the tens come before the units (<c>trecentoventiquattro</c>, <c>ventitré</c>).</summary>
+    Italian,
+
     /// <summary>
     /// Spanish and Portuguese: tens are joined to the unit by a connector (<c>treinta y cinco</c>, <c>trinta e cinco</c>), hundreds are words of their
     /// own (<c>doscientos</c>), and an ordinal tens word may be followed by an ordinal unit (<c>vigésimo tercero</c>, <c>décimo quinto</c>).
@@ -148,6 +151,9 @@ internal sealed class RecognizerData
 
     /// <summary>Ordinal stems that need an ending to be a word (German <c>dritt</c>, written <c>number.ordinal</c> with a trailing <c>~</c>).</summary>
     internal Dictionary<string, OrdinalWord> OrdinalStems { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>Pieces of compound number words that are not words themselves (<c>number.part</c>).</summary>
+    private List<Morpheme> Parts { get; } = [];
 
     /// <summary>The parts German number words are cut into, longest first; empty for other languages.</summary>
     internal Morpheme[] Morphemes { get; private set; } = [];
@@ -311,9 +317,9 @@ internal sealed class RecognizerData
     private static readonly HashSet<string> Sections = new(StringComparer.Ordinal)
     {
         "number.digits", "number.cardinal", "number.ordinal", "number.fraction", "number.article", "number.connector", "number.negative",
-        "number.point", "number.suffix", "number.ordinal-suffix", "percent", "unit", "unit.compound", "number.not-number", "currency.context", "age.unit", "age.suffix", "age.prefix", "age.word", "number.lone-skip", "number.ordinal-ending", "number.ordinal-dot-word", "currency.symbol",
+        "number.point", "number.suffix", "number.ordinal-suffix", "percent", "unit", "unit.compound", "number.not-number", "currency.context", "age.unit", "age.suffix", "age.prefix", "age.word", "number.lone-skip", "number.part", "number.ordinal-ending", "number.ordinal-dot-word", "currency.symbol",
         "currency.name", "currency.code", "url.scheme", "url.tld", "url.tld.bare", "time.month", "time.weekday", "time.unit", "time.season",
-        "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday", "time.flag", "time.region", "phone.space-start",
+        "time.daypart", "time.meridiem", "time.word", "time.recurrence", "time.zone", "time.holiday", "time.flag", "time.region", "time.glue", "time.decade", "phone.space-start",
     };
 
     private void Apply(string section, string[] f)
@@ -341,9 +347,10 @@ internal sealed class RecognizerData
                         {
                             "english" => NumberSystem.English,
                             "french" => NumberSystem.French,
-                            "german" => NumberSystem.German,
+                            "german" or "dutch" => NumberSystem.German,
+                            "italian" => NumberSystem.Italian,
                             "iberian" => NumberSystem.Iberian,
-                            _ => throw new RecognizerRulesException($"Unknown number system '{f[1]}' (expected english, french, german or iberian)."),
+                            _ => throw new RecognizerRulesException($"Unknown number system '{f[1]}' (expected english, french, german, dutch, italian or iberian)."),
                         };
                         break;
                     case "ordinal-dot":
@@ -380,13 +387,26 @@ internal sealed class RecognizerData
                 Need(f, 2, 3);
                 if (f[0].EndsWith('~'))
                 {
-                    OrdinalStems[f[0][..^1].ToLowerInvariant()] = new OrdinalWord(Number(f[1]), false);
+                    OrdinalStems[f[0][..^1].ToLowerInvariant()] = new OrdinalWord(Number(f[1]), f.Length > 2 && f[2] == "not-after-number");
                 }
                 else
                 {
                     Ordinals[f[0].ToLowerInvariant()] = new OrdinalWord(Number(f[1]), f.Length > 2 && f[2] == "not-after-number");
                 }
 
+                break;
+            case "number.part":
+                // A piece of a compound number word that is no word of its own (Italian elisions: vent- in ventuno, cent- in centottanta).
+                Need(f, 3, 3);
+                Parts.Add(new Morpheme(f[0].ToLowerInvariant(), f[1] switch
+                {
+                    "unit" => MorphemeKind.Unit,
+                    "teen" => MorphemeKind.Teen,
+                    "tens" => MorphemeKind.Tens,
+                    "hundred" => MorphemeKind.Hundred,
+                    "thousand" => MorphemeKind.Thousand,
+                    _ => throw new RecognizerRulesException($"Unknown part kind '{f[1]}' (expected unit, teen, tens, hundred or thousand)."),
+                }, Number(f[2]), false));
                 break;
             case "number.fraction":
                 Need(f, 2, 2);
@@ -619,7 +639,7 @@ internal sealed class RecognizerData
             }
         }
 
-        if (System == NumberSystem.German)
+        if (System is NumberSystem.German or NumberSystem.Italian)
         {
             BuildMorphemes();
         }
@@ -654,6 +674,7 @@ internal sealed class RecognizerData
             }
         }
 
+        parts.AddRange(Parts);
         foreach (string word in Connectors)
         {
             parts.Add(new Morpheme(word, MorphemeKind.And, 0, false));

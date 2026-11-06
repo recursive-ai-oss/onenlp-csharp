@@ -49,7 +49,60 @@ internal sealed partial class Scan
         _ordinalStems = data.OrdinalStems.GetAlternateLookup<ReadOnlySpan<char>>();
         data.NumberFormat(context.Region, out _dec, out _groupChars);
         Lexer.Lex(text, _items);
+        if (data.Temporal.Glue.Count > 0)
+        {
+            SplitGlued(data.Temporal.Glue);
+        }
+
         InitTemporal(context);
+    }
+
+    /// <summary>
+    /// Cuts a word that is a known prefix and suffix written together into two touching items, so "zaterdagavond" reads as "zaterdag"
+    /// "avond". The offsets of the pieces are the offsets in the text.
+    /// </summary>
+    private void SplitGlued(List<(string[] Prefixes, string[] Suffixes)> glue)
+    {
+        for (int i = _items.Count - 1; i >= 0; i--)
+        {
+            Item it = _items[i];
+            if (it.Kind != ItemKind.Word || it.End - it.Start < 5 || it.End - it.Start > 40)
+            {
+                continue;
+            }
+
+            string w = _t.Substring(it.Start, it.End - it.Start);
+            foreach ((string[] prefixes, string[] suffixes) in glue)
+            {
+                bool done = false;
+                foreach (string p in prefixes)
+                {
+                    if (w.Length > p.Length && w.StartsWith(p, StringComparison.OrdinalIgnoreCase))
+                    {
+                        foreach (string sfx in suffixes)
+                        {
+                            if (w.Length - p.Length == sfx.Length && w.EndsWith(sfx, StringComparison.OrdinalIgnoreCase))
+                            {
+                                _items[i] = new Item(it.Start, it.Start + p.Length, ItemKind.Word);
+                                _items.Insert(i + 1, new Item(it.Start + p.Length, it.End, ItemKind.Word));
+                                done = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (done)
+                    {
+                        break;
+                    }
+                }
+
+                if (done)
+                {
+                    break;
+                }
+            }
+        }
     }
 
     /// <summary>A number found in the text, before it is paired with a unit, a currency or a percent sign.</summary>
@@ -275,11 +328,11 @@ internal sealed partial class Scan
                 // Spanish and Portuguese write "vigésimo tercero": an ordinal tens word may be followed by an ordinal unit.
                 terminal = !(_d.System == NumberSystem.Iberian && o.Value is >= 10 and < 100 && o.Value % 10 == 0);
             }
-            else if (_d.System == NumberSystem.German && cur == 0 && TryGermanCompound(w, out decimal compound, out bool compoundOrdinal)
-                && compound < lastScale)
+            else if ((_d.System is NumberSystem.German or NumberSystem.Italian) && TryCompoundAfter(cur, lastScale, w, out decimal compound, out bool compoundOrdinal))
             {
-                // "dreihundertvierundzwanzig": a whole number below a million written as one word is one group.
-                cur = compound;
+                // "dreihundertvierundzwanzig": a whole number below a million written as one word is one group. A second word may
+                // follow a round thousand (Dutch "tweeduizend vijfhonderd").
+                cur += compound;
                 last = Piece.Hundred;
                 if (compoundOrdinal)
                 {
@@ -411,11 +464,23 @@ internal sealed partial class Scan
     /// <c>hundert</c>, <c>tausend</c>, <c>und</c>, ordinal stems), trying longer morphemes first and backing out of dead ends, and the
     /// morphemes must fit the grammar: [unit hundert | hundert] [unit tausend | tausend] ... with a unit before its tens joined by und.
     /// </summary>
+    /// <summary>A compound number word that starts a number (nothing read yet) or follows a round thousand ("tweeduizend vijfhonderd").</summary>
+    private bool TryCompoundAfter(decimal cur, decimal lastScale, ReadOnlySpan<char> word, out decimal compound, out bool ordinal)
+    {
+        compound = 0;
+        ordinal = false;
+        bool afterThousands = cur >= 1000 && cur < 1_000_000 && cur % 1000 == 0;
+        return (cur == 0 || afterThousands)
+            && TryGermanCompound(word, out compound, out ordinal)
+            && compound < lastScale
+            && (cur == 0 || compound < 1000);
+    }
+
     private bool TryGermanCompound(ReadOnlySpan<char> word, out decimal value, out bool ordinal)
     {
         value = 0;
         ordinal = false;
-        if (word.Length is < 8 or > 64 || _d.Morphemes.Length == 0)
+        if (word.Length < (_d.System == NumberSystem.Italian ? 6 : 8) || word.Length > 64 || _d.Morphemes.Length == 0)
         {
             return false;
         }
@@ -447,7 +512,7 @@ internal sealed partial class Scan
     {
         if (pos == length)
         {
-            return Evaluate(path, ordinal, out value);
+            return Evaluate(path, ordinal, _d.System == NumberSystem.Italian, out value);
         }
 
         foreach (Morpheme m in _d.Morphemes)
@@ -471,7 +536,7 @@ internal sealed partial class Scan
     }
 
     /// <summary>Checks a morpheme sequence against the grammar of German numbers below a million and returns its value.</summary>
-    private static bool Evaluate(List<Morpheme> m, bool ordinal, out decimal value)
+    private static bool Evaluate(List<Morpheme> m, bool ordinal, bool tensFirst, out decimal value)
     {
         value = 0;
         if (m.Count < 2 || (ordinal && !m[^1].Ordinal))
@@ -489,7 +554,7 @@ internal sealed partial class Scan
 
         int pos = 0;
         decimal total = 0;
-        if (!Group(m, ref pos, out decimal first))
+        if (!Group(m, tensFirst, ref pos, out decimal first))
         {
             first = 0;
         }
@@ -498,7 +563,7 @@ internal sealed partial class Scan
         {
             pos++;
             total = (first == 0 ? 1 : first) * 1000;
-            if (!Group(m, ref pos, out decimal rest))
+            if (!Group(m, tensFirst, ref pos, out decimal rest))
             {
                 rest = 0;
             }
@@ -514,12 +579,12 @@ internal sealed partial class Scan
         return pos == m.Count && total > 0;
     }
 
-    // group := [unit] hundert [rest] | rest ; rest := teen | tens | unit und tens | unit
-    private static bool Group(List<Morpheme> m, ref int pos, out decimal value)
+    // group := [unit | teen] hundert [rest] | rest ; rest := teen | tens [unit, Italian] | unit und tens | unit
+    private static bool Group(List<Morpheme> m, bool tensFirst, ref int pos, out decimal value)
     {
         value = 0;
         int start = pos;
-        if (pos + 1 < m.Count && m[pos].Kind == MorphemeKind.Unit && m[pos + 1].Kind == MorphemeKind.Hundred)
+        if (pos + 1 < m.Count && m[pos].Kind is MorphemeKind.Unit or MorphemeKind.Teen && m[pos + 1].Kind == MorphemeKind.Hundred)
         {
             value = m[pos].Value * 100;
             pos += 2;
@@ -530,14 +595,24 @@ internal sealed partial class Scan
             pos++;
         }
 
-        if (pos < m.Count && m[pos].Kind is MorphemeKind.Teen or MorphemeKind.Tens)
+        if (pos < m.Count && m[pos].Kind == MorphemeKind.Teen)
         {
             value += m[pos].Value;
             pos++;
         }
+        else if (pos < m.Count && m[pos].Kind == MorphemeKind.Tens)
+        {
+            value += m[pos].Value;
+            pos++;
+            if (tensFirst && pos < m.Count && m[pos].Kind == MorphemeKind.Unit)
+            {
+                value += m[pos].Value;
+                pos++;
+            }
+        }
         else if (pos < m.Count && m[pos].Kind == MorphemeKind.Unit)
         {
-            if (pos + 2 < m.Count && m[pos + 1].Kind == MorphemeKind.And && m[pos + 2].Kind == MorphemeKind.Tens)
+            if (!tensFirst && pos + 2 < m.Count && m[pos + 1].Kind == MorphemeKind.And && m[pos + 2].Kind == MorphemeKind.Tens)
             {
                 value += m[pos + 2].Value + m[pos].Value;
                 pos += 3;

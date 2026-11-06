@@ -892,6 +892,11 @@ internal sealed partial class Scan
             var s = new DateTime(Val(di + dpn), 1, 1);
             r.Add(Per(i, di + dpn + 1, s, s.AddYears(10), Granularity.Decade, false, false));
         }
+        else if (Is(i, "decadeprefix", out int dq) && DecadeName(i + dq, out int decadeEnd, out int decadeYear))
+        {
+            var s = new DateTime(decadeYear, 1, 1);
+            r.Add(Per(i, decadeEnd, s, s.AddYears(10), Granularity.Decade, false, false));
+        }
         else if (Dig(i, 4) && i + 1 < _items.Count && Tch(i, i + 1) && Val(i) % 10 == 0 && Val(i) is >= 1000 and <= 2990 && Is(i + 1, "decadesuffix", out int dsn))
         {
             int end = i + 1 + dsn;
@@ -910,6 +915,38 @@ internal sealed partial class Scan
             var s = new DateTime(year, 1, 1);
             r.Add(Per(i, e, s, s.AddYears(1), Granularity.Year, false, false, 0.8f));
         }
+    }
+
+    /// <summary>A decade written as a name ("Novanta") or as two digits with an optional apostrophe ("'90", "90") after "anni" / "jaren".</summary>
+    private bool DecadeName(int k, out int end, out int year)
+    {
+        end = k;
+        year = 0;
+        int yy;
+        if (Find(k, "decade", out int n, out TWord w))
+        {
+            yy = w.A;
+            end = k + n;
+        }
+        else
+        {
+            int d = k;
+            if (d < _items.Count && _items[d].Kind == ItemKind.Other && _items[d].End - _items[d].Start == 1 && _t[_items[d].Start] is '\'' or '\u2019')
+            {
+                d++;
+            }
+
+            if (!Dig(d, 2) || Val(d) % 10 != 0 || !FreeRight(d + 1))
+            {
+                return false;
+            }
+
+            yy = Val(d);
+            end = d + 1;
+        }
+
+        year = yy >= 30 ? 1900 + yy : 2000 + yy;
+        return true;
     }
 
     private void QuarterOrHalf(int i, DateTime a, bool nr, List<Cand> r)
