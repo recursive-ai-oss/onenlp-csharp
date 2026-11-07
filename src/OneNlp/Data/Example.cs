@@ -1,4 +1,6 @@
-namespace RecursiveAI.OneNlp.Data;
+using RecursiveAI.OneNlp.Data;
+
+namespace RecursiveAI.OneNlp;
 
 /// <summary>
 /// A training or evaluation example: a <see cref="Predicted"/> document, which components annotate, paired with a
@@ -58,6 +60,41 @@ public sealed class Example
     {
         ArgumentNullException.ThrowIfNull(reference);
         return new Example(Blank(reference), reference, cats, spans);
+    }
+
+    /// <summary>
+    /// Makes an example from a text and gold annotations given as character offsets (spaCy's <c>Example.from_dict</c>): the text is split
+    /// with the pipeline's tokenizer, so training sees the token boundaries the pipeline produces at prediction time.
+    /// </summary>
+    /// <param name="nlp">The pipeline whose tokenizer and string table are used.</param>
+    /// <param name="text">The text.</param>
+    /// <param name="entities">Gold entities as character offsets into <paramref name="text"/> (<c>End</c> exclusive, UTF-16 units) and a label, in any order; they must not overlap. <see langword="null"/> for none.</param>
+    /// <param name="cats">Gold category scores from 0 to 1, or <see langword="null"/>.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="nlp"/> or <paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">An entity does not start and end on token boundaries of the pipeline's tokenization, is empty, has no label, or overlaps another; the message names it.</exception>
+    public static Example Create(Pipeline nlp, string text, IEnumerable<(int Start, int End, string Label)>? entities = null, IReadOnlyDictionary<string, float>? cats = null)
+    {
+        ArgumentNullException.ThrowIfNull(nlp);
+        ArgumentNullException.ThrowIfNull(text);
+        Doc reference = nlp.Tokenizer.Tokenize(text, nlp.Strings);
+        if (entities is not null)
+        {
+            var specs = new List<SpanSpec>();
+            foreach ((int start, int end, string label) in entities)
+            {
+                if (!reference.TryGetCharSpan(start, end, out Span span, label))
+                {
+                    throw new ArgumentException($"The entity {label} at characters {start}..{end} does not start and end on token boundaries of the pipeline's tokenization.", nameof(entities));
+                }
+
+                specs.Add(new SpanSpec(span.Start, span.End, label));
+            }
+
+            specs.Sort(static (x, y) => x.Start.CompareTo(y.Start));
+            reference.SetEntities([.. specs]);
+        }
+
+        return FromReference(reference, cats);
     }
 
     /// <summary>Makes an unannotated document with the text and token boundaries of another, sharing its string table.</summary>

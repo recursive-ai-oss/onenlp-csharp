@@ -21,7 +21,7 @@ internal static class WordTokenizerTarget
         {
             Token t = doc[i];
             Require(t.Length > 0 && t.Idx >= previousEnd && t.EndIdx <= text.Length, "token range");
-            Require(t.Text.SequenceEqual(text.AsSpan(t.Idx, t.Length)), "token text");
+            Require(t.TextSpan.SequenceEqual(text.AsSpan(t.Idx, t.Length)), "token text");
             for (int c = previousEnd; c < t.Idx; c++)
             {
                 Require(char.IsWhiteSpace(text[c]), "gap holds only whitespace");

@@ -287,6 +287,40 @@ internal static class DocBinary
         return builder.Buffer.AsSpan(0, builder.Length).ToArray();
     }
 
+    /// <summary>The asynchronous twin of <see cref="ReadFully"/>.</summary>
+    internal static async ValueTask<byte[]> ReadFullyAsync(Stream stream, long count, CancellationToken cancellationToken)
+    {
+        const int Chunk = 1 << 20;
+        if (count > MaxBodyBytes + 4)
+        {
+            throw new InvalidDataException("A declared length is over the 1 GiB cap.");
+        }
+
+        var builder = new ByteBuilder();
+        byte[] chunk = new byte[(int)Math.Min(count, Chunk)];
+        long left = count;
+        while (left > 0)
+        {
+            int take = (int)Math.Min(left, chunk.Length);
+            int total = 0;
+            while (total < take)
+            {
+                int read = await stream.ReadAsync(chunk.AsMemory(total, take - total), cancellationToken).ConfigureAwait(false);
+                if (read == 0)
+                {
+                    throw new InvalidDataException("The stream ends before the length its header declares.");
+                }
+
+                total += read;
+            }
+
+            builder.Bytes(chunk.AsSpan(0, take));
+            left -= take;
+        }
+
+        return builder.Buffer.AsSpan(0, builder.Length).ToArray();
+    }
+
     /// <summary>Validates a 12-byte header and returns the body length and whether a checksum follows the body.</summary>
     internal static (uint BodyLength, bool Checksum) ReadHeader(ReadOnlySpan<byte> header, byte[] magic)
     {

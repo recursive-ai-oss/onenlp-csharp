@@ -6,7 +6,7 @@ Behaviour that every component and tokenizer family relies on. Language-neutral 
 
 - Every offset a `Doc`, `Token` or `Span` reports is a UTF-16 code unit offset into the string the caller passed in (`Doc.Text`). Nothing is reported against a normalized copy.
 - A token has `Idx` (first character) and `EndIdx` (just past the last). Spans cover whole tokens; `StartChar` is the first token's `Idx` and `EndChar` the last token's `EndIdx`. An empty span has `StartChar == EndChar`.
-- `Token.Text` and `Span.Text` are slices of `Doc.Text`; they copy nothing. A span's text includes the whitespace between its tokens.
+- `Token.Text` and `Span.Text` are strings cut from `Doc.Text` on each call, so `token.Text == "x"` compares contents. `TextSpan` is the same text as a `ReadOnlySpan<char>` over `Doc.Text` and copies nothing; the library's own loops use it. A span's text includes the whitespace between its tokens.
 - `Doc.TryGetCharSpan` makes a span from character offsets only when both fall on token boundaries. Nothing is rounded.
 - Tokenizer encodings (`TokenOffset`) count UTF-16 units for text passed as `char`, and bytes for text passed as UTF-8. Tokens that stand for no input text (added special tokens, padding) have the offsets `(0, 0)`.
 

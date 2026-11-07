@@ -19,8 +19,8 @@ public sealed class JsonlOptions
     /// <summary>The longest line accepted, in UTF-16 units. Default 16,777,216.</summary>
     public int MaxLineLength { get; init; } = 16 << 20;
 
-    /// <summary>Splits texts that do not give their own <c>tokens</c>. Default: <see cref="RuleWordTokenizer"/>.</summary>
-    public IWordTokenizer Tokenizer { get; init; } = new RuleWordTokenizer();
+    /// <summary>Splits texts that do not give their own <c>tokens</c>. Default: <see cref="Segmentation.UaxWordTokenizer.Default"/>, the tokenizer of <see cref="Pipeline.Blank(Language)"/>. To train for a pipeline, use the overloads that take it.</summary>
+    public IWordTokenizer Tokenizer { get; init; } = Segmentation.UaxWordTokenizer.Default;
 
     /// <summary>What to do with entities and spans that do not start and end on token boundaries. Default: <see cref="MisalignedSpanPolicy.Error"/>.</summary>
     public MisalignedSpanPolicy Misaligned { get; init; } = MisalignedSpanPolicy.Error;
@@ -70,6 +70,52 @@ public static class JsonlReader
         ArgumentNullException.ThrowIfNull(reader);
         return ReadReader(reader, strings ?? new StringStore(), options ?? new JsonlOptions());
     }
+
+    /// <summary>Reads a file as examples, tokenized by a pipeline: its tokenizer splits texts without <c>tokens</c> and its string table holds the documents, so the examples match what the pipeline sees at prediction time.</summary>
+    /// <param name="path">The file. It is opened when enumeration starts and closed when it ends or is disposed.</param>
+    /// <param name="pipeline">The pipeline; its tokenizer replaces <see cref="JsonlOptions.Tokenizer"/>.</param>
+    /// <param name="options">Limits; defaults when <see langword="null"/>.</param>
+    /// <returns>One example per non-blank line.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="path"/> or <paramref name="pipeline"/> is <see langword="null"/>.</exception>
+    /// <exception cref="DataFormatException">(While enumerating) a line is malformed.</exception>
+    public static IEnumerable<Example> Read(string path, Pipeline pipeline, JsonlOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(pipeline);
+        return Read(path, pipeline.Strings, With(pipeline, options));
+    }
+
+    /// <summary>Reads a UTF-8 stream as examples, tokenized by a pipeline; see <see cref="Read(string, Pipeline, JsonlOptions?)"/>.</summary>
+    /// <param name="stream">The stream; read to its end and left open.</param>
+    /// <param name="pipeline">The pipeline.</param>
+    /// <param name="options">Limits; defaults when <see langword="null"/>.</param>
+    /// <returns>One example per non-blank line.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> or <paramref name="pipeline"/> is <see langword="null"/>.</exception>
+    /// <exception cref="DataFormatException">(While enumerating) a line is malformed.</exception>
+    public static IEnumerable<Example> Read(Stream stream, Pipeline pipeline, JsonlOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(pipeline);
+        return Read(stream, pipeline.Strings, With(pipeline, options));
+    }
+
+    /// <summary>Reads text as examples, tokenized by a pipeline; see <see cref="Read(string, Pipeline, JsonlOptions?)"/>.</summary>
+    /// <param name="reader">The reader; read to its end and left open.</param>
+    /// <param name="pipeline">The pipeline.</param>
+    /// <param name="options">Limits; defaults when <see langword="null"/>.</param>
+    /// <returns>One example per non-blank line.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="reader"/> or <paramref name="pipeline"/> is <see langword="null"/>.</exception>
+    /// <exception cref="DataFormatException">(While enumerating) a line is malformed.</exception>
+    public static IEnumerable<Example> Read(TextReader reader, Pipeline pipeline, JsonlOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(pipeline);
+        return Read(reader, pipeline.Strings, With(pipeline, options));
+    }
+
+    private static JsonlOptions With(Pipeline pipeline, JsonlOptions? options) => new()
+    {
+        MaxLineLength = options?.MaxLineLength ?? new JsonlOptions().MaxLineLength,
+        Misaligned = options?.Misaligned ?? MisalignedSpanPolicy.Error,
+        Tokenizer = pipeline.Tokenizer,
+    };
 
     private static IEnumerable<Example> ReadFile(string path, StringStore strings, JsonlOptions options)
     {

@@ -4,8 +4,9 @@ using System.Text;
 namespace RecursiveAI.OneNlp;
 
 /// <summary>
-/// A simple rule-based word tokenizer: a placeholder for the pipeline's first step until segmentation by Unicode word boundaries
-/// (UAX #29) lands. Every character belongs to exactly one of these rules:
+/// A simple rule-based word tokenizer, kept for pipeline files that name it and for code that wants fixed, data-free rules. It is not
+/// the default anywhere: <see cref="Segmentation.UaxWordTokenizer"/> (Unicode word boundaries, UAX #29, plus Universal Dependencies
+/// adjustments) is. Every character belongs to exactly one of these rules:
 /// whitespace separates tokens and belongs to none; a run of letters, digits and combining marks is one token, and may contain an
 /// apostrophe or hyphen between two such characters (<c>don't</c>, <c>well-known</c>) or a period or comma between two digits
 /// (<c>3.14</c>, <c>1,000</c>); any other character (punctuation, symbols, emoji) is a token by itself.
