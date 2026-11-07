@@ -72,5 +72,9 @@ public sealed partial class TrainableTransformerEncoder
         writer.WriteString("modelSha256", sha256);
         writer.WriteString("pooling", Pooling == SubwordPooling.Mean ? "mean" : "first");
         writer.WriteNumber("maxLength", MaxLength);
+        if (_options.ExpandWordForms)
+        {
+            writer.WriteBoolean("expandForms", true);
+        }
     }
 }

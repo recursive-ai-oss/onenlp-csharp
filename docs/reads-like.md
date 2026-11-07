@@ -98,7 +98,7 @@ for d in nlp.pipe(["First text.", "Second text."]):
 OneNLP:
 
 ```csharp
-// A blank English pipeline: the rule tokenizer, then the components in the order they are added.
+// A blank English pipeline: the Unicode word tokenizer, then the components in the order they are added.
 using Pipeline nlp = Pipeline.Blank(Language.English);
 
 // Rule entities, from token patterns (the vocabulary of spaCy's rule-based matching) or from phrases.
@@ -136,7 +136,7 @@ How the terms map:
 
 | spaCy | OneNLP | Note |
 |---|---|---|
-| `spacy.blank("en")` | `Pipeline.Blank(Language.English)` | rule tokenizer; add components with `Add` |
+| `spacy.blank("en")` | `Pipeline.Blank(Language.English)` | `UaxWordTokenizer` (UAX #29 words, English exceptions); add components with `Add` |
 | `spacy.load("en_core_web_sm")` | reference `RecursiveAI.OneNlp.Models.English`; `Nlp.Analyze`, or `PipelineFile.Load(path)` for a file | models are NuGet packages, never downloaded |
 | `nlp(text)` / `nlp.pipe(texts)` | `nlp.Process(text)` / `nlp.ProcessMany(texts)` (and `ProcessManyAsync`) | synchronous; batches are read lazily |
 | `doc.ents`, `ent.label_`, `ent.start_char` | `doc.Ents`, `span.Label`, `span.StartChar` | offsets are UTF-16 units in the string you passed |

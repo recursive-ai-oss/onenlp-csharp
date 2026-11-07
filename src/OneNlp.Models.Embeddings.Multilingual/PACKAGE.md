@@ -4,6 +4,9 @@
 
 > **Early preview.** The API will change.
 
+**Measured.** Vectors match sentence-transformers 6.2.0 to a maximum absolute difference of 3e-7 over 2,103 texts, and `mteb` 2.27.1 scores equal the same-harness sentence-transformers scores on every task. Against the model card, four cells are lower for sentence-transformers itself too: Banking77Classification 70.44 against 79.42, MTOPDomainClassification (en, de, es, fr) 85.59 against 88.01, AskUbuntuDupQuestions 56.42 against 57.88, and STS22 65.13 against 66.01 (66.10 under `mteb` 1.12.94); the others are within 0.5 of the card (STSBenchmark 84.11 against 84.01, TwentyNewsgroupsClustering 32.81 against 33.22, TwitterSemEval2015 70.75 against 70.95, SciFact 67.70 against 67.70). Size: about 470 MiB of weights across three shard packages plus 16.3 MiB here. Lineage: the authors' weights (MIT); nothing is trained here.
+
+
 ```csharp
 using RecursiveAI.OneNlp;
 

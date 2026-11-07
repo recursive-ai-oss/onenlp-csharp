@@ -1,7 +1,7 @@
 # Provenance: en-spancat (UNER English-EWT)
 
 - **Model:** `en-spancat-uner`, version 0 (development); a span categorizer (PER, ORG, LOC) over the library fast encoder (`FastEncoder.English()`), English, fast tier. Format: `docs/provenance.md`.
-- **Recipe:** `recipes/en/spancat/` (`Program.cs`); defaults are the configuration: sizes 1, 2, 3, hidden 256, threshold 0.5, dropout 0.2, learning rate 0.003, batch 1000 words, patience 6, at most 40 epochs.
+- **Recipe:** `recipes/en/spancat/` (`Program.cs`); defaults are the configuration: sizes 1, 2, 3, hidden 256, threshold 0.8 (the weights were trained with 0.5 and the threshold set afterwards on the development split, see README), dropout 0.2, learning rate 0.003, batch 1000 words, patience 6, at most 40 epochs.
 - **Seed(s):** training, data order, initial weights and encoder 7 (`--seed`); the data splits are the official ones.
 - **Produced:** 2026-11-06; shared 32-core x64 worker, 4 threads; .NET SDK 10.0.403; RecursiveAI.OneModel 1.0.0 and OneModel.Training 1.0.0; 650 s.
 - **Weights:** `model.onenlp`, 36,191,861 bytes, weights hash reported by `Train` `96d1938dfc5785a19159ed1549dc73fbc7698794d17db0a7d203d5f0f8b06508`. Kept on the build machine; not in git. Best development span F1 59.600.

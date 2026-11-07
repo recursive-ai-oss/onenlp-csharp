@@ -1,43 +1,70 @@
 # Tools
 
-Programs and scripts that support the tests, the measurements and the training recipes. None of them ship in a package. Comparators and reference implementations (spaCy, Stanza, Lingua, Microsoft.Recognizers.Text, Duckling, Catalyst, Microsoft.ML.Tokenizers, Hugging Face `tokenizers`, `tiktoken`, sentence-transformers) are only ever run here, as installed packages through their documented APIs or command lines, at the versions pinned in the scripts. Datasets, models and reference outputs are fetched by script, pinned by version and SHA-256, and never committed, except small outputs on text we wrote.
+Programs and scripts that support the tests, the measurements and the training recipes. None of them ship in a package.
 
-Scripts take their paths from arguments or environment variables; run them from the repository root unless a script says otherwise. Long runs (training, corpus sweeps, timings) belong on a machine you can leave busy; timings should run alone on the machine.
+- **Paths are arguments or environment variables.** Run from the repository root unless a script says otherwise. Every script prints its usage in its first lines.
+- **Comparators run as black boxes.** spaCy, Stanza, Lingua, Microsoft.Recognizers.Text, Duckling, Catalyst, Microsoft.ML.Tokenizers, Hugging Face `tokenizers`, `tiktoken` and sentence-transformers are installed as packages (Python ones into a virtual environment you create) and called through their documented APIs or command lines, at the versions the scripts pin. Nothing of theirs is read or redistributed.
+- **Data is fetched, pinned and never committed.** Fetch scripts check every file against a SHA-256 and write a manifest; licences per source are in [docs/ud-licences.md](../docs/ud-licences.md).
+- **Heavy runs** (training, corpus sweeps, timings) belong on a machine you can leave busy; run timings alone on the machine.
 
 ## Evaluation
 
-- `OneNlp.Eval/` : the metrics program. UD scores (the CoNLL 2018 definitions), span F1, classification and span-group scores, paired bootstrap intervals, recognizer scoring and the `recognize` driver. Method: [docs/measurement.md](../docs/measurement.md).
-- `eval/` : cross-checks of those scorers against the reference scorers (run as black boxes), and the spaCy segmentation baseline.
-- `recognizers-gold/` : the sources and builder of the recognizer gold sets, and the benchmark-text builder. See [docs/recognizer-gold.md](../docs/recognizer-gold.md).
-- `ratio/` : training time of the C# recipes against plain PyTorch on CPU.
+| Tool | What it does | How it is run |
+|---|---|---|
+| `OneNlp.Eval/` | The metrics program: UD scores (CoNLL 2018 definitions), span F1, classification and span-group scores, paired bootstrap intervals, recognizer scoring, and the `segment`, `recognize` and `recognize-bench` drivers. Method: [docs/measurement.md](../docs/measurement.md). | `dotnet run -c Release --project tools/OneNlp.Eval -- <command> ...`; no arguments prints every command. |
+| `eval/segmentation.sh` | Scores tokens, words and sentences of the default pipeline and of spaCy's rule sentencizer against a UD split. | `segmentation.sh <gold.conllu> <work-dir> <oracle-python> [conll18_ud_eval.py]` |
+| `eval/crosscheck.py` | Checks `OneNlp.Eval` against the shared-task scorer on perturbed files. | `crosscheck.py --eval "dotnet OneNlp.Eval.dll" --home HOME --work WORKDIR [--sets 24]` |
+| `eval/` (others) | Helpers: `ud_raw.py` (raw text from a CoNLL-U file), `spacy_segment.py`, `perturb_ud.py`, `perturb_span.py`, `probe_feats.py`. | Usage in each file's header. |
+| `recognizers-gold/` | The sources and builder of the recognizer gold sets and the benchmark text. [docs/recognizer-gold.md](../docs/recognizer-gold.md) | `build.py`, `make_bench_text.py` |
+| `ratio/` | One epoch of each text-category head in the C# recipes against plain PyTorch on CPU. | `run.sh <recipes-bin-dir> <data-root> <work-dir> [threads]` |
+| `fasttier/torch_baseline.py`, `parser_torch.py`, `toy_tagger_torch.py` | The same fast-tier, parser and toy recipes in plain PyTorch, for training-time comparisons. | `torch_baseline.py <train.conllu> --threads N --epochs N` and the like |
 
-## Comparators and baselines (black box)
+## Comparators and baselines
 
-- `baselines/spacy/` : spaCy trained with its default configuration on our data, per language and task; the provenance file records versions and configuration hashes.
-- `oracles/` : Microsoft.Recognizers.Text (`Recognizers/`), Duckling (`duckling/`), SearchPioneer.Lingua and `lingua-language-detector` (`Lingua/`), and Catalyst (`Catalyst/`) drivers, with the scripts that score them against the gold sets:
-  - `comparators_lang.sh <lang> <culture> <gold|test> <out>` runs Microsoft.Recognizers.Text over a language's gold file; `score_dev.sh <lang> <out> [gold|test]` scores ours and compares; `score_recognizers.sh <out> <duckling dir>` does both comparators for English.
-  - `bench_recognizers.sh <work dir>` (English) and `bench_recognizers_lang.sh <lang> <culture> <work dir>` time ours against Microsoft.Recognizers.Text on text made from the development split. The comparator is very slow in Turkish and Hindi, so those two languages default to a quarter-megabyte of text; `BENCH_MB`, `BENCH_MB_DATETIME` and `BENCH_TIMEOUT` override the sizes and the per-run time limit. Run them as indicative timings unless the machine is otherwise idle.
-- `bench/` : language-ID benchmark inputs and the native-speed information rows.
+| Tool | What it does | How it is run |
+|---|---|---|
+| `baselines/spacy/` | spaCy trained with its default configuration on our data, per language and task; the provenance file records versions and configuration hashes. | Scripts per language; see the provenance file there. |
+| `oracles/Recognizers`, `oracles/duckling`, `oracles/Lingua`, `oracles/Catalyst` | Drivers for Microsoft.Recognizers.Text, Duckling, SearchPioneer.Lingua with `lingua-language-detector`, and Catalyst. | Built or started by the scripts below. |
+| `oracles/comparators_lang.sh`, `duckling_lang.sh` | Run a comparator over a language's gold file. | `comparators_lang.sh <lang> <culture> <gold\|test> <out>` |
+| `oracles/score_ours.sh`, `score_dev.sh`, `score_recognizers.sh`, `regress_check.sh` | Score our recognizers (and compare with the comparators) on a gold file. | `score_dev.sh <lang> <out> [gold\|test]`; the others print usage. |
+| `oracles/bench_recognizers.sh`, `bench_recognizers_lang.sh` | Time our recognizers against Microsoft.Recognizers.Text on text made from the development split. Indicative unless the machine is idle. | `bench_recognizers_lang.sh <lang> <culture> <work-dir>`; `BENCH_MB`, `BENCH_MB_DATETIME` and `BENCH_TIMEOUT` override sizes and limits. |
+| `oracles/probe.sh`, `spacy_*` | Black-box probes of spaCy's matcher and noun-chunk behaviour on crafted inputs. | Usage in each header. |
+| `bench/` | Language-ID benchmark inputs and the native-speed information rows. | `make-langid-bench.sh`, `native_speed.py` |
 
-## Tokenizer parity and goldens
+## Tokenizers
 
-- `parity/` and `OneNlp.Parity/` : the parity corpus builder, the oracle that writes reference encodings, and the checker. See [docs/parity.md](../docs/parity.md).
-- `stage_goldens/`, `tokenizer-goldens/`, `modelgolden/` : reference outputs for tokenizer stages and models, and seed files for the fuzz targets.
-- `gen_normalization_tables.py`, `gen_bert_clean_table.py`, `gen_script_table.py` : generate the Unicode data tables compiled into the core from the Unicode Character Database.
+| Tool | What it does | How it is run |
+|---|---|---|
+| `fetch/fetch_tokenizers.py`, `fetch/fetch_parity_inputs.py` | Fetch the tokenizer files and the raw text of the parity corpus, checked against pins. | Usage in each header. |
+| `parity/build_corpus.py`, `parity/oracle.py`, `parity/families.json` | Build the parity corpus and write reference encodings from the reference libraries. | See [docs/parity.md](../docs/parity.md). |
+| `OneNlp.Parity/` | Compares our encodings with the reference ones: IDs, offsets, masks and decoded text. | `dotnet run --project tools/OneNlp.Parity -- ...` |
+| `stage_goldens/`, `tokenizer-goldens/`, `modelgolden/` | Reference outputs for tokenizer stages and models, and seeds for the fuzz targets. | Generated by the scripts inside. |
+| `gen_normalization_tables.py`, `gen_bert_clean_table.py`, `gen_script_table.py` | Generate the Unicode tables compiled into the core, from the Unicode Character Database. | `python3 <script> <ucd-directory>` |
 
 ## Data
 
-- `fetch/` : fetch and pin treebanks, tokenizer files and parity inputs (`fetch_lang.py`, `fetch_tokenizers.py`, `fetch_parity_inputs.py`, the per-language manifests, the scorer cross-check). Licences per source: [docs/ud-licences.md](../docs/ud-licences.md).
-- `selftrain/` : overlap checks that keep self-labelled text from containing any evaluation sentence.
+| Tool | What it does | How it is run |
+|---|---|---|
+| `fetch/fetch_ud.py` | Fetches every Universal Dependencies treebank whose terms allow it, hashes each split, writes the manifest. | `fetch_ud.py <data-root> [--only Name,...]` |
+| `fetch/fetch_lang.py` | Fetches the training and evaluation data of one language (treebanks, entity sets) with a manifest. | `fetch_lang.py <lang> <data-root> [--md MANIFEST.md]` |
+| `fetch/ud.sh`, `fetch/conll18_crosscheck.sh` | Fetch English-EWT and the shared-task scorer; cross-check a scorer. | Usage in each header. |
+| `fetch/langid/`, `fetch/textcat/`, per-language folders | Language-ID corpora, classification data and per-language manifests. | `fetch.py` inside each. |
+| `fetch/ud_catalog.py`, `ud_docs.py`, `ud_survey.py`, `build_references.py` | Build the treebank catalogue, licence table and published-reference table. | Usage in each header. |
+| `selftrain/`, `tr_overlap.py` | Check that self-labelled text contains no evaluation sentence. | `check_overlap.py`, `tr_overlap.py pseudo.conllu eval1.conllu ...` |
+| `openner/` | Fetch, label and filter the open-type entity data (an open-weight instruction model labels web text). | Scripts in order: `fetch.py`, `fetch_text.py`, `label.py`, `filter_labels.py`, `prep.py`. |
 
 ## Models and training support
 
-- `OneNlp.LangId/` : trains and scores the language-ID model. See [docs/language-id.md](../docs/language-id.md).
-- `accurate/`, `OneNlp.Accurate/`, `distill/` : the accurate tier. PyTorch development tooling for distilling the student encoder and exporting encoders to ONNX, and the C# programs that check the exports and time fine-tuning steps. See [docs/accurate-encoder.md](../docs/accurate-encoder.md).
-- `embeddings/` : fetch, export, shard and score the sentence-embedding models (`mteb` runs). See [docs/embeddings.md](../docs/embeddings.md).
-- `fasttier/`, `OneNlp.Toy/`, `toy_*` : small training proofs and the PyTorch timing for the fast tier.
-- `OneNlp.ModelBench/` : cold-start time and per-stage throughput of a model package (indicative timings).
-- The training recipes themselves are in [`recipes/`](../recipes/), and are documented in [docs/training.md](../docs/training.md).
+| Tool | What it does | How it is run |
+|---|---|---|
+| `OneNlp.LangId/` | Trains and scores the language-ID model. [docs/language-id.md](../docs/language-id.md) | `dotnet run --project tools/OneNlp.LangId -- train\|score ...` |
+| `distill/`, `accurate/`, `OneNlp.Accurate/` | The accurate tier. PyTorch development tooling that distils the student encoder and exports encoders to ONNX; C# programs that check the exports against PyTorch and time fine-tuning steps. [docs/accurate-encoder.md](../docs/accurate-encoder.md) | `accurate/setup_venv.sh <venv-dir>`, then `distill/chunk.sh N` per resumable chunk; `OneNlp.Accurate` prints its commands. |
+| `embeddings/` | Fetch, export, shard and score the sentence-embedding models (`mteb` runs). [docs/embeddings.md](../docs/embeddings.md) | `setup_venv.sh <venv-dir>`, then the scripts in the folder. |
+| `OneNlp.Toy/`, `toy_proof.sh` | A synthetic tagging corpus and a check that training resumes to the same weights after a kill. | `toy_proof.sh` prints its usage. |
+| `OneNlp.ModelBench/`, `OneNlp.ModelBench.Multilingual/` | Cold-start time and per-stage throughput of a model package (indicative timings). | `ModelBench cold` or `speed <gold.conllu> <runs>` (`<lang>` first in the multilingual one). |
+| `tr_dev_eval.sh`, `tr_parser_variant.sh`, `tr_agree.py`, `tr_raw_diag.py` | Turkish parser experiments: score a model directory, train a parser variant, keep sentences two parsers agree on, split raw-text loss. | Usage in each header. |
+
+The training recipes themselves are in [`recipes/`](../recipes/) and are documented in [docs/training.md](../docs/training.md).
 
 ## Fuzzing
 

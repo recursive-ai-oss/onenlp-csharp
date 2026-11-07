@@ -1,0 +1,7 @@
+<Project>
+  <!-- The files this package packs: name, size, sha256. A pack fails when a file is missing or differs. Weights are never committed. -->
+  <ItemGroup>
+    <MultilingualWeight Include="student-v1.onnx" Size="141913197" Sha256="aee56231d97134e455fe80a79738eb294c7974c61311412256fa9cd854eeeae6" />
+    <MultilingualWeight Include="tokenizer.json" Size="17525329" Sha256="197d4cc5406ee12cc50c8b5511f2393cc32d9db321545979ce041c1199178356" />
+  </ItemGroup>
+</Project>

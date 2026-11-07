@@ -57,7 +57,7 @@ public class GermanSegmentationTests
     [Fact]
     public void MissingGermanModelNamesTheGermanPackage()
     {
-        InvalidOperationException e = Assert.Throws<InvalidOperationException>(() => ModelPackages.Get(Language.German));
+        ModelNotAvailableException e = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.German));
         Assert.Contains("RecursiveAI.OneNlp.Models.German", e.Message, StringComparison.Ordinal);
         Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", e.Message, StringComparison.Ordinal);
     }

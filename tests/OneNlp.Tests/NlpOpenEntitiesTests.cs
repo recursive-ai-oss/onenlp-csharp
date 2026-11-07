@@ -5,6 +5,8 @@ public class NlpOpenEntitiesTests
     // Marks every token that starts with an upper-case letter with the first type given.
     private sealed class Capitals : IOpenEntityRecognizer
     {
+        public static float? LastThreshold { get; private set; } = -1f;
+
         public string Name => "capitals";
 
         public void Process(Doc doc)
@@ -13,6 +15,7 @@ public class NlpOpenEntitiesTests
 
         public void Recognize(Doc doc, IReadOnlyList<string> types, float? threshold = null)
         {
+            LastThreshold = threshold;
             ArgumentException.ThrowIfNullOrEmpty(types.Count == 0 ? null : types[0]);
             var found = new List<SpanSpec>();
             for (int i = 0; i < doc.Length; i++)
@@ -30,7 +33,7 @@ public class NlpOpenEntitiesTests
     [Fact]
     public void MissingModelNamesThePackageThenRegisteredRecognizerIsUsed()
     {
-        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => Nlp.Entities("Anna met Bob.", "person"));
+        ModelNotAvailableException ex = Assert.Throws<ModelNotAvailableException>(() => Nlp.Entities("Anna met Bob.", "person"));
         Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", ex.Message, StringComparison.Ordinal);
 
         ModelPackages.RegisterOpenEntities("RecursiveAI.OneNlp.Models.Multilingual", () => Pipeline.Blank(Language.English).Add(new Capitals()));
@@ -38,6 +41,9 @@ public class NlpOpenEntitiesTests
         Assert.Equal(["Anna", "Bob"], found.Select(s => s.Text));
         Assert.All(found, s => Assert.Equal("first name", s.Label));
         Assert.Equal(0, found[0].Start);
+        Assert.Null(Capitals.LastThreshold);
+        Nlp.Entities("Anna met Bob.", ["first name"], 0.2f);
+        Assert.Equal(0.2f, Capitals.LastThreshold);
         Assert.Empty(Nlp.Entities("", "person"));
         Assert.ThrowsAny<ArgumentException>(() => Nlp.Entities("Anna", Array.Empty<string>()));
     }

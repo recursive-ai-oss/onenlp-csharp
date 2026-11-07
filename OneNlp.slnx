@@ -15,6 +15,10 @@
     <Project Path="src/OneNlp.Models.Turkish/OneNlp.Models.Turkish.csproj" />
     <Project Path="src/OneNlp.Models.Portuguese/OneNlp.Models.Portuguese.csproj" />
     <Project Path="src/OneNlp.Models.Dutch/OneNlp.Models.Dutch.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual/OneNlp.Models.Multilingual.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Parts/Encoder/OneNlp.Models.Multilingual.Encoder.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Parts/FrozenEncoder/OneNlp.Models.Multilingual.FrozenEncoder.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Parts/Segmenters/OneNlp.Models.Multilingual.Segmenters.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Large/OneNlp.Models.Multilingual.Large.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Encoder1/OneNlp.Models.Multilingual.Large.Encoder1.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Encoder2/OneNlp.Models.Multilingual.Large.Encoder2.csproj" />
@@ -39,6 +43,7 @@
   <Folder Name="/tools/">
     <Project Path="tools/OneNlp.Toy/OneNlp.Toy.csproj" />
     <Project Path="tools/OneNlp.ModelBench/OneNlp.ModelBench.csproj" />
+    <Project Path="tools/OneNlp.ModelBench.Multilingual/OneNlp.ModelBench.Multilingual.csproj" />
     <Project Path="tools/OneNlp.Accurate/OneNlp.Accurate.csproj" />
     <Project Path="tools/OneNlp.Eval/OneNlp.Eval.csproj" />
     <Project Path="tools/OneNlp.LangId/OneNlp.LangId.csproj" />
@@ -49,6 +54,7 @@
     <Project Path="recipes/en/parser/OneNlp.Recipe.EnParser.csproj" />
     <Project Path="recipes/en/fast-tagging/EnglishFastTagging.csproj" />
     <Project Path="recipes/accurate/en-tagging/AccurateEnglishTagging.csproj" />
+    <Project Path="recipes/accurate/student-multilingual/OneNlp.Recipes.AccurateStudent.csproj" />
     <Project Path="recipes/accurate/multilingual/OneNlp.Recipes.Accurate.csproj" />
     <Project Path="recipes/accurate/probe/AccurateProbe.csproj" />
     <Project Path="recipes/openner/OpenNer.csproj" />

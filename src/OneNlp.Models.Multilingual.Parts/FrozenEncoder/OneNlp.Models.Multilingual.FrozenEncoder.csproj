@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PartName>FrozenEncoder</PartName>
+    <ProbeFile>student-v1.onnx</ProbeFile>
+    <PartDescription>the frozen distilled encoder (an ONNX file) that the open-type entity head reads</PartDescription>
+  </PropertyGroup>
+
+  <Import Project="../Part.props" />
+
+  <PropertyGroup>
+    <Description>spaCy-class NLP for .NET: the frozen distilled multilingual encoder (a six-layer, width-384 student of mmBERT-base, 142 MB) with its tokenizer, loadable as an encoder with FrozenStudentEncoder.Create(). No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <PackageTags>$(PackageTags);encoder;multilingual</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../OneNlp.Neural/OneNlp.Neural.csproj" />
+    <None Include="PROVENANCE.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

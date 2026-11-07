@@ -6,11 +6,11 @@ Microsoft.ML.Tokenizers loads one tokenizer type per model family. OneNLP's `Tok
 
 | Microsoft.ML.Tokenizers | OneNLP |
 |---|---|
-| `BertTokenizer.Create(vocabStream, options)` (WordPiece; options for lower-casing and accent stripping) | `Tokenizer.FromFile("tokenizer.json")`; the normalizer settings come from the file. `Tokenizer.FromFile("vocab.txt")` reads a bare vocabulary |
+| `BertTokenizer.Create(vocabStream, options)` (WordPiece; options for lower-casing and accent stripping) | `Tokenizer.FromFile("tokenizer.json")`; the normalizer settings come from the file. For a bare `vocab.txt`, say the casing: `Tokenizer.FromWordPieceVocabulary("vocab.txt", new WordPieceVocabularyOptions { LowerCase = true })`. `Tokenizer.FromFile("vocab.txt")` guesses it from the vocabulary |
 | `SentencePieceTokenizer.Create(stream, addBeginningOfSentence, addEndOfSentence)`; `LlamaTokenizer.Create` | `Tokenizer.FromFile("tokenizer.json")` or `Tokenizer.FromFile("tokenizer.model")`; the special tokens come from the post-processor of the `tokenizer.json` |
 | `TiktokenTokenizer.CreateForModel("gpt-4o")` (the ranks come with the `Microsoft.ML.Tokenizers.Data.*` packages) | `Tokenizer.FromFile("o200k_base.tiktoken")`: you supply the ranks file; the encoding is taken from the file name or rank count (`r50k_base`, `p50k_base`, `cl100k_base`, `o200k_base`) |
-| `tokenizer.EncodeToIds(text)` returns `IReadOnlyList<int>` | `tokenizer.EncodeToIds(text, ids, out written, out consumed)` writes into your buffer and returns an `OperationStatus` (`Done` or `DestinationTooSmall`); `Encode(text)` returns a `TokenEncoding` with ids, tokens, offsets, the special-token mask and word ids |
-| `tokenizer.CountTokens(text)` | `tokenizer.CountTokens(text)` |
+| `tokenizer.EncodeToIds(text)` returns `IReadOnlyList<int>` | `tokenizer.EncodeToIds(text)` returns an `int[]` (pass `addSpecialTokens: false` to match the old call, see below); `EncodeToIds(text, buffer, out written, out consumed)` writes into your buffer and returns an `OperationStatus` (`Done` or `DestinationTooSmall`: always check it, a short buffer cuts the text); `Encode(text)` returns a `TokenEncoding` with ids, tokens, offsets, the special-token mask and word ids |
+| `tokenizer.CountTokens(text)` (no special tokens) | `tokenizer.CountTokens(text, addSpecialTokens: false)`; without the flag `[CLS]` and `[SEP]` are counted too, so a short text counts two more |
 | `tokenizer.GetIndexByTokenCount(text, n, out normalized, out count)` and `GetIndexByTokenCountFromEnd` | `tokenizer.TrimToTokenBudget(text, n, TokenizerSide.Left or Right)` returns the slice of your text covered by the first or last *n* tokens |
 | `tokenizer.Decode(ids)` | `tokenizer.Decode(ids)`, or `Decode(ids, destination, out idsConsumed, out charsWritten)` into your buffer |
 | `EncodedToken` values with `Offset` | `TokenEncoding.Offsets` (`Start`, `End`) |
@@ -33,11 +33,14 @@ OneNLP (`samples/OneNlp.Samples/MigrationSamples.cs`, which builds and runs; it 
 // BertTokenizer.Create / TiktokenTokenizer.CreateForModel / SentencePieceTokenizer.Create  become one type that reads the file's own format.
 Tokenizer tokenizer = Tokenizer.FromFile(tokenizerJson);
 
-int[] ids = new int[512];
-OperationStatus status = tokenizer.EncodeToIds("a text to encode", ids, out int written, out int consumed);   // EncodeToIds(text)
-int count = tokenizer.CountTokens("a text to encode");                                                      // CountTokens(text)
-string text = tokenizer.Decode(ids.AsSpan(0, written));                                                     // Decode(ids)
+int[] ids = tokenizer.EncodeToIds("a text to encode", addSpecialTokens: false);                              // EncodeToIds(text): a new array, nothing cut off
+int count = tokenizer.CountTokens("a text to encode", addSpecialTokens: false);                             // CountTokens(text)
+string text = tokenizer.Decode(ids);                                                                        // Decode(ids)
 ReadOnlySpan<char> head = tokenizer.TrimToTokenBudget("a text to encode", 2);                               // GetIndexByTokenCount
+
+// For a fixed buffer with no allocation, check the status: DestinationTooSmall means the buffer cut the text short.
+int[] buffer = new int[512];
+OperationStatus status = tokenizer.EncodeToIds("a text to encode", buffer, out int written, out int consumed);
 ```
 
 ## Differences that matter when you port

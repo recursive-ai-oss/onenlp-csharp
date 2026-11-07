@@ -11,9 +11,10 @@ namespace RecursiveAI.OneNlp.Tokenizers.Loaders;
 /// and the WordPiece decoder.
 /// </summary>
 /// <remarks>
-/// A <c>vocab.txt</c> does not say whether the model lowercases. The loader decides from the vocabulary: a vocabulary with any token that
-/// has an uppercase letter (outside the bracketed special tokens) is cased, otherwise it lowercases, which is also the default of the
-/// published BERT tokenizer configuration. Files are read as the reference reads them: lines end at <c>\n</c>, trailing white space of
+/// A <c>vocab.txt</c> does not say whether the model lowercases. Unless the caller states it, the loader decides from the vocabulary: a vocabulary
+/// with any token that has an uppercase letter which has a lowercase form (outside the bracketed special tokens) is cased, otherwise it
+/// lowercases, which is also the default of the published BERT tokenizer configuration. Letters without a case pair (<c>ℝ</c>, which the
+/// uncased BERT vocabulary contains) do not make a vocabulary cased: a lowercasing model would have left them as they are. Files are read as the reference reads them: lines end at <c>\n</c>, trailing white space of
 /// a line is dropped, blank lines are empty tokens, and a repeated token keeps its last ID.
 /// </remarks>
 internal static class WordPieceVocabularyFile
@@ -26,13 +27,23 @@ internal static class WordPieceVocabularyFile
     /// <summary>Loads a tokenizer from the stream, deciding case handling from the vocabulary.</summary>
     /// <param name="stream">A readable stream holding UTF-8 text.</param>
     /// <exception cref="InvalidDataException">The file is too large, is not valid UTF-8, or has no <c>[UNK]</c> token.</exception>
-    internal static Tokenizer Load(Stream stream) => Load(stream, lowercase: null, StageRegistry.Default);
+    internal static Tokenizer Load(Stream stream) => Load(stream, lowercase: null, stripAccents: null, StageRegistry.Default);
+
+    /// <summary>Loads a tokenizer from the stream with the normalization stated by the caller.</summary>
+    internal static Tokenizer Load(Stream stream, bool lowercase, bool? stripAccents) => Load(stream, lowercase, stripAccents, StageRegistry.Default);
 
     /// <summary>Loads a tokenizer from the stream.</summary>
     /// <param name="stream">A readable stream holding UTF-8 text.</param>
     /// <param name="lowercase">Whether the normalizer lowercases and strips accents; <see langword="null"/> decides from the vocabulary.</param>
     /// <param name="registry">The stage types to build the pipeline from.</param>
-    internal static Tokenizer Load(Stream stream, bool? lowercase, StageRegistry registry)
+    internal static Tokenizer Load(Stream stream, bool? lowercase, StageRegistry registry) => Load(stream, lowercase, null, registry);
+
+    /// <summary>Loads a tokenizer from the stream.</summary>
+    /// <param name="stream">A readable stream holding UTF-8 text.</param>
+    /// <param name="lowercase">Whether the normalizer lowercases; <see langword="null"/> decides from the vocabulary.</param>
+    /// <param name="stripAccents">Whether it strips accents; <see langword="null"/> follows <paramref name="lowercase"/>.</param>
+    /// <param name="registry">The stage types to build the pipeline from.</param>
+    internal static Tokenizer Load(Stream stream, bool? lowercase, bool? stripAccents, StageRegistry registry)
     {
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(registry);
@@ -67,7 +78,7 @@ internal static class WordPieceVocabularyFile
 
         return new HuggingFaceTokenizer(
             new WordPieceModel(vocab, "[UNK]", "##", 100),
-            FromJson($$"""{"type":"BertNormalizer","lowercase":{{(lower ? "true" : "false")}},"clean_text":true,"handle_chinese_chars":true,"strip_accents":null}""", registry, registry.CreateNormalizer),
+            FromJson($$"""{"type":"BertNormalizer","lowercase":{{(lower ? "true" : "false")}},"clean_text":true,"handle_chinese_chars":true,"strip_accents":{{(stripAccents is null ? "null" : stripAccents.Value ? "true" : "false")}}}""", registry, registry.CreateNormalizer),
             FromJson("""{"type":"BertPreTokenizer"}""", registry, registry.CreatePreTokenizer),
             post,
             FromJson("""{"type":"WordPiece","prefix":"##","cleanup":true}""", registry, registry.CreateDecoder),
@@ -101,7 +112,7 @@ internal static class WordPieceVocabularyFile
 
         foreach (char c in token)
         {
-            if (char.IsUpper(c))
+            if (char.IsUpper(c) && char.ToLowerInvariant(c) != c)
             {
                 return true;
             }

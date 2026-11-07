@@ -4,6 +4,8 @@
 
 > **Early preview.** The weights are development models and will be retrained; the API will change. The tagger and parser learn from only 897 sentences, because the larger Italian treebanks are non-commercial; expect them to be weaker than the other languages' models.
 
+**Measured.** UD Italian-ParlaMint r2.18 test (and WikiNER Italian test for entities), against spaCy 3.8.18 trained with its default configuration on the same data (95% paired bootstrap intervals are in the results table). Gold words: UPOS 94.44 against 94.10, lemmas 95.18 against 93.13 and UFeats 89.52 against 87.42 (UPOS within noise; UFeats and lemmas ahead), LAS 72.57 against 71.39 (within noise). Raw text: UPOS 94.01 against 83.53 and LAS 72.77 against 58.38 (ahead). Entities micro F1 86.35 against 83.54 (ahead). Misses: the tagger and parser learn from 897 sentences, and the absolute LAS (72.57) is the lowest of the fast-tier languages. Data lineage: UD Italian-ParlaMint (CC BY-SA 4.0) and Italian-MarkIT (CC BY 4.0), and WikiNER (CC BY 4.0 labels over Wikipedia text, so share-alike lineage); the weights carry share-alike lineage where the data does. Size: 105.8 MiB of weights. Speed against the managed reference is measured at the release gate.
+
 ```csharp
 using RecursiveAI.OneNlp;
 

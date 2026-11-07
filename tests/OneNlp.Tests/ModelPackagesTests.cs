@@ -9,7 +9,7 @@ public class ModelPackagesTests
     {
         var irish = Language.FromCode("ga");
         int calls = 0;
-        ModelPackages.Register(irish, "Test.Models.Irish", () =>
+        ModelPackages.RegisterQuietly(irish, "Test.Models.Irish", () =>
         {
             Interlocked.Increment(ref calls);
             return Pipeline.Blank(irish);
@@ -23,9 +23,9 @@ public class ModelPackagesTests
         Assert.Equal(1, calls);
 
         // The same package may register again (two projects can both add the registration file); a different one may not.
-        ModelPackages.Register(irish, "Test.Models.Irish", () => throw new InvalidOperationException("never called"));
+        ModelPackages.RegisterQuietly(irish, "Test.Models.Irish", () => throw new InvalidOperationException("never called"));
         Assert.Same(first, ModelPackages.Get(irish));
-        Assert.Throws<InvalidOperationException>(() => ModelPackages.Register(irish, "Other.Package", () => Pipeline.Blank(irish)));
+        Assert.Throws<InvalidOperationException>(() => ModelPackages.RegisterQuietly(irish, "Other.Package", () => Pipeline.Blank(irish)));
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class ModelPackagesTests
     {
         var welsh = Language.FromCode("cy");
         int calls = 0;
-        ModelPackages.Register(welsh, "Test.Models.Welsh", () =>
+        ModelPackages.RegisterQuietly(welsh, "Test.Models.Welsh", () =>
         {
             Interlocked.Increment(ref calls);
             Thread.Sleep(20);
@@ -48,20 +48,20 @@ public class ModelPackagesTests
     [Fact]
     public void MissingModelNamesThePackageToAdd()
     {
-        InvalidOperationException english = Assert.Throws<InvalidOperationException>(() => ModelPackages.Get(Language.English));
+        ModelNotAvailableException english = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.English));
         Assert.Contains("RecursiveAI.OneNlp.Models.English", english.Message, StringComparison.Ordinal);
         Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", english.Message, StringComparison.Ordinal);
-        InvalidOperationException other = Assert.Throws<InvalidOperationException>(() => ModelPackages.Get(Language.FromCode("sw")));
-        Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", other.Message, StringComparison.Ordinal);
+        ModelNotAvailableException other = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.FromCode("sw")));
         Assert.DoesNotContain("Models.English", other.Message, StringComparison.Ordinal);
+        Assert.Empty(other.PackageIds);
     }
 
     [Fact]
     public void ModelVerbsFailWithoutAPackageButAnalyzeStillTokenizes()
     {
         // The test project references no model package, so English has none.
-        Assert.Throws<InvalidOperationException>(() => Nlp.Entities("Ada lives in London."));
-        Assert.Throws<InvalidOperationException>(() => Nlp.Lemmas("cats"));
+        Assert.Throws<ModelNotAvailableException>(() => Nlp.Entities("Ada lives in London."));
+        Assert.Throws<ModelNotAvailableException>(() => Nlp.Lemmas("cats"));
         Assert.Throws<ArgumentNullException>(() => Nlp.Entities(null!));
         Doc doc = Nlp.Analyze("Ada lives in London. She is happy.");
         Assert.Equal(2, doc.Sentences.Count);
@@ -70,5 +70,5 @@ public class ModelPackagesTests
 
     [Fact]
     public void UnknownLanguageCannotBeRegistered() =>
-        Assert.Throws<ArgumentException>(() => ModelPackages.Register(Language.Unknown, "Test.Package", () => Pipeline.Blank()));
+        Assert.Throws<ArgumentException>(() => ModelPackages.RegisterQuietly(Language.Unknown, "Test.Package", () => Pipeline.Blank()));
 }

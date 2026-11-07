@@ -150,17 +150,36 @@ public sealed class Recognizer
         return FromRules(paths.Select(p => (ReadOnlyMemory<byte>)File.ReadAllBytes(p)).ToList());
     }
 
-    /// <summary>Finds everything the rules recognize in a text.</summary>
-    /// <param name="text">The text; may be empty.</param>
-    /// <param name="context">Inputs beyond the text: the reference date and region for dates and times. Without a reference date, relative expressions ("tomorrow", "next Friday") are left out.</param>
+    /// <summary>
+    /// Finds everything the rules recognize in a text, with no reference date: dates and times that stand alone (<c>March 5, 2026</c>, <c>3pm</c>,
+    /// <c>two weeks</c>, <c>every Monday</c>) are reported, and relative expressions (<c>tomorrow</c>, <c>next Friday</c>) are left out, because they
+    /// have no value without a date to count from. Pass a <see cref="RecognitionContext"/> to resolve them.
+    /// </summary>
+    /// <param name="text">The text; may be empty. Time grows with its length and nothing limits it here; the <see cref="Nlp"/> verbs refuse more than <see cref="Nlp.MaxLength"/> characters.</param>
     /// <returns>
-    /// The results in text order, without overlaps (see the remarks of <see cref="Recognizer"/>). Each is a <see cref="Quantity"/> or a
-    /// <see cref="SequenceMatch"/> with UTF-16 offsets into <paramref name="text"/>. Empty when nothing is found.
+    /// The results in text order, without overlaps (see the remarks of <see cref="Recognizer"/>). Each is a <see cref="Quantity"/>, a
+    /// <see cref="SequenceMatch"/> or a <see cref="TemporalMatch"/> with UTF-16 offsets into <paramref name="text"/>. Empty when nothing is found.
     /// </returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
-    public IReadOnlyList<Recognition> Recognize(string text, RecognitionContext context = default)
+    public IReadOnlyList<Recognition> Recognize(string text) => Recognize(text, default(RecognitionContext));
+
+    /// <summary>Finds everything the rules recognize in a text.</summary>
+    /// <param name="text">The text; may be empty. Time grows with its length and nothing limits it here; the <see cref="Nlp"/> verbs refuse more than <see cref="Nlp.MaxLength"/> characters.</param>
+    /// <param name="context">Inputs beyond the text: the reference date and region for dates and times. A context without a reference date behaves like <see cref="Recognize(string)"/>: relative expressions ("tomorrow", "next Friday") are left out.</param>
+    /// <returns>
+    /// The results in text order, without overlaps (see the remarks of <see cref="Recognizer"/>). Each is a <see cref="Quantity"/>, a
+    /// <see cref="SequenceMatch"/> or a <see cref="TemporalMatch"/> with UTF-16 offsets into <paramref name="text"/>. Empty when nothing is found.
+    /// </returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">The reference date of <paramref name="context"/> is <c>default(DateTimeOffset)</c>, which is year 1 and almost certainly an unset value.</exception>
+    public IReadOnlyList<Recognition> Recognize(string text, RecognitionContext context)
     {
         ArgumentNullException.ThrowIfNull(text);
+        if (context.ReferenceDate == default(DateTimeOffset))
+        {
+            throw new ArgumentException("The reference date is default(DateTimeOffset), which is year 1 and almost certainly unset. Leave the reference date out to skip relative expressions, or pass the moment they are resolved against.", nameof(context));
+        }
+
         if (text.Length == 0)
         {
             return [];

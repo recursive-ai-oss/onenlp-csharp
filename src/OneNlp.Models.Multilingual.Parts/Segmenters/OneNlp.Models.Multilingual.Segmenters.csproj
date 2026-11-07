@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PartName>Segmenters</PartName>
+    <ProbeFile>zh.onenlp</ProbeFile>
+    <PartDescription>the small trained tokenizers for Chinese (word segmenter) and Turkish (multiword-token splitter)</PartDescription>
+  </PropertyGroup>
+
+  <Import Project="../Part.props" />
+
+</Project>

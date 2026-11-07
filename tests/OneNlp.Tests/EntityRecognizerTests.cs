@@ -141,6 +141,34 @@ public class EntityRecognizerTests : IDisposable
         Assert.All(d.Ents, x => Assert.InRange(x.Confidence, 0.5f, 1f));
     }
 
+    [Theory]
+    [InlineData(NerDecoding.Tagging)]
+    [InlineData(NerDecoding.Spans)]
+    public void MinConfidenceDropsLowEntitiesIsSavedAndDefaultsToOff(NerDecoding decoding)
+    {
+        List<Example> train = [.. JsonlReader.Read(WriteCorpus("mc.jsonl", 120, 5))];
+        using Pipeline pipeline = NewPipeline(decoding);
+        pipeline.Train(train, new TrainOptions { Epochs = 2, BatchWords = 100, Seed = 1 });
+        var head = Assert.IsType<EntityRecognizer>(Assert.Single(pipeline.Components));
+        Assert.Equal(0f, head.MinConfidence);
+        Assert.Throws<ArgumentOutOfRangeException>(() => head.MinConfidence = 1.5f);
+        Assert.Throws<ArgumentOutOfRangeException>(() => head.MinConfidence = float.NaN);
+
+        string[] texts = [.. train.Take(40).Select(e => e.Reference.Text)];
+        var before = texts.Select(t => pipeline.Process(t).Ents.Select(x => (x.Start, x.End, x.Label, x.Confidence)).ToArray()).ToArray();
+        head.MinConfidence = 0.9f;
+        var after = texts.Select(t => pipeline.Process(t).Ents.Select(x => (x.Start, x.End, x.Label, x.Confidence)).ToArray()).ToArray();
+        for (int i = 0; i < texts.Length; i++)
+        {
+            Assert.Equal(before[i].Where(x => x.Confidence >= 0.9f), after[i]);
+        }
+
+        string model = Path.Combine(_dir, "mc-" + decoding + ".onenlp");
+        PipelineFile.Save(pipeline, model);
+        using Pipeline loaded = PipelineFile.Load(model);
+        Assert.Equal(0.9f, Assert.IsType<EntityRecognizer>(Assert.Single(loaded.Components)).MinConfidence);
+    }
+
     [Fact]
     public void TaggingDecodingNeverWritesAMalformedSequence()
     {

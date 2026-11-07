@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- A consumer of the packed frozen-encoder package, as a user's project would be: it restores the packages from a folder feed (environment
+       variable ONENLP_CONSUMER_FEED), never from project references. Not part of the solution. Run it with run.sh. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).ModelConsumer.FrozenEncoder</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).ModelConsumer.FrozenEncoder</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ONENLP_CONSUMER_FEED)</RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RecursiveAI.OneNlp.Models.Multilingual.FrozenEncoder" VersionOverride="$(Version)" />
+  </ItemGroup>
+
+</Project>

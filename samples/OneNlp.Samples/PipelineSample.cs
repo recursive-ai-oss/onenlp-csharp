@@ -11,7 +11,7 @@ internal static class PipelineSample
         Console.WriteLine("pipeline");
 
         // <sample>
-        // A blank English pipeline: the rule tokenizer, then the components in the order they are added.
+        // A blank English pipeline: the Unicode word tokenizer, then the components in the order they are added.
         using Pipeline nlp = Pipeline.Blank(Language.English);
 
         // Rule entities, from token patterns (the vocabulary of spaCy's rule-based matching) or from phrases.

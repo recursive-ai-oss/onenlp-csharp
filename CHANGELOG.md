@@ -6,20 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `EntityRecognizer.MinConfidence` drops decoded entities below a confidence (default 0, which changes nothing); it is saved in the model file only when above 0, so existing files load unchanged. The Chinese entity model ships with 0.6.
+
 ### Changed (breaking)
 
+- `Nlp.Entities(text)`, `Nlp.Lemmas(text)` and `Nlp.Analyze(text)`: when the language detector is unsure (confidence below 0.8) and has no model for its answer, the text is read in the most likely of the languages that have a model, so "Paris", "Ok" or a name is read by the model you referenced instead of throwing from one verb and silently losing entities in the other. Confident answers are unchanged: French text without a French model is still an error naming the package.
+- A missing model throws `ModelNotAvailableException` (still an `InvalidOperationException`) with `Language`, `Tier` and `PackageIds`; messages name only packages that exist.
+- `Nlp` verbs and `Pipeline.Process`/`ProcessMany` refuse text longer than `Nlp.MaxLength` / `Pipeline.MaxLength` (1,000,000 characters by default) with an `ArgumentOutOfRangeException`. Texts above that size that used to be accepted now need a raised limit.
+- `Tokenizer.FromFile("vocab.txt")` no longer reads letters without a case pair (such as U+211D, which `bert-base-uncased` contains) as evidence of a cased vocabulary: that vocabulary is now uncased, as it is.
+- `Recognizer.Recognize(text, context = default)` is two overloads, `Recognize(text)` and `Recognize(text, context)`; a `default(DateTimeOffset)` reference date throws `ArgumentException` here and in `Nlp.Dates` and `Nlp.ParseDate`.
+- `Language.Unknown.ToString()` is `"Unknown"` (its `Code` is still empty).
+- `PatternFormatException` and `RecognizerRulesException` carry `LineNumber` (and `BytePositionInLine` for patterns); pattern messages no longer end in `(Parameter 'name')`, and rule-line messages no longer repeat "Line N" inside the text they pass to the constructor.
 - `Token.Text` and `Span.Text` are now `string`s cut from `Doc.Text`, so `token.Text == "x"`, `doc.Select(t => t.Text)` and `ToDictionary(s => s.Text)` work. The copy-free view is `TextSpan` (a `ReadOnlySpan<char>`). *Migration:* code that wanted the span, such as `token.Text.SequenceEqual(...)` or a `ReadOnlySpan<char>` local, reads `token.TextSpan`; `token.Text.ToString()` becomes `token.Text`.
 - One default word tokenizer: `PhraseMatcher`, `EntityRuler` phrases and `JsonlOptions.Tokenizer` now default to the tokenizer `Pipeline.Blank` uses (`UaxWordTokenizer.Default`) instead of `RuleWordTokenizer`. An `EntityRuler` added to a pipeline splits its phrases with that pipeline's tokenizer unless it was given one. New: `new PhraseMatcher(pipeline)` and `JsonlReader.Read(path | stream | reader, pipeline)`. *Migration:* calls that passed `null` for the string table with options, `JsonlReader.Read(path, null, options)`, are now ambiguous; write `JsonlReader.Read(path, strings: null, options: options)`, or pass the pipeline.
 - `EntityRuler` has no indexer. It is a collection: `new EntityRuler { { "CASE_NO", Pattern.Shape("dd-dddd") } }` (or `ruler.Add(label, pattern)`). *Migration:* `new EntityRuler { ["X"] = p }` becomes `new EntityRuler { { "X", p } }`.
 - Serialization verbs: `Doc.WriteTo(Stream)` is `Doc.WriteBinary(Stream)`, `Doc.FromBytes(Stream)` is `Doc.FromStream(Stream)`, and `DocBin.WriteTo(Stream)` is `DocBin.WriteBinary(Stream)`.
 - `TrainOptions`, `TrainResult`, `TrainProgress`, `DevScores` (was `RecursiveAI.OneNlp.Neural.Training`) and `Example` (was `RecursiveAI.OneNlp.Data`) are in the `RecursiveAI.OneNlp` namespace. *Migration:* delete `using RecursiveAI.OneNlp.Neural.Training;`; `using RecursiveAI.OneNlp.Data;` is still needed for the readers and `Alignment`.
 
+- Training a head that already has weights (a packaged pipeline) on data with labels it lacks: an `EntityRecognizer` now appends the new labels and keeps its weights (spaCy's "add a label, then train"); before, the labels were silently dropped. A `Tagger`, `Morphologizer`, `EditTreeLemmatizer`, `Parser`, `SpanCategorizer` or `TextClassifier` throws `ArgumentException` naming the unknown values (part-of-speech and feature combinations, edit trees seen at least `minClassCount` times, dependency relations, span labels, or categories) instead of skipping them. `ITrainableComponent.ExtendLabels` is the new member (a default interface method).
+- `Pipeline.Add("sentencizer")` on a pipeline for a language uses that language's segmentation data (English `Mr.` no longer ends a sentence); it used the neutral data before. Settings that name `data` or `language` still win.
+- `SpanCategorizer` default threshold is 0.8 (was 0.5), and `Threshold` is settable. At 0.8, chosen on a development split, the English UNER precision is 76.0 (was 70.3; spaCy 75.4) with F1 63.8 (was 64.4). Saved models keep the threshold they were saved with.
+- `ModelNotAvailableException` for a language no published package covers (for example Basque) has an empty `PackageIds` and says so, instead of naming a package that cannot help; a package already referenced is never named.
+- `Span` and `Token` write their `start` and `end` in code points through `System.Text.Json`, as the `Doc` form does (they were UTF-16 offsets). The two differ only after a character outside the Basic Multilingual Plane; `StartChar` and `Idx` are unchanged.
+- `default(Token)` and `default(Span)` members throw `InvalidOperationException` (they threw `NullReferenceException`). `Example.Create` throws `ArgumentOutOfRangeException` for an offset outside the text. `Doc.FromJson` messages no longer end in `(Parameter 'name')`.
+- `Pipeline.ProcessMany` takes a trailing `CancellationToken` (source compatible; a method group or delegate bound to the old signature must be rebuilt).
+
 ### Added
 
+- `Nlp.Entities(text, types, threshold)` for open-type entities with a probability threshold (the default stays 0.5); `docs/open-ner.md` says where the recognizer comes from.
+- `Nlp.Entities`, `Nlp.Analyze`, `Nlp.AnalyzeMany` and `Nlp.Lemmas` overloads that take a `Language`; `Nlp.MaxLength`; `Pipeline.MaxLength`.
+- `Tokenizer.FromWordPieceVocabulary(path or stream, WordPieceVocabularyOptions)` states the casing of a `vocab.txt`; `Tokenizer.EncodeToIds(text, addSpecialTokens)` returns an `int[]`.
+- `ModelNotAvailableException`.
 - `System.Text.Json` works on `Doc` (it writes and reads the `Doc.ToJson` shape), and writes `Span` and `Token` as objects with character offsets, label and text; no reflection, so it also works under NativeAOT with a source-generated context.
 - `Example.Create(pipeline, text, entities, cats)` builds a training example from character offsets, tokenized by the pipeline.
 - `WriteJsonAsync`, `WriteBinaryAsync`, `FromJsonAsync` and `FromStreamAsync` on `Doc`, `WriteBinaryAsync` and `FromStreamAsync` on `DocBin`, and `DocBinReader` is an `IEnumerable<Doc>` with `ReadAsync` and `ReadAllAsync`.
-
 - Documentation for the first release: a rewritten README and package readmes, `docs/results-table.md` (every quality row with its reference and interval), side-by-side "reads like" samples (`docs/reads-like.md`), migration pages for Catalyst, Microsoft.Recognizers.Text, Lingua and Microsoft.ML.Tokenizers, guides for training, the fast tier and classification, and `samples/OneNlp.Samples`, which builds and runs every sample the docs show.
 - Recognizer comparison files for Turkish and Hindi test sets, and refreshed English ones that include date/time.
 

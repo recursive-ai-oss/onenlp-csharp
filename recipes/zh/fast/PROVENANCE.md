@@ -26,3 +26,20 @@ The dependency-parser and entity numbers on dev are lower than on test (the dev 
 ## Parser, faster configuration
 
 The parser part was retrained with one LSTM layer and product label features (`docs/parser.md`, "Speed configuration"): flags `--prefix 1 --suffix 1 --epochs 40 --lstm 192 --lstm-layers 1 --arc 192 --label 96 --label-bilinear 0 --label-product 1`; everything else as above (seed 7, dropout 0.25, 1,500-word batches, ten sentences per document, patience 6 on dev LAS). Data: UD Chinese-GSDSimp r2.18 train and dev (CC BY-SA 4.0 or CC BY 4.0 as listed above; share-alike lineage unchanged). Best dev LAS 66.814 at step 2,313; about 13 minutes on 4 threads of the shared worker; trainer weights hash `f721ccf0d2a578b7bfa9d08e82b003197afa36b9403f1f2dccb1741ac222792c`. File `parser.onenlp`: 39,260,234 bytes, sha256 `eb5a8e1dc60ac5536dc1e22bb9b43dc704ea0cda22c5b12f5ba3b157aef88457`. Test rows, speed and the earlier parser's rows: `docs/results.md`, "Parser speed". The earlier parser is reproduced by the same command without the label and LSTM flags above (defaults of the recipe).
+
+## Entity confidence threshold
+
+The entity model's output had precision below recall (test 62.44 against spaCy's 67.08, paired -4.64 [-8.52, -0.50]). `EntityRecognizer.MinConfidence` drops decoded entities whose confidence (the mean tag probability of their tokens) is below a value; the weights are unchanged, so no retraining was done. The value was chosen on the development file only (500 sentences, 753 entities), by `ner-eval --min-confidence`:
+
+| Threshold | F1 | Precision | Recall |
+|---|---|---|---|
+| 0 (before) | 63.81 | 63.35 | 64.28 |
+| 0.5 | 62.74 | 64.78 | 60.82 |
+| 0.6 | 63.32 | 68.91 | 58.57 |
+| 0.7 | 62.91 | 72.37 | 55.64 |
+| 0.8 | 61.82 | 76.37 | 51.93 |
+| 0.9 | 59.48 | 81.34 | 46.88 |
+
+0.6 is the lowest value with precision up by more than the 4.6-point gap and F1 within 1 point of the best (the rule was written before the test read). `ner-threshold MODEL OUT 0.6` writes the shipped `ner.onenlp` from the earlier file (same weights, `min_confidence` added to the head's configuration): 52,586,107 bytes, sha256 `840bd9287c6c7ffe9f8b8f724480558c8272acd309961b266f2e825c323993a7` (before: `97ac3eb877d88cef2bea9628310259acf8c655663e47de3b509b1708c6287c5d`). SA lineage unchanged.
+
+UNER Chinese-GSDSIMP test, gold tokens, paired against spaCy 3.8.18 `gold_preproc` (1,000 resamples, seed 1; the test file was read once for this setting; the same file was already read for the earlier model): micro F1 63.79 [59.39, 68.27] vs 61.86 (+1.93 [-1.48, 5.33]); precision 69.28 vs 67.08 (+2.20 [-2.02, 6.59]); recall 59.11 vs 57.40 (+1.70 [-1.61, 5.12]); LOC 70.38 vs 68.15, ORG 51.28 vs 45.00, PER 57.95 vs 59.08. Every row is within noise. Before: 62.80, 62.44, 63.17, LOC 69.86, ORG 47.91, PER 57.69. Speed: the filter runs on the few decoded entities, so tokens per second do not change.

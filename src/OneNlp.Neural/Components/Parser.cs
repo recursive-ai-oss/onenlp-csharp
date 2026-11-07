@@ -152,6 +152,35 @@ public sealed class Parser : DependencyParser
     }
 
     /// <inheritdoc/>
+    /// <exception cref="ArgumentException">The examples hold dependency relations this parser's label set lacks. The label set is fixed once the parser has weights.</exception>
+    public override IReadOnlyList<string> ExtendLabels(IReadOnlyList<Example> examples, ulong seed)
+    {
+        ArgumentNullException.ThrowIfNull(examples);
+        var unknown = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (Example example in examples)
+        {
+            Doc reference = example.Reference;
+            foreach (int id in reference.GetColumn(TokenColumn.Dep))
+            {
+                if (id != 0 && !_labelIds.ContainsKey(reference.Strings[id]))
+                {
+                    unknown.Add(reference.Strings[id]);
+                }
+            }
+        }
+
+        if (unknown.Count > 0)
+        {
+            throw new ArgumentException(
+                $"The training examples hold dependency relations that the component '{Name}' does not have: {string.Join(", ", unknown.Take(10))}. "
+                + "A parser's label set is fixed once it has weights; train a new parser, or remove these values.",
+                nameof(examples));
+        }
+
+        return [];
+    }
+
+    /// <inheritdoc/>
     public override Tensor Loss(EncodedBatch encoded, IReadOnlyList<Example> examples)
     {
         ArgumentNullException.ThrowIfNull(encoded);
