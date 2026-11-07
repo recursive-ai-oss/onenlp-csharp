@@ -40,6 +40,7 @@ public sealed class EditTreeLemmatizer : Lemmatizer
     private bool[] _lower = [];
     private Dictionary<string, int> _labelIds = new(StringComparer.Ordinal);
     private FactoredOutput? _module;
+    private LemmaLexicon? _lexicon;
     private readonly int _minClassCount;
     private readonly int _headClasses;
 
@@ -58,6 +59,17 @@ public sealed class EditTreeLemmatizer : Lemmatizer
         ArgumentOutOfRangeException.ThrowIfLessThan(minClassCount, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(minClassCount, 1000);
         _minClassCount = minClassCount;
+    }
+
+    /// <summary>
+    /// A table of lemmas for (form, part of speech) pairs of the training data, consulted before the edit trees: a hit gives the table's lemma.
+    /// It needs the part of speech, so a morphologizer must run before the lemmatizer; without one the table is not used. <see langword="null"/>
+    /// (the default) means trees only. Saved with the head.
+    /// </summary>
+    public LemmaLexicon? Lexicon
+    {
+        get => _lexicon;
+        set => _lexicon = value;
     }
 
     /// <summary>The classes (a flag character, <c>l</c> or <c>r</c>, then the serialized tree), in output order; empty until initialized.</summary>
@@ -292,6 +304,11 @@ public sealed class EditTreeLemmatizer : Lemmatizer
                         lemma = TryRanked(firstRow, factored ? k : classes, 0, tried, ref used, form, lower);
                     }
 
+                    if (_lexicon is not null && doc[t].Pos is { Length: > 0 } pos && _lexicon.TryGet(form.ToString().ToLowerInvariant(), pos, out string known))
+                    {
+                        lemma = known;
+                    }
+
                     lemmas[t] = doc.Strings.Add(lemma ?? form.ToString());
                 }
 
@@ -365,6 +382,11 @@ public sealed class EditTreeLemmatizer : Lemmatizer
         }
 
         writer.WriteEndArray();
+        if (_lexicon is { Count: > 0 })
+        {
+            writer.WritePropertyName("lexicon");
+            _lexicon.Write(writer);
+        }
     }
 
     /// <inheritdoc/>
@@ -388,6 +410,11 @@ public sealed class EditTreeLemmatizer : Lemmatizer
 
         var head = new EditTreeLemmatizer(encoder, name, 1, JsonSettings.OptionalInt(config, "headClasses", 0, 4096, 0)) { OwnsEncoder = true };
         head.Build(labels, new Generator(0));
+        if (config.TryGetProperty("lexicon", out JsonElement lexicon))
+        {
+            head._lexicon = LemmaLexicon.Read(lexicon);
+        }
+
         return head;
     }
 

@@ -8,7 +8,7 @@ here=$(cd "$(dirname "$0")" && pwd); repo=$(cd "$here/../.." && pwd)
 feed=$work/feed; mkdir -p "$feed"; rm -f "$feed"/*.nupkg
 export NUGET_PACKAGES=$work/nuget; rm -rf "$NUGET_PACKAGES/recursiveai.onenlp" "$NUGET_PACKAGES"/recursiveai.onenlp.*
 export ONENLP_CONSUMER_FEED=$feed ONENLP_MLLARGE_WEIGHTS=$weights ONENLP_ARTIFACTS=$work/artifacts
-for p in src/OneNlp/OneNlp.csproj src/OneNlp.Neural/OneNlp.Neural.csproj src/OneNlp.Models.Multilingual.Large.Parts/{Encoder1,Encoder2,TokenTable1,TokenTable2,TokenTable3,TokenTable4}/OneNlp.Models.Multilingual.Large.*.csproj src/OneNlp.Models.Multilingual.Large/OneNlp.Models.Multilingual.Large.csproj; do
+for p in src/OneNlp/OneNlp.csproj src/OneNlp.Neural/OneNlp.Neural.csproj src/OneNlp.Models.Multilingual.Large.Parts/{Encoder1,Encoder2,TokenTable1,TokenTable2,TokenTable3,TokenTable4,Chinese}/OneNlp.Models.Multilingual.Large.*.csproj src/OneNlp.Models.Multilingual.Large/OneNlp.Models.Multilingual.Large.csproj; do
   dotnet pack "$repo/$p" -c Release -o "$feed" -v quiet -clp:NoSummary -nologo
 done
 ls -l "$feed"
