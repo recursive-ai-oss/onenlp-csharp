@@ -187,6 +187,48 @@ public class ParserTests
     }
 
     [Fact]
+    public void ProductLabelScorerWithOneLstmLearnsAndSurvivesSaveAndLoad()
+    {
+        List<Example> train = Toy(300, 1);
+        List<Example> dev = Toy(60, 2);
+        using Pipeline pipeline = Pipeline.Blank().Add(new Parser(new HashEmbeddingEncoder(32, 512, seed: 1), arcSize: 24, labelSize: 12, contextLayers: 0, recurrentSize: 16, recurrentLayers: 1, labelBilinear: false, labelProduct: true) { OwnsEncoder = true });
+        TrainResult result = pipeline.Train(train, new TrainOptions
+        {
+            Epochs = 12,
+            BatchWords = 200,
+            LearningRate = 0.01f,
+            Dropout = 0.0f,
+            Seed = 3,
+            DevExamples = dev,
+            Score = DevScores.Ud("LAS"),
+        });
+        Assert.True(result.BestScore > 90, $"dev LAS {result.BestScore}");
+
+        string path = Path.Combine(Path.GetTempPath(), "onenlp-parser-" + Guid.NewGuid().ToString("N") + ".onenlp");
+        try
+        {
+            PipelineFile.Save(pipeline, path);
+            using Pipeline loaded = PipelineFile.Load(path);
+            Parser parser = Assert.IsType<Parser>(loaded.Components.Single());
+            Assert.True(parser.LabelProduct);
+            Assert.False(parser.LabelBilinear);
+            foreach (Example e in dev.Take(20))
+            {
+                Doc a = pipeline.Process(e.Reference.Text);
+                Doc b = loaded.Process(e.Reference.Text);
+                Assert.Equal(a.GetHeads().ToArray(), b.GetHeads().ToArray());
+                Assert.Equal(
+                    a.GetColumn(TokenColumn.Dep).ToArray().Select(x => a.Strings[x]),
+                    b.GetColumn(TokenColumn.Dep).ToArray().Select(x => b.Strings[x]));
+            }
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void PredictsSentenceBoundariesInRunningText()
     {
         // Six sentences per document. In this toy language a sentence always begins with word type 0 and no other position holds one.
