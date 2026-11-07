@@ -77,14 +77,17 @@ internal static class MigrationSamples
         // BertTokenizer.Create / TiktokenTokenizer.CreateForModel / SentencePieceTokenizer.Create  become one type that reads the file's own format.
         Tokenizer tokenizer = Tokenizer.FromFile(tokenizerJson);
 
-        int[] ids = new int[512];
-        OperationStatus status = tokenizer.EncodeToIds("a text to encode", ids, out int written, out int consumed);   // EncodeToIds(text)
-        int count = tokenizer.CountTokens("a text to encode");                                                      // CountTokens(text)
-        string text = tokenizer.Decode(ids.AsSpan(0, written));                                                     // Decode(ids)
+        int[] ids = tokenizer.EncodeToIds("a text to encode", addSpecialTokens: false);                              // EncodeToIds(text): a new array, nothing cut off
+        int count = tokenizer.CountTokens("a text to encode", addSpecialTokens: false);                             // CountTokens(text)
+        string text = tokenizer.Decode(ids);                                                                        // Decode(ids)
         ReadOnlySpan<char> head = tokenizer.TrimToTokenBudget("a text to encode", 2);                               // GetIndexByTokenCount
+
+        // For a fixed buffer with no allocation, check the status: DestinationTooSmall means the buffer cut the text short.
+        int[] buffer = new int[512];
+        OperationStatus status = tokenizer.EncodeToIds("a text to encode", buffer, out int written, out int consumed);
         // </tokenizers>
 
-        Program.Check("tokenizers: done, and the count agrees", status == OperationStatus.Done && count == written && consumed == "a text to encode".Length);
+        Program.Check("tokenizers: done, and the count agrees", status == OperationStatus.Done && count + 2 == written && ids.Length == count && consumed == "a text to encode".Length);
         Program.Check("tokenizers: decode round trip", text.Length > 0 && head.Length > 0);
     }
 

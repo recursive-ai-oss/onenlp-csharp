@@ -6,8 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed (breaking)
+
+- `Nlp.Entities(text)`, `Nlp.Lemmas(text)` and `Nlp.Analyze(text)`: when the language detector is unsure (confidence below 0.8) and has no model for its answer, the text is read in the most likely of the languages that have a model, so "Paris", "Ok" or a name is read by the model you referenced instead of throwing from one verb and silently losing entities in the other. Confident answers are unchanged: French text without a French model is still an error naming the package.
+- A missing model throws `ModelNotAvailableException` (still an `InvalidOperationException`) with `Language`, `Tier` and `PackageIds`; messages name only packages that exist.
+- `Nlp` verbs and `Pipeline.Process`/`ProcessMany` refuse text longer than `Nlp.MaxLength` / `Pipeline.MaxLength` (1,000,000 characters by default) with an `ArgumentOutOfRangeException`. Texts above that size that used to be accepted now need a raised limit.
+- `Tokenizer.FromFile("vocab.txt")` no longer reads letters without a case pair (such as U+211D, which `bert-base-uncased` contains) as evidence of a cased vocabulary: that vocabulary is now uncased, as it is.
+- `Recognizer.Recognize(text, context = default)` is two overloads, `Recognize(text)` and `Recognize(text, context)`; a `default(DateTimeOffset)` reference date throws `ArgumentException` here and in `Nlp.Dates` and `Nlp.ParseDate`.
+- `Language.Unknown.ToString()` is `"Unknown"` (its `Code` is still empty).
+- `PatternFormatException` and `RecognizerRulesException` carry `LineNumber` (and `BytePositionInLine` for patterns); pattern messages no longer end in `(Parameter 'name')`, and rule-line messages no longer repeat "Line N" inside the text they pass to the constructor.
+
 ### Added
 
+- `Nlp.Entities`, `Nlp.Analyze`, `Nlp.AnalyzeMany` and `Nlp.Lemmas` overloads that take a `Language`; `Nlp.MaxLength`; `Pipeline.MaxLength`.
+- `Tokenizer.FromWordPieceVocabulary(path or stream, WordPieceVocabularyOptions)` states the casing of a `vocab.txt`; `Tokenizer.EncodeToIds(text, addSpecialTokens)` returns an `int[]`.
+- `ModelNotAvailableException`.
 - Documentation for the first release: a rewritten README and package readmes, `docs/results-table.md` (every quality row with its reference and interval), side-by-side "reads like" samples (`docs/reads-like.md`), migration pages for Catalyst, Microsoft.Recognizers.Text, Lingua and Microsoft.ML.Tokenizers, guides for training, the fast tier and classification, and `samples/OneNlp.Samples`, which builds and runs every sample the docs show.
 - Recognizer comparison files for Turkish and Hindi test sets, and refreshed English ones that include date/time.
 

@@ -52,7 +52,7 @@ public class DutchSegmentationTests
     [Fact]
     public void MissingDutchModelNamesTheDutchPackage()
     {
-        InvalidOperationException e = Assert.Throws<InvalidOperationException>(() => ModelPackages.Get(Language.Dutch));
+        ModelNotAvailableException e = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.Dutch));
         Assert.Contains("RecursiveAI.OneNlp.Models.Dutch", e.Message);
     }
 }

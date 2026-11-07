@@ -42,7 +42,7 @@ public static class ComponentRegistry
     /// <summary>Creates a registered component.</summary>
     /// <param name="name">The registered name.</param>
     /// <param name="settings">Settings for the factory, or <see langword="null"/> for none.</param>
-    /// <exception cref="InvalidOperationException">No component has this name. The message lists the registered names and says that components from other packages register when that package is loaded.</exception>
+    /// <exception cref="InvalidOperationException">No component has this name. The message lists the registered names and points to Pipeline.Create(language) and Add for trained components.</exception>
     public static IPipelineComponent Create(string name, IReadOnlyDictionary<string, string>? settings = null)
     {
         ArgumentNullException.ThrowIfNull(name);
@@ -50,7 +50,7 @@ public static class ComponentRegistry
         {
             throw new InvalidOperationException(
                 $"No pipeline component named '{name}' is registered (registered: {string.Join(", ", Factories.Keys.Order(StringComparer.Ordinal))}). "
-                + "Components that live in another package, such as RecursiveAI.OneNlp.Neural, are registered once that package is loaded.");
+                + "Trained components such as the tagger or the entity recognizer are not registered by name: take them from a model package with Pipeline.Create(language).Add<T>().");
         }
 
         return factory(settings ?? NoSettings);

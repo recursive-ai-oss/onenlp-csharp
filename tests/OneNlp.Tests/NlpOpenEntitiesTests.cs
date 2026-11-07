@@ -30,7 +30,7 @@ public class NlpOpenEntitiesTests
     [Fact]
     public void MissingModelNamesThePackageThenRegisteredRecognizerIsUsed()
     {
-        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => Nlp.Entities("Anna met Bob.", "person"));
+        ModelNotAvailableException ex = Assert.Throws<ModelNotAvailableException>(() => Nlp.Entities("Anna met Bob.", "person"));
         Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", ex.Message, StringComparison.Ordinal);
 
         ModelPackages.RegisterOpenEntities("RecursiveAI.OneNlp.Models.Multilingual", () => Pipeline.Blank(Language.English).Add(new Capitals()));

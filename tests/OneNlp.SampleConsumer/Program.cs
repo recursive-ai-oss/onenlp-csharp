@@ -29,6 +29,7 @@ internal static class Program
         string german = "Im Fall 12-3456 entschied Angela Merkel in Hamburg.";
         // No package ships the open-type model yet: the verb names the package to add; then a tiny trained one stands in for it.
         InvalidOperationException? missing = Capture(() => Nlp.Entities(english, "contract party", "governing law"));
+        Check("open-type error is typed", missing is ModelNotAvailableException { PackageIds.Count: > 0 });
         Check("open-type error names the package", missing?.Message.Contains("RecursiveAI.OneNlp.Models.Multilingual", StringComparison.Ordinal) == true);
         Console.WriteLine(missing?.Message);
         RegisterTinyOpenModel();
@@ -83,6 +84,13 @@ internal static class Program
         {
             Check("ruler", d.Ents.Any(e => e.Label == "CASE_NO"));
             Check("german noun chunks", doc.NounChunks.Count > 0);
+        }
+
+        // Short texts are read in the referenced language instead of throwing, and both verbs agree.
+        foreach (string shortText in new[] { "Paris", "Ok", "Angela Merkel", "Sushi in Tokyo" })
+        {
+            Check($"short text '{shortText}' has a model", Capture(() => Nlp.Entities(shortText)) is null);
+            Check($"short text '{shortText}' analyzes", Nlp.Analyze(shortText).Length > 0);
         }
 
         Check("embed", v.Length > 0);
