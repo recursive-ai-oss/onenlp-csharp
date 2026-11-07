@@ -48,4 +48,4 @@ The open-type entity head (`recipes/openner/PROVENANCE.md`) was trained on **Few
 
 ## Hindi hand-annotated sentences (`testdata/hi`)
 
-`testdata/hi/selfdev.conllu` (17 sentences) and `testdata/hi/nerspot.iob2` (91 sentences) are Hindi web sentences from FineWeb-2 (Hugging Face, `HuggingFaceFW/fineweb-2`, Open Data Commons Attribution License 1.0, subject to the Common Crawl terms of use) with part-of-speech tags, dependency relations and entity labels written by us. They are used to check the Hindi model, never to train it.
+`testdata/hi/selfdev.conllu` (100 sentences) and `testdata/hi/nerspot.iob2` (91 sentences): 17 of the first and all of the second are Hindi web sentences from FineWeb-2 (Hugging Face, `HuggingFaceFW/fineweb-2`, Open Data Commons Attribution License 1.0, subject to the Common Crawl terms of use); the other 83 sentences of the first, and `selfdev.lemmas.tsv`, are text we wrote. All part-of-speech tags, dependency relations, lemmas and entity labels were written by us. They are used to check the Hindi model, never to train it.

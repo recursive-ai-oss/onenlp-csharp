@@ -26,7 +26,7 @@ Where a treebank has no XPOS column (French-GSD, Portuguese-Bosque) there is no 
 | `.Models.Dutch` | Dutch-Alpino | WikiNER Dutch | Dutch abbreviations and compounds |
 | `.Models.Turkish` | Turkish-BOUN | Turkish-WikiNER | apostrophe suffixes kept; a trained multiword splitter; Turkic case folding |
 | `.Models.Chinese` | Chinese-GSDSimp | UNER Chinese-GSDSIMP | a trained character-tagging word segmenter |
-| `.Models.Hindi` | none (no allowed treebank): FineWeb-2 Hindi text labelled by the accurate tier, 31,036 sentences kept by agreement | the same text, 50,245 sentences | none; the danda is a token. No lemmas, no XPOS |
+| `.Models.Hindi` | none (no allowed treebank): FineWeb-2 Hindi text labelled by the accurate tier and by Marathi, Sindhi and Punjabi heads on its encoder, 32,276 sentences kept by agreement | the same text, 50,380 sentences | none; the danda is a token. No lemmas (the token text stands in), no XPOS |
 
 Every training source is credited in the package's `THIRD-PARTY-NOTICES.md`, and `PROVENANCE.md` lists datasets, recipes, seeds and hashes. Most of the data is CC BY-SA, so the weights carry that lineage (credited), and they ship under `MIT OR Apache-2.0` ([ud-licences.md](ud-licences.md) lists every treebank considered and why some are not used). There is no Hindi package: Hindi has no allowed UD or named-entity training data.
 

@@ -23,8 +23,9 @@ internal static class Program
         Console.WriteLine(error?.Message);
 #else
         // Structure, not accuracy: every token is tagged and attached, each sentence has one root, and entities carry known labels. The model has no
-        // lemmatizer or XPOS head, so those stay empty.
+        // lemmatizer or XPOS head: the lemma is the token text and the tag stays empty.
         Check("tags", doc.All(t => t.Pos.Length > 0 && t.Dep.Length > 0));
+        Check("lemma is the token text", doc.All(t => t.Lemma == t.Text && t.Tag.Length == 0));
         Check("one root per sentence (counted over the document)", doc.Count(t => t.Dep == "root") == doc.Sentences.Count);
         Check("entities", Nlp.Entities(text).All(e => e.Label is "PER" or "ORG" or "LOC" && e.Confidence > 0));
         Check("entities match analyze", doc.Ents.Count == Nlp.Entities(text).Count);

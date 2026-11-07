@@ -141,32 +141,33 @@ Source for each language: its section in [results.md](results.md) and the recipe
 
 ### Hindi (self-labelled; information, not a gated comparison)
 
-There is no allowed Hindi treebank or entity corpus (`ud-licences.md`: Hindi-HDTB and the Samanantar-sourced NER sets are non-commercial), so the Hindi student learns from Hindi web text (FineWeb-2) labelled by the accurate tier: the heads of nine other languages applied through the shared encoder, combined by agreement (`recipes/hi/fast/README.md`). Hindi-PUD (1,000 sentences, CC BY-SA 3.0, test only) was read once, for the final model. Intervals are 95% bootstrap (1,000 resamples, seed 20261107). The "labeller" is the unfiltered ensemble of the source heads on the same input, the ceiling of what the student was shown. spaCy 3.8.18 is the black-box baseline trained on the same labelled sentences with its default configuration and the pipeline `morphologizer,parser` (the labels have no XPOS or lemmas). The published Stanza, UDPipe 2 and Trankit numbers are on Hindi-HDTB with non-commercial training data and are not comparable (`references.md`, "Hindi"). **Hindi cannot be brought within noise of the published references with the training data that may be used.**
+There is no allowed Hindi treebank or entity corpus (`ud-licences.md`: Hindi-HDTB and the Samanantar-sourced NER sets are non-commercial), so the Hindi student learns from Hindi web text (FineWeb-2) labelled by the accurate tier: the heads of five large languages and of heads we trained on the same frozen encoder for Marathi, Sindhi and Punjabi (UD, CC BY-SA), combined by agreement, with explicit adult content filtered out of the text first (`recipes/hi/fast/README.md`). Hindi-PUD (1,000 sentences, CC BY-SA 3.0, sha256 `3562b7f4...`, test only) was read once for the final model, which is the second round of this recipe; the first round (labels from nine unrelated languages) is shown as "before". Intervals are 95% bootstrap (1,000 resamples, seed 20261107). The "labeller" is the unfiltered ensemble of the source heads on the same input, the ceiling of what the student was shown. spaCy 3.8.18 is the black-box baseline trained on the same labelled sentences with its default configuration and the pipeline `morphologizer,parser` (the labels have no XPOS or lemmas). The published Stanza, UDPipe 2 and Trankit numbers are on Hindi-HDTB with non-commercial training data and are not comparable (`references.md`, "Hindi"). **Hindi cannot be brought within noise of the published references with the training data that may be used.**
 
-| Mode | Metric | Student | Labeller | spaCy, same labels | Verdict against spaCy |
-|---|---|---|---|---|---|
-| gold | UPOS | 70.93 [70.37, 71.49] | 72.77 [72.24, 73.34] | 71.91 [71.36, 72.52] | within noise |
-| gold | UFeats | 34.01 [33.37, 34.62] | 33.90 [33.28, 34.52] | 33.96 [33.35, 34.57] | within noise |
-| gold | UAS | 42.57 [41.61, 43.59] | 38.84 [37.90, 39.82] | 44.27 [43.26, 45.28] | within noise |
-| gold | LAS | 31.90 [31.10, 32.80] | 26.43 [25.64, 27.24] | 33.72 [32.93, 34.57] | behind (paired difference excludes 0) |
-| gold | CLAS | 29.62 [28.69, 30.68] | 26.85 [25.94, 27.84] | 30.41 [29.47, 31.41] | within noise |
-| gold | MLAS | 5.14 [4.81, 5.52] | 4.01 [3.70, 4.33] | 5.90 [5.53, 6.28] | behind (paired) |
-| raw | Tokens | 99.38 [99.23, 99.53] | 99.38 | 99.82 [99.72, 99.89] | behind (spaCy's tokenizer) |
-| raw | Sentences | 90.75 [88.61, 92.92] | 98.31 [97.22, 99.25] (rule sentencizer) | 81.14 [78.18, 84.05] | ahead |
-| raw | UPOS | 70.49 [69.94, 71.09] | 72.12 [71.56, 72.68] | 71.87 [71.32, 72.47] | behind (paired) |
-| raw | UFeats | 33.72 [33.10, 34.32] | 33.51 [32.89, 34.14] | 33.90 [33.26, 34.51] | within noise |
-| raw | UAS | 42.73 [41.75, 43.80] | 36.94 [36.01, 37.89] | 43.98 [43.00, 45.06] | within noise |
-| raw | LAS | 32.00 [31.17, 32.89] | 24.87 [24.08, 25.68] | 33.61 [32.81, 34.48] | within noise |
-| raw | CLAS | 29.80 [28.87, 30.90] | 25.50 [24.60, 26.45] | 30.39 [29.46, 31.37] | within noise |
-| raw | MLAS | 5.23 [4.91, 5.61] | 3.85 [3.54, 4.15] | 5.91 [5.52, 6.28] | within noise |
+| Mode | Metric | Student | Labeller | spaCy, same labels | Verdict against spaCy | Student before |
+|---|---|---|---|---|---|---|
+| gold | UPOS | 83.19 [82.65, 83.75] | 85.55 [85.05, 86.08] | 83.78 [83.24, 84.31] | within noise | 70.93 |
+| gold | UFeats | 34.28 [33.67, 34.90] | 34.63 [34.00, 35.27] | 34.29 [33.66, 34.90] | within noise | 34.01 |
+| gold | Lemmas (form) | 72.68 [72.15, 73.24] | none | none | n/a | 72.68 |
+| gold | UAS | 65.00 [64.01, 66.09] | 60.88 [59.84, 61.93] | 65.00 [64.01, 66.12] | within noise | 42.57 |
+| gold | LAS | 52.79 [51.85, 53.77] | 49.04 [48.06, 50.05] | 53.44 [52.48, 54.47] | within noise | 31.90 |
+| gold | CLAS | 45.60 [44.56, 46.69] | 44.52 [43.49, 45.56] | 46.46 [45.41, 47.57] | within noise | 29.62 |
+| gold | MLAS | 7.72 [7.30, 8.17] | 8.16 [7.74, 8.62] | 8.36 [7.91, 8.81] | within noise | 5.14 |
+| raw | Tokens | 99.38 [99.23, 99.53] | 99.38 | 99.82 [99.72, 99.89] | behind (spaCy's tokenizer) | 99.38 |
+| raw | Sentences | 89.68 [87.47, 91.82] | 98.31 [97.22, 99.25] (rule sentencizer) | 91.30 [89.07, 93.19] | within noise | 90.75 |
+| raw | UPOS | 82.41 [81.85, 82.95] | 84.99 [84.45, 85.54] | 83.65 [83.11, 84.18] | behind (1.2 points) | 70.49 |
+| raw | UFeats | 34.03 [33.43, 34.65] | 34.23 [33.61, 34.85] | 34.22 [33.60, 34.82] | within noise | 33.72 |
+| raw | UAS | 65.10 [64.09, 66.14] | 58.47 [57.47, 59.55] | 64.77 [63.77, 65.88] | within noise | 42.73 |
+| raw | LAS | 52.87 [51.93, 53.84] | 46.76 [45.81, 47.78] | 53.32 [52.35, 54.36] | within noise | 32.00 |
+| raw | CLAS | 45.54 [44.52, 46.67] | 42.60 [41.58, 43.68] | 46.40 [45.38, 47.57] | within noise | 29.80 |
+| raw | MLAS | 7.56 [7.16, 8.00] | 7.95 [7.55, 8.39] | 8.32 [7.86, 8.77] | within noise | 5.23 |
 
-The student is ahead of its own labeller on the parse (LAS +5.5 gold) and 1.8 points below it on UPOS. Lemmas: the model has none; the identity baseline (lemma = form) scores 72.68 [72.15, 73.24] on gold tokens and is what the package leaves out. Words are not scored separately from Tokens: Hindi has no multiword tokens. Sentences of the rule sentencizer alone (the labeller row) are 98.31.
+The labeller's own gold-token scores rose from UPOS 72.77 and LAS 26.43 in the first round to 85.55 and 49.04. The student is 2.4 points below the labeller on UPOS and 3.8 above it on LAS (a parser trained on the medoid trees of many sources is more consistent than any one source). Against spaCy trained on the same labels it is within noise on every gold-token row and on raw UFeats, UAS, LAS, CLAS, MLAS and Sentences, and behind on raw UPOS (1.2 points; the tokenizer differs, 99.38 against 99.82). **Lemmas:** the model has no lemmatizer, and an edit-tree lemmatizer trained on Marathi was not clearly better than copying the form on 315 nouns, verbs and adjectives that we lemmatized by hand (62.5% against 61.0%), so the package fills `Token.Lemma` with the token text; the Lemmas row above is that, 72.7% on Hindi-PUD, and wrong for inflected words. Words are not scored separately from Tokens: Hindi has no multiword tokens.
 
-**Entities (information only).** There is no Hindi entity gold we may use. A spot check on 91 held-out web sentences (61 entities) that we labelled by hand (`testdata/hi/nerspot.iob2`; PER, ORG, LOC): student 67.92 [53.01, 80.43] F1 (precision 80.00, recall 59.02), labeller 76.79 [64.35, 85.51], spaCy on the same labels 67.27 [52.83, 78.26]. On held-out labelled text the student reaches 79.07 F1 against the labeller's own entities. This is not a gated row.
+**Entities (information only).** There is no Hindi entity gold we may use. A spot check on 91 held-out web sentences (61 entities) that we labelled by hand (`testdata/hi/nerspot.iob2`; PER, ORG, LOC): student 70.48 [57.14, 82.05] F1 (precision 84.09, recall 60.66), labeller 77.48 [65.35, 86.27], spaCy on the same labels 70.48 [56.47, 82.05]; the first round's student scored 67.92. On held-out labelled text the student reaches 79.36 F1 against the labeller's own entities. This is not a gated row.
 
-**Hand-annotated development sentences.** 17 sentences (208 tokens, `testdata/hi/selfdev.conllu`), gold tokens: labeller UPOS 78.85 [74.29, 83.50], UAS 62.50, LAS 48.08; student UPOS 79.81 [74.63, 84.13], UAS 69.23, LAS 55.29. They ranked the source languages and the labelling model (below), nothing else; too small to separate most choices.
+**Hand-annotated development sentences.** 100 sentences (931 tokens, `testdata/hi/selfdev.conllu`: 17 web sentences and 83 that we wrote), gold tokens, UPOS / UAS / LAS: first-round student 80.56 [78.16, 82.80] / 70.46 / 55.85; second-round student 91.30 [89.43, 92.99] / 83.46 / 75.83; labeller (used set) 92.16 [90.64, 93.62] / 82.38 / 74.44; the nine large languages alone 83.03 / 71.64 / 59.51. These sentences ranked the source languages and the labelling model (`recipes/hi/fast/README.md`), so they are a development set, not a test.
 
-Indicative speed (x64 Ryzen 9 7950X3D, 1 thread, load 16 to 20 from other jobs): full pipeline about 4.0k tokens/s (3.5k to 4.0k over three runs), tagging path about 51k tokens/s; 6.5 kB and 1.6 kB allocated per token.
+Indicative speed (x64 Ryzen 9 7950X3D, 1 thread, load 7 to 9 from other jobs): full pipeline about 4.1k to 4.6k tokens/s over 20 repetitions on the development sentences (3.5k to 4.0k in the first round at higher load; the architecture and sizes are unchanged), 6.5 kB allocated per token.
 
 ## Text classification and span categorization (English)
 
@@ -225,5 +226,5 @@ No accurate-tier model package is released yet, so these rows are information an
 - **Embeddings:** the five cells below the model cards, shared with sentence-transformers (above).
 - **Language ID:** the languages named under the table are below Lingua on short text.
 - **Entities per type:** per-type rows are in each source file; several have intervals that overlap with a paired difference that excludes zero (for example English LOC with the single-encoder option); the packaged English model has none of those.
-- **Gaps:** no Hindi fast tier (data); no German, Spanish, Portuguese, Italian, Dutch, Turkish or Chinese rows against Catalyst (it has English models only); open-type NER and the accurate-tier packages are in progress and have no rows yet.
+- **Gaps:** Hindi has a fast tier but only on transferred labels (see "Hindi", not a gated comparison); no German, Spanish, Portuguese, Italian, Dutch, Turkish or Chinese rows against Catalyst (it has English models only); open-type NER and the accurate-tier packages are in progress and have no rows yet.
 - **Speed against Catalyst** on the tagging path is measured at the release gate; the indicative run is in `results.md` and is not repeated here.

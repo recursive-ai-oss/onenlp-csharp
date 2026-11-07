@@ -130,7 +130,7 @@ The same reading rules as above. The treebank per language is the one chosen in 
 | System (source) | UD release | Input | Tokens | Sents | Words | UPOS | XPOS | UFeats | AllTags | Lemmas | UAS | LAS |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 
-- Our own Hindi model is trained on self-labelled web text and scored on Hindi-PUD (`results-table.md`, "Hindi"); the black-box reference for it is spaCy 3.8.18 trained on the same labels. Every published system is trained and scored on Hindi-HDTB, which is CC BY-NC-SA 4.0 and not usable by us. No published number is on Hindi-PUD, so there is no reference row for the test set we can fetch. For information only, on HDTB: Stanza 1.5.1 raw, UD 2.12: 100.00 99.52 100.00 97.95 97.53 94.41 92.74 96.88 95.26 92.46 (Tokens, Sents, Words, UPOS, XPOS, UFeats, AllTags, Lemmas, UAS, LAS); UDPipe 2.17 raw: UPOS 97.61, Lemma 98.86, LAS 92.30; Trankit large raw, UD 2.5: UPOS 98.01, Lemmas 96.54, UAS 95.95, LAS 92.96.
+- Our own Hindi model is trained on self-labelled web text (labelled with the help of related-language heads) and scored on Hindi-PUD (`results-table.md`, "Hindi"); the black-box reference for it is spaCy 3.8.18 trained on the same labels. Every published system is trained and scored on Hindi-HDTB, which is CC BY-NC-SA 4.0 and not usable by us. No published number is on Hindi-PUD, so there is no reference row for the test set we can fetch. For information only, on HDTB: Stanza 1.5.1 raw, UD 2.12: 100.00 99.52 100.00 97.95 97.53 94.41 92.74 96.88 95.26 92.46 (Tokens, Sents, Words, UPOS, XPOS, UFeats, AllTags, Lemmas, UAS, LAS); UDPipe 2.17 raw: UPOS 97.61, Lemma 98.86, LAS 92.30; Trankit large raw, UD 2.5: UPOS 98.01, Lemmas 96.54, UAS 95.95, LAS 92.96.
 
 ### Dutch: UD Dutch-Alpino, test
 
