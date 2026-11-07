@@ -25,7 +25,7 @@ public class DocTests
             Assert.True(t.Idx >= previousEnd);
             Assert.True(t.Length > 0);
             Assert.Equal(text.Substring(t.Idx, t.Length), t.ToString());
-            Assert.True(t.Text.SequenceEqual(text.AsSpan(t.Idx, t.Length)));
+            Assert.True(t.TextSpan.SequenceEqual(text.AsSpan(t.Idx, t.Length)));
             Assert.Equal(t.Idx + t.Length, t.EndIdx);
             Assert.Equal(t.Index, doc.FindToken(t.Idx));
             Assert.Equal(t.Index, doc.FindToken(t.EndIdx - 1));
@@ -198,7 +198,7 @@ public class DocTests
         Assert.Equal(5, span.StartChar);
         Assert.Equal(16, span.EndChar);
         Assert.Equal("quick brown", span.ToString());
-        Assert.True(span.Text.SequenceEqual("quick brown"));
+        Assert.Equal("quick brown", span.Text);
         Assert.Equal("brown", span[1].ToString());
         Assert.Equal(["quick", "brown"], EnumerateTokens(span));
         Assert.Equal(1f, span.Confidence);

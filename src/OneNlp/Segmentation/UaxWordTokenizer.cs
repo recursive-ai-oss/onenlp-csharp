@@ -65,6 +65,11 @@ public sealed class UaxWordTokenizer : IWordTokenizer
     /// <param name="language">The language.</param>
     public static UaxWordTokenizer For(Language language) => new(SegmentationData.For(language));
 
+    private static UaxWordTokenizer? s_default;
+
+    /// <summary>The tokenizer <see cref="Pipeline.Blank(Language)"/> uses when no language is given, and the default of every matcher and reader that takes an optional tokenizer. One shared instance.</summary>
+    public static UaxWordTokenizer Default => s_default ??= For(default);
+
     /// <inheritdoc/>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> or <paramref name="strings"/> is <see langword="null"/>.</exception>
     public Doc Tokenize(string text, StringStore strings)

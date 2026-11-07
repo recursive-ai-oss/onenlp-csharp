@@ -26,13 +26,13 @@ internal sealed class TokenFacts
 
     internal int Length => _doc.Length;
 
-    internal ReadOnlySpan<char> Orth(int i) => _doc[i].Text;
+    internal ReadOnlySpan<char> Orth(int i) => _doc[i].TextSpan;
 
-    internal string Lower(int i) => _lower[i] ??= _doc[i].Text.ToString().ToLowerInvariant();
+    internal string Lower(int i) => _lower[i] ??= _doc[i].TextSpan.ToString().ToLowerInvariant();
 
-    internal string Shape(int i) => _shape[i] ??= TokenText.Shape(_doc[i].Text);
+    internal string Shape(int i) => _shape[i] ??= TokenText.Shape(_doc[i].TextSpan);
 
-    internal int CodePoints(int i) => TokenText.CodePointCount(_doc[i].Text);
+    internal int CodePoints(int i) => TokenText.CodePointCount(_doc[i].TextSpan);
 
     /// <summary>The text value of a string attribute. The span is valid until the document changes.</summary>
     internal ReadOnlySpan<char> Value(TokenProperty attribute, int i)
@@ -40,7 +40,7 @@ internal sealed class TokenFacts
         Token t = _doc[i];
         return attribute switch
         {
-            TokenProperty.Orth => t.Text,
+            TokenProperty.Orth => t.TextSpan,
             TokenProperty.Lower => Lower(i),
             TokenProperty.Norm => NormOf(i),
             TokenProperty.Lemma => t.Lemma,
@@ -94,7 +94,7 @@ internal sealed class TokenFacts
 
     private bool Compute(TokenProperty attribute, int i)
     {
-        ReadOnlySpan<char> text = _doc[i].Text;
+        ReadOnlySpan<char> text = _doc[i].TextSpan;
         return attribute switch
         {
             TokenProperty.IsAlpha => TokenText.IsAlpha(text),

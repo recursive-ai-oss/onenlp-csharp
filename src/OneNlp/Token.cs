@@ -4,6 +4,7 @@ namespace RecursiveAI.OneNlp;
 /// A view of one token of a <see cref="Doc"/>: a document reference and an index, copying nothing. Attribute names follow spaCy's
 /// documented ones. The default value is not a token; using it throws <see cref="NullReferenceException"/>.
 /// </summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(Serialization.TokenJsonConverter))]
 public readonly struct Token : IEquatable<Token>
 {
     private readonly Doc _doc;
@@ -30,8 +31,14 @@ public readonly struct Token : IEquatable<Token>
     /// <summary>The offset just past the last character of the token in the original text.</summary>
     public int EndIdx => Idx + Length;
 
-    /// <summary>The token's text: a slice of the original string, without copying.</summary>
-    public ReadOnlySpan<char> Text => _doc.Text.AsSpan(Idx, Length);
+    /// <summary>
+    /// The token's text as a new string (spaCy's <c>text</c>), so <c>token.Text == "x"</c> and <c>doc.Select(t => t.Text)</c> work. Each call copies the
+    /// characters; where that matters, read <see cref="TextSpan"/>.
+    /// </summary>
+    public string Text => _doc.Text.Substring(Idx, Length);
+
+    /// <summary>The token's text as a slice of the original string, without copying. Compare its contents with <see cref="System.MemoryExtensions.SequenceEqual{T}(ReadOnlySpan{T}, ReadOnlySpan{T})"/>; <c>==</c> on spans compares memory.</summary>
+    public ReadOnlySpan<char> TextSpan => _doc.Text.AsSpan(Idx, Length);
 
     /// <summary>The token's text as memory over the original string, for use where a span cannot be held.</summary>
     public ReadOnlyMemory<char> TextMemory => _doc.Text.AsMemory(Idx, Length);
@@ -85,8 +92,8 @@ public readonly struct Token : IEquatable<Token>
     /// </summary>
     public float Confidence => _doc.ConfidenceOf(_index);
 
-    /// <summary>Copies the token's text into a new string.</summary>
-    public override string ToString() => _doc.Text.Substring(Idx, Length);
+    /// <summary>Returns <see cref="Text"/>.</summary>
+    public override string ToString() => Text;
 
     /// <inheritdoc/>
     public bool Equals(Token other) => ReferenceEquals(_doc, other._doc) && _index == other._index;

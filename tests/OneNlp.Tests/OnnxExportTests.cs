@@ -4,7 +4,6 @@ using RecursiveAI.OneModel.Training;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
-using RecursiveAI.OneNlp.Neural.Training;
 
 namespace RecursiveAI.OneNlp.Tests;
 

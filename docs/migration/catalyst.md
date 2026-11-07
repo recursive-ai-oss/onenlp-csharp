@@ -12,7 +12,7 @@ Catalyst is a managed spaCy-style pipeline for .NET. This page maps its calls to
 | Processing | `nlp.ProcessSingle(doc)` | `nlp.Process(text)`; `nlp.ProcessMany(texts)` for batches |
 | Sentences | `doc.Spans` | `doc.Sentences` (`Span` values) |
 | Tokens | `span.Tokens` | `foreach (Token t in doc)` |
-| Token text | `token.Value` (may be normalized: `'ve` as `have`) | `token.ToString()` or `token.Text`, always a slice of your string; `token.Norm` for a normalized form |
+| Token text | `token.Value` (may be normalized: `'ve` as `have`) | `token.Text` (a string cut from your input; `token.TextSpan` is the copy-free view); `token.Norm` for a normalized form |
 | Offsets | `token.Begin`, `token.End` (the end is inclusive) | `token.Idx`, `token.EndIdx` (the end is exclusive); UTF-16 units into the string you passed |
 | Part of speech | `token.POS` (an enum) | `token.Pos` (a Universal Dependencies tag string such as `PROPN`) and `token.Tag` (the treebank's own tag) |
 | Lemma | `token.Lemma` | `token.Lemma` |

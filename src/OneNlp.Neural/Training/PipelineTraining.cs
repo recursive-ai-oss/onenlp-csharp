@@ -5,7 +5,6 @@ using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
 using RecursiveAI.OneNlp.Neural;
-using RecursiveAI.OneNlp.Neural.Training;
 
 // The extension lives in the namespace of Pipeline, so nlp.Train(...) needs no using beyond the one every program has.
 namespace RecursiveAI.OneNlp;

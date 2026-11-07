@@ -3,7 +3,6 @@ using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
-using RecursiveAI.OneNlp.Neural.Training;
 
 namespace RecursiveAI.OneNlp.Tests;
 
@@ -124,7 +123,7 @@ public class SpanCategorizerTests : IDisposable
 
         // The nested pair is found: both the two-token PRODUCT and the PART inside it, which entities could not hold together.
         Doc d = loaded.Process("the Grand Zorp saw Blix");
-        string[] spans = [.. d.Spans["sc"].Select(x => x.Text.ToString() + ":" + x.Label)];
+        string[] spans = [.. d.Spans["sc"].Select(x => x.Text + ":" + x.Label)];
         Assert.Contains("Grand Zorp:PRODUCT", spans);
         Assert.Contains("Zorp:PART", spans);
         Assert.Contains("Blix:PART", spans);

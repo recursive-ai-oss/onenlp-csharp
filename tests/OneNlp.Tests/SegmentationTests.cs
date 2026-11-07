@@ -66,7 +66,7 @@ public class SegmentationTests
         const string text = "Dr. Who arrived at 3.5 p.m. on Tuesday. Was it late? Yes! \"Quite,\" he said.";
         Assert.Equal(
             ["Dr. Who arrived at 3.5 p.m. on Tuesday.", "Was it late?", "Yes!", "\"Quite,\" he said."],
-            Sentences(text).Select(s => s.Text.ToString()));
+            Sentences(text).Select(s => s.Text));
     }
 
     [Fact]
