@@ -1,0 +1,46 @@
+<Project>
+  <!-- Shared by the parts of the distilled accurate tier: each part packs one slice of the model's weights as an embedded resource, so that
+       every package stays under the 250 MB size limit of nuget.org. Without a weights directory (environment variable ONENLP_MULTILINGUAL_WEIGHTS or
+       property MultilingualWeightsDir) a part builds, but cannot be packed. -->
+  <PropertyGroup>
+    <AssemblyName>$(PackagePrefix)$(LibName).Models.Multilingual.$(PartName)</AssemblyName>
+    <RootNamespace>$(PackagePrefix)$(LibName).Models.Multilingual.$(PartName)</RootNamespace>
+    <PackageId>$(PackagePrefix)$(LibName).Models.Multilingual.$(PartName)</PackageId>
+    <Description>spaCy-class NLP for .NET: $(PartDescription) of the distilled accurate-tier model. Pulled in by RecursiveAI.OneNlp.Models.Multilingual; reference that package, not this one. Unaffiliated with other projects named OneNLP.</Description>
+    <PackageTags>$(PackageTags);model</PackageTags>
+    <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <MultilingualWeightsDir Condition="'$(MultilingualWeightsDir)' == ''">$(ONENLP_MULTILINGUAL_WEIGHTS)</MultilingualWeightsDir>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildProjectDirectory)/weights.manifest.props" />
+
+  <ItemGroup>
+    <None Include="PACKAGE.md" Pack="true" PackagePath="/" />
+    <None Include="weights.manifest.props" Pack="true" PackagePath="/" />
+    <None Include="../../../LICENSE-MIT" Pack="true" PackagePath="/" />
+    <None Include="../../../LICENSE-APACHE" Pack="true" PackagePath="/" />
+    <None Include="../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <Target Name="EmbedMultilingualWeights" BeforeTargets="AssignTargetPaths" Condition="'$(MultilingualWeightsDir)' != ''">
+    <ItemGroup>
+      <_Weight Include="@(MultilingualWeight)" Path="$([MSBuild]::EnsureTrailingSlash('$(MultilingualWeightsDir)'))%(Identity)" WeightName="%(Identity)" />
+    </ItemGroup>
+    <Error Condition="!Exists('%(_Weight.Path)')" Text="Weights file '%(_Weight.WeightName)' is missing from '$(MultilingualWeightsDir)'. Put the files listed in weights.manifest.props there." />
+    <GetFileHash Files="@(_Weight->'%(Path)')" Algorithm="SHA256" HashEncoding="hex">
+      <Output TaskParameter="Items" ItemName="_WeightHashed" />
+    </GetFileHash>
+    <Error Condition="!$([System.String]::Equals('%(_WeightHashed.FileHash)', '%(_WeightHashed.Sha256)', System.StringComparison.OrdinalIgnoreCase))"
+           Text="Weights file '%(_WeightHashed.WeightName)' does not match the manifest: sha256 %(_WeightHashed.FileHash), expected %(_WeightHashed.Sha256). Use the weights listed in weights.manifest.props, or update the manifest and PROVENANCE.md together." />
+    <ItemGroup>
+      <EmbeddedResource Include="@(_WeightHashed)" LogicalName="weights/%(_WeightHashed.WeightName)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="RequireMultilingualWeightsToPack" BeforeTargets="GenerateNuspec" Condition="'$(MultilingualWeightsDir)' == ''">
+    <Error Text="Packing needs the weights: set the environment variable ONENLP_MULTILINGUAL_WEIGHTS (or the property MultilingualWeightsDir) to the directory that holds the files listed in weights.manifest.props." />
+  </Target>
+</Project>

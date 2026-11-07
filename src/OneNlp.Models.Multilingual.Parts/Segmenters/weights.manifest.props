@@ -1,0 +1,7 @@
+<Project>
+  <!-- The files of weights this package packs: name, size, sha256. A pack fails when a file is missing or differs. Weights are never committed. -->
+  <ItemGroup>
+    <MultilingualWeight Include="zh.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="tr.onenlp" Size="0" Sha256="PENDING" />
+  </ItemGroup>
+</Project>

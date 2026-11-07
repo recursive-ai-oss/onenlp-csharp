@@ -82,23 +82,49 @@ public sealed class TransformerEncoder : IEncoder
     /// <param name="maxLength">The longest sequence given to the model, special tokens included (2 to 65,536). Default 512.</param>
     /// <param name="modelSha256">The expected SHA-256 of the model file as lower-case hex, kept for <see cref="VerifyModelFile"/> and saved with the pipeline; may be <see langword="null"/>.</param>
     /// <param name="options">Session options; the default runs in OneModel's fast mode on every core.</param>
+    /// <param name="expandWordForms">Whether tokens that carry a <see cref="TokenColumn.Norm"/> are read as that word (the pieces of multiword tokens). Default <see langword="false"/>.</param>
     /// <exception cref="InvalidDataException">The model's inputs or output are not as described, or the tokenizer adds a variable number of special tokens.</exception>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxLength"/> is out of range.</exception>
-    public TransformerEncoder(string modelPath, string tokenizerPath, SubwordPooling pooling = SubwordPooling.Mean, int maxLength = 512, string? modelSha256 = null, ModelOptions? options = null)
+    public TransformerEncoder(string modelPath, string tokenizerPath, SubwordPooling pooling = SubwordPooling.Mean, int maxLength = 512, string? modelSha256 = null, ModelOptions? options = null, bool expandWordForms = false)
+        : this(NonEmpty(modelPath), NonEmpty(tokenizerPath), pooling, maxLength, modelSha256, options, expandWordForms, null, null)
     {
-        ArgumentException.ThrowIfNullOrEmpty(modelPath);
-        ArgumentException.ThrowIfNullOrEmpty(tokenizerPath);
+    }
+
+    /// <summary>Loads an exported encoder and its tokenizer from streams, for weights embedded in an assembly. A pipeline saved with such an encoder must go through <see cref="SharedEncoder"/>.</summary>
+    /// <param name="model">The ONNX file's bytes (see the path constructor for the required inputs and output); read to the end, not closed.</param>
+    /// <param name="tokenizerJson">The model's <c>tokenizer.json</c>; read to the end, not closed.</param>
+    /// <param name="pooling">How pieces become tokens.</param>
+    /// <param name="maxLength">The longest sequence given to the model, special tokens included (2 to 65,536).</param>
+    /// <param name="expandWordForms">Whether the encoder reads the words of multiword tokens (see <see cref="TrainableTransformerOptions.ExpandWordForms"/>).</param>
+    /// <param name="options">Session options.</param>
+    /// <exception cref="InvalidDataException">The model's inputs or output are not as described.</exception>
+    public static TransformerEncoder FromStreams(Stream model, Stream tokenizerJson, SubwordPooling pooling = SubwordPooling.Mean, int maxLength = 512, bool expandWordForms = false, ModelOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        ArgumentNullException.ThrowIfNull(tokenizerJson);
+        return new TransformerEncoder("<stream>", "<stream>", pooling, maxLength, null, options, expandWordForms, model, tokenizerJson);
+    }
+
+    private static string NonEmpty(string value)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(value);
+        return value;
+    }
+
+    private TransformerEncoder(string modelPath, string tokenizerPath, SubwordPooling pooling, int maxLength, string? modelSha256, ModelOptions? options, bool expandWordForms, Stream? modelStream, Stream? tokenizerStream)
+    {
         ArgumentOutOfRangeException.ThrowIfLessThan(maxLength, 2);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(maxLength, MaxLengthLimit);
         Pooling = pooling;
         MaxLength = maxLength;
+        ExpandWordForms = expandWordForms;
         _sha256 = modelSha256;
         _modelFile = modelPath;
         _tokenizerFile = tokenizerPath;
-        _tokenizer = Tokenizer.FromFile(tokenizerPath);
+        _tokenizer = tokenizerStream is null ? Tokenizer.FromFile(tokenizerPath) : Tokenizer.FromStream(tokenizerStream, TokenizerFormat.HuggingFaceJson);
         _tokenizer.Padding = null;
         _tokenizer.Truncation = null;
-        _session = Session.Load(modelPath, options);
+        _session = modelStream is null ? Session.Load(modelPath, options) : Session.Load(modelStream, options);
 
         TensorInfo? ids = null;
         _hasMask = false;
@@ -155,6 +181,9 @@ public sealed class TransformerEncoder : IEncoder
 
     /// <summary>The longest sequence given to the model, special tokens included.</summary>
     public int MaxLength { get; }
+
+    /// <summary>Whether tokens that carry a <see cref="TokenColumn.Norm"/> are read as that word (the pieces of multiword tokens); see <see cref="TrainableTransformerOptions.ExpandWordForms"/>.</summary>
+    public bool ExpandWordForms { get; }
 
     /// <summary>The most windows run in one model call. Default 8; larger batches use more memory.</summary>
     public int WindowBatch { get; set; } = 8;
@@ -239,6 +268,10 @@ public sealed class TransformerEncoder : IEncoder
 
         writer.WriteString("pooling", Pooling == SubwordPooling.Mean ? "mean" : "first");
         writer.WriteNumber("maxLength", MaxLength);
+        if (ExpandWordForms)
+        {
+            writer.WriteBoolean("expandForms", true);
+        }
     }
 
     internal static IEncoder FromSettings(JsonElement s)
@@ -274,7 +307,8 @@ public sealed class TransformerEncoder : IEncoder
             tokenizer,
             pooling == "mean" ? SubwordPooling.Mean : SubwordPooling.FirstPiece,
             JsonSettings.Int(s, "maxLength", 2, MaxLengthLimit),
-            sha);
+            sha,
+            expandWordForms: s.TryGetProperty("expandForms", out JsonElement expand) && expand.ValueKind == JsonValueKind.True);
     }
 
     internal static string Resolve(string name) =>
@@ -314,7 +348,7 @@ public sealed class TransformerEncoder : IEncoder
         var plans = new Dictionary<int, DocPlan>();
         foreach (int d in docIndexes)
         {
-            Doc doc = docs[d];
+            Doc doc = ExpandWordForms ? TrainableTransformerEncoder.WordFormView(docs[d]) : docs[d];
             TokenEncoding enc = _tokenizer.Encode(doc.Text, addSpecialTokens: false);
             int n = enc.Length;
             var plan = new DocPlan(enc, MapPiecesToTokens(doc, enc), doc.Length, Pooling == SubwordPooling.Mean);

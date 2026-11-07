@@ -1,0 +1,16 @@
+<Project>
+  <!-- The weights this package packs: name, size and sha256. A pack fails when a file is missing or differs. Weights are never committed. -->
+  <ItemGroup>
+    <MultilingualWeight Include="heads/en.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="heads/de.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="heads/fr.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="heads/es.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="heads/pt.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="heads/it.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="heads/nl.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="heads/tr.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="heads/zh.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="open-entities.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="tokenizer.json" Size="0" Sha256="PENDING" />
+  </ItemGroup>
+</Project>

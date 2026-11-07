@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PartName>Encoder</PartName>
+    <PartDescription>the fine-tuned encoder (all six layers and the factorised token table, as one ONNX file)</PartDescription>
+  </PropertyGroup>
+
+  <Import Project="../Part.props" />
+
+</Project>

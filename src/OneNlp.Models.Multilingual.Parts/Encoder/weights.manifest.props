@@ -1,0 +1,6 @@
+<Project>
+  <!-- The file of weights this package packs: name, size, sha256. A pack fails when the file is missing or differs. Weights are never committed. -->
+  <ItemGroup>
+    <MultilingualWeight Include="student-multilingual.onnx" Size="0" Sha256="PENDING" />
+  </ItemGroup>
+</Project>

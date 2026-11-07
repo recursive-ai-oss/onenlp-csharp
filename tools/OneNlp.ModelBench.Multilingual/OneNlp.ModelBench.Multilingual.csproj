@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Load time, resident memory and throughput of the distilled accurate-tier pipelines. Build with ONENLP_MULTILINGUAL_WEIGHTS set (the model
+       package embeds its weights). Information only; never shipped. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).ModelBench.Multilingual</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).ModelBench.Multilingual</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/OneNlp.Models.Multilingual/OneNlp.Models.Multilingual.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PartName>FrozenEncoder</PartName>
+    <PartDescription>the frozen distilled encoder (an ONNX file) that the open-type entity head reads</PartDescription>
+  </PropertyGroup>
+
+  <Import Project="../Part.props" />
+
+</Project>
