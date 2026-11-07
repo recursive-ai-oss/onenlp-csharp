@@ -147,7 +147,7 @@ the oracle saw when it differs from the corpus record. Pair lines follow: `{"pai
 
 ## Release run
 
-Full sweep over `~/onenlp/data/parity/golden/` for the release gate: 12 families, 47,981 corpus records each, 0 mismatches. Oracles as they report themselves: `tokenizers` 0.22.1, `tiktoken` 0.14.0.
+Full sweep over the golden files produced by the parity harness, for the release gate: 12 families, 47,981 corpus records each, 0 mismatches. Oracles as they report themselves: `tokenizers` 0.22.1, `tiktoken` 0.14.0.
 
 | Family | Comparisons |
 |---|---:|
