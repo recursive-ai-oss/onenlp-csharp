@@ -124,6 +124,7 @@ internal static class Program
         EntitySmoke(NerDecoding.Tagging);
         EntitySmoke(NerDecoding.Spans);
         ParserSmoke();
+        OpenEntitySmoke();
 
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
@@ -229,6 +230,44 @@ internal static class Program
         Doc a = trained.Process("we saw Vexa today");
         Doc b = loaded.Process("we saw Vexa today");
         Check("ner " + decoding, result.Completed && a.Ents.Count == 1 && a.Ents[0].Label == "GADGET" && b.Ents.Count == 1 && b.Ents[0].Label == "GADGET" && a.Ents[0].Confidence == b.Ents[0].Confidence);
+    }
+
+    // Trains an open-type recognizer on a toy corpus, saves and loads it, registers it for the happy path and asks for types by name.
+    private static void OpenEntitySmoke()
+    {
+        var strings = new StringStore();
+        var examples = new List<Example>();
+        string[] names = ["Zorp", "Blix", "Quan"];
+        string[] places = ["Aldor", "Brenn", "Cyth"];
+        for (int s = 0; s < 60; s++)
+        {
+            bool person = s % 2 == 0;
+            string[] words = ["we", "met", person ? names[s % 3] : places[s % 3], "today"];
+            var tokens = new List<TokenBoundary>();
+            int p = 0;
+            foreach (string w in words)
+            {
+                tokens.Add(new TokenBoundary(p, w.Length));
+                p += w.Length + 1;
+            }
+
+            var doc = new Doc(strings, string.Join(' ', words), [.. tokens]);
+            var groups = new Dictionary<string, IReadOnlyList<SpanSpec>>
+            {
+                ["person"] = person ? [new SpanSpec(2, 3, "person")] : [],
+                ["place"] = person ? [] : [new SpanSpec(2, 3, "place")],
+            };
+            examples.Add(Example.FromReference(doc, spans: groups));
+        }
+
+        using Pipeline trained = Pipeline.Blank(Language.English).Add(new OpenEntityRecognizer(new HashEmbeddingEncoder(32, 1024, 3), context: 1, hidden: 32, embedding: 16, maxSpanLength: 3, negativeTypes: 2) { OwnsEncoder = true });
+        TrainResult result = trained.Train(examples, new TrainOptions { Epochs = 25, BatchWords = 100, LearningRate = 0.01f, Seed = 5 });
+        using var buffer = new MemoryStream();
+        PipelineFile.Save(trained, buffer);
+        Pipeline loaded = PipelineFile.Load(new MemoryStream(buffer.ToArray()));
+        ModelPackages.RegisterOpenEntities("RecursiveAI.OneNlp.Models.Multilingual", () => loaded);
+        IReadOnlyList<Span> found = Nlp.Entities("we met Aldor today", "person", "place");
+        Check("open-type entities", result.Completed && found.Count == 1 && found[0].Label == "place" && found[0].ToString() == "Aldor");
     }
 
     // Trains a parser on chains (each word's head is the word before it), saves and loads it, and asks for noun chunks, under NativeAOT.
