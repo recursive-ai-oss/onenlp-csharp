@@ -1,0 +1,18 @@
+<Project>
+  <!-- The weights this package packs itself (the heads of each language, the encoder's settings and the tokenizer); the encoder's layers and
+       the token table are in the parts, each with its own manifest. Name, size and sha256; a pack fails when a file is missing or differs.
+       Weights are never committed. -->
+  <ItemGroup>
+    <LargeWeight Include="heads/en.onenlp" Size="26174934" Sha256="e96bd7a9e88ccc5d9e85ba4cc3fa62bcbcb028ea3e42d64044ca6104c34f8986" />
+    <LargeWeight Include="heads/de.onenlp" Size="26065310" Sha256="8dfc9548e355ce44b8b0e6bc6d56150a88054000c7afb621380529f95c04a591" />
+    <LargeWeight Include="heads/fr.onenlp" Size="27767285" Sha256="4faaafed9ebaeb1e4b5b8ea1313c352073944aa3a8b440bf1c7dd047fa142d24" />
+    <LargeWeight Include="heads/es.onenlp" Size="24084065" Sha256="5c659c6e7560db275cb2b887771f3c48e2c1a377b2a21281e03151f29046074f" />
+    <LargeWeight Include="heads/pt.onenlp" Size="22999960" Sha256="f61b0e0050f4071d5ceca8896e62e12a9e2356b0bb27a45f9cde67177c192da3" />
+    <LargeWeight Include="heads/it.onenlp" Size="21624599" Sha256="6b9ea8a513c3c1d554658987e89f2e8094cf5bf841141054e90677809d111003" />
+    <LargeWeight Include="heads/nl.onenlp" Size="26938690" Sha256="8ed3025b9e0db3833c1d7ed92a10aca96c78f30ab41f13c861a4fc7220a138e1" />
+    <LargeWeight Include="heads/tr.onenlp" Size="40487068" Sha256="1caadd9ee0763414c0f824f8a86ca7403e2144899fa765448eedad06b4735c86" />
+    <LargeWeight Include="heads/zh.onenlp" Size="20410273" Sha256="35a37a77b786f56dcac3f4392f0e239a703f1a7c259009a33964f7f6e9e7aa87" />
+    <LargeWeight Include="encoder.json" Size="325" Sha256="8aa3e3f03293b72b4b66e69cf98f29029706a3d16749e432e120d76f0ab57efa" />
+    <LargeWeight Include="tokenizer.json" Size="17525329" Sha256="197d4cc5406ee12cc50c8b5511f2393cc32d9db321545979ce041c1199178356" />
+  </ItemGroup>
+</Project>

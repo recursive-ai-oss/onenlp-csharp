@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PartName>Encoder1</PartName>
+    <PartDescription>layers 1 of 2 (the first half of the bytes of the fine-tuned encoder layers)</PartDescription>
+  </PropertyGroup>
+
+  <Import Project="../Part.props" />
+
+</Project>

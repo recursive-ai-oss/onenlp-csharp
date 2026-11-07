@@ -1,0 +1,6 @@
+<Project>
+  <!-- The slice of weights this package packs: name, size, sha256. A pack fails when the file is missing or differs. Weights are never committed. -->
+  <ItemGroup>
+    <LargeWeight Include="token-table-02.bin" Size="196608000" Sha256="09c97d56026230fccea3d354d18c3505e6cf02f2ffb9e9d5c6e9ac9ad5a53710" />
+  </ItemGroup>
+</Project>
