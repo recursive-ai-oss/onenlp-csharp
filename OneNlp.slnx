@@ -22,6 +22,7 @@
     <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable2/OneNlp.Models.Multilingual.Large.TokenTable2.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable3/OneNlp.Models.Multilingual.Large.TokenTable3.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable4/OneNlp.Models.Multilingual.Large.TokenTable4.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Chinese/OneNlp.Models.Multilingual.Large.Chinese.csproj" />
     <Project Path="src/OneNlp.Models.Chinese/OneNlp.Models.Chinese.csproj" />
   </Folder>
   <Folder Name="/tests/">

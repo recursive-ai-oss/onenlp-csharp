@@ -60,7 +60,8 @@ public static class MultilingualLargeModel
         }
 
         _ = Encoder.Value;
-        using Stream heads = Resource("heads/" + language + ".onenlp");
+        // Chinese heads carry the word segmenter and live in a part of their own, to keep the packages under the size limit.
+        using Stream heads = language == "zh" ? Chinese.Part.Open() : Resource("heads/" + language + ".onenlp");
         return PipelineFile.Load(heads);
     }
 

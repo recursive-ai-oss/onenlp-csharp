@@ -11,11 +11,17 @@ import collections
 import sys
 
 
-def words(path):
+def words(path, sentences=None):
     out = []
+    count = 0
     for line in open(path, encoding="utf-8"):
         line = line.rstrip("\n")
-        if not line or line[0] == "#":
+        if not line:
+            count += 1
+            if sentences is not None and count >= sentences:
+                break
+            continue
+        if line[0] == "#":
             continue
         f = line.split("\t")
         if "-" in f[0] or "." in f[0]:
@@ -29,7 +35,10 @@ def main(train_path, gold_path, pred_path):
     for f in words(train_path):
         if f[2] != "_" and f[3] != "_":
             counts[(f[1].lower(), f[3])][f[2]] += 1
-    gold, pred = words(gold_path), words(pred_path)
+    pred = words(pred_path)
+    # The predictions may cover only the first sentences of the development file.
+    sentences = sum(1 for line in open(pred_path, encoding="utf-8") if not line.strip())
+    gold = words(gold_path, sentences)
     if len(gold) != len(pred):
         raise SystemExit(f"{len(gold)} gold words but {len(pred)} predicted")
     base = sum(g[2] == p[2] for g, p in zip(gold, pred)) / len(gold) * 100

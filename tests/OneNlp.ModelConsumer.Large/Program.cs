@@ -19,6 +19,7 @@ internal static class Program
             "Jan woont in Amsterdam en werkt bij Philips.",
             "Ada Lovelace worked in London. She wrote the first program.",
             "Barack Obama a visité Paris, et il est venu au musée du Louvre.",
+            "李明昨天在北京的清华大学见到了王教授。",
         ];
 
         Doc probe = Nlp.Analyze(texts[0]);

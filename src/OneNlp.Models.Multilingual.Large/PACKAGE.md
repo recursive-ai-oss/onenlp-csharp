@@ -4,7 +4,7 @@
 
 > **Early preview.** The weights are development models and will be retrained; the API will change.
 
-The encoder is a 1.2 GB ONNX graph, so it is cut into six pieces that this package depends on (`...Large.Encoder1`, `Encoder2`, `TokenTable1` to `TokenTable4`, in that order); reference only this package. The first verb that needs the model reads the graph into memory once, and the heads of a language when that language is first used.
+The encoder is a 1.2 GB ONNX graph, so it is cut into six pieces that this package depends on (`...Large.Encoder1`, `Encoder2`, `TokenTable1` to `TokenTable4`, in that order) and one for the Chinese heads and word segmenter (`...Large.Chinese`); reference only this package. The first verb that needs the model reads the graph into memory once, and the heads of a language when that language is first used.
 
 ```csharp
 using RecursiveAI.OneNlp;
