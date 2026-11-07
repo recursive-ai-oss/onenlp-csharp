@@ -276,9 +276,16 @@ public sealed class OpenEntityRecognizer : TrainableHead
         Tensor all = logits.Count == 1 ? logits[0] : Ops.Concat([.. logits], 0);
         Tensor target = Tensor.FromSpan<float>([.. targets], Shape.Create(targets.Count));
         ActivationScope.Track(target);
-        // Sum over every span-type pair, per token of the batch: a mean over pairs would shrink with the number of types.
+        // Sum over every span-type pair, per token-type cell of the batch: each cell holds up to MaxSpanLength spans, and a plain mean
+        // over pairs would be dominated by the many empty ones.
+        long cells = 0;
+        for (int d = 0; d < examples.Count; d++)
+        {
+            cells += (long)encoded.Length(d) * chosenTypes[d].Length;
+        }
+
         Tensor sum = Losses.BceWithLogits(all, target, mean: false);
-        Tensor scale = Tensor.Scalar(1f / Math.Max(1, encoded.TokenCount));
+        Tensor scale = Tensor.Scalar(1f / Math.Max(1L, cells));
         ActivationScope.Track(scale);
         return Ops.Mul(sum, scale);
     }

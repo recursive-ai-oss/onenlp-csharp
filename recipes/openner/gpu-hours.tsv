@@ -1,0 +1,2 @@
+start_utc	end_utc	gpu_hours	job
+2026-11-07T00:44:42Z	2026-11-07T01:04:40Z	0.333	pilot labelling, 20000 passages, Qwen2.5-7B-Instruct-AWQ rev b25037543e9394b818fdfca67ab2a00ecc7dd641 (one gpu-class job, one chunk)
