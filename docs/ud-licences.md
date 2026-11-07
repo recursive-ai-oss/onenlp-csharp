@@ -117,7 +117,7 @@ Turkish-German `SAGT` is a code-switching treebank under CC BY-NC-SA 4.0 and is 
 | Convers | not in release 2.18 | none | none | not available |
 | Hindi-English `HIENCS` | not in release 2.18 | none | none | not available (code-mixed) |
 
-**There is no allowed Hindi training treebank.** Hindi-PUD has 1,000 test sentences and no training split, so no tagger, morphologizer, lemmatizer or parser baseline can be trained for Hindi from UD data, and our Hindi models would have to learn from other data. Our Hindi models need data this rule does not allow, or new data of our own.
+**There is no allowed Hindi training treebank.** Hindi-PUD has 1,000 test sentences and no training split, so no tagger, morphologizer, lemmatizer or parser baseline can be trained for Hindi from UD data, and our Hindi models would have to learn from other data. The Hindi fast-tier model is therefore trained on web text labelled by the accurate tier and by heads trained on the Marathi, Sindhi and Punjabi treebanks above (all CC BY-SA 4.0; `recipes/hi/fast/README.md`); no Hindi treebank or Hindi-derived annotation of HDTB enters the labeller or the student.
 
 ## Dutch
 

@@ -74,7 +74,7 @@ One entry per language for the data our fast-tier models and their spaCy baselin
 | German | UD German-GSD r2.18 (CC BY-SA 4.0); GermEval 2014 NER (CC BY 4.0, not SA) | GSD test; UD German-PUD; GermEval test; UNER German-PUD (test-only) | HDT no-go (text licensed for academic use) |
 | Italian | UD Italian-ParlaMint r2.18 train (CC BY-SA 4.0) and MarkIT (CC BY 4.0), derived into `it_gating`; WikiNER Italian wp3 (CC BY 4.0) | ParlaMint test (375 sentences); MarkIT test; UD Italian-PUD; WikiNER test | 897 training sentences: ISDT, VIT, ParTUT, PoSTWITA, KIParlaForest are NC; TWITTIRO no-go |
 | Turkish | UD Turkish-BOUN r2.18 (CC BY-SA 4.0); Turkish-WikiNER (CC BY-SA 4.0) | BOUN test; UD Turkish-PUD; Turkish-WikiNER test | IMST is NC; Penn no-go (translated Penn Treebank) |
-| Hindi | none (Naamapadam is out: its text comes from the CC BY-NC Samanantar corpus) | UD Hindi-PUD (test-only); none | HDTB is NC. No allowed Hindi treebank exists |
+| Hindi | none (Naamapadam is out: its text comes from the CC BY-NC Samanantar corpus); web text labelled by transfer, with label heads trained on UD Marathi-UFAL and -CMUPAN, Sindhi-Isra and Punjabi-Rang and -CS (CC BY-SA 4.0) | UD Hindi-PUD (test-only); none | HDTB is NC. No allowed Hindi treebank exists |
 | Dutch | UD Dutch-Alpino r2.18 (CC BY-SA 4.0); WikiNER Dutch wp3 (CC BY 4.0) | Alpino test; WikiNER test | LassySmall (CC BY-SA 4.0) allowed, unused |
 
 The corpora with no official split (WikiNER train and validation) are cut by the fixed rules in each `HEADER.md`/`MANIFEST.md`; the Italian training set is derived by `derive_italian` in `tools/fetch/fetch_lang.py`.

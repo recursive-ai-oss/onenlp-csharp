@@ -181,6 +181,7 @@ public static class ModelPackages
         ["es"] = "RecursiveAI.OneNlp.Models.Spanish",
         ["it"] = "RecursiveAI.OneNlp.Models.Italian",
         ["zh"] = "RecursiveAI.OneNlp.Models.Chinese",
+        ["hi"] = "RecursiveAI.OneNlp.Models.Hindi",
     };
 
     // The languages the two accurate-tier packages have heads for (their `Languages` lists). Core cannot ask a package that is not

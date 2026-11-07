@@ -1,0 +1,83 @@
+मेरी/PRON/2/nmod बहन/NOUN/5/nsubj दिल्ली/PROPN/5/obl में/ADP/3/case रहती/VERB/0/root है/AUX/5/aux ।/PUNCT/5/punct
+बच्चे/NOUN/5/nsubj स्कूल/NOUN/5/obl से/ADP/2/case घर/NOUN/5/obl लौट/VERB/0/root आए/AUX/5/aux ।/PUNCT/5/punct
+किसान/NOUN/8/nsubj ने/ADP/1/case खेत/NOUN/8/obl में/ADP/3/case गेहूँ/NOUN/7/nmod की/ADP/5/case फसल/NOUN/8/obj बोई/VERB/0/root थी/AUX/8/aux ।/PUNCT/8/punct
+यह/DET/2/det किताब/NOUN/4/nsubj बहुत/ADV/4/advmod दिलचस्प/ADJ/0/root है/AUX/4/cop ।/PUNCT/4/punct
+वह/PRON/5/nsubj रोज/ADV/5/advmod सुबह/NOUN/5/obl:tmod जल्दी/ADV/5/advmod उठता/VERB/0/root है/AUX/5/aux और/CCONJ/9/cc टहलने/VERB/9/advcl जाता/VERB/5/conj है/AUX/9/aux ।/PUNCT/5/punct
+सरकार/NOUN/9/nsubj ने/ADP/1/case किसानों/NOUN/9/obl के/ADP/3/case लिए/ADP/3/case नई/ADJ/7/amod योजना/NOUN/9/obj शुरू/ADJ/9/xcomp की/VERB/0/root ।/PUNCT/9/punct
+बारिश/NOUN/3/nmod के/ADP/1/case कारण/NOUN/7/obl कई/DET/5/det सड़कें/NOUN/7/nsubj बंद/ADJ/7/xcomp हो/VERB/0/root गईं/AUX/7/aux ।/PUNCT/7/punct
+मुझे/PRON/7/obl यह/DET/3/det खबर/NOUN/4/obj सुनकर/VERB/7/advcl बहुत/ADV/6/advmod खुशी/NOUN/7/nsubj हुई/VERB/0/root ।/PUNCT/7/punct
+शिक्षक/NOUN/5/nsubj ने/ADP/1/case छात्रों/NOUN/5/obl से/ADP/3/case कहा/VERB/0/root कि/SCONJ/9/mark कल/NOUN/9/obl:tmod परीक्षा/NOUN/9/nsubj होगी/VERB/5/ccomp ।/PUNCT/5/punct
+हम/PRON/8/nsubj सब/PRON/1/nmod मिलकर/VERB/8/advcl इस/DET/5/det समस्या/NOUN/7/nmod का/ADP/5/case हल/NOUN/8/obj निकालेंगे/VERB/0/root ।/PUNCT/8/punct
+यह/DET/2/det रास्ता/NOUN/6/nsubj सीधा/ADV/6/advmod बाजार/NOUN/6/obl तक/ADP/4/case जाता/VERB/0/root है/AUX/6/aux ।/PUNCT/6/punct
+कल/NOUN/2/nmod रात/NOUN/5/obl:tmod तेज/ADJ/4/amod हवा/NOUN/5/nsubj चल/VERB/0/root रही/AUX/5/aux थी/AUX/5/aux ।/PUNCT/5/punct
+उसने/PRON/6/nsubj मुझे/PRON/6/obl एक/NUM/5/nummod सुंदर/ADJ/5/amod तोहफा/NOUN/6/obj दिया/VERB/0/root ।/PUNCT/6/punct
+आप/PRON/6/nsubj कल/NOUN/6/obl:tmod हमारे/PRON/4/nmod घर/NOUN/6/obl कब/ADV/6/advmod आ/VERB/0/root सकते/AUX/6/aux हैं/AUX/6/aux ?/PUNCT/6/punct
+यह/DET/2/det मशीन/NOUN/5/nsubj बिजली/NOUN/5/obl से/ADP/3/case चलती/VERB/0/root है/AUX/5/aux ।/PUNCT/5/punct
+गाँव/NOUN/3/nmod के/ADP/1/case लोग/NOUN/7/nsubj हर/DET/5/det साल/NOUN/7/obl:tmod मेला/NOUN/7/obj लगाते/VERB/0/root हैं/AUX/7/aux ।/PUNCT/7/punct
+डॉक्टर/NOUN/9/nsubj ने/ADP/1/case मरीज/NOUN/9/obl को/ADP/3/case दवा/NOUN/6/obj लेने/VERB/8/acl की/ADP/6/case सलाह/NOUN/9/obj दी/VERB/0/root ।/PUNCT/9/punct
+वह/DET/2/det आदमी/NOUN/8/nsubj जो/PRON/5/nsubj कल/NOUN/5/obl:tmod आया/VERB/2/acl:relcl था/AUX/5/aux मेरा/PRON/8/nmod दोस्त/NOUN/0/root है/AUX/8/cop ।/PUNCT/8/punct
+पुस्तकालय/NOUN/5/nsubj सुबह/NOUN/5/obl:tmod नौ/NUM/4/nummod बजे/NOUN/5/obl:tmod खुलता/VERB/0/root है/AUX/5/aux ।/PUNCT/5/punct
+भारत/PROPN/8/nsubj और/CCONJ/3/cc चीन/PROPN/1/conj एशिया/PROPN/8/nmod के/ADP/4/case दो/NUM/8/nummod बड़े/ADJ/8/amod देश/NOUN/0/root हैं/AUX/8/cop ।/PUNCT/8/punct
+मैं/PRON/8/nsubj हर/DET/3/det रविवार/NOUN/8/obl:tmod अपने/PRON/5/nmod दादाजी/NOUN/7/obl से/ADP/5/case मिलने/VERB/8/advcl जाता/VERB/0/root हूँ/AUX/8/aux ।/PUNCT/8/punct
+इस/DET/2/det साल/NOUN/10/obl:tmod गर्मी/NOUN/10/obl में/ADP/3/case नदी/NOUN/7/nmod का/ADP/5/case पानी/NOUN/10/nsubj बहुत/ADV/9/advmod कम/ADJ/10/xcomp हो/VERB/0/root गया/AUX/10/aux ।/PUNCT/10/punct
+वैज्ञानिकों/NOUN/8/nsubj ने/ADP/1/case एक/NUM/5/nummod नए/ADJ/5/amod ग्रह/NOUN/7/nmod की/ADP/5/case खोज/NOUN/8/obj की/VERB/0/root है/AUX/8/aux ।/PUNCT/8/punct
+माँ/NOUN/5/nsubj रसोई/NOUN/5/obl में/ADP/2/case खाना/NOUN/5/obj बना/VERB/0/root रही/AUX/5/aux हैं/AUX/5/aux ।/PUNCT/5/punct
+उसे/PRON/4/obl तैरना/VERB/4/nsubj नहीं/PART/4/advmod आता/VERB/0/root ।/PUNCT/4/punct
+तुम्हारा/PRON/2/nmod नाम/NOUN/3/nsubj क्या/PRON/0/root है/AUX/3/cop ?/PUNCT/3/punct
+वह/PRON/4/nsubj कहाँ/ADV/4/obl से/ADP/2/case आया/VERB/0/root है/AUX/4/aux ?/PUNCT/4/punct
+कृपया/ADV/4/advmod दरवाजा/NOUN/4/obj बंद/ADJ/4/xcomp कर/VERB/0/root दीजिए/AUX/4/aux ।/PUNCT/4/punct
+पेड़/NOUN/3/obl पर/ADP/1/case बैठा/VERB/4/acl तोता/NOUN/8/nsubj मीठी/ADJ/6/amod आवाज/NOUN/8/obl में/ADP/6/case बोल/VERB/0/root रहा/AUX/8/aux था/AUX/8/aux ।/PUNCT/8/punct
+रामायण/PROPN/6/nsubj भारत/PROPN/6/nmod का/ADP/2/case एक/NUM/6/nummod प्राचीन/ADJ/6/amod महाकाव्य/NOUN/0/root है/AUX/6/cop ।/PUNCT/6/punct
+पिछले/ADJ/2/amod महीने/NOUN/10/obl:tmod कंपनी/NOUN/10/nsubj ने/ADP/3/case सौ/NUM/7/nummod नए/ADJ/7/amod कर्मचारियों/NOUN/10/obl को/ADP/7/case नौकरी/NOUN/10/obj दी/VERB/0/root ।/PUNCT/10/punct
+अगर/SCONJ/4/mark कल/NOUN/4/obl:tmod बारिश/NOUN/4/nsubj हुई/VERB/8/advcl तो/PART/8/advmod मैच/NOUN/8/nsubj नहीं/PART/8/advmod होगा/VERB/0/root ।/PUNCT/8/punct
+वह/PRON/2/nsubj थक/VERB/0/root गया/AUX/2/aux था/AUX/2/aux ,/PUNCT/9/punct फिर/ADV/9/advmod भी/ADV/6/advmod काम/NOUN/9/obj करता/VERB/2/conj रहा/AUX/9/aux ।/PUNCT/2/punct
+बाजार/NOUN/6/obl में/ADP/1/case सब्जियों/NOUN/5/nmod के/ADP/3/case दाम/NOUN/6/nsubj बढ़/VERB/0/root गए/AUX/6/aux हैं/AUX/6/aux ।/PUNCT/6/punct
+हमें/PRON/6/obl अपने/PRON/3/nmod पर्यावरण/NOUN/5/nmod की/ADP/3/case रक्षा/NOUN/6/obj करनी/VERB/0/root चाहिए/AUX/6/aux ।/PUNCT/6/punct
+रेलगाड़ी/NOUN/6/nsubj दो/NUM/3/nummod घंटे/NOUN/4/nmod देर/NOUN/6/obl से/ADP/4/case पहुँची/VERB/0/root ।/PUNCT/6/punct
+यह/DET/2/det गीत/NOUN/6/nsubj बचपन/NOUN/6/obl से/ADP/3/case मेरा/PRON/6/nmod पसंदीदा/ADJ/0/root रहा/AUX/6/cop है/AUX/6/aux ।/PUNCT/6/punct
+विद्यार्थियों/NOUN/6/obl को/ADP/1/case समय/NOUN/6/obl पर/ADP/3/case स्कूल/NOUN/6/obl पहुँचना/VERB/0/root चाहिए/AUX/6/aux ।/PUNCT/6/punct
+मैंने/PRON/8/nsubj कल/NOUN/8/obl:tmod बाजार/NOUN/8/obl से/ADP/3/case आम/NOUN/8/obj और/CCONJ/7/cc केले/NOUN/5/conj खरीदे/VERB/0/root ।/PUNCT/8/punct
+इस/DET/2/det मंदिर/NOUN/4/nmod का/ADP/2/case निर्माण/NOUN/8/nsubj सौ/NUM/6/nummod साल/NOUN/8/obl:tmod पहले/ADP/6/case हुआ/VERB/0/root था/AUX/8/aux ।/PUNCT/8/punct
+नदी/NOUN/3/nmod के/ADP/1/case किनारे/NOUN/6/obl कई/DET/5/det पक्षी/NOUN/6/nsubj आते/VERB/0/root हैं/AUX/6/aux ।/PUNCT/6/punct
+आज/ADV/6/advmod सुबह/NOUN/6/obl:tmod से/ADP/2/case लगातार/ADV/6/advmod पानी/NOUN/6/nsubj बरस/VERB/0/root रहा/AUX/6/aux है/AUX/6/aux ।/PUNCT/6/punct
+लड़की/NOUN/4/nsubj ने/ADP/1/case गाना/NOUN/4/obj गाया/VERB/0/root और/CCONJ/9/cc सब/PRON/9/nsubj ने/ADP/6/case ताली/NOUN/9/obj बजाई/VERB/4/conj ।/PUNCT/4/punct
+सड़क/NOUN/4/obl पर/ADP/1/case बहुत/ADJ/4/amod भीड़/NOUN/0/root थी/AUX/4/cop ।/PUNCT/4/punct
+प्रधानमंत्री/NOUN/10/nsubj आज/ADV/10/advmod नई/PROPN/10/obl दिल्ली/PROPN/3/flat में/ADP/3/case एक/NUM/7/nummod सभा/NOUN/10/obj को/ADP/7/case संबोधित/ADJ/10/xcomp करेंगे/VERB/0/root ।/PUNCT/10/punct
+बच्चों/NOUN/7/obl को/ADP/1/case कहानियाँ/NOUN/4/obj सुनना/VERB/7/nsubj बहुत/ADV/6/advmod अच्छा/ADJ/7/xcomp लगता/VERB/0/root है/AUX/7/aux ।/PUNCT/7/punct
+ताजमहल/PROPN/3/obj को/ADP/1/case देखने/VERB/8/advcl हर/DET/5/det साल/NOUN/8/obl:tmod लाखों/NUM/7/nummod पर्यटक/NOUN/8/nsubj आते/VERB/0/root हैं/AUX/8/aux ।/PUNCT/8/punct
+वह/PRON/7/nsubj अंग्रेजी/NOUN/7/obl के/ADP/2/case साथ/ADP/2/case फ्रेंच/PROPN/7/obj भी/ADV/5/advmod बोल/VERB/0/root लेता/AUX/7/aux है/AUX/7/aux ।/PUNCT/7/punct
+हमारे/PRON/2/nmod शहर/NOUN/6/obl में/ADP/2/case नया/ADJ/5/amod अस्पताल/NOUN/6/nsubj खुला/VERB/0/root है/AUX/6/aux ।/PUNCT/6/punct
+उसने/PRON/6/nsubj बिना/ADP/4/mark कुछ/PRON/4/obj कहे/VERB/6/advcl फोन/NOUN/6/obj रख/VERB/0/root दिया/AUX/6/aux ।/PUNCT/6/punct
+सर्दियों/NOUN/6/obl में/ADP/1/case यहाँ/ADV/6/advmod बहुत/ADJ/5/amod ठंड/NOUN/6/nsubj पड़ती/VERB/0/root है/AUX/6/aux ।/PUNCT/6/punct
+मेरे/PRON/2/nmod पिताजी/NOUN/7/nsubj एक/NUM/4/nummod बैंक/NOUN/7/obl में/ADP/4/case काम/NOUN/7/obj करते/VERB/0/root हैं/AUX/7/aux ।/PUNCT/7/punct
+चुनाव/NOUN/2/compound आयोग/NOUN/8/nsubj ने/ADP/2/case मतदान/NOUN/6/nmod की/ADP/4/case तारीख/NOUN/8/obj घोषित/ADJ/8/xcomp कर/VERB/0/root दी/AUX/8/aux ।/PUNCT/8/punct
+इंटरनेट/NOUN/7/nsubj ने/ADP/1/case दुनिया/NOUN/7/obj को/ADP/3/case बहुत/ADV/6/advmod छोटा/ADJ/7/xcomp बना/VERB/0/root दिया/AUX/7/aux है/AUX/7/aux ।/PUNCT/7/punct
+रात/NOUN/5/obl को/ADP/1/case देर/NOUN/5/obl तक/ADP/3/case जागना/VERB/9/nsubj सेहत/NOUN/9/obl के/ADP/6/case लिए/ADP/6/case अच्छा/ADJ/0/root नहीं/PART/9/advmod है/AUX/9/cop ।/PUNCT/9/punct
+वे/DET/3/det दोनों/NUM/3/nummod भाई/NOUN/6/nsubj पुणे/PROPN/6/obl में/ADP/4/case पढ़ते/VERB/0/root हैं/AUX/6/aux ।/PUNCT/6/punct
+खिलाड़ियों/NOUN/7/nsubj ने/ADP/1/case मैदान/NOUN/7/obl में/ADP/3/case जमकर/ADV/7/advmod पसीना/NOUN/7/obj बहाया/VERB/0/root ।/PUNCT/7/punct
+वर्षा/NOUN/3/nmod का/ADP/1/case मौसम/NOUN/8/nsubj किसानों/NOUN/8/obl के/ADP/4/case लिए/ADP/4/case बहुत/ADV/8/advmod महत्वपूर्ण/ADJ/0/root होता/AUX/8/cop है/AUX/8/aux ।/PUNCT/8/punct
+उसने/PRON/4/nsubj अपनी/PRON/3/nmod गलती/NOUN/4/obj मान/VERB/0/root ली/AUX/4/aux ।/PUNCT/4/punct
+बच्चे/NOUN/4/nsubj पार्क/NOUN/4/obl में/ADP/2/case खेल/VERB/0/root रहे/AUX/4/aux थे/AUX/4/aux ।/PUNCT/4/punct
+मोहन/PROPN/7/nsubj ने/ADP/1/case सीता/PROPN/7/obl को/ADP/3/case एक/NUM/6/nummod पत्र/NOUN/7/obj लिखा/VERB/0/root ।/PUNCT/7/punct
+हिमालय/PROPN/7/nsubj दुनिया/NOUN/7/nmod की/ADP/2/case सबसे/ADV/5/advmod ऊँची/ADJ/7/amod पर्वत/NOUN/7/compound श्रृंखला/NOUN/0/root है/AUX/7/cop ।/PUNCT/7/punct
+पुलिस/NOUN/5/nsubj ने/ADP/1/case चोर/NOUN/5/obj को/ADP/3/case पकड़/VERB/0/root लिया/AUX/5/aux ।/PUNCT/5/punct
+हम/PRON/7/nsubj शाम/NOUN/7/obl:tmod को/ADP/2/case पार्क/NOUN/6/obl में/ADP/4/case टहलने/VERB/7/advcl जाते/VERB/0/root हैं/AUX/7/aux ।/PUNCT/7/punct
+इस/DET/2/det फिल्म/NOUN/4/nmod की/ADP/2/case कहानी/NOUN/6/nsubj बहुत/ADV/6/advmod भावुक/ADJ/0/root है/AUX/6/cop ।/PUNCT/6/punct
+मंत्री/NOUN/4/nsubj जी/NOUN/1/flat ने/ADP/1/case कहा/VERB/0/root कि/SCONJ/9/mark सभी/PRON/9/obl को/ADP/6/case शिक्षा/NOUN/9/nsubj मिलनी/VERB/4/ccomp चाहिए/AUX/9/aux ।/PUNCT/4/punct
+रोज़/ADV/3/advmod व्यायाम/NOUN/3/obj करने/VERB/7/obl से/ADP/3/case शरीर/NOUN/7/nsubj स्वस्थ/ADJ/7/xcomp रहता/VERB/0/root है/AUX/7/aux ।/PUNCT/7/punct
+पुराने/ADJ/2/amod शहर/NOUN/4/nmod की/ADP/2/case गलियाँ/NOUN/6/nsubj बहुत/ADV/6/advmod तंग/ADJ/0/root हैं/AUX/6/cop ।/PUNCT/6/punct
+उसकी/PRON/2/nmod आवाज़/NOUN/3/obj सुनते/VERB/7/advcl ही/ADV/3/advmod सब/PRON/7/nsubj चुप/ADJ/7/xcomp हो/VERB/0/root गए/AUX/7/aux ।/PUNCT/7/punct
+मैंने/PRON/5/nsubj पहली/ADJ/3/amod बार/NOUN/5/obl:tmod समुद्र/NOUN/5/obj देखा/VERB/0/root ।/PUNCT/5/punct
+किताबें/NOUN/5/nsubj हमारी/PRON/5/nmod सबसे/ADV/4/advmod अच्छी/ADJ/5/amod दोस्त/NOUN/0/root होती/AUX/5/cop हैं/AUX/5/cop ।/PUNCT/5/punct
+वह/PRON/7/nsubj सुबह/NOUN/4/nmod की/ADP/2/case गाड़ी/NOUN/7/obl से/ADP/4/case मुंबई/PROPN/7/obl गया/VERB/0/root ।/PUNCT/7/punct
+सभी/DET/2/det छात्रों/NOUN/6/obl को/ADP/2/case कल/NOUN/6/obl:tmod किताबें/NOUN/6/obj लानी/VERB/0/root हैं/AUX/6/aux ।/PUNCT/6/punct
+उनका/PRON/2/nmod घर/NOUN/7/nsubj पहाड़/NOUN/5/nmod की/ADP/3/case चोटी/NOUN/7/obl पर/ADP/5/case बना/VERB/0/root है/AUX/7/aux ।/PUNCT/7/punct
+इस/DET/2/det बार/NOUN/6/obl:tmod हमारी/PRON/4/nmod टीम/NOUN/6/nsubj जरूर/ADV/6/advmod जीतेगी/VERB/0/root ।/PUNCT/6/punct
+दादी/NOUN/6/nsubj हमें/PRON/6/obl रोज़/ADV/6/advmod नई/ADJ/5/amod कहानी/NOUN/6/obj सुनाती/VERB/0/root थीं/AUX/6/aux ।/PUNCT/6/punct
+मुझे/PRON/2/obl लगता/VERB/0/root है/AUX/2/aux कि/SCONJ/7/mark वह/PRON/7/nsubj सच/NOUN/7/obj बोल/VERB/2/ccomp रहा/AUX/7/aux है/AUX/7/aux ।/PUNCT/2/punct
+तालाब/NOUN/7/obl के/ADP/1/case पास/ADP/1/case एक/NUM/6/nummod बूढ़ा/ADJ/6/amod पेड़/NOUN/7/nsubj खड़ा/VERB/0/root था/AUX/7/aux ।/PUNCT/7/punct
+कंप्यूटर/NOUN/7/nsubj ने/ADP/1/case हमारे/PRON/4/nmod काम/NOUN/7/obj को/ADP/4/case आसान/ADJ/7/xcomp बना/VERB/0/root दिया/AUX/7/aux है/AUX/7/aux ।/PUNCT/7/punct
+श्रीलंका/PROPN/8/obl और/CCONJ/3/cc भारत/PROPN/1/conj के/ADP/1/case बीच/ADP/1/case कल/NOUN/8/obl:tmod मैच/NOUN/8/nsubj:pass खेला/VERB/0/root जाएगा/AUX/8/aux:pass ।/PUNCT/8/punct
+वह/PRON/4/nsubj बहुत/ADV/3/advmod तेज/ADV/4/advmod दौड़ता/VERB/0/root है/AUX/4/aux ,/PUNCT/9/punct इसलिए/ADV/9/advmod हमेशा/ADV/9/advmod जीतता/VERB/4/conj है/AUX/9/aux ।/PUNCT/4/punct
+छोटे/ADJ/2/amod बच्चे/NOUN/6/nsubj अक्सर/ADV/6/advmod बिना/ADP/5/mark सोचे/VERB/6/advcl बोल/VERB/0/root देते/AUX/6/aux हैं/AUX/6/aux ।/PUNCT/6/punct
+स्टेशन/NOUN/7/obl पर/ADP/1/case यात्रियों/NOUN/6/nmod की/ADP/3/case लंबी/ADJ/6/amod कतार/NOUN/7/nsubj लगी/VERB/0/root हुई/AUX/7/aux थी/AUX/7/aux ।/PUNCT/7/punct

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).Recipes.Hindi</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).Recipes.Hindi</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../src/OneNlp/OneNlp.csproj" />
+    <ProjectReference Include="../../../src/OneNlp.Neural/OneNlp.Neural.csproj" />
+  </ItemGroup>
+
+</Project>

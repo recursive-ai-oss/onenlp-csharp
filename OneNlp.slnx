@@ -12,6 +12,7 @@
     <Project Path="src/OneNlp.Models.German/OneNlp.Models.German.csproj" />
     <Project Path="src/OneNlp.Models.Spanish/OneNlp.Models.Spanish.csproj" />
     <Project Path="src/OneNlp.Models.Italian/OneNlp.Models.Italian.csproj" />
+    <Project Path="src/OneNlp.Models.Hindi/OneNlp.Models.Hindi.csproj" />
     <Project Path="src/OneNlp.Models.Turkish/OneNlp.Models.Turkish.csproj" />
     <Project Path="src/OneNlp.Models.Portuguese/OneNlp.Models.Portuguese.csproj" />
     <Project Path="src/OneNlp.Models.Dutch/OneNlp.Models.Dutch.csproj" />
@@ -68,6 +69,7 @@
     <Project Path="recipes/de/fast/OneNlp.Recipes.German.csproj" />
     <Project Path="recipes/es/fast/OneNlp.Recipes.Spanish.csproj" />
     <Project Path="recipes/it/fast/OneNlp.Recipes.Italian.csproj" />
+    <Project Path="recipes/hi/fast/OneNlp.Recipes.Hindi.csproj" />
     <Project Path="recipes/zh/fast/OneNlp.Recipes.Chinese.csproj" />
     <Project Path="recipes/tr/fast/OneNlp.Recipes.Turkish.csproj" />
     <Project Path="recipes/pt/fast/OneNlp.Recipes.Portuguese.csproj" />
