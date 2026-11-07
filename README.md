@@ -19,6 +19,8 @@ Text in, structure out: tokens, sentences, tags, morphology, lemmas, dependency 
 
 Not packaged yet and therefore not listed as working: open-type NER (entity types named at runtime), the accurate-tier packages above, and a Hindi fast-tier model (there is no allowed Hindi training data; Hindi has recognizers and language ID today). See [docs/results-table.md](docs/results-table.md) for the gaps.
 
+Languages without an accurate-tier model: Basque, Bulgarian, Classical Armenian, Gothic, Hungarian, Kadiweu, Nheengatu, Old Church Slavonic, Pomak, Shanghainese, South Levantine Arabic and Urdu have no Universal Dependencies treebank licensed for commercial use (each is non-commercial only), and Hindi's only such treebank is a test set. Language ID covers these languages where it lists them; we train no tagger, parser or entity model on non-commercial data. See [docs/ud-licences.md](docs/ud-licences.md).
+
 Nothing is ever downloaded. A model lives inside its package; without the package, a verb that needs it throws an exception that names the package to add (see [docs/model-packages.md](docs/model-packages.md)).
 
 ## Install
