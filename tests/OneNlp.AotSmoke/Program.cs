@@ -124,6 +124,7 @@ internal static class Program
         EntitySmoke(NerDecoding.Tagging);
         EntitySmoke(NerDecoding.Spans);
         ParserSmoke();
+        CategorySmoke();
 
         Console.WriteLine(failures == 0 ? "OK" : $"{failures} check(s) failed");
         return failures == 0 ? 0 : 1;
@@ -229,6 +230,49 @@ internal static class Program
         Doc a = trained.Process("we saw Vexa today");
         Doc b = loaded.Process("we saw Vexa today");
         Check("ner " + decoding, result.Completed && a.Ents.Count == 1 && a.Ents[0].Label == "GADGET" && b.Ents.Count == 1 && b.Ents[0].Label == "GADGET" && a.Ents[0].Confidence == b.Ents[0].Confidence);
+    }
+
+    // Trains a text classifier (exclusive and multi-label) and a span categorizer from JSON Lines, saves and loads them, and writes the
+    // categories and span groups of a document through both serializations, under NativeAOT.
+    private static void CategorySmoke()
+    {
+        var textLines = new System.Text.StringBuilder();
+        var spanLines = new System.Text.StringBuilder();
+        for (int s = 0; s < 40; s++)
+        {
+            bool cat = s % 2 == 0;
+            string word = cat ? "cat" : "soup";
+            textLines.Append("{\"text\":\"the ").Append(word).Append(" is here\",\"cats\":{\"ANIMAL\":").Append(cat ? 1 : 0).Append(",\"FOOD\":").Append(cat ? 0 : 1).Append("}}\n");
+            spanLines.Append("{\"text\":\"we saw Grand Zorp today\",\"spans\":{\"sc\":[[7,17,\"PRODUCT\"],[13,17,\"PART\"]]}}\n");
+        }
+
+        foreach (bool multi in new[] { false, true })
+        {
+            List<Example> examples = [.. JsonlReader.Read(new StringReader(textLines.ToString()))];
+            using Pipeline trained = Pipeline.Blank(Language.English).Add(new TextClassifier(new HashEmbeddingEncoder(16, 256, 1), multi) { OwnsEncoder = true });
+            TrainResult result = trained.Train(examples, new TrainOptions { Epochs = 12, BatchWords = 60, LearningRate = 0.02f, Seed = 3 });
+            using var buffer = new MemoryStream();
+            PipelineFile.Save(trained, buffer);
+            using Pipeline loaded = PipelineFile.Load(new MemoryStream(buffer.ToArray()));
+            Doc a = trained.Process("the soup is here");
+            Doc b = loaded.Process("the soup is here");
+            Doc c = Doc.FromBytes(a.ToBytes());
+            Doc d = Doc.FromJson(a.ToJson());
+            Check("textcat " + (multi ? "multi-label" : "exclusive"),
+                result.Completed && a.Cats["FOOD"] > 0.5f && a.Cats["FOOD"] == b.Cats["FOOD"] && c.Cats["ANIMAL"] == a.Cats["ANIMAL"] && d.Cats["FOOD"] == a.Cats["FOOD"]);
+        }
+
+        List<Example> spans = [.. JsonlReader.Read(new StringReader(spanLines.ToString()))];
+        using Pipeline spanTrained = Pipeline.Blank(Language.English).Add(new SpanCategorizer(new HashEmbeddingEncoder(16, 256, 1), "sc", [1, 2], 16) { OwnsEncoder = true });
+        TrainResult spanResult = spanTrained.Train(spans, new TrainOptions { Epochs = 15, BatchWords = 60, LearningRate = 0.02f, Seed = 3 });
+        using var spanBuffer = new MemoryStream();
+        PipelineFile.Save(spanTrained, spanBuffer);
+        using Pipeline spanLoaded = PipelineFile.Load(new MemoryStream(spanBuffer.ToArray()));
+        Doc x = spanTrained.Process("we saw Grand Zorp today");
+        Doc y = spanLoaded.Process("we saw Grand Zorp today");
+        Doc z = Doc.FromBytes(x.ToBytes());
+        Check("spancat nested spans", spanResult.Completed && x.Spans["sc"].Count == 2 && x.Spans["sc"].Select(t => t.Label + t.Text.ToString()).Order().SequenceEqual(["PARTZorp", "PRODUCTGrand Zorp"])
+            && y.Spans["sc"].Count == 2 && z.Spans["sc"].Count == 2 && Doc.FromJson(x.ToJson()).Spans["sc"].Count == 2);
     }
 
     // Trains a parser on chains (each word's head is the word before it), saves and loads it, and asks for noun chunks, under NativeAOT.

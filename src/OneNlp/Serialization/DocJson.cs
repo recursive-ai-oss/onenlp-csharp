@@ -140,6 +140,48 @@ internal static class DocJson
             w.WriteEndArray();
         }
 
+        if (doc.CatLabels is { } catLabels)
+        {
+            w.WriteStartObject("cats"u8);
+            ReadOnlySpan<float> scores = doc.CatScores;
+            for (int i = 0; i < catLabels.Length; i++)
+            {
+                CheckString(catLabels[i]);
+                w.WriteNumber(catLabels[i], scores[i]);
+            }
+
+            w.WriteEndObject();
+        }
+
+        IReadOnlyList<KeyValuePair<string, SpanSpec[]>> groups = doc.GroupSpecs();
+        if (groups.Count > 0)
+        {
+            w.WriteStartObject("spans"u8);
+            foreach (KeyValuePair<string, SpanSpec[]> g in groups)
+            {
+                CheckString(g.Key);
+                w.WriteStartArray(g.Key);
+                foreach (SpanSpec s in g.Value)
+                {
+                    Span span = new(doc, s.Start, s.End);
+                    w.WriteStartObject();
+                    w.WriteNumber("start"u8, Offset(span.StartChar));
+                    w.WriteNumber("end"u8, Offset(span.EndChar));
+                    PropertyString(w, "label"u8, s.Label);
+                    if (s.Confidence != 1f)
+                    {
+                        w.WriteNumber("conf"u8, s.Confidence);
+                    }
+
+                    w.WriteEndObject();
+                }
+
+                w.WriteEndArray();
+            }
+
+            w.WriteEndObject();
+        }
+
         ReadOnlySpan<SentenceBoundary> boundaries = doc.GetSentenceBoundaries();
         bool anyBoundary = false;
         foreach (SentenceBoundary b in boundaries)
@@ -353,6 +395,8 @@ internal static class DocJson
         List<SpanRecord>? ents = null;
         List<SpanRecord>? sents = null;
         List<TokenRecord>? tokens = null;
+        List<KeyValuePair<string, float>>? cats = null;
+        List<KeyValuePair<string, List<SpanRecord>>>? groups = null;
         while (true)
         {
             if (!r.Read())
@@ -385,9 +429,19 @@ internal static class DocJson
                 r.Read();
                 tokens = ReadTokens(ref r);
             }
+            else if (r.ValueTextEquals("cats"u8))
+            {
+                r.Read();
+                cats = ReadCats(ref r);
+            }
+            else if (r.ValueTextEquals("spans"u8))
+            {
+                r.Read();
+                groups = ReadGroups(ref r);
+            }
             else
             {
-                // spans, cats, user_data and anything else: not stored by a Doc, so not read.
+                // user_data and anything else: not stored by a Doc, so not read.
                 r.Read();
                 r.Skip();
             }
@@ -403,7 +457,102 @@ internal static class DocJson
             throw Bad("A document needs \"text\" and \"tokens\".");
         }
 
-        return Build(text, tokens, ents, sents, store);
+        Doc doc = Build(text, tokens, ents, sents, store);
+        try
+        {
+            if (cats is not null)
+            {
+                doc.SetCats(cats.ToArray());
+            }
+
+            if (groups is not null)
+            {
+                int codePoints = text.Length;
+                int[]? units = null;
+                if (CodePointIndex(text) is { } cpMap)
+                {
+                    codePoints = cpMap[text.Length];
+                    units = UnitIndex(text, codePoints);
+                }
+
+                foreach (KeyValuePair<string, List<SpanRecord>> g in groups)
+                {
+                    var specs = new SpanSpec[g.Value.Count];
+                    for (int i = 0; i < specs.Length; i++)
+                    {
+                        SpanRecord e = g.Value[i];
+                        if (!doc.TryGetCharSpan(ToUnitOffset(units, codePoints, e.Start), ToUnitOffset(units, codePoints, e.End), out Span span))
+                        {
+                            throw Bad($"Span {i} of group '{g.Key}' does not start and end on token boundaries.");
+                        }
+
+                        specs[i] = new SpanSpec(span.Start, span.End, e.Label ?? string.Empty, e.Conf);
+                    }
+
+                    doc.SetSpans(g.Key, specs);
+                }
+            }
+        }
+        catch (ArgumentException e)
+        {
+            throw Bad("The document's cats or spans are inconsistent: " + e.Message);
+        }
+
+        return doc;
+    }
+
+    private static int ToUnitOffset(int[]? units, int codePoints, int offset)
+    {
+        if (offset > codePoints)
+        {
+            throw Bad("An offset lies beyond the end of the text.");
+        }
+
+        return units is null ? offset : units[offset];
+    }
+
+    private static List<KeyValuePair<string, float>> ReadCats(ref Utf8JsonReader r)
+    {
+        ExpectStart(ref r, JsonTokenType.StartObject);
+        var list = new List<KeyValuePair<string, float>>();
+        while (true)
+        {
+            if (!r.Read())
+            {
+                throw Bad("The JSON ends inside the cats object.");
+            }
+
+            if (r.TokenType == JsonTokenType.EndObject)
+            {
+                return list;
+            }
+
+            string label = r.GetString() ?? string.Empty;
+            r.Read();
+            list.Add(new(label, ReadConfidence(ref r)));
+        }
+    }
+
+    private static List<KeyValuePair<string, List<SpanRecord>>> ReadGroups(ref Utf8JsonReader r)
+    {
+        ExpectStart(ref r, JsonTokenType.StartObject);
+        var list = new List<KeyValuePair<string, List<SpanRecord>>>();
+        while (true)
+        {
+            if (!r.Read())
+            {
+                throw Bad("The JSON ends inside the spans object.");
+            }
+
+            if (r.TokenType == JsonTokenType.EndObject)
+            {
+                return list;
+            }
+
+            string key = r.GetString() ?? string.Empty;
+            r.Read();
+            list.Add(new(key, ReadSpans(ref r)));
+        }
     }
 
     private static List<SpanRecord> ReadSpans(ref Utf8JsonReader r)

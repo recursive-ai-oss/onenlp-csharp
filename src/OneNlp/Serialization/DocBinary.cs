@@ -48,6 +48,8 @@ internal static class DocBinary
     internal const byte SectionTokens = 3;
     internal const byte SectionEntities = 4;
     internal const byte SectionDocs = 5;
+    internal const byte SectionCats = 6;
+    internal const byte SectionSpanGroups = 7;
 
     internal const ushort Version = 1;
     internal const ushort FlagChecksum = 1;
@@ -172,6 +174,42 @@ internal static class DocBinary
                 b.Varint((uint)table.IndexOf(e.Label));
                 b.Float(e.Confidence);
                 previous = e.End;
+            }
+
+            b.EndSection(at);
+        }
+
+        // Sections 6 and 7 are additive: a reader that predates them skips them by length.
+        if (doc.CatLabels is { } catLabels)
+        {
+            at = b.BeginSection(SectionCats);
+            b.Varint((uint)catLabels.Length);
+            ReadOnlySpan<float> scores = doc.CatScores;
+            for (int i = 0; i < catLabels.Length; i++)
+            {
+                b.Varint((uint)table.IndexOf(catLabels[i]));
+                b.Float(scores[i]);
+            }
+
+            b.EndSection(at);
+        }
+
+        IReadOnlyList<KeyValuePair<string, SpanSpec[]>> groups = doc.GroupSpecs();
+        if (groups.Count > 0)
+        {
+            at = b.BeginSection(SectionSpanGroups);
+            b.Varint((uint)groups.Count);
+            foreach (KeyValuePair<string, SpanSpec[]> g in groups)
+            {
+                b.Varint((uint)table.IndexOf(g.Key));
+                b.Varint((uint)g.Value.Length);
+                foreach (SpanSpec s in g.Value)
+                {
+                    b.Varint((uint)s.Start);
+                    b.Varint((uint)(s.End - s.Start));
+                    b.Varint((uint)table.IndexOf(s.Label));
+                    b.Float(s.Confidence);
+                }
             }
 
             b.EndSection(at);
@@ -358,8 +396,12 @@ internal static class DocBinary
         string? text = null;
         ReadOnlySpan<byte> tokens = default;
         ReadOnlySpan<byte> ents = default;
+        ReadOnlySpan<byte> cats = default;
+        ReadOnlySpan<byte> groups = default;
         bool hasTokens = false;
         bool hasEnts = false;
+        bool hasCats = false;
+        bool hasGroups = false;
         int previousId = 0;
         while (c.Remaining > 0)
         {
@@ -389,6 +431,14 @@ internal static class DocBinary
                     ents = payload;
                     hasEnts = true;
                     break;
+                case SectionCats:
+                    cats = payload;
+                    hasCats = true;
+                    break;
+                case SectionSpanGroups:
+                    groups = payload;
+                    hasGroups = true;
+                    break;
                 default:
                     // Sections a later version adds are skipped; their length says how.
                     break;
@@ -406,6 +456,16 @@ internal static class DocBinary
             if (hasEnts)
             {
                 DecodeEntities(ents, doc, map);
+            }
+
+            if (hasCats)
+            {
+                DecodeCats(cats, doc, map);
+            }
+
+            if (hasGroups)
+            {
+                DecodeSpanGroups(groups, doc, map);
             }
 
             return doc;
@@ -549,5 +609,87 @@ internal static class DocBinary
         }
 
         doc.SetEntities(specs);
+    }
+
+    private static void DecodeCats(ReadOnlySpan<byte> payload, Doc doc, int[] map)
+    {
+        var c = new ByteCursor(payload);
+        uint count = c.Varint();
+
+        // A category takes at least 5 bytes.
+        if ((long)count * 5 > c.Remaining)
+        {
+            throw new InvalidDataException("The category count is larger than the section can hold.");
+        }
+
+        var cats = new KeyValuePair<string, float>[count];
+        for (int i = 0; i < cats.Length; i++)
+        {
+            uint label = c.Varint();
+            float score = c.Float();
+            if (label == 0 || label >= map.Length)
+            {
+                throw new InvalidDataException($"Category {i} is unlabelled.");
+            }
+
+            cats[i] = new KeyValuePair<string, float>(doc.Strings[map[label]], score);
+        }
+
+        if (c.Remaining != 0)
+        {
+            throw new InvalidDataException("The category section has bytes after its last category.");
+        }
+
+        doc.SetCats(cats);
+    }
+
+    private static void DecodeSpanGroups(ReadOnlySpan<byte> payload, Doc doc, int[] map)
+    {
+        var c = new ByteCursor(payload);
+        uint groups = c.Varint();
+
+        // A group takes at least 2 bytes.
+        if ((long)groups * 2 > c.Remaining)
+        {
+            throw new InvalidDataException("The span group count is larger than the section can hold.");
+        }
+
+        for (uint g = 0; g < groups; g++)
+        {
+            uint key = c.Varint();
+            uint count = c.Varint();
+            if (key == 0 || key >= map.Length)
+            {
+                throw new InvalidDataException("A span group has no name.");
+            }
+
+            // A span takes at least 7 bytes.
+            if ((long)count * 7 > c.Remaining)
+            {
+                throw new InvalidDataException("The span count is larger than the section can hold.");
+            }
+
+            var specs = new SpanSpec[count];
+            for (int i = 0; i < specs.Length; i++)
+            {
+                long start = c.Varint();
+                long length = c.Varint();
+                uint label = c.Varint();
+                float confidence = c.Float();
+                if (length < 1 || start + length > doc.Length || label == 0 || label >= map.Length)
+                {
+                    throw new InvalidDataException($"Span {i} is empty, outside the document or unlabelled.");
+                }
+
+                specs[i] = new SpanSpec((int)start, (int)(start + length), doc.Strings[map[label]], confidence);
+            }
+
+            doc.SetSpans(doc.Strings[map[key]], specs);
+        }
+
+        if (c.Remaining != 0)
+        {
+            throw new InvalidDataException("The span group section has bytes after its last group.");
+        }
     }
 }
