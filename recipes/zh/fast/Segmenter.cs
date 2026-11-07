@@ -15,6 +15,10 @@ internal static partial class Program
 {
     private const int SentencesPerDocument = 8;
 
+    // --language CODE: the segmenter of another unspaced-script language (ja, lzh, th, vi) is trained with the same recipe; the code only
+    // labels the saved pipeline.
+    private static Language segmenterLanguage = Language.Chinese;
+
     // Groups consecutive sentences into documents joined by a space, the way running text arrives; the space makes the first character of each sentence
     // a word start, as it is in the treebank.
     private static List<Example> SegmentationExamples(string path, out int lost, out int goldWords)
@@ -120,6 +124,7 @@ internal static partial class Program
     private static int TrainSegmenter(string[] args)
     {
         string outDir = Required(args, "out");
+        segmenterLanguage = Language.FromCode(Opt(args, "language", "zh"));
         List<Example> train = SegmentationExamples(Required(args, "train"), out int lostTrain, out int goldTrain);
         List<Example> dev = SegmentationExamples(Required(args, "dev"), out int lostDev, out int goldDev);
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"gold words not representable as unit starts: train {lostTrain}/{goldTrain}, dev {lostDev}/{goldDev}"));
@@ -127,7 +132,7 @@ internal static partial class Program
         ulong seed = (ulong)Num(args, "seed", 1);
         FastEncoder encoder = MakeEncoder(args, seed);
         var tagger = new Tagger(encoder, TokenColumn.Tag, NeuralWordSegmenter.HeadName) { OwnsEncoder = true };
-        using Pipeline pipeline = Pipeline.Blank(Language.Chinese).Add(tagger);
+        using Pipeline pipeline = Pipeline.Blank(segmenterLanguage).Add(tagger);
         int batchWords = Num(args, "batch-words", 2000);
         float lr = Flt(args, "lr", 0.002f);
         int cosineEpochs = Num(args, "cosine-epochs", 0);
@@ -155,7 +160,7 @@ internal static partial class Program
     // the training pipeline, which disposes it.
     private static void SaveSegmenter(Pipeline trained, string path)
     {
-        var holder = new Pipeline(new NeuralWordSegmenter((Tagger)trained.Components[0]), Language.Chinese);
+        var holder = new Pipeline(new NeuralWordSegmenter((Tagger)trained.Components[0]), segmenterLanguage);
         PipelineFile.Save(holder, path);
     }
 }

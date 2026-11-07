@@ -14,7 +14,7 @@ namespace RecursiveAI.OneNlp;
 /// </para>
 /// <para>All members are thread-safe.</para>
 /// </remarks>
-public static class ModelPackages
+public static partial class ModelPackages
 {
     /// <summary>The package that carries every language through the accurate tier. Named in the error when no model is available.</summary>
     internal const string MultilingualPackageId = "RecursiveAI.OneNlp.Models.Multilingual";
@@ -183,9 +183,8 @@ public static class ModelPackages
         ["zh"] = "RecursiveAI.OneNlp.Models.Chinese",
     };
 
-    // The languages the two accurate-tier packages have heads for (their `Languages` lists). Core cannot ask a package that is not
-    // referenced, so the table is here; a package that gains languages must be added to it.
-    private static readonly HashSet<string> AccurateLanguages = new(StringComparer.Ordinal) { "en", "de", "fr", "es", "pt", "it", "nl", "tr", "zh" };
+    // The languages the two accurate-tier packages have heads for are in ModelPackages.AccurateLanguages.g.cs, written from the training corpus
+    // description by tools/accurate/make_corpus_spec.py (--cs). Core cannot ask a package that is not referenced, so the table is here.
 
     /// <summary>
     /// The error for a language and tier without a model. The message names only packages that would change the outcome: ones that

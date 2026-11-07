@@ -29,16 +29,16 @@ NER = [
     ("hr500k `classla/hr500k`", "hr", "card: cc-by-sa-4.0; NER layer of the Croatian reference corpus", "go (SA lineage)", "Croatian NER"),
     ("RONEC `community-datasets/ronec`", "ro", "card: MIT; \"sentences that are free of copyright\" from SEETimes, Romanian Wikipedia and Common Crawl", "go", "Romanian NER (15 classes)"),
     ("SUCX 3.0 NER `KBLab/sucx3_ner`", "sv", "card: cc-by-4.0 (SUC 3.0, Spr\u00e5kbanken)", "go", "Swedish NER; the Swedish-Talbanken UNER set is the UD-aligned alternative"),
-    ("MasakhaNER 2.0 `masakhane/masakhaner2`", "20 African languages (bm bbj ee fon ha ig rw lg luo mos ny pcm sn sw tn tw wo xh yo zu)", "card: afl-3.0; text from news outlets: \"The data is sourced from newspaper source\"", "unclear: the annotations' licence is permissive, the news publishers' terms on the text are not stated", "none until ruled"),
-    ("MasakhaNER 1.0 `masakhane/masakhaner`", "10 African languages", "card: license unknown", "unclear (no stated terms)", "none"),
-    ("Hausa VOA NER `UdS-LSV/hausa_voa_ner`", "ha", "card: cc-by-4.0; \"crawled from VOA Hausa news\"", "unclear: crawled news site; the site's terms are not stated on the card", "none until ruled"),
-    ("HiNER original `cfilt/HiNER-original`", "hi", "card: cc-by-sa-4.0; \"The dataset contains sentences from ILCI and other sources. ILCI dataset requires license from Indian Language Consortium due to which we do not distribute the ILCI portion of the data.\"", "unclear: the remaining sources are not named on the card (would be the first Hindi NER candidate)", "none until ruled"),
-    ("KLUE-NER `klue/klue`", "ko", "card: cc-by-sa-4.0; the card's examples show news, review and other web text", "unclear: the terms on those texts are not stated", "none until ruled"),
-    ("FiNER `mpsilfve/finer`", "fi", "card: mit; the card is a blank template and names no text source", "unclear: the text source is not stated", "none until ruled"),
-    ("Persian NER `HaniehPoostchi/persian_ner`", "fa", "card: cc-by-4.0", "unclear: the card does not name the text source", "none until ruled"),
-    ("Catalan NER `Ugiat/ner-cat`", "ca", "card: apache-2.0; television transcriptions", "unclear: rights in the transcribed programmes are not stated", "none until ruled"),
-    ("fiNERweb `whoisjones/fiNERweb`", "91 languages", "card: mit; \"annotated text in multiple languages\"; the card does not name the label generator", "unclear: the label generator (and so the labels' terms) is not stated", "none until ruled"),
-    ("Swedish NER corpus `klintan/swedish_ner_corpus`", "sv", "card: cc-by-4.0; \"news from Swedish newspapers' websites\"", "unclear: newspaper text, terms not stated", "none"),
+    ("MasakhaNER 2.0 `masakhane/masakhaner2`", "20 African languages (bm bbj ee fon ha ig rw lg luo mos ny pcm sn sw tn tw wo xh yo zu)", "card: afl-3.0; text from news outlets: \"The data is sourced from newspaper source\"", "out (ruled 2026-11-07), unclear terms: the annotations' licence is permissive, the news publishers' terms on the text are not stated", "none"),
+    ("MasakhaNER 1.0 `masakhane/masakhaner`", "10 African languages", "card: license unknown", "out (ruled 2026-11-07), no stated terms", "none"),
+    ("Hausa VOA NER `UdS-LSV/hausa_voa_ner`", "ha", "card: cc-by-4.0; \"crawled from VOA Hausa news\"", "out (ruled 2026-11-07), unclear terms: crawled news site; the site's terms are not stated on the card", "none"),
+    ("HiNER original `cfilt/HiNER-original`", "hi", "card: cc-by-sa-4.0; \"The dataset contains sentences from ILCI and other sources. ILCI dataset requires license from Indian Language Consortium due to which we do not distribute the ILCI portion of the data.\"", "out (ruled 2026-11-07), unclear terms: the remaining sources are not named on the card (would be the first Hindi NER candidate)", "none"),
+    ("KLUE-NER `klue/klue`", "ko", "card: cc-by-sa-4.0; the card's examples show news, review and other web text", "out (ruled 2026-11-07), unclear terms: the terms on those texts are not stated", "none"),
+    ("FiNER `mpsilfve/finer`", "fi", "card: mit; the card is a blank template and names no text source", "out (ruled 2026-11-07), unclear terms: the text source is not stated", "none"),
+    ("Persian NER `HaniehPoostchi/persian_ner`", "fa", "card: cc-by-4.0", "out (ruled 2026-11-07), unclear terms: the card does not name the text source", "none"),
+    ("Catalan NER `Ugiat/ner-cat`", "ca", "card: apache-2.0; television transcriptions", "out (ruled 2026-11-07), unclear terms: rights in the transcribed programmes are not stated", "none"),
+    ("fiNERweb `whoisjones/fiNERweb`", "91 languages", "card: mit; \"annotated text in multiple languages\"; the card does not name the label generator", "out (ruled 2026-11-07), unclear terms: the label generator (and so the labels' terms) is not stated", "none"),
+    ("Swedish NER corpus `klintan/swedish_ner_corpus`", "sv", "card: cc-by-4.0; \"news from Swedish newspapers' websites\"", "out (ruled 2026-11-07), unclear terms: newspaper text, terms not stated", "none"),
     ("Europeana Newspapers `community-datasets/euronews`", "de fr nl", "card: cc0-1.0; historical newspapers", "go (public-domain scans, CC0 card)", "silver-quality historical NER; not chosen (old orthography)"),
     ("WikiANN / PAN-X", "many languages", "card: `license: unknown`", "no-go [ruled]", "-"),
     ("WikiNEuRal, MultiNERD (Babelscape)", "9 languages", "cards: cc-by-nc-sa-4.0", "no-go (NC)", "-"),
@@ -107,14 +107,13 @@ def licences_doc(cat, langs, docs):
              "The sections above give the nine languages' detail; this one covers all languages with the same rules.\n")
     o.append("### Summary\n")
     o.append("| Verdict | Treebanks |\n|---|---|")
-    for k in ("go", "eval-only", "no-go", "unclear"):
+    for k in ("go", "eval-only", "no-go"):
         o.append(f"| {k} | {vc.get(k, 0)} |")
     o.append(f"| total | {n} |\n")
     o.append("| Language class | Languages |\n|---|---|")
     o.append(f"| **train+eval**: at least one `go` treebank with training and test splits | {lc.get('train+eval', 0)} (of which {big} have 1,000 or more training sentences in the gating treebank and {small} fewer than 500) |")
     o.append(f"| **eval-only**: only test-only or evaluation data is allowed | {lc.get('eval-only', 0)} |")
-    o.append(f"| **pending**: the only data is `unclear` (listed below) | {lc.get('pending', 0)} |")
-    o.append(f"| **gap**: every treebank is non-commercial: the accurate tier has no UD data | {lc.get('gap', 0)} |")
+    o.append(f"| **gap**: every treebank is non-commercial, research-only or otherwise ruled out: the accurate tier has no UD data | {lc.get('gap', 0)} |")
     o.append(f"| total | {len(langs)} |\n")
     o.append("The nine languages with fast-tier work (zh fr es pt de it tr nl, plus en) keep their treebanks and manifests; Hindi stays a recorded gap for training (HDTB is NC), "
              "with Hindi-PUD as its test set.\n")
@@ -122,14 +121,14 @@ def licences_doc(cat, langs, docs):
     o.append("- **go**: the README licence line is CC BY-SA, CC BY, CC0, PD, LGPL-LR or another permissive licence, `LICENSE.txt` does not contradict it, no README sentence restricts the text, and the treebank has a training split. SA lineage is recorded in provenance. Credit goes in THIRD-PARTY-NOTICES.")
     o.append("- **eval-only**: allowed licence but no training split (PUD and other test-only treebanks).")
     o.append("- **no-go**: non-commercial or no-derivatives licence (the README line and `LICENSE.txt` agree), research-only text, platform-restricted text (tweets, Reddit), LDC-derived text, or the rulings of 2026-11-05.")
-    o.append("- **unclear**: the sources disagree (README says non-commercial, `LICENSE.txt` is the generic CC BY-SA 4.0 template, or the reverse) or the README names text whose terms it does not state. Not fetched, not used; listed below with the quotes for a ruling.")
+    o.append("- **Rulings of 2026-11-07 on the 22 treebanks that were `unclear`**: (1) the README says non-commercial and `LICENSE.txt` is the generic CC BY-SA template: no-go, the README statement wins; (2) CC BY-SA annotation over platform or terms-restricted text: no-go; (3) Polish-LFG (GNU GPL 3.0): no-go; (4) Ligurian-GLT (Computational Use of Data Agreement 1.0): go, credited. Nothing stays unclear.")
     o.append("- The `LICENSE.txt` column abbreviates its first lines; `own text` means a bespoke document (read in full for the decision).\n")
 
     byl = {}
     for c in cat:
         byl.setdefault(c["language"], []).append(c)
     o.append("### Languages\n")
-    o.append("Gating treebank: among the `go` treebanks with training and test splits, the one the most published systems report (Stanza, UDPipe 2, Trankit), then the larger training set; the nine fast-tier languages keep theirs. Training sentences in brackets. *Extra training* are further `go` treebanks. *Test-only* are `eval-only` sets. *Not usable* lists `no-go` and `unclear` treebanks.\n")
+    o.append("Gating treebank: among the `go` treebanks with training and test splits, the one the most published systems report (Stanza, UDPipe 2, Trankit), then the larger training set; the nine fast-tier languages keep theirs. Training sentences in brackets. *Extra training* are further `go` treebanks. *Test-only* are `eval-only` sets. *Not usable* lists `no-go` treebanks.\n")
     o.append("| Language | Class | Gating treebank (train sentences) | Extra training | Test-only | Not usable |")
     o.append("|---|---|---|---|---|---|")
     for l in langs:
@@ -137,9 +136,17 @@ def licences_doc(cat, langs, docs):
         nu = []
         if l["no_go"]:
             nu.append("no-go: " + l["no_go"].replace(";", ", "))
-        if l["unclear"]:
-            nu.append("unclear: " + l["unclear"].replace(";", ", "))
         o.append(f"| {l['language'].replace('_', ' ')} | {l['klass']} | {gate} | {l['extra_train'].replace(';', ', ')} | {l['test_only'].replace(';', ', ')} | {'; '.join(nu)} |")
+    o.append("")
+    o.append("### Languages without an accurate-tier model\n")
+    o.append("Every treebank of these languages is ruled out, so there is no allowed training data. Hindi has UD data only in the test-only PUD set (HDTB is non-commercial); its fast-tier model is trained on labels from the accurate tier.\n")
+    o.append("| Language | Treebanks and why they are out |")
+    o.append("|---|---|")
+    for l in langs:
+        if l["klass"] != "gap":
+            continue
+        why = "; ".join(f"{c['repo'][3:]}: {c['reason'][:110].rstrip()}" for c in cat if c["language"] == l["language"] and c["verdict"] == "no-go")
+        o.append(f"| {l['language'].replace('_', ' ')} | {why.replace('|', '/')} |")
     o.append("")
     o.append("### Treebanks\n")
     o.append("Splits are sentence counts (train/dev/test) from `stats.xml`. \"Licence line\" is the README's `License:` metadata; the quote for any other decision is in the Rulings section.\n")
@@ -153,12 +160,11 @@ def licences_doc(cat, langs, docs):
     o.append("### Rulings and quotes\n")
     o.append("**no-go on the text source or the sources of terms** (licence line alone would pass):\n")
     for c in cat:
-        if c["verdict"] == "no-go" and c["flag"] == "text":
+        if c["verdict"] == "no-go" and c["flag"] == "text" and not c["reason"].startswith("ruled no-go"):
             o.append(f"- **{c['repo'][3:]}**: {c['reason']}")
-    o.append("\n**unclear** (not fetched; each needs a ruling):\n")
+    o.append("\n**ruled no-go from `unclear`** (not fetched; the quotes behind the rulings):\n")
     for c in cat:
-        if c["verdict"] == "unclear":
-            lang = c["language"]
+        if c["reason"].startswith("ruled no-go"):
             o.append(f"- **{c['repo'][3:]}** ({c['readme_licence']}; {c['train_sentences'] or 0} train sentences): {c['reason']}")
     o.append("\n**go with a condition or note**:\n")
     for c in cat:
@@ -175,7 +181,7 @@ def licences_doc(cat, langs, docs):
         c = by_repo.get("UD_" + tb)
         v = c["verdict"] if c else "not in r2.18"
         if u == "Romanian-LegalNERo":
-            res = "unclear: the UNER README says \"Initially, the LegalNERo dataset was made available under the license CC BY-NC-ND 4.0 ... The Zenodo version remains under that license. This UNER version of the work is provided under the license CC BY-SA 4.0\""
+            res = "out (ruled 2026-11-07), unclear terms: the UNER README says \"Initially, the LegalNERo dataset was made available under the license CC BY-NC-ND 4.0 ... The Zenodo version remains under that license. This UNER version of the work is provided under the license CC BY-SA 4.0\""
         elif v == "go":
             res = "go (train, dev, eval; SA lineage)"
         elif v == "eval-only":

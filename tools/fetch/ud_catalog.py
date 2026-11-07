@@ -147,6 +147,8 @@ def main():
     cat = []
     for r in rows:
         v, flag, why = verdict(r, work)
+        if v == "unclear":  # rulings of 2026-11-07, see ud_rulings.py
+            v, why = "no-go", "ruled no-go: " + why
         st = {s: (a, b) for s, a, b in zip(("train", "dev", "test"), r["sentences"].split(","), r["tokens"].split(","))}
         cat.append(dict(repo=r["repo"], language=r["language"], treebank=r["treebank"], readme_licence=r["readme_licence"],
                         licence_file=r["licence_file_head"], prefix=r["prefix"], splits=r["splits"],
@@ -178,8 +180,6 @@ def main():
             cls = "train-no-test"
         elif evalonly:
             cls = "eval-only"
-        elif any(t["verdict"] == "unclear" for t in tbs):
-            cls = "pending"
         else:
             cls = "gap"
         lrows.append(dict(language=lang, klass=cls, gating=gating["repo"] if gating else "",

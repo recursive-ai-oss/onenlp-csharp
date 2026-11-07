@@ -179,16 +179,14 @@ Release 2.18 (15 May 2026) has 353 treebanks in 193 languages. Each repository w
 |---|---|
 | go | 129 |
 | eval-only | 145 |
-| no-go | 57 |
-| unclear | 22 |
+| no-go | 79 |
 | total | 353 |
 
 | Language class | Languages |
 |---|---|
 | **train+eval**: at least one `go` treebank with training and test splits | 84 (of which 60 have 1,000 or more training sentences in the gating treebank and 20 fewer than 500) |
 | **eval-only**: only test-only or evaluation data is allowed | 84 |
-| **pending**: the only data is `unclear` (listed below) | 13 |
-| **gap**: every treebank is non-commercial: the accurate tier has no UD data | 12 |
+| **gap**: every treebank is non-commercial, research-only or otherwise ruled out: the accurate tier has no UD data | 25 |
 | total | 193 |
 
 The nine languages with fast-tier work (zh fr es pt de it tr nl, plus en) keep their treebanks and manifests; Hindi stays a recorded gap for training (HDTB is NC), with Hindi-PUD as its test set.
@@ -198,12 +196,12 @@ The nine languages with fast-tier work (zh fr es pt de it tr nl, plus en) keep t
 - **go**: the README licence line is CC BY-SA, CC BY, CC0, PD, LGPL-LR or another permissive licence, `LICENSE.txt` does not contradict it, no README sentence restricts the text, and the treebank has a training split. SA lineage is recorded in provenance. Credit goes in THIRD-PARTY-NOTICES.
 - **eval-only**: allowed licence but no training split (PUD and other test-only treebanks).
 - **no-go**: non-commercial or no-derivatives licence (the README line and `LICENSE.txt` agree), research-only text, platform-restricted text (tweets, Reddit), LDC-derived text, or the rulings of 2026-11-05.
-- **unclear**: the sources disagree (README says non-commercial, `LICENSE.txt` is the generic CC BY-SA 4.0 template, or the reverse) or the README names text whose terms it does not state. Not fetched, not used; listed below with the quotes for a ruling.
+- **Rulings of 2026-11-07 on the 22 treebanks that were `unclear`**: (1) the README says non-commercial and `LICENSE.txt` is the generic CC BY-SA template: no-go, the README statement wins; (2) CC BY-SA annotation over platform or terms-restricted text: no-go; (3) Polish-LFG (GNU GPL 3.0): no-go; (4) Ligurian-GLT (Computational Use of Data Agreement 1.0): go, credited. Nothing stays unclear.
 - The `LICENSE.txt` column abbreviates its first lines; `own text` means a bespoke document (read in full for the decision).
 
 ### Languages
 
-Gating treebank: among the `go` treebanks with training and test splits, the one the most published systems report (Stanza, UDPipe 2, Trankit), then the larger training set; the nine fast-tier languages keep theirs. Training sentences in brackets. *Extra training* are further `go` treebanks. *Test-only* are `eval-only` sets. *Not usable* lists `no-go` and `unclear` treebanks.
+Gating treebank: among the `go` treebanks with training and test splits, the one the most published systems report (Stanza, UDPipe 2, Trankit), then the larger training set; the nine fast-tier languages keep theirs. Training sentences in brackets. *Extra training* are further `go` treebanks. *Test-only* are `eval-only` sets. *Not usable* lists `no-go` treebanks.
 
 | Language | Class | Gating treebank (train sentences) | Extra training | Test-only | Not usable |
 |---|---|---|---|---|---|
@@ -216,7 +214,7 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | Alemannic | eval-only |  |  | Alemannic-DIVITAL, Alemannic-UZH |  |
 | Amharic | eval-only |  |  | Amharic-ATT |  |
 | Ancient Greek | train+eval | Ancient_Greek-PTNK (727) |  |  | no-go: Ancient_Greek-PROIEL, Ancient_Greek-Perseus |
-| Ancient Hebrew | pending |  |  |  | unclear: Ancient_Hebrew-PTNK |
+| Ancient Hebrew | gap |  |  |  | no-go: Ancient_Hebrew-PTNK |
 | Apurina | eval-only |  |  | Apurina-UFPA |  |
 | Arabic | eval-only |  |  | Arabic-PUD | no-go: Arabic-NYUAD, Arabic-PADT |
 | Armenian | train+eval | Armenian-ArmTDP (4,352) | Armenian-BSUT |  |  |
@@ -227,7 +225,7 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | Basque | gap |  |  |  | no-go: Basque-BDT |
 | Bavarian | eval-only |  |  | Bavarian-MaiBaam |  |
 | Beja | eval-only |  |  | Beja-Autogramm |  |
-| Belarusian | pending |  |  |  | unclear: Belarusian-HSE |
+| Belarusian | gap |  |  |  | no-go: Belarusian-HSE |
 | Bengali | eval-only |  |  | Bengali-BRU |  |
 | Bhojpuri | eval-only |  |  | Bhojpuri-BHTB |  |
 | Bokota | eval-only |  |  | Bokota-ChibErgIS |  |
@@ -241,8 +239,8 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | Catalan | train+eval | Catalan-AnCora (13,123) |  |  |  |
 | Cebuano | eval-only |  |  | Cebuano-GJA |  |
 | Central Kurdish | train+eval | Central_Kurdish-Mukri (92) |  |  |  |
-| Chinese | train+eval | Chinese-GSDSimp (3,997) | Chinese-GSD | Chinese-CFL, Chinese-HK, Chinese-PUD | no-go: Chinese-Beginner; unclear: Chinese-PatentChar |
-| Chintang | pending |  |  |  | unclear: Chintang-CTNTB |
+| Chinese | train+eval | Chinese-GSDSimp (3,997) | Chinese-GSD | Chinese-CFL, Chinese-HK, Chinese-PUD | no-go: Chinese-Beginner, Chinese-PatentChar |
+| Chintang | gap |  |  |  | no-go: Chintang-CTNTB |
 | Chukchi | eval-only |  |  | Chukchi-HSE |  |
 | Classical Armenian | gap |  |  |  | no-go: Classical_Armenian-CAVaL |
 | Classical Chinese | train+eval | Classical_Chinese-Kyoto (74,609) |  | Classical_Chinese-TueCL |  |
@@ -255,9 +253,9 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | English | train+eval | English-EWT (12,544) | English-Atis, English-CHILDES, English-ESLSpok | English-CTeTex, English-LittlePrince, English-PUD, English-Pronouns | no-go: English-GENTLE, English-GUM, English-GUMReddit, English-LinES, English-ParTUT |
 | Erzya | train+eval | Erzya-JR (1,217) |  |  |  |
 | Esperanto | eval-only |  |  | Esperanto-Cairo, Esperanto-Prago |  |
-| Estonian | pending |  |  |  | no-go: Estonian-EDT; unclear: Estonian-EWT |
+| Estonian | gap |  |  |  | no-go: Estonian-EDT, Estonian-EWT |
 | Faroese | train+eval | Faroese-FarPaHC (1,020) |  | Faroese-OFT |  |
-| Finnish | train+eval | Finnish-FTB (14,981) | Finnish-TDT | Finnish-PUD | unclear: Finnish-OOD |
+| Finnish | train+eval | Finnish-FTB (14,981) | Finnish-TDT | Finnish-PUD | no-go: Finnish-OOD |
 | French | train+eval | French-GSD (14,450) | French-ALTS, French-ParisStories, French-Rhapsodie, French-Sequoia | French-FQB, French-PUD, French-PoitevinDIVITAL | no-go: French-ParTUT |
 | Frisian Dutch | eval-only |  |  | Frisian_Dutch-Fame |  |
 | Galician | train+eval | Galician-TreeGal (600) |  | Galician-PUD | no-go: Galician-CTG |
@@ -266,7 +264,7 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | Gheg | eval-only |  |  | Gheg-GPS |  |
 | Gorontalo | eval-only |  |  | Gorontalo-BungoLoLombi |  |
 | Gothic | gap |  |  |  | no-go: Gothic-PROIEL |
-| Greek | train+eval | Greek-GUD (1,071) | Greek-Cretan, Greek-Messinian | Greek-Lesbian | no-go: Greek-GDT; unclear: Greek-GLCII |
+| Greek | train+eval | Greek-GUD (1,071) | Greek-Cretan, Greek-Messinian | Greek-Lesbian | no-go: Greek-GDT, Greek-GLCII |
 | Guajajara | eval-only |  |  | Guajajara-TuDeT |  |
 | Guarani | eval-only |  |  | Guarani-OldTuDeT |  |
 | Gujarati | eval-only |  |  | Gujarati-GujTB |  |
@@ -291,14 +289,14 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | Karelian | eval-only |  |  | Karelian-KKPP |  |
 | Karo | eval-only |  |  | Karo-TuDeT |  |
 | Kazakh | train+eval | Kazakh-KTB (31) |  |  |  |
-| Khoekhoe | pending |  |  |  | unclear: Khoekhoe-KDT |
+| Khoekhoe | gap |  |  |  | no-go: Khoekhoe-KDT |
 | Kiche | eval-only |  |  | Kiche-IU |  |
 | Komi Permyak | train+eval | Komi_Permyak-UH (34) |  |  |  |
 | Komi Zyrian | train+eval | Komi_Zyrian-Lattice (20) |  | Komi_Zyrian-IKDP |  |
 | Korean | train+eval | Korean-Kaist (23,010) | Korean-GSD, Korean-KSL | Korean-LittlePrince, Korean-PUD |  |
 | Kyrgyz | train+eval | Kyrgyz-KTMU (1,308) |  | Kyrgyz-TueCL |  |
 | Latgalian | eval-only |  |  | Latgalian-Cairo |  |
-| Latin | train+eval | Latin-LLCT (7,289) | Latin-CIRCSE |  | no-go: Latin-ITTB, Latin-PROIEL, Latin-Perseus; unclear: Latin-UDante |
+| Latin | train+eval | Latin-LLCT (7,289) | Latin-CIRCSE |  | no-go: Latin-ITTB, Latin-PROIEL, Latin-Perseus, Latin-UDante |
 | Latvian | train+eval | Latvian-LVTB (15,059) |  | Latvian-Cairo |  |
 | Ligurian | train+eval | Ligurian-GLT (20) |  |  |  |
 | Lithuanian | train+eval | Lithuanian-ALKSNIS (2,341) | Lithuanian-HSE |  |  |
@@ -307,18 +305,18 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | Luxembourgish | eval-only |  |  | Luxembourgish-LuxBank |  |
 | Macedonian | eval-only |  |  | Macedonian-MTB |  |
 | Madi | eval-only |  |  | Madi-Jarawara |  |
-| Maghrebi Arabic French | pending |  |  |  | unclear: Maghrebi_Arabic_French-Arabizi |
+| Maghrebi Arabic French | gap |  |  |  | no-go: Maghrebi_Arabic_French-Arabizi |
 | Makurap | eval-only |  |  | Makurap-TuDeT |  |
 | Malayalam | eval-only |  |  | Malayalam-UFAL |  |
 | Maltese | train+eval | Maltese-MUDT (1,123) |  |  |  |
-| Manx | pending |  |  |  | unclear: Manx-Cadhan |
+| Manx | gap |  |  |  | no-go: Manx-Cadhan |
 | Marathi | train+eval | Marathi-UFAL (373) | Marathi-CMUPAN |  |  |
-| Mbya Guarani | pending |  |  |  | unclear: Mbya_Guarani-Thomas |
+| Mbya Guarani | gap |  |  |  | no-go: Mbya_Guarani-Thomas |
 | Middle Armenian | eval-only |  |  | Middle_Armenian-ArmTDP |  |
-| Middle French | eval-only |  |  | Middle_French-ALTM | unclear: Middle_French-PROFITEROLE |
+| Middle French | eval-only |  |  | Middle_French-ALTM | no-go: Middle_French-PROFITEROLE |
 | Moksha | train+eval | Moksha-JR (22) |  |  |  |
 | Munduruku | eval-only |  |  | Munduruku-TuDeT |  |
-| Naga | pending |  |  |  | unclear: Naga-Suansu |
+| Naga | gap |  |  |  | no-go: Naga-Suansu |
 | Naija | train+eval | Naija-NSC (7,279) |  |  |  |
 | Neapolitan | eval-only |  |  | Neapolitan-RB |  |
 | Nenets | eval-only |  |  | Nenets-Tundra |  |
@@ -328,12 +326,12 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | Northern Kurdish | train+eval | Northern_Kurdish-Kurmanji (20) |  |  |  |
 | Northwest Gbaya | eval-only |  |  | Northwest_Gbaya-Autogramm |  |
 | Norwegian | train+eval | Norwegian-Bokmaal (15,696) | Norwegian-Nynorsk |  |  |
-| Occitan | pending |  |  |  | unclear: Occitan-TTB |
+| Occitan | gap |  |  |  | no-go: Occitan-TTB |
 | Odia | eval-only |  |  | Odia-ODTB |  |
 | Old Church Slavonic | gap |  |  |  | no-go: Old_Church_Slavonic-PROIEL |
 | Old East Slavic | train+eval | Old_East_Slavic-RNC (3,778) | Old_East_Slavic-Birchbark, Old_East_Slavic-Ruthenian |  | no-go: Old_East_Slavic-TOROT |
 | Old English | eval-only |  |  | Old_English-Cairo |  |
-| Old French | eval-only |  |  | Old_French-ALTM | unclear: Old_French-PROFITEROLE |
+| Old French | eval-only |  |  | Old_French-ALTM | no-go: Old_French-PROFITEROLE |
 | Old Georgian | eval-only |  |  | Old_Georgian-GLC |  |
 | Old Irish | eval-only |  |  | Old_Irish-DipWBG | no-go: Old_Irish-DipSGG |
 | Old Occitan | train+eval | Old_Occitan-CorAG (1,092) |  |  |  |
@@ -344,13 +342,13 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | Persian | train+eval | Persian-Seraji (4,798) | Persian-PerDT |  |  |
 | Pesh | eval-only |  |  | Pesh-ChibErgIS |  |
 | Phrygian | eval-only |  |  | Phrygian-KUL |  |
-| Polish | train+eval | Polish-MPDT (1,433) |  | Polish-PUD | no-go: Polish-PDB; unclear: Polish-LFG |
+| Polish | train+eval | Polish-MPDT (1,433) |  | Polish-PUD | no-go: Polish-PDB, Polish-LFG |
 | Pomak | gap |  |  |  | no-go: Pomak-Philotis |
 | Portuguese | train+eval | Portuguese-Bosque (7,018) | Portuguese-GSD, Portuguese-PetroGold, Portuguese-Porttinari | Portuguese-PUD | no-go: Portuguese-CINTIL, Portuguese-DANTEStocks |
 | Punjabi | train+eval | Punjabi-Rang (81) | Punjabi-CS |  |  |
-| Romanian | train+eval | Romanian-RRT (8,043) | Romanian-SiMoNERo | Romanian-ArT, Romanian-MolDoRo | no-go: Romanian-TueCL; unclear: Romanian-Nonstandard |
-| Russian | train+eval | Russian-GSD (3,850) | Russian-Poetry | Russian-PUD | no-go: Russian-SynTagRus; unclear: Russian-Taiga |
-| Ruuli | pending |  |  |  | unclear: Ruuli-RDT |
+| Romanian | train+eval | Romanian-RRT (8,043) | Romanian-SiMoNERo | Romanian-ArT, Romanian-MolDoRo | no-go: Romanian-TueCL, Romanian-Nonstandard |
+| Russian | train+eval | Russian-GSD (3,850) | Russian-Poetry | Russian-PUD | no-go: Russian-SynTagRus, Russian-Taiga |
+| Ruuli | gap |  |  |  | no-go: Ruuli-RDT |
 | Sanskrit | train+eval | Sanskrit-Vedic (21,477) |  | Sanskrit-UFAL |  |
 | Scottish Gaelic | train+eval | Scottish_Gaelic-ARCOSG (3,544) |  |  |  |
 | Serbian | train+eval | Serbian-SET (3,328) |  |  |  |
@@ -378,7 +376,7 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | Tupinamba | eval-only |  |  | Tupinamba-TuDeT |  |
 | Turkish | train+eval | Turkish-BOUN (7,803) | Turkish-Atis, Turkish-FrameNet, Turkish-Kenet, Turkish-Tourism | Turkish-GB, Turkish-PUD, Turkish-TueCL | no-go: Turkish-IMST, Turkish-Penn |
 | Turkish English | eval-only |  |  | Turkish_English-BUTR |  |
-| Turkish German | pending |  |  |  | unclear: Turkish_German-SAGT |
+| Turkish German | gap |  |  |  | no-go: Turkish_German-SAGT |
 | Ukrainian | train+eval | Ukrainian-ParlaMint (5,611) |  |  | no-go: Ukrainian-IU |
 | Umbrian | eval-only |  |  | Umbrian-IKUVINA |  |
 | Upper Sorbian | eval-only |  |  | Upper_Sorbian-UFAL |  |
@@ -393,13 +391,45 @@ Gating treebank: among the `go` treebanks with training and test splits, the one
 | Western Sierra Puebla Nahuatl | eval-only |  |  | Western_Sierra_Puebla_Nahuatl-MesoTree |  |
 | Wolof | train+eval | Wolof-WTB (1,188) |  |  |  |
 | Xavante | eval-only |  |  | Xavante-XDT |  |
-| Xibe | pending |  |  |  | unclear: Xibe-XDT |
+| Xibe | gap |  |  |  | no-go: Xibe-XDT |
 | Yakut | eval-only |  |  | Yakut-YKTDT |  |
 | Yiddish | train+eval | Yiddish-YiTB (1,877) |  |  |  |
 | Yoruba | eval-only |  |  | Yoruba-YTB |  |
 | Yupik | eval-only |  |  | Yupik-SLI |  |
 | Zaar | train+eval | Zaar-Autogramm (978) |  |  |  |
 | Zazaki | train+eval | Zazaki-ZSD (138) |  |  |  |
+
+### Languages without an accurate-tier model
+
+Every treebank of these languages is ruled out, so there is no allowed training data. Hindi has UD data only in the test-only PUD set (HDTB is non-commercial); its fast-tier model is trained on labels from the accurate tier.
+
+| Language | Treebanks and why they are out |
+|---|---|
+| Ancient Hebrew | Ancient_Hebrew-PTNK: ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC 4.0, but LICENSE |
+| Basque | Basque-BDT: README licence line CC BY-NC-SA 3.0; LICENSE.txt agrees |
+| Belarusian | Belarusian-HSE: ruled no-go (terms-restricted text): README: genre list includes "5) social media: messages from the Telegram |
+| Bulgarian | Bulgarian-BTB: README licence line CC BY-NC-SA 3.0; LICENSE.txt agrees |
+| Chintang | Chintang-CTNTB: ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICE |
+| Classical Armenian | Classical_Armenian-CAVaL: README licence line CC BY-NC-SA 4.0; LICENSE.txt agrees |
+| Estonian | Estonian-EDT: README licence line CC BY-NC-SA 4.0; LICENSE.txt agrees; Estonian-EWT: ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICE |
+| Gothic | Gothic-PROIEL: README licence line CC BY-NC-SA 3.0; LICENSE.txt agrees |
+| Hungarian | Hungarian-Szeged: README licence line CC BY-NC-SA 3.0; LICENSE.txt agrees |
+| Kadiweu | Kadiweu-Unicamp: README licence line CC BY-NC-SA 4.0; LICENSE.txt agrees |
+| Khoekhoe | Khoekhoe-KDT: ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICE |
+| Maghrebi Arabic French | Maghrebi_Arabic_French-Arabizi: ruled no-go (terms-restricted text): README: sources include "Algerian newspaper’s web forums"; no statement a |
+| Manx | Manx-Cadhan: ruled no-go (terms-restricted text): README: sentences "came from a large web-crawled corpus of Manx"; genres |
+| Mbya Guarani | Mbya_Guarani-Thomas: ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICE |
+| Naga | Naga-Suansu: ruled no-go (terms-restricted text): README: test set includes "film_Bridge: Begining of the subtitles from Br |
+| Nheengatu | Nheengatu-CompLin: README licence line CC BY-NC-SA 4.0; LICENSE.txt agrees |
+| Occitan | Occitan-TTB: ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICE |
+| Old Church Slavonic | Old_Church_Slavonic-PROIEL: README licence line CC BY-NC-SA 4.0; LICENSE.txt agrees |
+| Pomak | Pomak-Philotis: README licence line CC BY-NC-SA 3.0; LICENSE.txt agrees |
+| Ruuli | Ruuli-RDT: ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICE |
+| Shanghainese | Shanghainese-ShUD: README: the source corpus is "licensed under Creative Commons BY-NC-ND 4.0", with "additional permission for d |
+| South Levantine Arabic | South_Levantine_Arabic-MADAR: README: sentences come from the MADAR parallel corpus, built on BTEC; the MADAR corpus "is made available to t |
+| Turkish German | Turkish_German-SAGT: ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICE |
+| Urdu | Urdu-UDTB: README licence line CC BY-NC-SA 4.0; LICENSE.txt agrees |
+| Xibe | Xibe-XDT: ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 3.0, but LICE |
 
 ### Treebanks
 
@@ -421,7 +451,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Ancient_Greek-PROIEL | CC BY-NC-SA 3.0 | own text | 15016/1019/1047 | no-go |
 | Ancient_Greek-PTNK | CC BY-SA 4.0 | CC BY-SA 4.0 | 727/439/410 | go |
 | Ancient_Greek-Perseus | CC BY-NC-SA 2.5 | own text | 11476/1137/1306 | no-go |
-| Ancient_Hebrew-PTNK | CC BY-NC 4.0 | CC BY-SA 4.0 | 4417/639/552 | unclear (conflict) |
+| Ancient_Hebrew-PTNK | CC BY-NC 4.0 | CC BY-SA 4.0 | 4417/639/552 | no-go (conflict) |
 | Apurina-UFPA | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/183 | eval-only |
 | Arabic-NYUAD | CC BY-SA 4.0 | CC BY-SA 4.0 | 15789/1986/1963 | no-go |
 | Arabic-PADT | CC BY-NC-SA 3.0 | own text | 6075/909/680 | no-go |
@@ -435,7 +465,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Basque-BDT | CC BY-NC-SA 3.0 | CC BY-NC-SA | 5396/1798/1799 | no-go |
 | Bavarian-MaiBaam | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/1070 | eval-only |
 | Beja-Autogramm | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/763 | eval-only |
-| Belarusian-HSE | CC BY-SA 4.0 | CC BY-SA 4.0 | 22853/1301/1077 | unclear |
+| Belarusian-HSE | CC BY-SA 4.0 | CC BY-SA 4.0 | 22853/1301/1077 | no-go |
 | Bengali-BRU | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/56 | eval-only |
 | Bhojpuri-BHTB | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/357 | eval-only |
 | Bokota-ChibErgIS | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/406 | eval-only |
@@ -456,8 +486,8 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Chinese-GSDSimp | CC BY-SA 4.0 | CC BY-SA 4.0 | 3997/500/500 | go |
 | Chinese-HK | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/1004 | eval-only |
 | Chinese-PUD | CC BY-SA 3.0 | CC BY-SA 3.0 | -/-/1000 | eval-only |
-| Chinese-PatentChar | CC BY-NC-SA 3.0 | CC BY-SA 4.0 | -/-/200 | unclear (conflict) |
-| Chintang-CTNTB | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | -/-/2289 | unclear (conflict) |
+| Chinese-PatentChar | CC BY-NC-SA 3.0 | CC BY-SA 4.0 | -/-/200 | no-go (conflict) |
+| Chintang-CTNTB | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | -/-/2289 | no-go (conflict) |
 | Chukchi-HSE | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/1004 | eval-only |
 | Classical_Armenian-CAVaL | CC BY-NC-SA 4.0 | CC BY-NC-SA | 3795/423/563 | no-go |
 | Classical_Chinese-Kyoto | PD | CC BY-SA 4.0 | 74609/6102/5528 | go |
@@ -492,11 +522,11 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Esperanto-Cairo | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/20 | eval-only |
 | Esperanto-Prago | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/131 | eval-only |
 | Estonian-EDT | CC BY-NC-SA 4.0 | own text | 24601/3122/3207 | no-go |
-| Estonian-EWT | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | 5444/833/913 | unclear (conflict) |
+| Estonian-EWT | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | 5444/833/913 | no-go (conflict) |
 | Faroese-FarPaHC | CC BY-SA 4.0 | CC BY-SA 4.0 | 1020/300/301 | go |
 | Faroese-OFT | CC BY-SA 4.0 | own text | -/-/1208 | eval-only |
 | Finnish-FTB | CC BY 4.0 | own text | 14981/1875/1867 | go |
-| Finnish-OOD | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/2122 | unclear |
+| Finnish-OOD | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/2122 | no-go |
 | Finnish-PUD | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/1000 | eval-only |
 | Finnish-TDT | CC BY-SA 4.0 | own text | 12217/1364/1555 | go |
 | French-ALTS | CC BY-SA 4.0 | CC BY-SA 4.0 | 1202/154/670 | go |
@@ -523,7 +553,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Gothic-PROIEL | CC BY-NC-SA 3.0 | own text | 3387/985/1029 | no-go |
 | Greek-Cretan | CC BY-SA 4.0 | CC BY-SA 4.0 | 180/60/30 | go |
 | Greek-GDT | CC BY-NC-SA 3.0 | own text | 1662/403/456 | no-go |
-| Greek-GLCII | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | -/-/671 | unclear (conflict) |
+| Greek-GLCII | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | -/-/671 | no-go (conflict) |
 | Greek-GUD | CC BY-SA 4.0 | CC BY-SA 4.0 | 1071/-/736 | go |
 | Greek-Lesbian | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/625 | eval-only |
 | Greek-Messinian | CC BY-SA 4.0 | CC BY-SA 4.0 | 60/20/30 | go |
@@ -581,7 +611,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Karelian-KKPP | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/228 | eval-only |
 | Karo-TuDeT | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/674 | eval-only |
 | Kazakh-KTB | CC BY-SA 4.0 | CC BY-SA 4.0 | 31/-/1047 | go |
-| Khoekhoe-KDT | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | 2002/232/1355 | unclear (conflict) |
+| Khoekhoe-KDT | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | 2002/232/1355 | no-go (conflict) |
 | Kiche-IU | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/1435 | eval-only |
 | Komi_Permyak-UH | CC BY-SA 4.0 | CC BY-SA 4.0 | 34/-/106 | go |
 | Komi_Zyrian-IKDP | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/214 | eval-only |
@@ -599,7 +629,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Latin-LLCT | CC BY-SA 4.0 | CC BY-SA 4.0 | 7289/850/884 | go |
 | Latin-PROIEL | CC BY-NC-SA 3.0 | own text | 16196/1233/1260 | no-go |
 | Latin-Perseus | CC BY-NC-SA 2.5 | own text | 1334/-/939 | no-go |
-| Latin-UDante | CC BY-NC-SA 3.0 | CC BY-SA 4.0 | 926/376/421 | unclear (conflict) |
+| Latin-UDante | CC BY-NC-SA 3.0 | CC BY-SA 4.0 | 926/376/421 | no-go (conflict) |
 | Latvian-Cairo | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/20 | eval-only |
 | Latvian-LVTB | CC BY-SA 4.0 | CC BY-SA 4.0 | 15059/2109/2412 | go |
 | Ligurian-GLT | C-UDA 1.0 | C-UDA 1.0 | 20/-/296 | go |
@@ -610,20 +640,20 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Luxembourgish-LuxBank | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/20 | eval-only |
 | Macedonian-MTB | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/155 | eval-only |
 | Madi-Jarawara | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/20 | eval-only |
-| Maghrebi_Arabic_French-Arabizi | CC BY-SA 4.0 | CC BY-SA 4.0 | 1003/139/145 | unclear |
+| Maghrebi_Arabic_French-Arabizi | CC BY-SA 4.0 | CC BY-SA 4.0 | 1003/139/145 | no-go |
 | Makurap-TuDeT | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/37 | eval-only |
 | Malayalam-UFAL | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/218 | eval-only |
 | Maltese-MUDT | CC BY-SA 4.0 | CC BY-SA 4.0 | 1123/433/518 | go |
-| Manx-Cadhan | CC BY-SA 4.0 | CC BY-SA 4.0 | 1172/-/1164 | unclear |
+| Manx-Cadhan | CC BY-SA 4.0 | CC BY-SA 4.0 | 1172/-/1164 | no-go |
 | Marathi-CMUPAN | CC BY-SA 4.0 | CC BY-SA 4.0 | 7616/987/1003 | go |
 | Marathi-UFAL | CC BY-SA 4.0 | CC BY-SA 4.0 | 373/46/47 | go |
-| Mbya_Guarani-Thomas | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | -/-/98 | unclear (conflict) |
+| Mbya_Guarani-Thomas | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | -/-/98 | no-go (conflict) |
 | Middle_Armenian-ArmTDP | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/27 | eval-only |
 | Middle_French-ALTM | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/217 | eval-only |
-| Middle_French-PROFITEROLE | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | 4496/569/906 | unclear (conflict) |
+| Middle_French-PROFITEROLE | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | 4496/569/906 | no-go (conflict) |
 | Moksha-JR | CC BY-SA 4.0 | CC BY-SA 4.0 | 22/-/468 | go |
 | Munduruku-TuDeT | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/158 | eval-only |
-| Naga-Suansu | CC BY-SA 4.0 | CC BY-SA 4.0 | 20/-/564 | unclear |
+| Naga-Suansu | CC BY-SA 4.0 | CC BY-SA 4.0 | 20/-/564 | no-go |
 | Naija-NSC | CC BY-SA 4.0 | CC BY-SA 4.0 | 7279/990/972 | go |
 | Neapolitan-RB | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/20 | eval-only |
 | Nenets-Tundra | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/170 | eval-only |
@@ -634,7 +664,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Northwest_Gbaya-Autogramm | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/403 | eval-only |
 | Norwegian-Bokmaal | CC BY-SA 4.0 | CC BY-SA 4.0 | 15696/2409/1939 | go |
 | Norwegian-Nynorsk | CC BY-SA 4.0 | CC BY-SA 4.0 | 14174/1890/1511 | go |
-| Occitan-TTB | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | 830/79/613 | unclear (conflict) |
+| Occitan-TTB | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | 830/79/613 | no-go (conflict) |
 | Odia-ODTB | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/456 | eval-only |
 | Old_Church_Slavonic-PROIEL | CC BY-NC-SA 4.0 | CC BY-NC-SA | 18327/2205/2096 | no-go |
 | Old_East_Slavic-Birchbark | CC BY-SA 4.0 | CC BY-SA 4.0 | 1113/1062/1009 | go |
@@ -643,7 +673,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Old_East_Slavic-TOROT | CC BY-NC-SA 4.0 | CC BY-NC-SA | 20480/3061/2955 | no-go |
 | Old_English-Cairo | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/20 | eval-only |
 | Old_French-ALTM | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/553 | eval-only |
-| Old_French-PROFITEROLE | CC BY-NC-SA 3.0 | CC BY-SA 4.0 | 15955/2143/2252 | unclear (conflict) |
+| Old_French-PROFITEROLE | CC BY-NC-SA 3.0 | CC BY-SA 4.0 | 15955/2143/2252 | no-go (conflict) |
 | Old_Georgian-GLC | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/151 | eval-only |
 | Old_Irish-DipSGG | CC BY-NC-SA 4.0 | CC BY-NC-SA | -/-/64 | no-go |
 | Old_Irish-DipWBG | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/34 | eval-only |
@@ -659,7 +689,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Persian-Seraji | CC BY-SA 4.0 | CC BY-SA 4.0 | 4798/599/600 | go |
 | Pesh-ChibErgIS | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/524 | eval-only |
 | Phrygian-KUL | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/203 | eval-only |
-| Polish-LFG | GNU GPL 3.0 | GPL | 13774/1745/1727 | unclear |
+| Polish-LFG | GNU GPL 3.0 | GPL | 13774/1745/1727 | no-go |
 | Polish-MPDT | CC BY-SA 4.0 | CC BY-SA 4.0 | 1433/162/423 | go |
 | Polish-PDB | CC BY-NC-SA 4.0 | own text | 17722/2215/2215 | no-go |
 | Polish-PUD | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/1000 | eval-only |
@@ -675,7 +705,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Punjabi-Rang | CC BY-SA 4.0 | CC BY-SA 4.0 | 81/30/26 | go |
 | Romanian-ArT | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/50 | eval-only |
 | Romanian-MolDoRo | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/30 | eval-only |
-| Romanian-Nonstandard | CC BY-SA 4.0 | CC BY-SA 4.0 | 24121/1052/1052 | unclear |
+| Romanian-Nonstandard | CC BY-SA 4.0 | CC BY-SA 4.0 | 24121/1052/1052 | no-go |
 | Romanian-RRT | CC BY-SA 4.0 | CC BY-SA 4.0 | 8043/752/729 | go |
 | Romanian-SiMoNERo | CC BY-SA 4.0 | CC BY-SA 4.0 | 3747/443/491 | go |
 | Romanian-TueCL | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/210 | no-go |
@@ -683,8 +713,8 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Russian-PUD | CC BY-SA 3.0 | CC BY-SA 3.0 | -/-/1000 | eval-only |
 | Russian-Poetry | CC BY-SA 4.0 | CC BY-SA 4.0 | 3568/789/728 | go |
 | Russian-SynTagRus | CC BY-NC-SA 4.0 | CC BY-NC-SA | 69631/8906/8800 | no-go |
-| Russian-Taiga | CC BY-SA 4.0 | CC BY-SA 4.0 | 119490/1260/1217 | unclear |
-| Ruuli-RDT | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | -/-/1234 | unclear (conflict) |
+| Russian-Taiga | CC BY-SA 4.0 | CC BY-SA 4.0 | 119490/1260/1217 | no-go |
+| Ruuli-RDT | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | -/-/1234 | no-go (conflict) |
 | Sanskrit-UFAL | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/230 | eval-only |
 | Sanskrit-Vedic | CC BY-SA 4.0 | CC BY-SA 4.0 | 21477/2996/2709 | go |
 | Scottish_Gaelic-ARCOSG | CC BY-SA 4.0 | CC BY-SA 4.0 | 3544/656/548 | go |
@@ -734,7 +764,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Turkish-Tourism | CC BY-SA 4.0 | CC BY-SA 4.0 | 15473/2166/2191 | go |
 | Turkish-TueCL | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/148 | eval-only |
 | Turkish_English-BUTR | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/58 | eval-only |
-| Turkish_German-SAGT | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | 578/801/805 | unclear (conflict) |
+| Turkish_German-SAGT | CC BY-NC-SA 4.0 | CC BY-SA 4.0 | 578/801/805 | no-go (conflict) |
 | Ukrainian-IU | CC BY-NC-SA 4.0 | CC BY-NC-SA | 5521/673/898 | no-go |
 | Ukrainian-ParlaMint | CC BY-SA 4.0 | CC BY-SA 4.0 | 5611/739/792 | go |
 | Umbrian-IKUVINA | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/202 | eval-only |
@@ -753,7 +783,7 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 | Western_Sierra_Puebla_Nahuatl-MesoTree | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/3024 | eval-only |
 | Wolof-WTB | CC BY-SA 4.0 | CC BY-SA 4.0 | 1188/449/470 | go |
 | Xavante-XDT | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/248 | eval-only |
-| Xibe-XDT | CC BY-NC-SA 3.0 | CC BY-SA 4.0 | -/-/810 | unclear (conflict) |
+| Xibe-XDT | CC BY-NC-SA 3.0 | CC BY-SA 4.0 | -/-/810 | no-go (conflict) |
 | Yakut-YKTDT | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/299 | eval-only |
 | Yiddish-YiTB | CC BY-SA 4.0 | CC BY-SA 4.0 | 1877/157/1079 | go |
 | Yoruba-YTB | CC BY-SA 4.0 | CC BY-SA 4.0 | -/-/317 | eval-only |
@@ -776,30 +806,30 @@ Splits are sentence counts (train/dev/test) from `stats.xml`. "Licence line" is 
 - **South_Levantine_Arabic-MADAR**: README: sentences come from the MADAR parallel corpus, built on BTEC; the MADAR corpus "is made available to the research community under a non-commercial license" (NYU Abu Dhabi CAMeL Lab resources page)
 - **Turkish-Penn**: sentences translated from the LDC Penn Treebank (ruled)
 
-**unclear** (not fetched; each needs a ruling):
+**ruled no-go from `unclear`** (not fetched; the quotes behind the rulings):
 
-- **Ancient_Hebrew-PTNK** (CC BY-NC 4.0; 4417 train sentences): README licence line says CC BY-NC 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Belarusian-HSE** (CC BY-SA 4.0; 22853 train sentences): README: genre list includes "5) social media: messages from the Telegram channels"; annotations CC BY-SA 4.0, no statement about the channel text
-- **Chinese-PatentChar** (CC BY-NC-SA 3.0; 0 train sentences): README licence line says CC BY-NC-SA 3.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Chintang-CTNTB** (CC BY-NC-SA 4.0; 0 train sentences): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Estonian-EWT** (CC BY-NC-SA 4.0; 5444 train sentences): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Finnish-OOD** (CC BY-SA 4.0; 0 train sentences): README: texts from "nursing narratives (hospital patient records), discussion forums, tweets, general web crawls and poetry"; "The underlying texts come from various sources collected from the Internet. These may hold different copyright owners."
-- **Greek-GLCII** (CC BY-NC-SA 4.0; 0 train sentences): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Khoekhoe-KDT** (CC BY-NC-SA 4.0; 2002 train sentences): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Latin-UDante** (CC BY-NC-SA 3.0; 926 train sentences): README licence line says CC BY-NC-SA 3.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Maghrebi_Arabic_French-Arabizi** (CC BY-SA 4.0; 1003 train sentences): README: sources include "Algerian newspaper’s web forums"; no statement about the forum text
-- **Manx-Cadhan** (CC BY-SA 4.0; 1172 train sentences): README: sentences "came from a large web-crawled corpus of Manx"; genres include blog and social
-- **Mbya_Guarani-Thomas** (CC BY-NC-SA 4.0; 0 train sentences): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Middle_French-PROFITEROLE** (CC BY-NC-SA 4.0; 4496 train sentences): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Naga-Suansu** (CC BY-SA 4.0; 20 train sentences): README: test set includes "film_Bridge: Begining of the subtitles from Bridge of Spies (2015)" (a commercial film’s subtitles); the rest is grammar examples
-- **Occitan-TTB** (CC BY-NC-SA 4.0; 830 train sentences): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Old_French-PROFITEROLE** (CC BY-NC-SA 3.0; 15955 train sentences): README licence line says CC BY-NC-SA 3.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Polish-LFG** (GNU GPL 3.0; 13774 train sentences): licence line and LICENSE.txt: GNU GPL 3.0 on a treebank (copyleft terms for data, and for what is trained on it, are untested); 3% of the text is forums and chatrooms
-- **Romanian-Nonstandard** (CC BY-SA 4.0; 24121 train sentences): README: nonstandard genres "Old Romanian, Chat, Folklore"; the chat source is not stated
-- **Russian-Taiga** (CC BY-SA 4.0; 119490 train sentences): README: "source: vk.com, instagram, facebook, twitter, youtube comments, questions & answers (otvet.mail.ru), reviews (reviews.yandex.ru)"; annotations CC BY-SA 4.0, no statement about the platform text
-- **Ruuli-RDT** (CC BY-NC-SA 4.0; 0 train sentences): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Turkish_German-SAGT** (CC BY-NC-SA 4.0; 578 train sentences): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
-- **Xibe-XDT** (CC BY-NC-SA 3.0; 0 train sentences): README licence line says CC BY-NC-SA 3.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Ancient_Hebrew-PTNK** (CC BY-NC 4.0; 4417 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Belarusian-HSE** (CC BY-SA 4.0; 22853 train sentences): ruled no-go (terms-restricted text): README: genre list includes "5) social media: messages from the Telegram channels"; annotations CC BY-SA 4.0, no statement about the channel text
+- **Chinese-PatentChar** (CC BY-NC-SA 3.0; 0 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 3.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Chintang-CTNTB** (CC BY-NC-SA 4.0; 0 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Estonian-EWT** (CC BY-NC-SA 4.0; 5444 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Finnish-OOD** (CC BY-SA 4.0; 0 train sentences): ruled no-go (terms-restricted text): README: texts from "nursing narratives (hospital patient records), discussion forums, tweets, general web crawls and poetry"; "The underlying texts come from various sources collected from the Internet. These may hold different copyright owners."
+- **Greek-GLCII** (CC BY-NC-SA 4.0; 0 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Khoekhoe-KDT** (CC BY-NC-SA 4.0; 2002 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Latin-UDante** (CC BY-NC-SA 3.0; 926 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 3.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Maghrebi_Arabic_French-Arabizi** (CC BY-SA 4.0; 1003 train sentences): ruled no-go (terms-restricted text): README: sources include "Algerian newspaper’s web forums"; no statement about the forum text
+- **Manx-Cadhan** (CC BY-SA 4.0; 1172 train sentences): ruled no-go (terms-restricted text): README: sentences "came from a large web-crawled corpus of Manx"; genres include blog and social
+- **Mbya_Guarani-Thomas** (CC BY-NC-SA 4.0; 0 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Middle_French-PROFITEROLE** (CC BY-NC-SA 4.0; 4496 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Naga-Suansu** (CC BY-SA 4.0; 20 train sentences): ruled no-go (terms-restricted text): README: test set includes "film_Bridge: Begining of the subtitles from Bridge of Spies (2015)" (a commercial film’s subtitles); the rest is grammar examples
+- **Occitan-TTB** (CC BY-NC-SA 4.0; 830 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Old_French-PROFITEROLE** (CC BY-NC-SA 3.0; 15955 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 3.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Polish-LFG** (GNU GPL 3.0; 13774 train sentences): ruled no-go (GNU GPL 3.0 on a treebank): licence line and LICENSE.txt: GNU GPL 3.0 on a treebank (copyleft terms for data, and for what is trained on it, are untested); 3% of the text is forums and chatrooms
+- **Romanian-Nonstandard** (CC BY-SA 4.0; 24121 train sentences): ruled no-go (terms-restricted text): README: nonstandard genres "Old Romanian, Chat, Folklore"; the chat source is not stated
+- **Russian-Taiga** (CC BY-SA 4.0; 119490 train sentences): ruled no-go (terms-restricted text): README: "source: vk.com, instagram, facebook, twitter, youtube comments, questions & answers (otvet.mail.ru), reviews (reviews.yandex.ru)"; annotations CC BY-SA 4.0, no statement about the platform text
+- **Ruuli-RDT** (CC BY-NC-SA 4.0; 0 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Turkish_German-SAGT** (CC BY-NC-SA 4.0; 578 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 4.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
+- **Xibe-XDT** (CC BY-NC-SA 3.0; 0 train sentences): ruled no-go (README statement over a template LICENSE.txt): README licence line says CC BY-NC-SA 3.0, but LICENSE.txt says: "The treebank is licensed under the Creative Commons License Attribution-ShareAlike 4.0 International. The complete"
 
 **go with a condition or note**:
 
@@ -840,11 +870,11 @@ UNER v1 (`github.com/UniversalNER`, listing read 2026-11-06) holds 31 datasets. 
 | UNER_Indonesian-PUD | Indonesian-PUD | eval-only | eval-only |
 | UNER_Japanese-PUD | Japanese-PUD | eval-only | eval-only |
 | UNER_Korean-PUD | Korean-PUD | eval-only | eval-only |
-| UNER_Maghrebi_Arabic_French-Arabizi | Maghrebi_Arabic_French-Arabizi | unclear | unclear |
+| UNER_Maghrebi_Arabic_French-Arabizi | Maghrebi_Arabic_French-Arabizi | no-go | no-go (its text is NC) |
 | UNER_Norwegian-NDT | Norwegian-Bokmaal | go | go (train, dev, eval; SA lineage) |
 | UNER_Portuguese-Bosque | Portuguese-Bosque | go | go (train, dev, eval; SA lineage) |
 | UNER_Portuguese-PUD | Portuguese-PUD | eval-only | eval-only |
-| UNER_Romanian-LegalNERo | Romanian-LegalNERo | not in r2.18 | unclear: the UNER README says "Initially, the LegalNERo dataset was made available under the license CC BY-NC-ND 4.0 ... The Zenodo version remains under that license. This UNER version of the work is provided under the license CC BY-SA 4.0" |
+| UNER_Romanian-LegalNERo | Romanian-LegalNERo | not in r2.18 | out (ruled 2026-11-07), unclear terms: the UNER README says "Initially, the LegalNERo dataset was made available under the license CC BY-NC-ND 4.0 ... The Zenodo version remains under that license. This UNER version of the work is provided under the license CC BY-SA 4.0" |
 | UNER_Russian-PUD | Russian-PUD | eval-only | eval-only |
 | UNER_Serbian-SET | Serbian-SET | go | go (train, dev, eval; SA lineage) |
 | UNER_Slovak-SNK | Slovak-SNK | go | go (train, dev, eval; SA lineage) |
@@ -868,16 +898,16 @@ Other named-entity corpora checked at their cards (a card's licence is the datas
 | hr500k `classla/hr500k` | hr | card: cc-by-sa-4.0; NER layer of the Croatian reference corpus | go (SA lineage) | Croatian NER |
 | RONEC `community-datasets/ronec` | ro | card: MIT; "sentences that are free of copyright" from SEETimes, Romanian Wikipedia and Common Crawl | go | Romanian NER (15 classes) |
 | SUCX 3.0 NER `KBLab/sucx3_ner` | sv | card: cc-by-4.0 (SUC 3.0, Språkbanken) | go | Swedish NER; the Swedish-Talbanken UNER set is the UD-aligned alternative |
-| MasakhaNER 2.0 `masakhane/masakhaner2` | 20 African languages (bm bbj ee fon ha ig rw lg luo mos ny pcm sn sw tn tw wo xh yo zu) | card: afl-3.0; text from news outlets: "The data is sourced from newspaper source" | unclear: the annotations' licence is permissive, the news publishers' terms on the text are not stated | none until ruled |
-| MasakhaNER 1.0 `masakhane/masakhaner` | 10 African languages | card: license unknown | unclear (no stated terms) | none |
-| Hausa VOA NER `UdS-LSV/hausa_voa_ner` | ha | card: cc-by-4.0; "crawled from VOA Hausa news" | unclear: crawled news site; the site's terms are not stated on the card | none until ruled |
-| HiNER original `cfilt/HiNER-original` | hi | card: cc-by-sa-4.0; "The dataset contains sentences from ILCI and other sources. ILCI dataset requires license from Indian Language Consortium due to which we do not distribute the ILCI portion of the data." | unclear: the remaining sources are not named on the card (would be the first Hindi NER candidate) | none until ruled |
-| KLUE-NER `klue/klue` | ko | card: cc-by-sa-4.0; the card's examples show news, review and other web text | unclear: the terms on those texts are not stated | none until ruled |
-| FiNER `mpsilfve/finer` | fi | card: mit; the card is a blank template and names no text source | unclear: the text source is not stated | none until ruled |
-| Persian NER `HaniehPoostchi/persian_ner` | fa | card: cc-by-4.0 | unclear: the card does not name the text source | none until ruled |
-| Catalan NER `Ugiat/ner-cat` | ca | card: apache-2.0; television transcriptions | unclear: rights in the transcribed programmes are not stated | none until ruled |
-| fiNERweb `whoisjones/fiNERweb` | 91 languages | card: mit; "annotated text in multiple languages"; the card does not name the label generator | unclear: the label generator (and so the labels' terms) is not stated | none until ruled |
-| Swedish NER corpus `klintan/swedish_ner_corpus` | sv | card: cc-by-4.0; "news from Swedish newspapers' websites" | unclear: newspaper text, terms not stated | none |
+| MasakhaNER 2.0 `masakhane/masakhaner2` | 20 African languages (bm bbj ee fon ha ig rw lg luo mos ny pcm sn sw tn tw wo xh yo zu) | card: afl-3.0; text from news outlets: "The data is sourced from newspaper source" | out (ruled 2026-11-07), unclear terms: the annotations' licence is permissive, the news publishers' terms on the text are not stated | none |
+| MasakhaNER 1.0 `masakhane/masakhaner` | 10 African languages | card: license unknown | out (ruled 2026-11-07), no stated terms | none |
+| Hausa VOA NER `UdS-LSV/hausa_voa_ner` | ha | card: cc-by-4.0; "crawled from VOA Hausa news" | out (ruled 2026-11-07), unclear terms: crawled news site; the site's terms are not stated on the card | none |
+| HiNER original `cfilt/HiNER-original` | hi | card: cc-by-sa-4.0; "The dataset contains sentences from ILCI and other sources. ILCI dataset requires license from Indian Language Consortium due to which we do not distribute the ILCI portion of the data." | out (ruled 2026-11-07), unclear terms: the remaining sources are not named on the card (would be the first Hindi NER candidate) | none |
+| KLUE-NER `klue/klue` | ko | card: cc-by-sa-4.0; the card's examples show news, review and other web text | out (ruled 2026-11-07), unclear terms: the terms on those texts are not stated | none |
+| FiNER `mpsilfve/finer` | fi | card: mit; the card is a blank template and names no text source | out (ruled 2026-11-07), unclear terms: the text source is not stated | none |
+| Persian NER `HaniehPoostchi/persian_ner` | fa | card: cc-by-4.0 | out (ruled 2026-11-07), unclear terms: the card does not name the text source | none |
+| Catalan NER `Ugiat/ner-cat` | ca | card: apache-2.0; television transcriptions | out (ruled 2026-11-07), unclear terms: rights in the transcribed programmes are not stated | none |
+| fiNERweb `whoisjones/fiNERweb` | 91 languages | card: mit; "annotated text in multiple languages"; the card does not name the label generator | out (ruled 2026-11-07), unclear terms: the label generator (and so the labels' terms) is not stated | none |
+| Swedish NER corpus `klintan/swedish_ner_corpus` | sv | card: cc-by-4.0; "news from Swedish newspapers' websites" | out (ruled 2026-11-07), unclear terms: newspaper text, terms not stated | none |
 | Europeana Newspapers `community-datasets/euronews` | de fr nl | card: cc0-1.0; historical newspapers | go (public-domain scans, CC0 card) | silver-quality historical NER; not chosen (old orthography) |
 | WikiANN / PAN-X | many languages | card: `license: unknown` | no-go [ruled] | - |
 | WikiNEuRal, MultiNERD (Babelscape) | 9 languages | cards: cc-by-nc-sa-4.0 | no-go (NC) | - |

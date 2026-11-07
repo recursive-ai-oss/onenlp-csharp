@@ -72,6 +72,11 @@ internal static class Program
     {
         try
         {
+            if (args.Length > 0 && args[0] == "plan")
+            {
+                return PlanOnly(args);
+            }
+
             if (args.Length > 0 && args[0] == "verify-export")
             {
                 if (Opt(args, "threads", string.Empty).Length > 0)
@@ -123,6 +128,64 @@ internal static class Program
         }
     }
 
+    // plan --spec FILE --data DIR [--langs a,b | all] [--plan ALPHA] [--sentences-per-doc N]: reads each language's data and prints the sampling plan and
+    // the --repeat argument it comes to, without a model. The same numbers the training run prints at its start.
+    private static int PlanOnly(string[] args)
+    {
+        CorpusSpec spec = CorpusSpec.Load(Required(args, "spec"));
+        string[] langs = Opt(args, "langs", "all") is "all" ? [.. spec.Languages.Select(l => l.Code)] : Opt(args, "langs", string.Empty).Split(',');
+        var words = new Dictionary<string, long>();
+        foreach (string lang in langs)
+        {
+            LanguageData d = CorpusReader.ReadUd(spec, spec[lang], Required(args, "data"), Num(args, "sentences-per-doc", 4));
+            words[lang] = d.Train.Sum(e => (long)e.Predicted.Length);
+            Console.WriteLine($"{lang}: train docs={d.Train.Count} dev docs={d.Dev.Count} held out={d.HeldOut} dropped={d.Dropped}");
+        }
+
+        IReadOnlyList<LanguagePlan> plan = SamplingPlan.Compute(spec, langs, l => words[l], PlanOptions(args, Opt(args, "plan", "0.3")));
+        Console.Write(SamplingPlan.Describe(plan));
+        Console.WriteLine("--repeat " + SamplingPlan.ToRepeatArgument(plan));
+        return 0;
+    }
+
+    private static SamplingOptions PlanOptions(string[] args, string alpha)
+    {
+        var boost = new Dictionary<string, double>();
+        foreach (string kv in Opt(args, "boost", string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries))
+        {
+            string[] parts = kv.Split('=');
+            boost[parts[0]] = double.Parse(parts[1], CultureInfo.InvariantCulture);
+        }
+
+        return new SamplingOptions(
+            Alpha: double.Parse(alpha, CultureInfo.InvariantCulture),
+            MaxRepeat: Num(args, "max-repeat", 6),
+            SmallMaxRepeat: Num(args, "small-max-repeat", 8),
+            ParserWeight: Flt(args, "parser-weight", 1.5f),
+            Boost: boost);
+    }
+
+    // Replaces the examples that satisfy mine by this many copies of their distinct set; a fraction takes evenly spaced ones of the last copy.
+    private static void Repeat(List<Example> train, Func<Example, bool> mine, double times)
+    {
+        var distinct = new List<Example>(train.Where(mine).Distinct());
+        train.RemoveAll(e => mine(e));
+        int whole = (int)Math.Floor(times);
+        for (int r = 0; r < whole; r++)
+        {
+            train.AddRange(distinct);
+        }
+
+        double fraction = times - whole;
+        for (int i = 0; i < distinct.Count; i++)
+        {
+            if (Math.Floor((i + 1) * fraction) > Math.Floor(i * fraction))
+            {
+                train.Add(distinct[i]);
+            }
+        }
+    }
+
     private static string Opt(string[] args, string name, string fallback)
     {
         int i = Array.IndexOf(args, "--" + name);
@@ -147,7 +210,8 @@ internal static class Program
         float lr = Flt(args, "lr", 1e-4f);
         int warmup = Num(args, "warmup", 40);
         string[] heads = Opt(args, "heads", "tagger,morphologizer,lemmatizer,parser,ner").Split(',');
-        string[] nerLangs = heads.Contains("ner") ? [.. langs.Where(NerSets.ContainsKey)] : [];
+        CorpusSpec? spec = Opt(args, "spec", string.Empty) is { Length: > 0 } specPath ? CorpusSpec.Load(specPath) : null;
+        string[] nerLangs = heads.Contains("ner") ? [.. langs.Where(l => spec is not null ? spec.Contains(l) && spec[l].Ner.Count > 0 : NerSets.ContainsKey(l))] : [];
         int balance = Num(args, "balance", 1);
         predictLimit = Num(args, "predict-limit", 0);
         nerTestLimit = Num(args, "ner-test", 3000);
@@ -160,6 +224,19 @@ internal static class Program
         var stores = new Dictionary<string, StringStore>();
         foreach (string lang in langs)
         {
+            int before = train.Count;
+            if (spec is not null)
+            {
+                LanguageData data1 = CorpusReader.ReadUd(spec, spec[lang], data, perDoc);
+                stores[lang] = data1.Store;
+                train.AddRange(data1.Train);
+                int trainDocs = train.Count - before;
+                before = dev.Count;
+                dev.AddRange(data1.Dev.Take(Num(args, "dev-docs", 1000000)));
+                Console.WriteLine($"{lang}: train docs={trainDocs} dev docs={dev.Count - before} held out sentences={data1.HeldOut} dropped test repeats={data1.Dropped}");
+                continue;
+            }
+
             (string dir, string prefix) = Treebanks[lang];
             string root = Path.Combine(data, "train", "ud", dir);
             if (!Directory.Exists(root))
@@ -169,26 +246,37 @@ internal static class Program
 
             var store = new StringStore();
             stores[lang] = store;
-            int before = train.Count;
-            train.AddRange(Documents(Path.Combine(root, prefix + "-train.conllu"), perDoc, store));
+            train.AddRange(CorpusReader.Documents(Path.Combine(root, prefix + "-train.conllu"), perDoc, store));
             int trainCount = train.Count - before;
             before = dev.Count;
-            dev.AddRange(Documents(Path.Combine(root, prefix + "-dev.conllu"), perDoc, store).Take(Num(args, "dev-docs", 1000000)));
+            dev.AddRange(CorpusReader.Documents(Path.Combine(root, prefix + "-dev.conllu"), perDoc, store).Take(Num(args, "dev-docs", 1000000)));
             Console.WriteLine($"{lang}: train docs={trainCount} dev docs={dev.Count - before}");
         }
 
         var nerStores = new Dictionary<string, StringStore>();
         foreach (string lang in nerLangs)
         {
+            int before = train.Count;
+            if (spec is not null)
+            {
+                LanguageData n = CorpusReader.ReadNer(spec[lang], data, Num(args, "ner-train", 6000), Num(args, "ner-dev", 600));
+                nerStores[lang] = n.Store;
+                train.AddRange(n.Train);
+                int docs = train.Count - before;
+                before = dev.Count;
+                dev.AddRange(n.Dev);
+                Console.WriteLine($"{lang} ner: train docs={docs} dev docs={dev.Count - before}");
+                continue;
+            }
+
             var store = new StringStore();
             nerStores[lang] = store;
             (string dir, string prefix, _) = NerSets[lang];
             string root = Path.Combine(data, "train", dir);
-            int before = train.Count;
-            train.AddRange(NerExamples(Path.Combine(root, prefix + "-train.iob2"), lang, Num(args, "ner-train", 6000), store));
+            train.AddRange(CorpusReader.NerExamples(Path.Combine(root, prefix + "-train.iob2"), Num(args, "ner-train", 6000), store));
             int trainCount = train.Count - before;
             before = dev.Count;
-            dev.AddRange(NerExamples(Path.Combine(root, prefix + "-dev.iob2"), lang, Num(args, "ner-dev", 600), store));
+            dev.AddRange(CorpusReader.NerExamples(Path.Combine(root, prefix + "-dev.iob2"), Num(args, "ner-dev", 600), store));
             Console.WriteLine($"{lang} ner: train docs={trainCount} dev docs={dev.Count - before}");
         }
 
@@ -227,31 +315,35 @@ internal static class Program
 
         // --repeat zh=1.8,tr=1.8,fr=0.2: replaces the multiplicity of each listed language's examples (UD and entities) by this many copies
         // of its distinct examples; a fraction takes evenly spaced examples of the last copy. Which languages a continued run sees most is
-        // set here, from the development scores of the run before it.
-        foreach (string spec in Opt(args, "repeat", string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries))
+        // set here, from the development scores of the run before it. --plan ALPHA computes the list by temperature sampling over the languages
+        // (SamplingPlan) from the corpus spec; entity examples are repeated by the plan's entity factor.
+        var repeats = new List<(string Lang, double Times)>();
+        var nerRepeats = new List<(string Lang, double Times)>();
+        if (spec is not null && Opt(args, "plan", string.Empty) is { Length: > 0 } alpha)
         {
-            string[] kv = spec.Split('=');
-            string lang = kv[0];
-            double times = double.Parse(kv[1], CultureInfo.InvariantCulture);
-            bool Mine(Example e) => ReferenceEquals(e.Predicted.Strings, stores[lang]);
-            var distinct = new List<Example>(train.Where(Mine).Distinct());
-            train.RemoveAll(Mine);
-            int whole = (int)Math.Floor(times);
-            for (int r = 0; r < whole; r++)
-            {
-                train.AddRange(distinct);
-            }
+            IReadOnlyList<LanguagePlan> plan = SamplingPlan.Compute(spec, langs, l => train.Where(e => ReferenceEquals(e.Predicted.Strings, stores[l])).Sum(e => (long)e.Predicted.Length), PlanOptions(args, alpha));
+            Console.Write(SamplingPlan.Describe(plan));
+            repeats.AddRange(plan.Select(p => (p.Code, p.Repeat)));
+            nerRepeats.AddRange(plan.Where(p => p.NerRepeat > 0).Select(p => (p.Code, p.NerRepeat)));
+        }
 
-            double fraction = times - whole;
-            for (int i = 0; i < distinct.Count; i++)
-            {
-                if (Math.Floor((i + 1) * fraction) > Math.Floor(i * fraction))
-                {
-                    train.Add(distinct[i]);
-                }
-            }
+        foreach (string spec1 in Opt(args, "repeat", string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries))
+        {
+            string[] kv = spec1.Split('=');
+            repeats.RemoveAll(r => r.Lang == kv[0]);
+            repeats.Add((kv[0], double.Parse(kv[1], CultureInfo.InvariantCulture)));
+        }
 
+        foreach ((string lang, double times) in repeats)
+        {
+            Repeat(train, e => ReferenceEquals(e.Predicted.Strings, stores[lang]), times);
             Console.WriteLine($"{lang}: UD multiplicity {times}");
+        }
+
+        foreach ((string lang, double times) in nerRepeats.Where(r => nerStores.ContainsKey(r.Lang)))
+        {
+            Repeat(train, e => ReferenceEquals(e.Predicted.Strings, nerStores[lang]), times);
+            Console.WriteLine($"{lang}: entity multiplicity {times}");
         }
 
         // The examples of the languages are interleaved by the trainer's seeded shuffle; with one language this is a plain epoch order.
@@ -281,7 +373,7 @@ internal static class Program
                     "parser" => new Parser(encoder, arcSize: 512, labelSize: 256, contextLayers: 0, name: name),
                     _ => throw new ArgumentException("Unknown head " + head),
                 };
-                pipeline.Add(new ScopedHead(h, scope));
+                pipeline.Add(new ScopedHead(h, scope) { LossWeight = head == "parser" ? Flt(args, "parser-weight", 1f) : 1f });
             }
         }
 
@@ -390,9 +482,9 @@ internal static class Program
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"chunk_wall_s={Wall.Elapsed.TotalSeconds:F1} threads={TensorCompute.Threads}"));
         // --lexicon tr=1:0.9,fr=2:0.8: a lemma table from each listed language's training treebank in front of its edit trees (minimum count : minimum share,
         // chosen on development data with tools/accurate/lexicon_dev.py).
-        foreach (string spec in Opt(args, "lexicon", string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries))
+        foreach (string setting in Opt(args, "lexicon", string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
-            string[] kv = spec.Split('=');
+            string[] kv = setting.Split('=');
             string[] cs = kv[1].Split(':');
             foreach (ScopedHead scoped in pipeline.Components.OfType<ScopedHead>().Where(h => h.Name == "lemmatizer-" + kv[0]))
             {
@@ -658,123 +750,6 @@ internal static class Program
         }
     }
 
-    // Entity types to the family scheme. WikiNER and UNER already use PER, ORG, LOC (and MISC); GermEval's OTH is MISC and its derived and
-    // partial variants are outside; Turkish-WikiNER keeps PERSON, ORG, GPE and LOC (GPE joins LOC) and drops its other types.
-    private static string MapTag(string tag)
-    {
-        if (tag.Length < 3)
-        {
-            return "O";
-        }
-
-        string mapped = tag[2..] switch { "PER" or "PERSON" => "PER", "LOC" or "GPE" => "LOC", "ORG" => "ORG", "MISC" or "OTH" => "MISC", _ => string.Empty };
-        return mapped.Length == 0 ? "O" : tag[..2] + mapped;
-    }
-
-    // An .iob2 file (a '# text = ...' comment, then one token per line: id, form, BIO tag, ...; a blank line ends a sentence) as examples;
-    // at most limit sentences, taken evenly through the file so the sample is the same on every run (0 = all).
-    private static List<Example> NerExamples(string path, string lang, int limit, StringStore strings)
-    {
-        var sentences = new List<(string? Text, List<string> Forms, List<string> Tags)>();
-        string? text = null;
-        var forms = new List<string>();
-        var tags = new List<string>();
-        foreach (string line in File.ReadLines(path))
-        {
-            if (line.StartsWith("# text = ", StringComparison.Ordinal))
-            {
-                text = line["# text = ".Length..];
-            }
-            else if (line.StartsWith('#'))
-            {
-                continue;
-            }
-            else if (line.Length == 0)
-            {
-                if (forms.Count > 0)
-                {
-                    sentences.Add((text, forms, tags));
-                }
-
-                text = null;
-                forms = [];
-                tags = [];
-            }
-            else
-            {
-                string[] cols = line.Split('\t');
-                forms.Add(cols[1]);
-                tags.Add(MapTag(cols[2]));
-            }
-        }
-
-        if (forms.Count > 0)
-        {
-            sentences.Add((text, forms, tags));
-        }
-
-        var result = new List<Example>();
-        double step = limit > 0 && sentences.Count > limit ? (double)sentences.Count / limit : 1;
-        for (double at = 0; (int)at < sentences.Count; at += step)
-        {
-            (string? t, List<string> f, List<string> g) = sentences[(int)at];
-            result.Add(NerExample(t, f, g, strings));
-        }
-
-        return result;
-    }
-
-    // Token offsets come from walking the sentence text; if a form is not found there, the forms are joined with spaces instead.
-    private static Example NerExample(string? text, List<string> forms, List<string> tags, StringStore strings)
-    {
-        var starts = new int[forms.Count];
-        bool ok = text is not null;
-        int pos = 0;
-        for (int i = 0; ok && i < forms.Count; i++)
-        {
-            int at = text!.IndexOf(forms[i], pos, StringComparison.Ordinal);
-            if (at < 0)
-            {
-                ok = false;
-                break;
-            }
-
-            starts[i] = at;
-            pos = at + forms[i].Length;
-        }
-
-        if (!ok)
-        {
-            text = string.Join(' ', forms);
-            pos = 0;
-            for (int i = 0; i < forms.Count; i++)
-            {
-                starts[i] = pos;
-                pos += forms[i].Length + 1;
-            }
-        }
-
-        var tokens = new TokenBoundary[forms.Count];
-        for (int i = 0; i < tokens.Length; i++)
-        {
-            tokens[i] = new TokenBoundary(starts[i], forms[i].Length);
-        }
-
-        var doc = new Doc(strings, text!, tokens);
-        var entities = new List<SpanSpec>();
-        foreach (LabeledSpan sp in SpanScorer.ExtractIob2(tags))
-        {
-            entities.Add(new SpanSpec(sp.Start, sp.End, sp.Label));
-        }
-
-        doc.SetEntities(entities.ToArray());
-        var marks = new SentenceBoundary[tokens.Length];
-        Array.Fill(marks, SentenceBoundary.Inside);
-        marks[0] = SentenceBoundary.Start;
-        doc.SetSentenceBoundaries(marks);
-        return Example.FromReference(doc);
-    }
-
     // Runs the shared encoder once over the documents and lets every head of the language read the same vectors.
     private static void Annotate(IEncoder encoder, ITrainableComponent[] heads, Doc[] docs)
     {
@@ -906,7 +881,7 @@ internal static class Program
     // Entity corpus in, gold and predicted tags out as token-per-line IOB2 files for 'OneNlp.Eval span'.
     private static void PredictNer(IEncoder encoder, ITrainableComponent[] heads, string file, string lang, StringStore store, string outDir, string split)
     {
-        List<Example> examples = NerExamples(file, lang, split == "test" ? nerTestLimit : 0, store);
+        List<Example> examples = CorpusReader.NerExamples(file, split == "test" ? nerTestLimit : 0, store);
         if (predictLimit > 0 && examples.Count > predictLimit)
         {
             examples = examples.GetRange(0, predictLimit);
@@ -969,7 +944,7 @@ internal static class Program
             var docs = new Doc[n];
             for (int i = 0; i < n; i++)
             {
-                docs[i] = Example.Blank(Merge([sentences[start + i]], store));
+                docs[i] = Example.Blank(CorpusReader.Merge([sentences[start + i]], store));
                 docs[i].SetSentenceBoundaries(sentences[start + i].Doc.GetSentenceBoundaries());
             }
 
@@ -1015,130 +990,6 @@ internal static class Program
         }
 
         sb.Append('\n');
-    }
-
-    // Groups consecutive sentences into documents of perDoc sentences, with every annotation column kept: the heads of one example batch
-    // (tags, morphology, lemmas, parse) all read the same documents.
-    private static List<Example> Documents(string path, int perDoc, StringStore strings)
-    {
-        var result = new List<Example>();
-        var group = new List<ConllUSentence>();
-        foreach (ConllUSentence s in ConllUReader.Read(path, strings))
-        {
-            group.Add(s);
-            if (group.Count == perDoc)
-            {
-                result.Add(Example.FromReference(Merge(group, strings)));
-                group.Clear();
-            }
-        }
-
-        if (group.Count > 0)
-        {
-            result.Add(Example.FromReference(Merge(group, strings)));
-        }
-
-        return result;
-    }
-
-    // The text of one sentence as the encoder reads it, with one token for each word. A multiword token whose words spell its surface form
-    // (English "don't" = "do" + "n't") is written as it stands; one whose words do not (French "du" = "de" + "le", German "zum" = "zu" + "dem")
-    // is written as its words separated by spaces, so that each word has characters of its own and a vector of its own. Inference does the same
-    // from the tokenizer's pieces (MultiwordFormsComponent and the encoder's ExpandWordForms).
-    private static void AppendWords(ConllUSentence s, StringBuilder text, List<TokenBoundary> tokens)
-    {
-        int n = s.Doc.Length;
-        int m = 0;
-        int word = 0;
-        while (word < n)
-        {
-            bool spaceAfter;
-            if (m < s.MultiwordTokens.Count && s.MultiwordTokens[m].FirstWord == word)
-            {
-                MultiwordToken mwt = s.MultiwordTokens[m++];
-                int count = mwt.LastWord - mwt.FirstWord + 1;
-                bool spelled = string.Concat(Enumerable.Range(word, count).Select(i => s.Forms[i])) == mwt.Form;
-                if (spelled)
-                {
-                    int start = text.Length;
-                    text.Append(mwt.Form);
-                    int at = start;
-                    for (int k = 0; k < count; k++)
-                    {
-                        tokens.Add(new TokenBoundary(at, s.Forms[word + k].Length));
-                        at += s.Forms[word + k].Length;
-                    }
-                }
-                else
-                {
-                    for (int k = 0; k < count; k++)
-                    {
-                        if (k > 0)
-                        {
-                            text.Append(' ');
-                        }
-
-                        tokens.Add(new TokenBoundary(text.Length, s.Forms[word + k].Length));
-                        text.Append(s.Forms[word + k]);
-                    }
-                }
-
-                spaceAfter = !mwt.Misc.Contains("SpaceAfter=No", StringComparison.Ordinal);
-                word += count;
-            }
-            else
-            {
-                tokens.Add(new TokenBoundary(text.Length, s.Forms[word].Length));
-                text.Append(s.Forms[word]);
-                spaceAfter = !s.Misc[word].Contains("SpaceAfter=No", StringComparison.Ordinal);
-                word++;
-            }
-
-            if (word < n && spaceAfter)
-            {
-                text.Append(' ');
-            }
-        }
-    }
-
-    private static Doc Merge(List<ConllUSentence> sentences, StringStore strings)
-    {
-        var text = new StringBuilder();
-        var tokens = new List<TokenBoundary>();
-        var heads = new List<int>();
-        var marks = new List<SentenceBoundary>();
-        TokenColumn[] columns = [TokenColumn.Lemma, TokenColumn.Pos, TokenColumn.Tag, TokenColumn.Dep, TokenColumn.Morph];
-        var values = columns.Select(_ => new List<int>()).ToArray();
-        foreach (ConllUSentence s in sentences)
-        {
-            if (text.Length > 0)
-            {
-                text.Append(' ');
-            }
-
-            int tokenOffset = tokens.Count;
-            Doc d = s.Doc;
-            AppendWords(s, text, tokens);
-            for (int t = 0; t < d.Length; t++)
-            {
-                heads.Add(tokenOffset + d.GetHeads()[t]);
-                marks.Add(t == 0 ? SentenceBoundary.Start : SentenceBoundary.Inside);
-                for (int c = 0; c < columns.Length; c++)
-                {
-                    values[c].Add(d.GetColumn(columns[c])[t]);
-                }
-            }
-        }
-
-        var doc = new Doc(strings, text.ToString(), tokens.ToArray());
-        doc.SetHeads(heads.ToArray());
-        for (int c = 0; c < columns.Length; c++)
-        {
-            doc.SetColumn(columns[c], values[c].ToArray());
-        }
-
-        doc.SetSentenceBoundaries(marks.ToArray());
-        return doc;
     }
 
     private sealed class Progress(Action<TrainProgress> handler) : IProgress<TrainProgress>

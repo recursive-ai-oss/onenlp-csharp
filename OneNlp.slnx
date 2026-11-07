@@ -55,6 +55,7 @@
     <Project Path="recipes/en/fast-tagging/EnglishFastTagging.csproj" />
     <Project Path="recipes/accurate/en-tagging/AccurateEnglishTagging.csproj" />
     <Project Path="recipes/accurate/student-multilingual/OneNlp.Recipes.AccurateStudent.csproj" />
+    <Project Path="recipes/accurate/common/OneNlp.Recipes.AccurateCommon.csproj" />
     <Project Path="recipes/accurate/multilingual/OneNlp.Recipes.Accurate.csproj" />
     <Project Path="recipes/accurate/probe/AccurateProbe.csproj" />
     <Project Path="recipes/openner/OpenNer.csproj" />
