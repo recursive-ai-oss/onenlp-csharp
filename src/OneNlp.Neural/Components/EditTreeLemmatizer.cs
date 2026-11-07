@@ -25,7 +25,7 @@ namespace RecursiveAI.OneNlp.Neural.Components;
 /// <c>trainable_lemmatizer</c> documents).
 /// </para>
 /// </remarks>
-public sealed class EditTreeLemmatizer : TrainableHead
+public sealed class EditTreeLemmatizer : Lemmatizer
 {
     /// <summary>The kind name used by <see cref="HeadRegistry"/>: <c>lemmatizer</c>.</summary>
     public const string ComponentKind = "lemmatizer";

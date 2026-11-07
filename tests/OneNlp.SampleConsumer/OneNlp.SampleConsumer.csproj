@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Compiles and runs the happy-path sample of the design as an application would, against the packed packages from a folder feed
+       (environment variable ONENLP_CONSUMER_FEED): core, .Neural, the English and German models and the embedder. With WithModels=false only
+       core is referenced and the program shows the errors that name the missing package. Not part of the solution. Run it with run.sh. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).SampleConsumer</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).SampleConsumer</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <WithModels Condition="'$(WithModels)' == ''">true</WithModels>
+    <DefineConstants Condition="'$(WithModels)' != 'true'">$(DefineConstants);NO_MODELS</DefineConstants>
+    <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ONENLP_CONSUMER_FEED)</RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RecursiveAI.OneNlp" VersionOverride="$(Version)" />
+    <PackageReference Include="RecursiveAI.OneNlp.Neural" VersionOverride="$(Version)" Condition="'$(WithModels)' == 'true'" />
+    <PackageReference Include="RecursiveAI.OneNlp.Models.English" VersionOverride="$(Version)" Condition="'$(WithModels)' == 'true'" />
+    <PackageReference Include="RecursiveAI.OneNlp.Models.German" VersionOverride="$(Version)" Condition="'$(WithModels)' == 'true'" />
+    <PackageReference Include="RecursiveAI.OneNlp.Models.Embeddings" VersionOverride="$(Version)" Condition="'$(WithModels)' == 'true'" />
+  </ItemGroup>
+
+</Project>
