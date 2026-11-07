@@ -230,6 +230,10 @@ internal static partial class Program
         string rawSegmenter = Opt(args, "raw", string.Empty);
         bool raw = rawSegmenter.Length > 0;
         using Pipeline pipeline = PipelineFile.Load(args[1]);
+        if (Opt(args, "min-confidence", string.Empty).Length > 0)
+        {
+            SetMinConfidence(pipeline, Flt(args, "min-confidence", 0f));
+        }
         using Pipeline? segmenterPipeline = raw ? PipelineFile.Load(rawSegmenter) : null;
 
         var gold = new List<IReadOnlyCollection<LabeledSpan>>();
@@ -324,6 +328,27 @@ internal static partial class Program
             PrintRow("F1[" + label + "]", o.PerDocument, rf?.PerDocument, Bootstrap.F1Points);
         }
 
+        return 0;
+    }
+
+    // Entities below this confidence are dropped (EntityRecognizer.MinConfidence); chosen on the development file.
+    private static void SetMinConfidence(Pipeline pipeline, float value)
+    {
+        foreach (IPipelineComponent c in pipeline.Components)
+        {
+            if (c is EntityRecognizer ner)
+            {
+                ner.MinConfidence = value;
+            }
+        }
+    }
+
+    // Loads a model, sets the entity confidence threshold and saves it again.
+    private static int NerThreshold(string[] args)
+    {
+        using Pipeline pipeline = PipelineFile.Load(args[1]);
+        SetMinConfidence(pipeline, float.Parse(args[3], CultureInfo.InvariantCulture));
+        PipelineFile.Save(pipeline, args[2]);
         return 0;
     }
 

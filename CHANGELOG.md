@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- `EntityRecognizer.MinConfidence` drops decoded entities below a confidence (default 0, which changes nothing); it is saved in the model file only when above 0, so existing files load unchanged. The Chinese entity model ships with 0.6.
+
 ### Changed (breaking)
 
 - `Nlp.Entities(text)`, `Nlp.Lemmas(text)` and `Nlp.Analyze(text)`: when the language detector is unsure (confidence below 0.8) and has no model for its answer, the text is read in the most likely of the languages that have a model, so "Paris", "Ok" or a name is read by the model you referenced instead of throwing from one verb and silently losing entities in the other. Confident answers are unchanged: French text without a French model is still an error naming the package.
