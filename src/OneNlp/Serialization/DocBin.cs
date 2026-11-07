@@ -4,7 +4,7 @@ namespace RecursiveAI.OneNlp.Serialization;
 
 /// <summary>
 /// A container for many documents that share one string table, so a label or lemma that appears in a thousand documents is stored
-/// once. Write it with <see cref="ToBytes"/> or <see cref="WriteTo(Stream, bool)"/>; read it whole with <see cref="FromBytes"/> or
+/// once. Write it with <see cref="ToBytes"/> or <see cref="WriteBinary(Stream, bool)"/>; read it whole with <see cref="FromBytes"/> or
 /// document by document with <see cref="DocBinReader"/>. The layout is in <c>docs/binary-format.md</c>.
 /// </summary>
 /// <remarks>Not thread-safe. Documents added to a bin may come from different <see cref="StringStore"/> instances.</remarks>
@@ -83,10 +83,21 @@ public sealed class DocBin
 
     /// <summary>Serializes the bin to a stream. Same bytes as <see cref="ToBytes"/>.</summary>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public void WriteTo(Stream stream, bool checksum = true)
+    public void WriteBinary(Stream stream, bool checksum = true)
     {
         ArgumentNullException.ThrowIfNull(stream);
         stream.Write(ToBytes(checksum));
+    }
+
+    /// <summary>Serializes the bin to a stream asynchronously. Same bytes as <see cref="ToBytes"/>.</summary>
+    /// <param name="stream">A writable stream. It is left open.</param>
+    /// <param name="checksum">Append a CRC-32 (default <see langword="true"/>).</param>
+    /// <param name="cancellationToken">Cancels the write.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    public ValueTask WriteBinaryAsync(Stream stream, bool checksum = true, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        return stream.WriteAsync(ToBytes(checksum), cancellationToken);
     }
 
     /// <summary>Reads a whole bin from memory.</summary>
@@ -126,6 +137,22 @@ public sealed class DocBin
 
         return bin;
     }
+
+    /// <summary>Reads a whole bin from a stream asynchronously; see <see cref="FromStream"/>.</summary>
+    /// <param name="stream">A readable stream positioned at the start of a bin.</param>
+    /// <param name="strings">The store the documents share; a new one when <see langword="null"/>.</param>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <exception cref="InvalidDataException">As for <see cref="FromStream"/>.</exception>
+    public static async ValueTask<DocBin> FromStreamAsync(Stream stream, StringStore? strings = null, CancellationToken cancellationToken = default)
+    {
+        var bin = new DocBin();
+        await foreach (Doc doc in new DocBinReader(stream, strings).ReadAllAsync(cancellationToken).ConfigureAwait(false))
+        {
+            bin._docs.Add(doc);
+        }
+
+        return bin;
+    }
 }
 
 /// <summary>
@@ -134,7 +161,7 @@ public sealed class DocBin
 /// is verified once the last document has been read.
 /// </summary>
 /// <remarks>Reading never allocates more than the stream actually delivers, whatever the lengths in the data claim.</remarks>
-public sealed class DocBinReader
+public sealed class DocBinReader : IEnumerable<Doc>
 {
     private readonly Stream _stream;
     private readonly StringStore _store;
@@ -226,6 +253,90 @@ public sealed class DocBinReader
         }
 
         return true;
+    }
+
+    /// <summary>Reads the next document asynchronously; see <see cref="TryRead"/>.</summary>
+    /// <param name="cancellationToken">Cancels the read.</param>
+    /// <returns>The document, or <see langword="null"/> at the end of the bin, after the checksum has been verified.</returns>
+    /// <exception cref="InvalidDataException">As for <see cref="TryRead"/>.</exception>
+    public async ValueTask<Doc?> ReadAsync(CancellationToken cancellationToken = default)
+    {
+        if (_remainingDocs == 0)
+        {
+            return null;
+        }
+
+        uint length = BinaryPrimitives.ReadUInt32LittleEndian(await ReadBodyAsync(4, cancellationToken).ConfigureAwait(false));
+        _remainingDocsBytes -= 4;
+        byte[] record = await ReadBodyAsync(length, cancellationToken).ConfigureAwait(false);
+        _remainingDocsBytes -= length;
+        _remainingDocs--;
+        Doc doc = DocBinary.DecodeBody(record, _map, _store);
+        if (_remainingDocs == 0)
+        {
+            await FinishAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        return doc;
+    }
+
+    /// <summary>Reads the documents not yet read, one by one, as the sequence is walked; the checksum is verified after the last. Reading is not repeatable: a second walk continues where the first stopped.</summary>
+    /// <exception cref="InvalidDataException">(While enumerating) as for <see cref="TryRead"/>.</exception>
+    public IEnumerator<Doc> GetEnumerator()
+    {
+        while (TryRead(out Doc? doc))
+        {
+            yield return doc;
+        }
+    }
+
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>Reads the documents not yet read asynchronously, one by one; see <see cref="GetEnumerator"/>.</summary>
+    /// <param name="cancellationToken">Cancels the walk.</param>
+    /// <exception cref="InvalidDataException">(While enumerating) as for <see cref="TryRead"/>.</exception>
+    public async IAsyncEnumerable<Doc> ReadAllAsync([System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        while (await ReadAsync(cancellationToken).ConfigureAwait(false) is { } doc)
+        {
+            yield return doc;
+        }
+    }
+
+    private async ValueTask FinishAsync(CancellationToken cancellationToken)
+    {
+        if (_finished)
+        {
+            return;
+        }
+
+        _finished = true;
+        if (_remainingDocsBytes != 0 || _remainingBody != 0)
+        {
+            throw new InvalidDataException("There are bytes in the document list after the last record.");
+        }
+
+        if (_checksum)
+        {
+            byte[] stored = await DocBinary.ReadFullyAsync(_stream, 4, cancellationToken).ConfigureAwait(false);
+            if (BinaryPrimitives.ReadUInt32LittleEndian(stored) != _crc)
+            {
+                throw new InvalidDataException("The checksum does not match: the data is corrupt.");
+            }
+        }
+    }
+
+    private async ValueTask<byte[]> ReadBodyAsync(long count, CancellationToken cancellationToken)
+    {
+        if (count > _remainingBody || count > DocBinary.MaxBodyBytes)
+        {
+            throw new InvalidDataException("A length in the data exceeds what remains of the body.");
+        }
+
+        byte[] bytes = await DocBinary.ReadFullyAsync(_stream, count, cancellationToken).ConfigureAwait(false);
+        _remainingBody -= count;
+        _crc = Crc32.Update(_crc, bytes);
+        return bytes;
     }
 
     private void Finish()

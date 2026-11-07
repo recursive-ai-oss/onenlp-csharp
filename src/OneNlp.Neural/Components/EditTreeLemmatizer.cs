@@ -240,7 +240,7 @@ public sealed class EditTreeLemmatizer : Lemmatizer
                 {
                     int r = start + t;
                     string norm = wordForms ? doc[t].Norm : string.Empty;
-                    ReadOnlySpan<char> form = norm.Length > 0 ? norm : doc[t].Text;
+                    ReadOnlySpan<char> form = norm.Length > 0 ? norm : doc[t].TextSpan;
                     ReadOnlySpan<char> lower = lowered[..0];
                     if (form.Length <= LowerBuffer)
                     {

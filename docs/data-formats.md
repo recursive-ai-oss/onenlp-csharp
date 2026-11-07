@@ -28,7 +28,7 @@ Per the CoNLL-U format specification (universaldependencies.org/format.html). `C
 | Property | Type | Meaning |
 |---|---|---|
 | `text` | string, required | The text. |
-| `tokens` | optional array of `[start, end]` | Token boundaries, UTF-16 offsets into `text`, `end` exclusive, in order, non-empty, not overlapping. Without it the reader's tokenizer (default `RuleWordTokenizer`) splits the text. |
+| `tokens` | optional array of `[start, end]` | Token boundaries, UTF-16 offsets into `text`, `end` exclusive, in order, non-empty, not overlapping. Without it the reader's tokenizer (default: the tokenizer `Pipeline.Blank` uses; the overloads that take a `Pipeline` use that pipeline's) splits the text. |
 | `entities` | optional array of `[start, end, "LABEL"]` | Gold entities, character offsets. Must not overlap. Their presence, even as `[]`, marks the document as entity-annotated (every other token is outside an entity); absence leaves the entity column unset. Stored in the reference `Doc`. |
 | `spans` | optional object, name to array of `[start, end, "LABEL"]` | Span groups; spans may overlap. Stored as token ranges in `Example.Spans`. |
 | `cats` | optional object, label to number (or boolean) in `[0, 1]` | Text categories (multi-class or multi-label). Stored in `Example.Cats`. |

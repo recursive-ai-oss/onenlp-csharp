@@ -1,6 +1,8 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using RecursiveAI.OneNlp;
 using RecursiveAI.OneNlp.LanguageId;
 using RecursiveAI.OneNlp.Serialization;
@@ -8,7 +10,6 @@ using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
-using RecursiveAI.OneNlp.Neural.Training;
 using RecursiveAI.OneNlp.Tokenizers;
 
 namespace RecursiveAI.OneNlp.AotSmoke;
@@ -30,12 +31,19 @@ internal static class Program
         // Doc, Token and Span views.
         Doc doc = Nlp.Analyze("Ada Lovelace wrote notes, 1843.");
         Check("token count", doc.Length == 7);
-        Check("offsets", doc[1].Idx == 4 && doc[1].EndIdx == 12 && doc[1].Text.SequenceEqual("Lovelace"));
+        Check("offsets", doc[1].Idx == 4 && doc[1].EndIdx == 12 && doc[1].Text == "Lovelace");
         doc.SetEntities([new SpanSpec(0, 2, "PER", 0.75f)]);
         Check("entity", doc.Ents.Count == 1 && doc.Ents[0].ToString() == "Ada Lovelace" && doc[1].EntIob == EntIob.Inside && doc.Ents[0].Confidence == 0.75f);
         doc.SetAnnotation(TokenColumn.Pos, 0, "PROPN");
         Check("annotation", doc[0].Pos == "PROPN" && doc[1].Pos.Length == 0);
         Check("char span", doc.TryGetCharSpan(4, 18, out Span span) && span.ToString() == "Lovelace wrote");
+
+        // System.Text.Json: a Doc inside a DTO, through a source-generated context (no reflection), as a web endpoint would write it.
+        string dtoJson = JsonSerializer.Serialize(new SmokeDto(1, doc), SmokeJson.Default.SmokeDto);
+        Check("json dto", dtoJson.Contains("\"Analysis\":{\"text\":\"Ada Lovelace wrote notes, 1843.\"", StringComparison.Ordinal));
+        SmokeDto? back = JsonSerializer.Deserialize(dtoJson, SmokeJson.Default.SmokeDto);
+        Check("json dto back", back?.Analysis?.ToJson() == doc.ToJson());
+        Check("json ents", JsonSerializer.Serialize(doc.Ents.ToArray(), SmokeJson.Default.SpanArray).Contains("\"text\":\"Ada Lovelace\"", StringComparison.Ordinal));
 
         // Word and sentence segmentation, with English data and the registered sentencizer.
         Token[] tokens = Nlp.Tokens("Mr. Smith can't go. He's gone!");
@@ -310,7 +318,7 @@ internal static class Program
         Doc x = spanTrained.Process("we saw Grand Zorp today");
         Doc y = spanLoaded.Process("we saw Grand Zorp today");
         Doc z = Doc.FromBytes(x.ToBytes());
-        Check("spancat nested spans", spanResult.Completed && x.Spans["sc"].Count == 2 && x.Spans["sc"].Select(t => t.Label + t.Text.ToString()).Order().SequenceEqual(["PARTZorp", "PRODUCTGrand Zorp"])
+        Check("spancat nested spans", spanResult.Completed && x.Spans["sc"].Count == 2 && x.Spans["sc"].Select(t => t.Label + t.Text).Order().SequenceEqual(["PARTZorp", "PRODUCTGrand Zorp"])
             && y.Spans["sc"].Count == 2 && z.Spans["sc"].Count == 2 && Doc.FromJson(x.ToJson()).Spans["sc"].Count == 2);
     }
 
@@ -435,3 +443,9 @@ internal static class Program
         return e.Ids[0] == 256 && e.Ids[1] == 256 && tokenizer.Decode(e.Ids) == "abab 日";
     }
 }
+
+internal sealed record SmokeDto(int Id, Doc? Analysis);
+
+[JsonSerializable(typeof(SmokeDto))]
+[JsonSerializable(typeof(Span[]))]
+internal sealed partial class SmokeJson : JsonSerializerContext;

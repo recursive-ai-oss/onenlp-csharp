@@ -87,7 +87,7 @@ public sealed class SentencizerComponent : IPipelineComponent, IConfigurableComp
                 break;
             }
 
-            if (token > 0 && !(_hasNonFinal && _nonFinal.Contains(doc[token - 1].Text)) && !(Data.OrdinalDot && IsOrdinalToken(doc[token - 1].Text)))
+            if (token > 0 && !(_hasNonFinal && _nonFinal.Contains(doc[token - 1].TextSpan)) && !(Data.OrdinalDot && IsOrdinalToken(doc[token - 1].TextSpan)))
             {
                 boundaries[token] = SentenceBoundary.Start;
             }

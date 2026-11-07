@@ -38,3 +38,7 @@ JSON text cannot hold an unpaired surrogate, so writing a document whose text or
 ## Reading limits
 
 The reader accepts UTF-8 with an optional byte-order mark. It rejects, with `InvalidDataException`: nesting deeper than 32, trailing data, wrong types, a token `id` that is not its index, a `head` outside the document, a `conf` outside 0 to 1, an `sb` other than 0, 1 or 2, and any offset beyond the text. From a stream it takes at most 512 MiB.
+
+## With System.Text.Json
+
+`JsonSerializer.Serialize(doc)` writes exactly `doc.ToJson()`, and `Deserialize<Doc>` reads it (an invalid document throws `JsonException`), so a `Doc` can be a property of a DTO or an endpoint's return value. This goes through a converter named by an attribute on `Doc`, with no reflection; under NativeAOT, list the DTO in a source-generated `JsonSerializerContext` as usual. A `Span` is written as `{"start", "end", "label", "text", "confidence"}` and a `Token` as `{"i", "start", "end", "text", "lemma", "pos", "tag", "morph", "dep", "head"}` (annotations only when set). Their `start` and `end` are UTF-16 offsets into `Doc.Text`, not code points as in the document form. Neither can be read on its own.

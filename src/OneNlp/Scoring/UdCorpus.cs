@@ -141,7 +141,7 @@ public sealed class UdCorpus
                     string[] columns =
                     [
                         id.ToString(CultureInfo.InvariantCulture),
-                        Strip(token.Text.ToString()),
+                        Strip(token.TextSpan.ToString()),
                         OrUnderscore(token.Lemma),
                         OrUnderscore(token.Pos),
                         OrUnderscore(token.Tag),

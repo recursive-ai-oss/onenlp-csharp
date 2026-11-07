@@ -2,7 +2,6 @@ using System.Globalization;
 using RecursiveAI.OneModel.Tensors;
 using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural.Encoders;
-using RecursiveAI.OneNlp.Neural.Training;
 
 namespace RecursiveAI.OneNlp.Recipes.Italian;
 

@@ -35,7 +35,7 @@ public class NlpOpenEntitiesTests
 
         ModelPackages.RegisterOpenEntities("RecursiveAI.OneNlp.Models.Multilingual", () => Pipeline.Blank(Language.English).Add(new Capitals()));
         IReadOnlyList<Span> found = Nlp.Entities("Anna met Bob.", "first name");
-        Assert.Equal(["Anna", "Bob"], found.Select(s => s.Text.ToString()));
+        Assert.Equal(["Anna", "Bob"], found.Select(s => s.Text));
         Assert.All(found, s => Assert.Equal("first name", s.Label));
         Assert.Equal(0, found[0].Start);
         Assert.Empty(Nlp.Entities("", "person"));

@@ -7,7 +7,6 @@ using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
-using RecursiveAI.OneNlp.Neural.Training;
 
 namespace RecursiveAI.OneNlp.Recipes.EnTextcatMultilabel;
 
@@ -72,8 +71,8 @@ internal static class Program
 
         // The documents are split by the pipeline's own tokenizer, so training sees the tokens that prediction will.
         var options = new JsonlOptions { Tokenizer = pipeline.Tokenizer };
-        List<Example> train = [.. JsonlReader.Read(args[1], null, options)];
-        List<Example> dev = [.. JsonlReader.Read(args[2], null, options)];
+        List<Example> train = [.. JsonlReader.Read(args[1], strings: null, options: options)];
+        List<Example> dev = [.. JsonlReader.Read(args[2], strings: null, options: options)];
 
         using var cts = new CancellationTokenSource();
         double budget = double.Parse(Opt(args, "budget-seconds", "0"), CultureInfo.InvariantCulture);

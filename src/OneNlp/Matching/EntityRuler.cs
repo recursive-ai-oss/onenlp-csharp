@@ -24,13 +24,14 @@ public readonly record struct RuleEntity(Span Span, string? Id);
 /// document is being processed. Processing is safe from several threads.
 /// </para>
 /// </remarks>
-public sealed class EntityRuler : IPipelineComponent
+public sealed class EntityRuler : IPipelineComponent, IEnumerable<EntityRulerPattern>
 {
     /// <summary>The registry name, <c>entity_ruler</c>.</summary>
     public const string ComponentName = "entity_ruler";
 
     private readonly List<EntityRulerPattern> _rules = [];
-    private readonly IWordTokenizer? _tokenizer;
+    private IWordTokenizer? _tokenizer;
+    private readonly bool _explicitTokenizer;
     private readonly Lock _gate = new();
     private Snapshot? _snapshot;
 
@@ -48,7 +49,7 @@ public sealed class EntityRuler : IPipelineComponent
     /// <summary>Creates a ruler with no rules.</summary>
     /// <param name="overwriteEnts">Whether matches replace overlapping entities already in the document; see the remarks.</param>
     /// <param name="phraseMatcherAttribute">The attribute phrase rules compare on: Orth (the default), Lower, Norm or Shape (the others need annotated phrases and are not available for rules given as text).</param>
-    /// <param name="phraseTokenizer">Splits phrase rules into tokens; the rule word tokenizer when <see langword="null"/>. It should be the tokenizer of the pipeline the ruler runs in.</param>
+    /// <param name="phraseTokenizer">Splits phrase rules into tokens; when <see langword="null"/>, the tokenizer of the pipeline the ruler is added to (see <see cref="Pipeline.Add(IPipelineComponent)"/>), or the default word tokenizer until then.</param>
     /// <exception cref="ArgumentException">The attribute cannot be used for phrases.</exception>
     public EntityRuler(bool overwriteEnts = false, TokenProperty phraseMatcherAttribute = TokenProperty.Orth, IWordTokenizer? phraseTokenizer = null)
     {
@@ -60,6 +61,7 @@ public sealed class EntityRuler : IPipelineComponent
         OverwriteEnts = overwriteEnts;
         PhraseMatcherAttribute = phraseMatcherAttribute;
         _tokenizer = phraseTokenizer;
+        _explicitTokenizer = phraseTokenizer is not null;
     }
 
     /// <inheritdoc/>
@@ -114,14 +116,27 @@ public sealed class EntityRuler : IPipelineComponent
         }
     }
 
-    /// <summary>Adds a token-pattern rule with the label as its index: <c>new EntityRuler { ["CASE_NO"] = Pattern.Shape("dd-dddd") }</c>. Assigning again adds another rule; nothing is replaced.</summary>
-    /// <param name="label">The entity label; not empty.</param>
-    public Pattern this[string label]
+    /// <summary>Returns the rules added so far; with <see cref="Add(string, Pattern, string?)"/> this lets a ruler be built with a collection initializer: <c>new EntityRuler { { "CASE_NO", Pattern.Shape("dd-dddd") } }</c>. Each entry adds a rule; nothing is replaced.</summary>
+    public IEnumerator<EntityRulerPattern> GetEnumerator() => Patterns.GetEnumerator();
+
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+
+    // A ruler added to a pipeline splits its phrases the way that pipeline splits documents, unless it was given a tokenizer of its own.
+    internal void BindTokenizer(IWordTokenizer tokenizer)
     {
-        set => Add(label, value);
+        if (_explicitTokenizer)
+        {
+            return;
+        }
+
+        lock (_gate)
+        {
+            _tokenizer = tokenizer;
+            _snapshot = null;
+        }
     }
 
-    /// <summary>Adds a token-pattern rule.</summary>
+    /// <summary>Adds a token-pattern rule. This is the method collection-initializer entries call.</summary>
     /// <param name="label">The entity label; not empty.</param>
     /// <param name="pattern">The pattern.</param>
     /// <param name="id">An optional entity ID.</param>

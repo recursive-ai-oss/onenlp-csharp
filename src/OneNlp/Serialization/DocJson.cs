@@ -874,5 +874,23 @@ internal static class DocJson
         return buffer.ToArray();
     }
 
+    internal static async ValueTask<byte[]> ReadAllAsync(Stream stream, CancellationToken cancellationToken)
+    {
+        using var buffer = new MemoryStream();
+        byte[] chunk = new byte[81920];
+        int read;
+        while ((read = await stream.ReadAsync(chunk, cancellationToken).ConfigureAwait(false)) > 0)
+        {
+            if (buffer.Length + read > MaxInputBytes)
+            {
+                throw new InvalidDataException("The JSON is larger than the 512 MiB limit.");
+            }
+
+            buffer.Write(chunk, 0, read);
+        }
+
+        return buffer.ToArray();
+    }
+
     internal static string Utf8ToString(byte[] bytes) => Encoding.UTF8.GetString(bytes);
 }

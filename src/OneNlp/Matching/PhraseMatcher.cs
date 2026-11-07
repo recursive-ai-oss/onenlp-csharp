@@ -25,7 +25,7 @@ public sealed class PhraseMatcher
 
     /// <summary>Creates an empty matcher.</summary>
     /// <param name="attribute">The token attribute that phrases and documents are compared on: Orth, Lower, Norm, Shape, Lemma, Pos, Tag, Dep or Morph. Lemma, Pos, Tag, Dep and Morph need annotated phrase documents.</param>
-    /// <param name="tokenizer">Splits phrases added as strings; the rule word tokenizer when <see langword="null"/>. Use the tokenizer that produced the documents you will match so both sides agree on token boundaries.</param>
+    /// <param name="tokenizer">Splits phrases added as strings; the default word tokenizer (<see cref="Segmentation.UaxWordTokenizer.Default"/>, the one <see cref="Pipeline.Blank(Language)"/> uses) when <see langword="null"/>. Use the tokenizer that produced the documents you will match so both sides agree on token boundaries, or the constructor that takes the pipeline.</param>
     /// <exception cref="ArgumentException">The attribute cannot be compared as text (for example a flag).</exception>
     public PhraseMatcher(TokenProperty attribute = TokenProperty.Orth, IWordTokenizer? tokenizer = null)
     {
@@ -35,7 +35,17 @@ public sealed class PhraseMatcher
         }
 
         _attribute = attribute;
-        _tokenizer = tokenizer ?? new RuleWordTokenizer();
+        _tokenizer = tokenizer ?? Segmentation.UaxWordTokenizer.Default;
+    }
+
+    /// <summary>Creates an empty matcher whose phrases are split by a pipeline's tokenizer, so phrases and the pipeline's documents agree on token boundaries.</summary>
+    /// <param name="pipeline">The pipeline whose <see cref="Pipeline.Tokenizer"/> splits phrases added as strings.</param>
+    /// <param name="attribute">As for <see cref="PhraseMatcher(TokenProperty, IWordTokenizer?)"/>.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="pipeline"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">The attribute cannot be compared as text.</exception>
+    public PhraseMatcher(Pipeline pipeline, TokenProperty attribute = TokenProperty.Orth)
+        : this(attribute, (pipeline ?? throw new ArgumentNullException(nameof(pipeline))).Tokenizer)
+    {
     }
 
     /// <summary>The attribute phrases are compared on.</summary>
@@ -212,7 +222,7 @@ public sealed class PhraseMatcher
     private int Lookup(Doc doc, TokenFacts? facts, int i)
     {
         var lookup = _vocabulary.GetAlternateLookup<ReadOnlySpan<char>>();
-        ReadOnlySpan<char> text = doc[i].Text;
+        ReadOnlySpan<char> text = doc[i].TextSpan;
         if (_attribute == TokenProperty.Orth)
         {
             return lookup.TryGetValue(text, out int id) ? id : -1;

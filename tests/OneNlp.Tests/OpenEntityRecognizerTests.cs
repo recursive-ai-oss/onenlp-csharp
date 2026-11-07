@@ -4,7 +4,6 @@ using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
-using RecursiveAI.OneNlp.Neural.Training;
 
 namespace RecursiveAI.OneNlp.Tests;
 
@@ -105,7 +104,7 @@ public class OpenEntityRecognizerTests : IDisposable
         Progress = progress,
     };
 
-    private static string[] Found(Doc d) => [.. d.Ents.Select(x => x.Text.ToString() + ":" + x.Label)];
+    private static string[] Found(Doc d) => [.. d.Ents.Select(x => x.Text + ":" + x.Label)];
 
     [Fact]
     public void LearnsTypesFromNamesAndFindsOnlyTheTypesAsked()
