@@ -1,0 +1,259 @@
+# sent_id = hi-selfdev-1
+# text = चीन में एक समय चोरों का बड़ा आतंक था.
+1	चीन	_	PROPN	_	_	8	obl	_	_
+2	में	_	ADP	_	_	1	case	_	_
+3	एक	_	NUM	_	_	4	nummod	_	_
+4	समय	_	NOUN	_	_	8	obl:tmod	_	_
+5	चोरों	_	NOUN	_	_	8	nmod	_	_
+6	का	_	ADP	_	_	5	case	_	_
+7	बड़ा	_	ADJ	_	_	8	amod	_	_
+8	आतंक	_	NOUN	_	_	0	root	_	_
+9	था	_	AUX	_	_	8	cop	_	SpaceAfter=No
+10	.	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-2
+# text = अब मेरे राज्य की सुरक्षा खतरे में है.”
+1	अब	_	ADV	_	_	6	advmod	_	_
+2	मेरे	_	PRON	_	_	3	nmod	_	_
+3	राज्य	_	NOUN	_	_	5	nmod	_	_
+4	की	_	ADP	_	_	3	case	_	_
+5	सुरक्षा	_	NOUN	_	_	6	nsubj	_	_
+6	खतरे	_	NOUN	_	_	0	root	_	_
+7	में	_	ADP	_	_	6	case	_	_
+8	है	_	AUX	_	_	6	cop	_	SpaceAfter=No
+9	.	_	PUNCT	_	_	6	punct	_	SpaceAfter=No
+10	”	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-3
+# text = इस बीच, सीएजी ने पीएमओ को चिट्ठी लिखकर सफाई दी है।
+1	इस	_	DET	_	_	2	det	_	_
+2	बीच	_	NOUN	_	_	11	obl	_	SpaceAfter=No
+3	,	_	PUNCT	_	_	11	punct	_	_
+4	सीएजी	_	PROPN	_	_	11	nsubj	_	_
+5	ने	_	ADP	_	_	4	case	_	_
+6	पीएमओ	_	PROPN	_	_	11	obl	_	_
+7	को	_	ADP	_	_	6	case	_	_
+8	चिट्ठी	_	NOUN	_	_	9	obj	_	_
+9	लिखकर	_	VERB	_	_	11	advcl	_	_
+10	सफाई	_	NOUN	_	_	11	obj	_	_
+11	दी	_	VERB	_	_	0	root	_	_
+12	है	_	AUX	_	_	11	aux	_	SpaceAfter=No
+13	।	_	PUNCT	_	_	11	punct	_	_
+
+# sent_id = hi-selfdev-4
+# text = इस दौरान शिबू सोरेन कोयला मंत्री थे।
+1	इस	_	DET	_	_	2	det	_	_
+2	दौरान	_	NOUN	_	_	6	obl:tmod	_	_
+3	शिबू	_	PROPN	_	_	6	nsubj	_	_
+4	सोरेन	_	PROPN	_	_	3	flat	_	_
+5	कोयला	_	NOUN	_	_	6	compound	_	_
+6	मंत्री	_	NOUN	_	_	0	root	_	_
+7	थे	_	AUX	_	_	6	cop	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-5
+# text = संसद में हंगामे के बाद कांग्रेस 'डैमेज कंट्रोल' करने में जुट गई है।
+1	संसद	_	NOUN	_	_	3	nmod	_	_
+2	में	_	ADP	_	_	1	case	_	_
+3	हंगामे	_	NOUN	_	_	13	obl	_	_
+4	के	_	ADP	_	_	3	case	_	_
+5	बाद	_	ADP	_	_	3	case	_	_
+6	कांग्रेस	_	PROPN	_	_	13	nsubj	_	_
+7	'	_	PUNCT	_	_	9	punct	_	SpaceAfter=No
+8	डैमेज	_	NOUN	_	_	9	compound	_	_
+9	कंट्रोल	_	NOUN	_	_	11	obj	_	SpaceAfter=No
+10	'	_	PUNCT	_	_	9	punct	_	_
+11	करने	_	VERB	_	_	13	advcl	_	_
+12	में	_	ADP	_	_	11	case	_	_
+13	जुट	_	VERB	_	_	0	root	_	_
+14	गई	_	AUX	_	_	13	aux	_	_
+15	है	_	AUX	_	_	13	aux	_	SpaceAfter=No
+16	।	_	PUNCT	_	_	13	punct	_	_
+
+# sent_id = hi-selfdev-6
+# text = कांग्रेस के नेता राजीव शुक्ला ने कहा है कि कोई घोटाला नहीं हुआ है।
+1	कांग्रेस	_	PROPN	_	_	3	nmod	_	_
+2	के	_	ADP	_	_	1	case	_	_
+3	नेता	_	NOUN	_	_	7	nsubj	_	_
+4	राजीव	_	PROPN	_	_	3	appos	_	_
+5	शुक्ला	_	PROPN	_	_	4	flat	_	_
+6	ने	_	ADP	_	_	3	case	_	_
+7	कहा	_	VERB	_	_	0	root	_	_
+8	है	_	AUX	_	_	7	aux	_	_
+9	कि	_	SCONJ	_	_	13	mark	_	_
+10	कोई	_	DET	_	_	11	det	_	_
+11	घोटाला	_	NOUN	_	_	13	nsubj	_	_
+12	नहीं	_	PART	_	_	13	advmod	_	_
+13	हुआ	_	VERB	_	_	7	ccomp	_	_
+14	है	_	AUX	_	_	13	aux	_	SpaceAfter=No
+15	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-7
+# text = यहीं नही इसके बीजों का फैलाव पक्षियों विशेषकर भारतीय मैना द्वारा किया जाता है।
+1	यहीं	_	ADV	_	_	12	advmod	_	_
+2	नही	_	PART	_	_	12	advmod	_	_
+3	इसके	_	PRON	_	_	4	nmod	_	_
+4	बीजों	_	NOUN	_	_	6	nmod	_	_
+5	का	_	ADP	_	_	4	case	_	_
+6	फैलाव	_	NOUN	_	_	12	nsubj:pass	_	_
+7	पक्षियों	_	NOUN	_	_	12	obl	_	_
+8	विशेषकर	_	ADV	_	_	10	advmod	_	_
+9	भारतीय	_	ADJ	_	_	10	amod	_	_
+10	मैना	_	NOUN	_	_	7	appos	_	_
+11	द्वारा	_	ADP	_	_	7	case	_	_
+12	किया	_	VERB	_	_	0	root	_	_
+13	जाता	_	AUX	_	_	12	aux:pass	_	_
+14	है	_	AUX	_	_	12	aux	_	SpaceAfter=No
+15	।	_	PUNCT	_	_	12	punct	_	_
+
+# sent_id = hi-selfdev-8
+# text = इस कुदरती घटना से धरती को खतरा पहुंच सकता है।
+1	इस	_	DET	_	_	3	det	_	_
+2	कुदरती	_	ADJ	_	_	3	amod	_	_
+3	घटना	_	NOUN	_	_	8	obl	_	_
+4	से	_	ADP	_	_	3	case	_	_
+5	धरती	_	NOUN	_	_	8	obl	_	_
+6	को	_	ADP	_	_	5	case	_	_
+7	खतरा	_	NOUN	_	_	8	nsubj	_	_
+8	पहुंच	_	VERB	_	_	0	root	_	_
+9	सकता	_	AUX	_	_	8	aux	_	_
+10	है	_	AUX	_	_	8	aux	_	SpaceAfter=No
+11	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-9
+# text = यहां तक कि इंसान के व्यवहार पर भी इनका असर पड़ता है।
+1	यहां	_	ADV	_	_	11	advmod	_	_
+2	तक	_	ADP	_	_	1	case	_	_
+3	कि	_	SCONJ	_	_	1	fixed	_	_
+4	इंसान	_	NOUN	_	_	6	nmod	_	_
+5	के	_	ADP	_	_	4	case	_	_
+6	व्यवहार	_	NOUN	_	_	11	obl	_	_
+7	पर	_	ADP	_	_	6	case	_	_
+8	भी	_	ADV	_	_	6	advmod	_	_
+9	इनका	_	PRON	_	_	10	nmod	_	_
+10	असर	_	NOUN	_	_	11	nsubj	_	_
+11	पड़ता	_	VERB	_	_	0	root	_	_
+12	है	_	AUX	_	_	11	aux	_	SpaceAfter=No
+13	।	_	PUNCT	_	_	11	punct	_	_
+
+# sent_id = hi-selfdev-10
+# text = इससे टेलीग्राप प्रणाली में गड़बड़ी पैदा हो गई।
+1	इससे	_	PRON	_	_	7	obl	_	_
+2	टेलीग्राप	_	NOUN	_	_	3	compound	_	_
+3	प्रणाली	_	NOUN	_	_	5	nmod	_	_
+4	में	_	ADP	_	_	3	case	_	_
+5	गड़बड़ी	_	NOUN	_	_	7	nsubj	_	_
+6	पैदा	_	ADJ	_	_	7	xcomp	_	_
+7	हो	_	VERB	_	_	0	root	_	_
+8	गई	_	AUX	_	_	7	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-11
+# text = सुरक्षा की दृष्टि से ऐसे चित्र सॉफ्टवेयर से हटाए जाने चाहिए।
+1	सुरक्षा	_	NOUN	_	_	3	nmod	_	_
+2	की	_	ADP	_	_	1	case	_	_
+3	दृष्टि	_	NOUN	_	_	9	obl	_	_
+4	से	_	ADP	_	_	3	case	_	_
+5	ऐसे	_	ADJ	_	_	6	amod	_	_
+6	चित्र	_	NOUN	_	_	9	nsubj:pass	_	_
+7	सॉफ्टवेयर	_	NOUN	_	_	9	obl	_	_
+8	से	_	ADP	_	_	7	case	_	_
+9	हटाए	_	VERB	_	_	0	root	_	_
+10	जाने	_	AUX	_	_	9	aux:pass	_	_
+11	चाहिए	_	AUX	_	_	9	aux	_	SpaceAfter=No
+12	।	_	PUNCT	_	_	9	punct	_	_
+
+# sent_id = hi-selfdev-12
+# text = सन् १९६३ में भारत सरकार ने इसे मानद विश्वविद्यालय का दर्जा दिया।
+1	सन्	_	NOUN	_	_	2	compound	_	_
+2	१९६३	_	NUM	_	_	12	obl	_	_
+3	में	_	ADP	_	_	2	case	_	_
+4	भारत	_	PROPN	_	_	5	compound	_	_
+5	सरकार	_	NOUN	_	_	12	nsubj	_	_
+6	ने	_	ADP	_	_	5	case	_	_
+7	इसे	_	PRON	_	_	12	obl	_	_
+8	मानद	_	ADJ	_	_	9	amod	_	_
+9	विश्वविद्यालय	_	NOUN	_	_	11	nmod	_	_
+10	का	_	ADP	_	_	9	case	_	_
+11	दर्जा	_	NOUN	_	_	12	obj	_	_
+12	दिया	_	VERB	_	_	0	root	_	SpaceAfter=No
+13	।	_	PUNCT	_	_	12	punct	_	_
+
+# sent_id = hi-selfdev-13
+# text = इस जीत के साथ भारत ए ने दो मैचों की श्रृंखला बराबर कर दी।
+1	इस	_	DET	_	_	2	det	_	_
+2	जीत	_	NOUN	_	_	13	obl	_	_
+3	के	_	ADP	_	_	2	case	_	_
+4	साथ	_	ADP	_	_	2	case	_	_
+5	भारत	_	PROPN	_	_	13	nsubj	_	_
+6	ए	_	PROPN	_	_	5	flat	_	_
+7	ने	_	ADP	_	_	5	case	_	_
+8	दो	_	NUM	_	_	9	nummod	_	_
+9	मैचों	_	NOUN	_	_	11	nmod	_	_
+10	की	_	ADP	_	_	9	case	_	_
+11	श्रृंखला	_	NOUN	_	_	13	obj	_	_
+12	बराबर	_	ADJ	_	_	13	xcomp	_	_
+13	कर	_	VERB	_	_	0	root	_	_
+14	दी	_	AUX	_	_	13	aux	_	SpaceAfter=No
+15	।	_	PUNCT	_	_	13	punct	_	_
+
+# sent_id = hi-selfdev-14
+# text = उन्होंने 63 गेंद की अपनी पारी में चार चौके और एक छक्का मारा।
+1	उन्होंने	_	PRON	_	_	13	nsubj	_	_
+2	63	_	NUM	_	_	3	nummod	_	_
+3	गेंद	_	NOUN	_	_	6	nmod	_	_
+4	की	_	ADP	_	_	3	case	_	_
+5	अपनी	_	PRON	_	_	6	nmod	_	_
+6	पारी	_	NOUN	_	_	13	obl	_	_
+7	में	_	ADP	_	_	6	case	_	_
+8	चार	_	NUM	_	_	9	nummod	_	_
+9	चौके	_	NOUN	_	_	13	obj	_	_
+10	और	_	CCONJ	_	_	12	cc	_	_
+11	एक	_	NUM	_	_	12	nummod	_	_
+12	छक्का	_	NOUN	_	_	9	conj	_	_
+13	मारा	_	VERB	_	_	0	root	_	SpaceAfter=No
+14	।	_	PUNCT	_	_	13	punct	_	_
+
+# sent_id = hi-selfdev-15
+# text = इनके लिखे में कोई बनावट नहीं होती।
+1	इनके	_	PRON	_	_	2	obl	_	_
+2	लिखे	_	VERB	_	_	7	obl	_	_
+3	में	_	ADP	_	_	2	case	_	_
+4	कोई	_	DET	_	_	5	det	_	_
+5	बनावट	_	NOUN	_	_	7	nsubj	_	_
+6	नहीं	_	PART	_	_	7	advmod	_	_
+7	होती	_	VERB	_	_	0	root	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-16
+# text = इन लोगों का व्यवहार से खास लेना - देना नहीं होता।
+1	इन	_	DET	_	_	2	det	_	_
+2	लोगों	_	NOUN	_	_	4	nmod	_	_
+3	का	_	ADP	_	_	2	case	_	_
+4	व्यवहार	_	NOUN	_	_	7	obl	_	_
+5	से	_	ADP	_	_	4	case	_	_
+6	खास	_	ADJ	_	_	7	amod	_	_
+7	लेना	_	NOUN	_	_	11	nsubj	_	_
+8	-	_	PUNCT	_	_	9	punct	_	_
+9	देना	_	NOUN	_	_	7	conj	_	_
+10	नहीं	_	PART	_	_	11	advmod	_	_
+11	होता	_	VERB	_	_	0	root	_	SpaceAfter=No
+12	।	_	PUNCT	_	_	11	punct	_	_
+
+# sent_id = hi-selfdev-17
+# text = एक बार फिर से बंगाली बाला का जादू बॉक्स ऑफिस पर चल गया।
+1	एक	_	NUM	_	_	2	nummod	_	_
+2	बार	_	NOUN	_	_	12	obl	_	_
+3	फिर	_	ADV	_	_	12	advmod	_	_
+4	से	_	ADP	_	_	3	case	_	_
+5	बंगाली	_	ADJ	_	_	6	amod	_	_
+6	बाला	_	NOUN	_	_	8	nmod	_	_
+7	का	_	ADP	_	_	6	case	_	_
+8	जादू	_	NOUN	_	_	12	nsubj	_	_
+9	बॉक्स	_	NOUN	_	_	10	compound	_	_
+10	ऑफिस	_	NOUN	_	_	12	obl	_	_
+11	पर	_	ADP	_	_	10	case	_	_
+12	चल	_	VERB	_	_	0	root	_	_
+13	गया	_	AUX	_	_	12	aux	_	SpaceAfter=No
+14	।	_	PUNCT	_	_	12	punct	_	_
+

@@ -181,6 +181,7 @@ public static class ModelPackages
         ["es"] = "RecursiveAI.OneNlp.Models.Spanish",
         ["it"] = "RecursiveAI.OneNlp.Models.Italian",
         ["zh"] = "RecursiveAI.OneNlp.Models.Chinese",
+        ["hi"] = "RecursiveAI.OneNlp.Models.Hindi",
     };
 
     /// <summary>The error for a language and tier without a model: it carries the packages to add, and its message names them.</summary>
