@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using RecursiveAI.OneModel.Tensors;
 using RecursiveAI.OneModel.Training;
 using RecursiveAI.OneNlp.Data;
@@ -90,6 +89,7 @@ public static class PipelineTraining
         private bool _done;
         private bool _stoppedEarly;
         private byte[]? _bestSnapshot;
+        private bool _bestOnDisk;
 
         public Trainer(Pipeline pipeline, IReadOnlyList<Example> examples, TrainOptions options, CancellationToken ct)
         {
@@ -166,7 +166,7 @@ public static class PipelineTraining
             {
                 // A fresh run that starts from the weights and optimizer moments of an earlier run: the step counter of the run restarts at 0
                 // while the optimizer keeps its own count, so a schedule given by the caller sees steps continuing from the earlier run.
-                Checkpoint.Load(_o.InitializeFrom, _state, _optimizer);
+                CheckpointFile.Load(_o.InitializeFrom, _state, _optimizer);
             }
 
             while (!_done)
@@ -422,12 +422,18 @@ public static class PipelineTraining
                 _bestScore = score;
                 _bestStep = _step;
                 _sinceBest = 0;
-                using var ms = new MemoryStream();
-                Checkpoint.Save(ms, _weights);
-                _bestSnapshot = ms.ToArray();
                 if (_o.CheckpointDirectory is not null)
                 {
-                    WriteAtomically(Path.Combine(_o.CheckpointDirectory, BestName), _bestSnapshot);
+                    // Streamed to the file: the weights of a many-head pipeline are larger than an in-memory array can be.
+                    Checkpoint.Save(Path.Combine(_o.CheckpointDirectory, BestName), _weights);
+                    _bestSnapshot = null;
+                    _bestOnDisk = true;
+                }
+                else
+                {
+                    using var ms = new MemoryStream();
+                    Checkpoint.Save(ms, _weights);
+                    _bestSnapshot = ms.ToArray();
                 }
             }
             else
@@ -495,7 +501,21 @@ public static class PipelineTraining
             }
 
             SetMode(training: false);
-            if (_o.RestoreBest && _bestSnapshot is not null)
+            RestoreBestWeights();
+        }
+
+        private void RestoreBestWeights()
+        {
+            if (!_o.RestoreBest)
+            {
+                return;
+            }
+
+            if (_bestOnDisk)
+            {
+                CheckpointFile.Load(Path.Combine(_o.CheckpointDirectory!, BestName), _weights);
+            }
+            else if (_bestSnapshot is not null)
             {
                 using var ms = new MemoryStream(_bestSnapshot);
                 Checkpoint.Load(ms, _weights);
@@ -531,8 +551,7 @@ public static class PipelineTraining
                 return;
             }
 
-            CheckpointInfo info = Checkpoint.Load(last, _state, _optimizer);
-            IReadOnlyDictionary<string, long> x = info.Extra;
+            IReadOnlyDictionary<string, long> x = CheckpointFile.Load(last, _state, _optimizer);
             if (x["seed"] != unchecked((long)_o.Seed) || x["trainCount"] != _train.Count || x["batchWords"] != _o.BatchWords)
             {
                 throw new InvalidOperationException($"The checkpoint in '{_o.CheckpointDirectory}' was made with a different seed, batch size or training set. Delete it or use another directory.");
@@ -550,33 +569,20 @@ public static class PipelineTraining
             _stoppedEarly = x["stoppedEarly"] != 0;
             if (_hasBest)
             {
-                _bestSnapshot = File.ReadAllBytes(Path.Combine(_o.CheckpointDirectory!, BestName));
+                _bestOnDisk = true;
             }
 
             if (_done)
             {
                 SetMode(training: false);
-                if (_o.RestoreBest && _bestSnapshot is not null)
-                {
-                    using var ms = new MemoryStream(_bestSnapshot);
-                    Checkpoint.Load(ms, _weights);
-                }
+                RestoreBestWeights();
             }
         }
 
         private TrainResult Result(bool completed)
         {
-            using var ms = new MemoryStream();
-            Checkpoint.Save(ms, _weights);
-            string hash = Convert.ToHexStringLower(SHA256.HashData(ms.ToArray()));
+            string hash = CheckpointFile.HashOf(_weights);
             return new TrainResult(_step, _epoch, completed, _stoppedEarly, _evals, _bestScore, _bestStep, hash);
-        }
-
-        private static void WriteAtomically(string path, byte[] bytes)
-        {
-            string temp = path + ".tmp";
-            File.WriteAllBytes(temp, bytes);
-            File.Move(temp, path, overwrite: true);
         }
     }
 }
