@@ -21,8 +21,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Serialization verbs: `Doc.WriteTo(Stream)` is `Doc.WriteBinary(Stream)`, `Doc.FromBytes(Stream)` is `Doc.FromStream(Stream)`, and `DocBin.WriteTo(Stream)` is `DocBin.WriteBinary(Stream)`.
 - `TrainOptions`, `TrainResult`, `TrainProgress`, `DevScores` (was `RecursiveAI.OneNlp.Neural.Training`) and `Example` (was `RecursiveAI.OneNlp.Data`) are in the `RecursiveAI.OneNlp` namespace. *Migration:* delete `using RecursiveAI.OneNlp.Neural.Training;`; `using RecursiveAI.OneNlp.Data;` is still needed for the readers and `Alignment`.
 
+- Training a head that already has weights (a packaged pipeline) on data with labels it lacks: an `EntityRecognizer` now appends the new labels and keeps its weights (spaCy's "add a label, then train"); before, the labels were silently dropped. A `Tagger` or `TextClassifier` throws `ArgumentException` naming the unknown values or categories instead of skipping them. (Other heads are unchanged.) `ITrainableComponent.ExtendLabels` is the new member (a default interface method).
+- `ModelNotAvailableException` for a language no published package covers (for example Basque) has an empty `PackageIds` and says so, instead of naming a package that cannot help; a package already referenced is never named.
+- `Span` and `Token` write their `start` and `end` in code points through `System.Text.Json`, as the `Doc` form does (they were UTF-16 offsets). The two differ only after a character outside the Basic Multilingual Plane; `StartChar` and `Idx` are unchanged.
+- `default(Token)` and `default(Span)` members throw `InvalidOperationException` (they threw `NullReferenceException`). `Example.Create` throws `ArgumentOutOfRangeException` for an offset outside the text. `Doc.FromJson` messages no longer end in `(Parameter 'name')`.
+- `Pipeline.ProcessMany` takes a trailing `CancellationToken` (source compatible; a method group or delegate bound to the old signature must be rebuilt).
+
 ### Added
 
+- `Nlp.Entities(text, types, threshold)` for open-type entities with a probability threshold (the default stays 0.5); `docs/open-ner.md` says where the recognizer comes from.
 - `Nlp.Entities`, `Nlp.Analyze`, `Nlp.AnalyzeMany` and `Nlp.Lemmas` overloads that take a `Language`; `Nlp.MaxLength`; `Pipeline.MaxLength`.
 - `Tokenizer.FromWordPieceVocabulary(path or stream, WordPieceVocabularyOptions)` states the casing of a `vocab.txt`; `Tokenizer.EncodeToIds(text, addSpecialTokens)` returns an `int[]`.
 - `ModelNotAvailableException`.

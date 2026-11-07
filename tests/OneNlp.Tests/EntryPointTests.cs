@@ -104,9 +104,12 @@ public class EntryPointTests
         Assert.Equal(Tier.Accurate, accurate.Tier);
         Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual.Large", accurate.PackageIds);
 
-        // A language without a fast-tier package is told only about the package that exists.
+        // A language no package covers is told so, and no package is named.
         ModelNotAvailableException swahili = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.FromCode("sw")));
-        Assert.Equal(["RecursiveAI.OneNlp.Models.Multilingual"], swahili.PackageIds);
+        Assert.Empty(swahili.PackageIds);
+
+        ModelNotAvailableException hindi = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.FromCode("hi")));
+        Assert.Empty(hindi.PackageIds);
 
         // Code that caught InvalidOperationException keeps working.
         Assert.IsAssignableFrom<InvalidOperationException>(german);

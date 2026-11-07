@@ -105,6 +105,35 @@ public sealed class Tagger : TrainableHead
     }
 
     /// <inheritdoc/>
+    /// <exception cref="ArgumentException">The examples hold values this tagger's label set lacks. A tagger's label set is fixed once it has weights.</exception>
+    public override IReadOnlyList<string> ExtendLabels(IReadOnlyList<Example> examples, ulong seed)
+    {
+        ArgumentNullException.ThrowIfNull(examples);
+        var unknown = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (Example example in examples)
+        {
+            Doc reference = example.Reference;
+            foreach (int id in reference.GetColumn(Column))
+            {
+                if (id != 0 && !_labelIds.ContainsKey(reference.Strings[id]))
+                {
+                    unknown.Add(reference.Strings[id]);
+                }
+            }
+        }
+
+        if (unknown.Count > 0)
+        {
+            throw new ArgumentException(
+                $"The training examples hold {Column} values that the component '{Name}' does not have: {string.Join(", ", unknown.Take(10))}. "
+                + "A tagger's label set is fixed once it has weights; train a new tagger, or remove these values.",
+                nameof(examples));
+        }
+
+        return [];
+    }
+
+    /// <inheritdoc/>
     public override Tensor Loss(EncodedBatch encoded, IReadOnlyList<Example> examples)
     {
         ArgumentNullException.ThrowIfNull(encoded);

@@ -34,12 +34,31 @@ internal static class Program
         RegisterTinyOpenModel();
         Sample(english, [english, "Paris is in France."], tokenizerFile, english: true);
         Sample(german, [german, "Berlin liegt in Deutschland.", "Ein kleiner Test."], tokenizerFile, english: false);
+        FineTuneNewLabel();
         Console.WriteLine(failures == 0 ? "OK" : $"FAILED {failures}");
         return failures == 0 ? 0 : 1;
 #endif
     }
 
 #if !NO_MODELS
+    // Training the packaged entity recognizer on a label it lacks adds the label (and keeps PER, ORG and LOC) instead of dropping it.
+    private static void FineTuneNewLabel()
+    {
+        using var nlp = Pipeline.Create(Language.English, Tier.Fast).Add<EntityRecognizer>();
+        var head = (EntityRecognizer)nlp.Components[0];
+        int before = head.Labels.Count;
+        var examples = new List<Example>();
+        for (int i = 0; i < 24; i++)
+        {
+            string text = $"Order {4400 + i} shipped to Paris.";
+            examples.Add(Example.Create(nlp, text, [(6, 10, "ORDER"), (22, 27, "LOC")]));
+        }
+
+        nlp.Train(examples, new TrainOptions { Epochs = 2, Seed = 1 });
+        Check("a new label is added", head.Labels.Contains("ORDER") && head.Labels.Count == before + 1 && head.Labels.Contains("PER"));
+        Console.WriteLine("labels: " + string.Join(",", head.Labels));
+    }
+
     private static void Sample(string text, string[] texts, string tokenizerFile, bool english)
     {
         DateTimeOffset today = new(2026, 11, 6, 0, 0, 0, TimeSpan.Zero);

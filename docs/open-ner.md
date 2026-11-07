@@ -1,6 +1,6 @@
 # Open-type entities
 
-Entity types named at run time: `Nlp.Entities(text, "contract party", "governing law")`, or `OpenEntityRecognizer.Recognize(doc, types)` on a document you tokenized.
+Entity types named at run time: `Nlp.Entities(text, "person", "organization")`, with a threshold `Nlp.Entities(text, ["contract party"], 0.1f)`, or `OpenEntityRecognizer.Recognize(doc, types)` on a document you tokenized.
 
 ## Model
 
@@ -12,6 +12,8 @@ Entity types named at run time: `Nlp.Entities(text, "contract party", "governing
 ## Happy path
 
 `Nlp.Entities(string text, params string[] types)` finds the registered open-type pipeline (`ModelPackages.RegisterOpenEntities`, called by the model package) and throws, naming `RecursiveAI.OneNlp.Models.Multilingual`, when there is none. Nothing is downloaded. A pipeline's `Recognize` is thread-safe.
+
+The default threshold of 0.5 was the best on the Few-NERD and UNER dev sets, and it suits common type names: "organization" finds "Acme Corp." (0.76) and "Beta LLC" (0.80). An unusual name such as "contract party" scores far lower on the same text (0.15 to 0.17), so it returns nothing at 0.5. Pass a lower threshold to `Nlp.Entities(text, types, threshold)`, and check the results, or use a type name the model has seen. To hold the recognizer yourself, `MultilingualModel.LoadOpenEntities()` returns a pipeline whose `Components` include an `IOpenEntityRecognizer`; its `Recognize(doc, types, threshold)` takes the same threshold (null for the component's default).
 
 ## Data and limits
 

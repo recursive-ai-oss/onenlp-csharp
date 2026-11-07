@@ -15,7 +15,7 @@ public static class PipelineTraining
     /// <summary>
     /// Trains every <see cref="ITrainableComponent"/> of the pipeline, and the encoders they read, on examples: AdamW with an optional
     /// schedule and gradient clipping, batches by token count, dropout on the encoder output, a deterministic train/dev split,
-    /// evaluation on dev, early stopping and checkpoints. Heads that have no weights yet are initialized from the training examples.
+    /// evaluation on dev, early stopping and checkpoints. Heads that have no weights yet are initialized from the training examples; a head that already has weights keeps them and learns the labels the examples add (an entity recognizer appends them; a tagger or text classifier throws <see cref="ArgumentException"/> naming labels it does not have).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -116,6 +116,11 @@ public static class PipelineTraining
                 if (!_heads[i].IsInitialized)
                 {
                     _heads[i].Initialize(_train, options.Seed + 1 + (ulong)i);
+                }
+                else
+                {
+                    // spaCy's "add a label, then train": a head with weights grows to the labels of the new data, or refuses them.
+                    _heads[i].ExtendLabels(_train, options.Seed + 1 + (ulong)i);
                 }
             }
 

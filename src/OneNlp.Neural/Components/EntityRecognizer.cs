@@ -143,6 +143,59 @@ public sealed class EntityRecognizer : TrainableHead
         Build([.. seen], new Generator(seed));
     }
 
+    /// <summary>
+    /// Appends the entity labels of <paramref name="examples"/> that this recognizer lacks, keeping every weight it has (spaCy's
+    /// "add a label, then train"). New labels follow the existing ones in sorted order, so the old outputs keep their positions; the
+    /// new outputs start from fresh random weights drawn from <paramref name="seed"/>. <c>Train</c> calls this for a recognizer that
+    /// already has weights.
+    /// </summary>
+    /// <param name="examples">The training examples.</param>
+    /// <param name="seed">Seed of the new outputs' initial weights.</param>
+    /// <returns>The labels added, in output order; empty when there were none.</returns>
+    /// <exception cref="InvalidOperationException">The recognizer has no weights yet.</exception>
+    /// <exception cref="ArgumentException">The label set would exceed 4096 labels.</exception>
+    public override IReadOnlyList<string> ExtendLabels(IReadOnlyList<Example> examples, ulong seed)
+    {
+        ArgumentNullException.ThrowIfNull(examples);
+        NerModule old = _module ?? throw new InvalidOperationException($"The component '{Name}' is not initialized.");
+        var added = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (Example example in examples)
+        {
+            foreach (Span entity in example.Reference.Ents)
+            {
+                if (entity.Label.Length > 0 && !_labelIds.ContainsKey(entity.Label))
+                {
+                    added.Add(entity.Label);
+                }
+            }
+        }
+
+        if (added.Count == 0)
+        {
+            return [];
+        }
+
+        if (_labels.Length + added.Count > MaxLabels)
+        {
+            throw new ArgumentException($"The recognizer would hold more than {MaxLabels} entity labels.", nameof(examples));
+        }
+
+        // New output rows come last (tag layout and span classes both index labels in order), so every old row keeps its place.
+        Dictionary<string, Tensor> before = old.NamedParameters().ToDictionary(static p => p.Name, static p => p.Tensor, StringComparer.Ordinal);
+        Build([.. _labels, .. added], new Generator(seed));
+        foreach ((string name, Tensor target) in _module!.NamedParameters())
+        {
+            if (before.TryGetValue(name, out Tensor source))
+            {
+                // Same trailing shape, fewer or equal leading rows: the leading rows are the old weights.
+                source.Data<float>().CopyTo(target.MutableData<float>());
+            }
+        }
+
+        old.Dispose();
+        return [.. added];
+    }
+
     /// <inheritdoc/>
     public override Tensor Loss(EncodedBatch encoded, IReadOnlyList<Example> examples)
     {

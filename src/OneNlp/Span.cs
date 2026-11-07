@@ -8,6 +8,8 @@ namespace RecursiveAI.OneNlp;
 public readonly struct Span : IEquatable<Span>
 {
     private readonly Doc _doc;
+
+    private Doc Owner => _doc ?? throw new InvalidOperationException("A default Span has no document; get spans from a Doc.");
     private readonly int _start;
     private readonly int _end;
     private readonly int _label;
@@ -36,7 +38,7 @@ public readonly struct Span : IEquatable<Span>
     }
 
     /// <summary>The document this span belongs to.</summary>
-    public Doc Doc => _doc;
+    public Doc Doc => Owner;
 
     /// <summary>The index of the first token.</summary>
     public int Start => _start;
@@ -51,13 +53,13 @@ public readonly struct Span : IEquatable<Span>
     /// The offset of the first character: the start of the first token. An empty span sits at the start of the token it precedes, or at
     /// the end of the text.
     /// </summary>
-    public int StartChar => _start < _doc.Length ? _doc.StartOf(_start) : _doc.Text.Length;
+    public int StartChar => _start < Owner.Length ? Owner.StartOf(_start) : Owner.Text.Length;
 
     /// <summary>The offset just past the last character: the end of the last token (equal to <see cref="StartChar"/> when empty).</summary>
-    public int EndChar => _end > _start ? _doc.StartOf(_end - 1) + _doc.LengthOf(_end - 1) : StartChar;
+    public int EndChar => _end > _start ? Owner.StartOf(_end - 1) + Owner.LengthOf(_end - 1) : StartChar;
 
     /// <summary>The label; the empty string when there is none.</summary>
-    public string Label => _doc.Strings[_label];
+    public string Label => Owner.Strings[_label];
 
     /// <summary>The label's ID in the document's string table; 0 for none.</summary>
     public int LabelId => _label;
@@ -66,13 +68,13 @@ public readonly struct Span : IEquatable<Span>
     public float Confidence => _confidence;
 
     /// <summary>The text from <see cref="StartChar"/> to <see cref="EndChar"/>, whitespace between tokens included, as a new string (spaCy's <c>text</c>). Each call copies; see <see cref="TextSpan"/>.</summary>
-    public string Text => _doc.Text.Substring(StartChar, EndChar - StartChar);
+    public string Text => Owner.Text.Substring(StartChar, EndChar - StartChar);
 
     /// <summary>The same text as a slice of the original string, without copying. Compare contents with <see cref="System.MemoryExtensions.SequenceEqual{T}(ReadOnlySpan{T}, ReadOnlySpan{T})"/>; <c>==</c> on spans compares memory.</summary>
-    public ReadOnlySpan<char> TextSpan => _doc.Text.AsSpan(StartChar, EndChar - StartChar);
+    public ReadOnlySpan<char> TextSpan => Owner.Text.AsSpan(StartChar, EndChar - StartChar);
 
     /// <summary>The text as memory over the original string.</summary>
-    public ReadOnlyMemory<char> TextMemory => _doc.Text.AsMemory(StartChar, EndChar - StartChar);
+    public ReadOnlyMemory<char> TextMemory => Owner.Text.AsMemory(StartChar, EndChar - StartChar);
 
     /// <summary>Gets a token of the span.</summary>
     /// <param name="index">The position within the span, from 0.</param>
@@ -86,14 +88,14 @@ public readonly struct Span : IEquatable<Span>
                 throw new ArgumentOutOfRangeException(nameof(index), index, "The index is outside the span.");
             }
 
-            return new Token(_doc, _start + index);
+            return new Token(Owner, _start + index);
         }
     }
 
     /// <summary>Returns the same tokens with another label and confidence.</summary>
     /// <param name="label">The new label.</param>
     /// <param name="confidence">The new confidence from 0 to 1.</param>
-    public Span With(string? label, float confidence = 1f) => new(_doc, _start, _end, label, confidence);
+    public Span With(string? label, float confidence = 1f) => new(Owner, _start, _end, label, confidence);
 
     /// <summary>Returns <see cref="Text"/>.</summary>
     public override string ToString() => Text;
@@ -158,7 +160,7 @@ public readonly struct Span : IEquatable<Span>
                 return false;
             }
 
-            Current = new Token(_span._doc, _next++);
+            Current = new Token(_span.Owner, _next++);
             return true;
         }
     }

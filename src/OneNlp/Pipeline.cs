@@ -183,13 +183,15 @@ public sealed class Pipeline : IDisposable
     /// </summary>
     /// <param name="texts">The texts.</param>
     /// <param name="batchSize">Texts per batch, at least 1.</param>
+    /// <param name="cancellationToken">Checked before each text is read and each batch is processed; enumeration then throws <see cref="OperationCanceledException"/>. Default: never cancelled.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="batchSize"/> is less than 1.</exception>
     /// <exception cref="ArgumentOutOfRangeException">A text is longer than <see cref="MaxLength"/>; raised when that text is reached.</exception>
-    public IEnumerable<Doc> ProcessMany(IEnumerable<string> texts, int batchSize = 64)
+    /// <exception cref="OperationCanceledException">During enumeration, <paramref name="cancellationToken"/> was cancelled.</exception>
+    public IEnumerable<Doc> ProcessMany(IEnumerable<string> texts, int batchSize = 64, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(texts);
         ArgumentOutOfRangeException.ThrowIfLessThan(batchSize, 1);
-        return ProcessManyCore(texts, batchSize);
+        return ProcessManyCore(texts, batchSize, cancellationToken);
     }
 
     /// <summary>
@@ -232,11 +234,12 @@ public sealed class Pipeline : IDisposable
         return text;
     }
 
-    private IEnumerable<Doc> ProcessManyCore(IEnumerable<string> texts, int batchSize)
+    private IEnumerable<Doc> ProcessManyCore(IEnumerable<string> texts, int batchSize, CancellationToken cancellationToken)
     {
         var batch = new List<Doc>(batchSize);
         foreach (string text in texts)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             batch.Add(Tokenizer.Tokenize(CheckedItem(text ?? throw new ArgumentException("A text is null.", nameof(texts))), Strings));
             if (batch.Count == batchSize)
             {
@@ -266,6 +269,7 @@ public sealed class Pipeline : IDisposable
         var batch = new List<Doc>(batchSize);
         await foreach (string text in texts.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             batch.Add(Tokenizer.Tokenize(CheckedItem(text ?? throw new ArgumentException("A text is null.", nameof(texts))), Strings));
             if (batch.Count == batchSize)
             {

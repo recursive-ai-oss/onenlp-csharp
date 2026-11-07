@@ -113,6 +113,39 @@ public sealed class TextClassifier : TrainableHead
     }
 
     /// <inheritdoc/>
+    /// <exception cref="ArgumentException">The examples hold categories this classifier lacks. Its label set is fixed once it has weights.</exception>
+    public override IReadOnlyList<string> ExtendLabels(IReadOnlyList<Example> examples, ulong seed)
+    {
+        ArgumentNullException.ThrowIfNull(examples);
+        var unknown = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (Example example in examples)
+        {
+            if (example.Cats is null)
+            {
+                continue;
+            }
+
+            foreach (string label in example.Cats.Keys)
+            {
+                if (!_labelIds.ContainsKey(label))
+                {
+                    unknown.Add(label);
+                }
+            }
+        }
+
+        if (unknown.Count > 0)
+        {
+            throw new ArgumentException(
+                $"The training examples hold categories that the component '{Name}' does not have: {string.Join(", ", unknown.Take(10))}. "
+                + "A text classifier's label set is fixed once it has weights; train a new one, or remove these categories.",
+                nameof(examples));
+        }
+
+        return [];
+    }
+
+    /// <inheritdoc/>
     public override Tensor Loss(EncodedBatch encoded, IReadOnlyList<Example> examples)
     {
         ArgumentNullException.ThrowIfNull(encoded);
