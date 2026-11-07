@@ -96,8 +96,18 @@ internal static partial class Program
     {
         string outDir = Required(args, "out");
         int perDoc = Num(args, "sentences-per-doc", 10);
-        List<Example> train = Documents(Required(args, "train"), perDoc);
-        List<Example> dev = Documents(Required(args, "dev"), perDoc);
+        // --predicted-words FILE: train (and select) on the words of the tokenizer in FILE (a splitter.onenlp), with the treebank annotation
+        // projected onto them, the way the parser meets text at run time. --predicted-dev 0 keeps the development file on treebank words.
+        IWordTokenizer? tokenizer = Opt(args, "predicted-words", string.Empty) is { Length: > 0 } tokenizerFile ? PipelineFile.Load(tokenizerFile).Tokenizer : null;
+        List<Example> train = Documents(Required(args, "train"), perDoc, tokenizer);
+        List<Example> dev = Documents(Required(args, "dev"), perDoc, Num(args, "predicted-dev", 1) == 1 ? tokenizer : null);
+        // --extra FILE.conllu: more training sentences (parsed web text, already in the tokenizer's words), added after the treebank's.
+        if (Opt(args, "extra", string.Empty) is { Length: > 0 } extra)
+        {
+            train.AddRange(Documents(extra, perDoc));
+        }
+
+        Console.WriteLine($"projected_tokens={projectedTokens} documents_with_changed_tokens={projectedChanged}");
         using Pipeline pipeline = Pipeline.Blank(Language.Turkish).Add(new Parser(
             MakeEncoder(args, EncoderSeed),
             arcSize: Num(args, "arc", 256),
@@ -151,7 +161,7 @@ internal static partial class Program
 
     // Groups consecutive sentences into documents, the way running text arrives: a parser that only ever saw single sentences could not learn
     // where one ends.
-    private static List<Example> Documents(string path, int perDoc)
+    private static List<Example> Documents(string path, int perDoc, IWordTokenizer? tokenizer = null)
     {
         var result = new List<Example>();
         var strings = new StringStore();
@@ -161,18 +171,21 @@ internal static partial class Program
             group.Add(s);
             if (group.Count == perDoc)
             {
-                result.Add(Example.FromReference(Merge(group, strings)));
+                result.Add(Example.FromReference(Words(Merge(group, strings), tokenizer, strings)));
                 group.Clear();
             }
         }
 
         if (group.Count > 0)
         {
-            result.Add(Example.FromReference(Merge(group, strings)));
+            result.Add(Example.FromReference(Words(Merge(group, strings), tokenizer, strings)));
         }
 
         return result;
     }
+
+    private static Doc Words(Doc gold, IWordTokenizer? tokenizer, StringStore strings) =>
+        tokenizer is null ? gold : Project(gold, tokenizer.Tokenize(gold.Text, strings), strings);
 
     private static Doc Merge(List<ConllUSentence> sentences, StringStore strings)
     {
@@ -265,12 +278,12 @@ internal static partial class Program
         int tokens = 0;
         if (raw)
         {
-            // Ten gold sentences at a time, joined by one space as the text of a running document.
+            // --per-doc gold sentences (default ten) at a time, joined by one space as the text of a running document.
             var chunk = new List<string>();
             foreach (ConllUSentence sentence in ConllUReader.Read(Required(args, "gold")))
             {
                 chunk.Add(sentence.Doc.Text);
-                if (chunk.Count == 10)
+                if (chunk.Count == Num(args, "per-doc", 10))
                 {
                     tokens += WriteRaw(pipeline, string.Join(' ', chunk), sb);
                     chunk.Clear();
