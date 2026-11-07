@@ -68,12 +68,12 @@ Source for each language: its section in [results.md](results.md) and the recipe
 | gold | UPOS | 94.16 [93.79, 94.54] | 94.29 [93.89, 94.66] | within noise |
 | gold | UFeats | 95.15 [94.86, 95.47] | 95.18 [94.88, 95.45] | within noise |
 | gold | Lemmas | 96.11 [95.77, 96.44] | 95.80 [95.42, 96.13] | within noise |
-| gold | LAS | 81.68 [80.82, 82.49] | 81.96 [81.03, 82.83] | within noise |
+| gold | LAS | 81.53 [80.62, 82.43] | 81.96 [81.03, 82.83] | within noise |
 | raw | UPOS | 92.90 [92.42, 93.35] | 92.45 [91.84, 93.06] | within noise |
 | raw | Lemmas | 95.03 [94.61, 95.43] | 93.69 [93.08, 94.29] | ahead |
-| raw | LAS | 77.76 [76.82, 78.70] | 78.53 [77.46, 79.55] | within noise |
-| raw | Sentences (parser) | 76.15 [74.25, 78.08] | 72.66 | within noise or ahead (source gives the interval for ours only) |
-| raw | MLAS | 65.61 [64.46, 66.72] | 69.05 [67.81, 70.21] | **behind** (information row, not gated) |
+| raw | LAS | 77.26 [76.28, 78.25] | 78.53 [77.46, 79.55] | within noise |
+| raw | Sentences (parser) | 71.08 [69.06, 72.98] | 72.66 [70.48, 74.75] | within noise |
+| raw | MLAS | 65.30 [64.12, 66.48] | 69.05 [67.81, 70.21] | **behind** (information row, not gated) |
 | gold, UNER EWT test | Entities micro F1 | 63.09 [60.01, 65.89] | 62.32 [59.42, 65.33] | within noise |
 
 ### Other languages
@@ -83,44 +83,44 @@ Source for each language: its section in [results.md](results.md) and the recipe
 | German | gold | UPOS | 94.56 [94.18, 94.94] | 94.59 [94.22, 94.95] | within noise |
 | German | gold | UFeats | 86.25 [85.60, 86.96] | 84.71 [84.03, 85.39] | ahead |
 | German | gold | Lemmas | 95.95 [95.67, 96.25] | 95.65 [95.34, 95.98] | within noise |
-| German | gold | LAS | 78.25 [77.23, 79.26] | 77.31 [76.29, 78.36] | within noise |
+| German | gold | LAS | 76.66 [75.63, 77.72] | 77.31 [76.29, 78.36] | within noise |
 | German | raw | UPOS | 94.22 [93.83, 94.61] | 90.13 [89.57, 90.67] | ahead |
-| German | raw | LAS | 76.75 [75.74, 77.76] | 70.77 [69.59, 71.95] | ahead |
+| German | raw | LAS | 74.87 [73.79, 75.92] | 70.77 [69.59, 71.95] | ahead |
 | German | gold, GermEval 2014 | Entities micro F1 | 66.28 [64.94, 67.61] | 65.77 [64.49, 67.19] | within noise |
 | French | gold | UPOS | 96.77 [96.33, 97.19] | 97.07 [96.68, 97.47] | within noise |
 | French | gold | UFeats | 96.34 [95.89, 96.81] | 96.41 [95.91, 96.88] | within noise |
 | French | gold | Lemmas | 97.51 [97.16, 97.84] | 97.49 [97.14, 97.84] | within noise |
-| French | gold | LAS | 86.69 [85.60, 87.81] | 85.98 [84.80, 87.12] | within noise |
+| French | gold | LAS | 86.96 [85.86, 87.96] | 85.98 [84.80, 87.12] | within noise |
 | French | raw | UPOS | 96.06 [95.60, 96.53] | 91.80 [91.07, 92.55] | ahead |
-| French | raw | LAS | 85.97 [84.73, 87.08] | 78.10 [76.77, 79.43] | ahead |
+| French | raw | LAS | 86.07 [84.92, 87.11] | 78.10 [76.77, 79.43] | ahead |
 | French | gold, WikiNER test | Entities micro F1 | 82.48 [81.74, 83.28] | 75.50 [74.68, 76.46] | ahead |
 | Spanish | gold | UPOS | 98.11 [97.98, 98.25] | 98.18 [98.04, 98.32] | within noise |
 | Spanish | gold | UFeats | 97.71 [97.56, 97.86] | 97.74 [97.58, 97.89] | within noise |
 | Spanish | gold | Lemmas | 98.84 [98.73, 98.95] | 98.72 [98.59, 98.83] | within noise |
-| Spanish | gold | LAS | 87.00 [86.50, 87.51] | 85.95 [85.44, 86.44] | ahead |
+| Spanish | gold | LAS | 86.41 [85.90, 86.89] | 85.95 [85.44, 86.44] | within noise |
 | Spanish | raw | UPOS | 97.86 [97.71, 98.01] | 94.81 [94.56, 95.02] | ahead |
-| Spanish | raw | LAS | 86.70 [86.15, 87.23] | 81.82 [81.25, 82.37] | ahead |
+| Spanish | raw | LAS | 86.15 [85.61, 86.64] | 81.82 [81.25, 82.37] | ahead |
 | Spanish | gold, WikiNER test | Entities micro F1 | 84.81 [84.08, 85.54] | 83.35 [82.63, 84.08] | ahead (paired +1.46 [0.84, 2.14]; PER 91.57 vs 90.45, ahead) |
 | Portuguese | gold | UPOS | 95.89 [95.62, 96.14] | 95.92 [95.66, 96.22] | within noise |
 | Portuguese | gold | UFeats | 94.51 [94.17, 94.80] | 94.11 [93.82, 94.42] | within noise |
 | Portuguese | gold | Lemmas | 97.30 [97.10, 97.51] | 96.90 [96.70, 97.11] | within noise |
-| Portuguese | gold | LAS | 82.74 [82.07, 83.35] | 81.96 [81.30, 82.61] | within noise |
+| Portuguese | gold | LAS | 81.80 [81.10, 82.49] | 81.96 [81.31, 82.61] | within noise |
 | Portuguese | raw | UPOS | 95.35 [95.05, 95.64] | 84.15 [83.59, 84.73] | ahead |
-| Portuguese | raw | LAS | 82.09 [81.38, 82.76] | 65.85 [64.88, 66.65] | ahead |
+| Portuguese | raw | LAS | 81.14 [80.44, 81.82] | 65.85 [65.02, 66.75] | ahead |
 | Portuguese | gold, UNER Bosque test | Entities micro F1 | 73.48 [70.95, 75.86] | 75.27 [72.73, 77.60] | within noise (precision 75.46 vs 76.96, paired -1.50 [-3.76, 0.83]) |
 | Italian | gold | UPOS | 94.44 [93.92, 94.96] | 94.10 [93.58, 94.60] | within noise |
 | Italian | gold | UFeats | 89.52 [88.85, 90.16] | 87.42 [86.67, 88.14] | ahead |
 | Italian | gold | Lemmas | 95.18 [94.73, 95.63] | 93.13 [92.58, 93.64] | ahead |
-| Italian | gold | LAS | 72.57 [71.24, 74.06] | 71.39 [70.26, 72.58] | within noise |
+| Italian | gold | LAS | 71.55 [70.26, 72.97] | 71.39 [70.26, 72.58] | within noise |
 | Italian | raw | UPOS | 94.01 [93.45, 94.51] | 83.53 [82.50, 84.48] | ahead |
-| Italian | raw | LAS | 72.77 [71.46, 74.16] | 58.38 [56.92, 59.86] | ahead |
+| Italian | raw | LAS | 71.55 [70.27, 72.90] | 58.38 [56.92, 59.86] | ahead |
 | Italian | gold, WikiNER test | Entities micro F1 | 86.35 [85.73, 87.01] | 83.54 [82.85, 84.26] | ahead |
 | Dutch | gold | UPOS | 93.83 [93.16, 94.49] | 94.42 [93.77, 95.04] | within noise |
 | Dutch | gold | UFeats | 92.94 [92.24, 93.53] | 93.13 [92.47, 93.72] | within noise |
 | Dutch | gold | Lemmas | 91.61 [90.99, 92.14] | 91.83 [91.21, 92.39] | within noise |
-| Dutch | gold | LAS | 80.28 [79.12, 81.51] | 79.85 [78.58, 81.16] | within noise |
+| Dutch | gold | LAS | 79.12 [77.87, 80.39] | 79.85 [78.58, 81.16] | within noise |
 | Dutch | raw | UPOS | 93.09 [92.40, 93.77] | 94.36 [93.67, 94.98] | within noise |
-| Dutch | raw | LAS | 79.48 [78.28, 80.78] | 79.57 [78.26, 80.89] | within noise |
+| Dutch | raw | LAS | 78.18 [76.87, 79.46] | 79.57 [78.26, 80.89] | within noise |
 | Dutch | gold, WikiNER test | Entities micro F1 | 87.47 [86.91, 87.98] | 86.21 [85.70, 86.78] | ahead (paired +1.26 [0.76, 1.72]) |
 | Turkish | gold | UPOS | 88.97 [88.31, 89.58] | 88.04 [87.37, 88.64] | within noise |
 | Turkish | gold | UFeats | 78.15 [77.40, 78.90] | 78.30 [77.46, 79.05] | within noise |
@@ -132,11 +132,11 @@ Source for each language: its section in [results.md](results.md) and the recipe
 | Chinese | gold (spaCy `gold_preproc`) | UPOS | 90.41 [89.70, 91.07] | 90.35 [89.70, 90.99] | within noise |
 | Chinese | gold | UFeats | 98.38 [98.13, 98.59] | 98.43 [98.19, 98.66] | within noise |
 | Chinese | gold | Lemmas | 99.87 [99.79, 99.94] | 99.91 [99.85, 99.96] | within noise |
-| Chinese | gold | LAS | 68.76 [67.12, 70.32] | 68.24 [66.47, 69.94] | within noise |
-| Chinese | gold | MLAS | 56.94 [55.08, 58.69] | 58.87 [56.85, 60.72] | within noise |
+| Chinese | gold | LAS | 67.49 [65.94, 69.14] | 68.24 [66.47, 69.94] | within noise |
+| Chinese | gold | MLAS | 55.78 [53.92, 57.68] | 58.87 [56.85, 60.72] | within noise |
 | Chinese | raw | Words | 89.62 [88.87, 90.42] | 39.43 [38.60, 40.23] | ahead (spaCy's default Chinese tokenizer cuts single characters) |
 | Chinese | raw | UPOS | 81.90 [80.99, 82.86] | 34.92 [34.11, 35.68] | ahead |
-| Chinese | raw | LAS | 57.88 [56.21, 59.63] | 8.59 [7.94, 9.28] | ahead |
+| Chinese | raw | LAS | 56.93 [55.23, 58.73] | 8.59 [7.94, 9.28] | ahead |
 | Chinese | gold, UNER GSDSIMP test | Entities micro F1 | 63.79 [59.39, 68.27] | 61.86 [57.66, 66.12] | within noise (precision 69.28 vs 67.08, recall 59.11 vs 57.40, all within noise) |
 
 ### Hindi (self-labelled; information, not a gated comparison)
