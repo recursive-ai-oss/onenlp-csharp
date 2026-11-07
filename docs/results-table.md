@@ -152,9 +152,9 @@ Reference: spaCy 3.8.18 `textcat`, `textcat_multilabel` and `spancat`, default c
 | Multi-label, EUR-LEX test (5,000) | Micro-F1 | 59.60 [58.92, 60.30] | 44.86 [44.07, 45.69] | ahead |
 | | Macro-F1 | 40.93 [39.78, 41.78] | 15.66 [15.27, 16.05] | ahead |
 | | Macro ROC-AUC | 91.81 [91.47, 92.15] | 67.29 [66.65, 67.93] | ahead |
-| Spans, UNER English-EWT test | Span F1 | 64.44 [61.28, 67.36] | 60.19 [57.02, 63.40] | ahead (paired +4.25 [1.57, 6.71]) |
-| | Precision | 70.33 [66.97, 73.38] | 75.38 [72.01, 78.86] | **behind** (paired -5.05 [-8.63, -1.42]) |
-| | Recall | 59.47 [56.11, 62.50] | 50.09 [46.64, 53.48] | ahead |
+| Spans, UNER English-EWT test (threshold 0.8, chosen on dev) | Span F1 | 63.79 [60.78, 66.63] | 60.19 [57.02, 63.40] | ahead (paired +3.60 [1.14, 6.07]) |
+| | Precision | 75.98 [72.83, 79.18] | 75.38 [72.01, 78.86] | within noise (paired +0.60 [-3.02, 4.17]) |
+| | Recall | 54.96 [51.67, 58.24] | 50.09 [46.64, 53.48] | ahead (paired +4.87 [2.44, 7.10]) |
 
 For information, the LexGLUE paper's EUR-LEX numbers on the same test split (TF-IDF with an SVM: micro-F1 71.3, macro-F1 51.4; BERT-base: 71.4 and 57.2) are above ours; ours is a from-scratch fast-tier model with a 512-word cut.
 
@@ -197,7 +197,7 @@ No accurate-tier model package is released yet, so these rows are information an
 - **Spanish entities, PER type** (WikiNER test): -1.96 [-2.83, -1.13] against spaCy; micro F1 is within noise and ORG is ahead (`recipes/es/fast/PROVENANCE.md`).
 - **Portuguese entities, precision:** -4.27 [-6.58, -1.59] outside the interval, while micro F1 is within noise (`recipes/pt/fast/PROVENANCE.md`).
 - **Chinese entities, precision:** 62.44 against 67.08 (-4.64 [-8.52, -0.50]); micro F1, recall (63.17 against 57.40) and every type are within noise or ahead.
-- **Span categorizer, precision:** 70.33 against 75.38 (above); the threshold was not tuned (0.5 as in spaCy).
+- **Span categorizer:** at spaCy's threshold of 0.5 precision was 70.33 against 75.38 (paired -5.05 [-8.63, -1.42]); the shipped default threshold is 0.8, chosen on the development split (`recipes/en/spancat/README.md`).
 - **Embeddings:** the five cells below the model cards, shared with sentence-transformers (above).
 - **Language ID:** the languages named under the table are below Lingua on short text.
 - **Entities per type:** per-type rows are in each source file; several have intervals that overlap with a paired difference that excludes zero (for example English LOC with the single-encoder option); the packaged English model has none of those.

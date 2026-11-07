@@ -23,7 +23,7 @@ namespace RecursiveAI.OneNlp.Neural.Components;
 /// non-exclusive mode. Every proposal that is not a gold span is a negative for every label.
 /// </para>
 /// <para>
-/// <b>Output.</b> A span is written once per label whose score is at least <see cref="Threshold"/> (default 0.5), with that score as its
+/// <b>Output.</b> A span is written once per label whose score is at least <see cref="Threshold"/> (default 0.8), with that score as its
 /// confidence, in text order (start, then length, then label order).
 /// </para>
 /// </remarks>
@@ -43,6 +43,7 @@ public sealed class SpanCategorizer : TrainableHead
 
     private readonly int[] _sizes;
     private string[] _labels = [];
+    private float _threshold;
     private Dictionary<string, int> _labelIds = new(StringComparer.Ordinal);
     private SpanModule? _module;
 
@@ -51,11 +52,11 @@ public sealed class SpanCategorizer : TrainableHead
     /// <param name="spansKey">The name of the span group it reads from the gold documents and writes to predicted ones. Default <c>sc</c>.</param>
     /// <param name="sizes">The span lengths in tokens to propose, each 1 to 256, at most 32 of them; <see langword="null"/> means 1, 2 and 3.</param>
     /// <param name="hiddenSize">Width of the hidden layer, 0 to 4096; 0 (the default) means none.</param>
-    /// <param name="threshold">The score a span needs for a label to be written, above 0 and at most 1. Default 0.5.</param>
+    /// <param name="threshold">The score a span needs for a label to be written, above 0 and at most 1. Default 0.8: chosen on a development set so that precision matches a reference system at a small cost in recall (see docs/classification.md).</param>
     /// <param name="name">The component name, unique in its pipeline. Default <c>spancat</c>.</param>
     /// <exception cref="ArgumentException">A size is out of range or repeated, or the key is empty.</exception>
     /// <exception cref="ArgumentOutOfRangeException">The hidden size or the threshold is out of range.</exception>
-    public SpanCategorizer(IEncoder encoder, string spansKey = "sc", IReadOnlyList<int>? sizes = null, int hiddenSize = 0, float threshold = 0.5f, string name = "spancat")
+    public SpanCategorizer(IEncoder encoder, string spansKey = "sc", IReadOnlyList<int>? sizes = null, int hiddenSize = 0, float threshold = 0.8f, string name = "spancat")
         : base(name, encoder)
     {
         ArgumentException.ThrowIfNullOrEmpty(spansKey);
@@ -77,7 +78,7 @@ public sealed class SpanCategorizer : TrainableHead
         Sizes = list;
         _sizes = list;
         HiddenSize = hiddenSize;
-        Threshold = threshold;
+        _threshold = threshold;
     }
 
     /// <summary>The span group the categorizer reads and writes.</summary>
@@ -89,8 +90,24 @@ public sealed class SpanCategorizer : TrainableHead
     /// <summary>Width of the hidden layer; 0 for none.</summary>
     public int HiddenSize { get; }
 
-    /// <summary>The score a span needs for a label to be written.</summary>
-    public float Threshold { get; }
+    /// <summary>
+    /// The score a span needs for a label to be written, above 0 and at most 1. Raising it trades recall for precision; it can be changed
+    /// on a trained categorizer (and is saved with it), but not while another thread is processing text.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">The value is not above 0 and at most 1.</exception>
+    public float Threshold
+    {
+        get => _threshold;
+        set
+        {
+            if (!(value > 0f && value <= 1f))
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "The threshold is above 0 and at most 1.");
+            }
+
+            _threshold = value;
+        }
+    }
 
     /// <summary>The labels, in output order; empty until the categorizer is initialized.</summary>
     public IReadOnlyList<string> Labels => _labels;
