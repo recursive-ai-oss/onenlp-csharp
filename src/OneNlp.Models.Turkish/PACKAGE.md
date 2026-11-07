@@ -19,12 +19,13 @@ foreach (Span e in Nlp.Entities("Ankara Türkiye'nin başkentidir."))
 }
 ```
 
-A suffix written after a name or a number with an apostrophe (`Ankara'da`, `1882'den`) stays in its token, as in the treebank. UD Turkish also writes a copula or a suffix such as `-ken` that is spelled onto its word as a word of its own (`yaparken` is `yapar` + `ken`); the tokenizer cuts those from a table of word endings learned from the treebank, which is right about as often as it is wrong, so expect some extra splits and some missed ones (`docs/segmentation.md`).
+A suffix written after a name or a number with an apostrophe (`Ankara'da`, `1882'den`) stays in its token, as in the treebank. UD Turkish also writes a copula or a suffix such as `-ken` that is spelled onto its word as a word of its own (`yaparken` is `yapar` + `ken`); a small trained model decides those cuts from the characters of the word and its sentence. The treebank is not consistent about them, so about half of the cuts are ones the treebank does not make and a third of its cuts are missed (`docs/segmentation.md`).
 
 The package adds a small source file to the project that references it; that file registers the model when the program starts. Programs that cannot compile it call `TurkishModel.Register()` once.
 
 The weights are trained on Universal Dependencies Turkish-BOUN (CC BY-SA 4.0) and Turkish-WikiNER (CC BY-SA 4.0), credited in `THIRD-PARTY-NOTICES.md`; `PROVENANCE.md` lists every dataset, recipe and seed. The weights are licensed `MIT OR Apache-2.0`.
 
+- Measured results against spaCy and others: <https://github.com/recursive-ai-oss/onenlp-csharp/blob/main/docs/results-table.md>
 - Source and documentation: <https://github.com/recursive-ai-oss/onenlp-csharp>
 - Home: <https://recursiveai.org/onenlp/>
 

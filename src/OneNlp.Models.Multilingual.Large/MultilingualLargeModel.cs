@@ -13,7 +13,7 @@ namespace RecursiveAI.OneNlp.Models.Multilingual.Large;
 /// <remarks>
 /// <para>
 /// Referencing this package is all the <see cref="Nlp"/> verbs need: the package adds a module initializer to the project that references it, which
-/// calls <see cref="Register"/>. The model is a <em>fallback</em>: a language that also has a fast-tier package uses that package's pipeline.
+/// calls <see cref="Register"/>. The model is accurate-tier: a language that also has a fast-tier package keeps using that package for the plain verbs, and this model serves the accurate-tier request.
 /// Nothing is downloaded and nothing is discovered by reflection. The 1.3 GB of weights are read the first time a verb needs any of the
 /// languages; the encoder is then shared by all of them.
 /// </para>
@@ -36,7 +36,7 @@ public static class MultilingualLargeModel
     public static IReadOnlyList<string> Languages { get; } = ["en", "de", "fr", "es", "pt", "it", "nl", "tr", "zh"];
 
     /// <summary>
-    /// Makes the <see cref="Nlp"/> verbs use this model for its languages when no fast-tier package registered one. Safe to call more than once; the
+    /// Registers this model as the accurate-tier pipeline of its languages, with priority over the base multilingual package. Safe to call more than once; the
     /// registration the package adds to a project calls it. The weights are read on first use.
     /// </summary>
     public static void Register()
@@ -44,7 +44,7 @@ public static class MultilingualLargeModel
         foreach (string code in Languages)
         {
             string language = code;
-            ModelPackages.RegisterFallback(Language.FromCode(language), PackageId, () => Load(language));
+            ModelPackages.Register(Language.FromCode(language), Tier.Accurate, PackageId, () => Load(language), priority: 1);
         }
     }
 

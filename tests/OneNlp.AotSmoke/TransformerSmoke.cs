@@ -60,6 +60,21 @@ internal static class TransformerSmoke
             using JsonDocument saved = JsonDocument.Parse(settingsStream.ToArray());
             using IEncoder rebuilt = EncoderRegistry.Create(TrainableTransformerEncoder.EncoderKind, saved.RootElement);
             check(file + " trainable registry", rebuilt.Width == trainable.Width && rebuilt.Weights is not null);
+
+            // The fine-tuned weights written back to ONNX run on the graph runtime.
+            string written = Path.Combine(Path.GetTempPath(), "aot-smoke-" + Guid.NewGuid().ToString("N") + ".onnx");
+            try
+            {
+                trainable.ExportOnnx(written);
+                using var graph = new TransformerEncoder(written, tokenizer, SubwordPooling.Mean, maxLength: 16);
+                using var graphScope = new ActivationScope();
+                float[] a = graph.Encode([doc]).Vectors.Data<float>().ToArray();
+                check(file + " written graph", a.Length == 5 * graph.Width && a.All(float.IsFinite));
+            }
+            finally
+            {
+                File.Delete(written);
+            }
         }
     }
 }

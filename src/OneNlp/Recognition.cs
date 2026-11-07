@@ -252,7 +252,9 @@ public readonly record struct RecognitionContext(DateTimeOffset? ReferenceDate =
 {
     /// <summary>
     /// The region whose conventions apply to holidays and numeric dates: <c>us</c> (the default; <c>04/05/2026</c> is April 5) or <c>gb</c>
-    /// (<c>04/05/2026</c> is 4 May; Boxing Day, bank holidays). Case-insensitive; an unknown value is read as <c>us</c>.
+    /// (<c>04/05/2026</c> is 4 May; Boxing Day, bank holidays). For Spanish, <c>es</c> (default) or <c>mx</c> (Mexico: <c>1,234.56</c> with a decimal point,
+    /// and the Mexican holidays); for Portuguese, <c>br</c> (default) or <c>pt</c> (Portugal holidays). Case-insensitive; an unknown value is read as the
+    /// language's own default.
     /// </summary>
     public string? Region { get; init; }
 }

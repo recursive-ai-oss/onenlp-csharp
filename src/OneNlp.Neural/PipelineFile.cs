@@ -44,16 +44,46 @@ public static class PipelineFile
     /// <summary>Saves a pipeline to a file, replacing it (written to a temporary name first, then renamed).</summary>
     /// <param name="pipeline">The pipeline. Its trainable components must be initialized; its other components must be registered in <see cref="ComponentRegistry"/>; its tokenizer must be a <see cref="RuleWordTokenizer"/> or a <see cref="UaxWordTokenizer"/>.</param>
     /// <param name="path">The destination file.</param>
+    /// <remarks>
+    /// A fine-tuned transformer encoder (<see cref="TrainableTransformerEncoder"/>) is saved as an ONNX file beside the pipeline, named <c>&lt;file name without extension&gt;.encoder&lt;N&gt;.onnx</c>,
+    /// and the pipeline refers to it as a <see cref="TransformerEncoder"/>: loading the pipeline then runs the encoder on OneModel's inference runtime, not on the
+    /// trainable modules, with the same results. The two files travel together. Use <see cref="Save(Pipeline, string, bool)"/> with <see langword="false"/> to keep the
+    /// weights inside the pipeline file instead (the pipeline then loads as a trainable encoder, which can be trained further but runs slower).
+    /// </remarks>
     /// <exception cref="NotSupportedException">The pipeline holds a tokenizer or component that cannot be saved.</exception>
     /// <exception cref="InvalidOperationException">A trainable component has no weights yet.</exception>
-    public static void Save(Pipeline pipeline, string path)
+    public static void Save(Pipeline pipeline, string path) => Save(pipeline, path, exportEncoderGraphs: true);
+
+    /// <summary>Saves a pipeline to a file, replacing it, choosing how a fine-tuned transformer encoder is stored.</summary>
+    /// <param name="pipeline">The pipeline; see <see cref="Save(Pipeline, string)"/> for what it may hold.</param>
+    /// <param name="path">The destination file.</param>
+    /// <param name="exportEncoderGraphs"><see langword="true"/> writes each <see cref="TrainableTransformerEncoder"/> as an ONNX file beside the pipeline (see <see cref="Save(Pipeline, string)"/>); <see langword="false"/> stores its weights in the pipeline file.</param>
+    /// <exception cref="NotSupportedException">The pipeline holds a tokenizer or component that cannot be saved.</exception>
+    /// <exception cref="InvalidOperationException">A trainable component has no weights yet.</exception>
+    public static void Save(Pipeline pipeline, string path, bool exportEncoderGraphs)
     {
         ArgumentNullException.ThrowIfNull(pipeline);
         ArgumentException.ThrowIfNullOrEmpty(path);
+        var graphs = new Dictionary<int, (string File, string Sha256)>();
+        if (exportEncoderGraphs)
+        {
+            (_, List<IEncoder> encoders) = StateModule.Collect(pipeline);
+            string directory = Path.GetDirectoryName(Path.GetFullPath(path))!;
+            string stem = Path.GetFileNameWithoutExtension(path);
+            for (int i = 0; i < encoders.Count; i++)
+            {
+                if (encoders[i] is TrainableTransformerEncoder transformer)
+                {
+                    string file = FormattableString.Invariant($"{stem}.encoder{i}.onnx");
+                    graphs[i] = (file, transformer.ExportOnnx(Path.Combine(directory, file)));
+                }
+            }
+        }
+
         string temp = path + ".tmp";
         using (var stream = new FileStream(temp, FileMode.Create, FileAccess.Write, FileShare.None))
         {
-            Save(pipeline, stream);
+            Save(pipeline, stream, graphs);
         }
 
         File.Move(temp, path, overwrite: true);
@@ -64,13 +94,15 @@ public static class PipelineFile
     /// <param name="stream">A writable stream; left open.</param>
     /// <exception cref="NotSupportedException">The pipeline holds a tokenizer or component that cannot be saved.</exception>
     /// <exception cref="InvalidOperationException">A trainable component has no weights yet.</exception>
-    public static void Save(Pipeline pipeline, Stream stream)
+    public static void Save(Pipeline pipeline, Stream stream) => Save(pipeline, stream, []);
+
+    private static void Save(Pipeline pipeline, Stream stream, Dictionary<int, (string File, string Sha256)> graphs)
     {
         ArgumentNullException.ThrowIfNull(pipeline);
         ArgumentNullException.ThrowIfNull(stream);
-        if (pipeline.Tokenizer is not (RuleWordTokenizer or UaxWordTokenizer))
+        if (pipeline.Tokenizer is not (RuleWordTokenizer or UaxWordTokenizer or NeuralWordSegmenter or NeuralMultiwordSplitter { Inner: RuleWordTokenizer or UaxWordTokenizer }))
         {
-            throw new NotSupportedException("Only a pipeline with the rule word tokenizer or the UAX #29 word tokenizer can be saved so far.");
+            throw new NotSupportedException("Only a pipeline with the rule word tokenizer, the UAX #29 word tokenizer, a trained word segmenter or a multiword splitter over the first two can be saved so far.");
         }
 
         (List<ITrainableComponent> heads, List<IEncoder> encoders) = StateModule.Collect(pipeline);
@@ -82,9 +114,9 @@ public static class PipelineFile
             }
         }
 
-        byte[] config = WriteConfig(pipeline, encoders);
+        byte[] config = WriteConfig(pipeline, encoders, graphs);
         using var weights = new MemoryStream();
-        Checkpoint.Save(weights, StateModule.ForWeights(encoders, heads));
+        Checkpoint.Save(weights, StateModule.ForWeights(encoders, heads, graphs.Keys));
 
         Span<byte> header = stackalloc byte[HeaderSize];
         Encoding.ASCII.GetBytes(Magic, header);
@@ -122,6 +154,8 @@ public static class PipelineFile
             throw new ArgumentException("The stream must support seeking so the lengths can be checked.", nameof(stream));
         }
 
+        string? previous = TransformerEncoder.PipelineDirectory;
+        TransformerEncoder.PipelineDirectory = stream is FileStream file ? Path.GetDirectoryName(Path.GetFullPath(file.Name)) : null;
         try
         {
             return LoadCore(stream);
@@ -129,6 +163,10 @@ public static class PipelineFile
         catch (Exception e) when (e is JsonException or CheckpointException or ArgumentException or InvalidOperationException or KeyNotFoundException or FormatException or OverflowException)
         {
             throw new InvalidDataException("The saved pipeline is invalid: " + e.Message, e);
+        }
+        finally
+        {
+            TransformerEncoder.PipelineDirectory = previous;
         }
     }
 
@@ -179,7 +217,6 @@ public static class PipelineFile
         }
 
         Language language = Language.FromCode(JsonSettings.String(root, "language", 32));
-        IWordTokenizer tokenizer = ReadTokenizer(JsonSettings.Property(root, "tokenizer"));
 
         JsonElement encodersJson = JsonSettings.Property(root, "encoders");
         JsonElement componentsJson = JsonSettings.Property(root, "components");
@@ -193,6 +230,21 @@ public static class PipelineFile
         foreach (JsonElement e in encodersJson.EnumerateArray())
         {
             encoders.Add(EncoderRegistry.Create(JsonSettings.String(e, "kind"), JsonSettings.Property(e, "settings")));
+        }
+
+        IWordTokenizer tokenizer;
+        try
+        {
+            tokenizer = ReadTokenizer(JsonSettings.Property(root, "tokenizer"), encoders);
+        }
+        catch
+        {
+            foreach (IEncoder e in encoders)
+            {
+                e.Dispose();
+            }
+
+            throw;
         }
 
         var pipeline = new Pipeline(tokenizer, language);
@@ -226,7 +278,7 @@ public static class PipelineFile
         }
     }
 
-    private static IWordTokenizer ReadTokenizer(JsonElement e)
+    private static IWordTokenizer ReadTokenizer(JsonElement e, List<IEncoder> encoders)
     {
         switch (JsonSettings.String(e, "kind", 16))
         {
@@ -235,8 +287,27 @@ public static class PipelineFile
             case "uax":
                 string data = JsonSettings.String(e, "data", 16);
                 return new UaxWordTokenizer(SegmentationData.ByName(data));
+            case "mwt":
+                // A multiword splitter: the surface tokenizer (rule or uax) it wraps, and a tagger over one of the file's encoders with the labels B and I.
+                JsonElement innerJson = JsonSettings.Property(e, "inner");
+                IWordTokenizer inner = JsonSettings.String(innerJson, "kind", 16) switch
+                {
+                    "rule" => new RuleWordTokenizer(),
+                    "uax" => new UaxWordTokenizer(SegmentationData.ByName(JsonSettings.String(innerJson, "data", 16))),
+                    _ => throw new InvalidDataException("The inner tokenizer of a multiword splitter must be 'rule' or 'uax'."),
+                };
+                int splitterEncoder = JsonSettings.Int(e, "encoder", 0, encoders.Count - 1);
+                var splitterHead = HeadRegistry.Create(Tagger.ComponentKind, NeuralMultiwordSplitter.HeadName, encoders[splitterEncoder], JsonSettings.Property(e, "head")) as Tagger
+                    ?? throw new InvalidDataException("The splitter's head must be a tagger.");
+                return new NeuralMultiwordSplitter(inner, splitterHead) { MinCutPercent = JsonSettings.OptionalInt(e, "minCutPercent", 50, 99, 50) };
+            case "segmenter":
+                // A trained word segmenter: its tagger reads one of the file's encoders and holds the labels B and I.
+                int encoderIndex = JsonSettings.Int(e, "encoder", 0, encoders.Count - 1);
+                var head = HeadRegistry.Create(Tagger.ComponentKind, NeuralWordSegmenter.HeadName, encoders[encoderIndex], JsonSettings.Property(e, "head")) as Tagger
+                    ?? throw new InvalidDataException("The segmenter's head must be a tagger.");
+                return new NeuralWordSegmenter(head);
             default:
-                throw new InvalidDataException("Unsupported tokenizer kind; known kinds are 'rule' and 'uax'.");
+                throw new InvalidDataException("Unsupported tokenizer kind; known kinds are 'rule', 'uax', 'segmenter' and 'mwt'.");
         }
     }
 
@@ -270,7 +341,7 @@ public static class PipelineFile
         return result;
     }
 
-    private static byte[] WriteConfig(Pipeline pipeline, List<IEncoder> encoders)
+    private static byte[] WriteConfig(Pipeline pipeline, List<IEncoder> encoders, Dictionary<int, (string File, string Sha256)> graphs)
     {
         using var buffer = new MemoryStream();
         using (var w = new Utf8JsonWriter(buffer))
@@ -285,6 +356,39 @@ public static class PipelineFile
                 w.WriteString("kind", "uax");
                 w.WriteString("data", uax.Data.Name);
             }
+            else if (pipeline.Tokenizer is NeuralMultiwordSplitter splitter)
+            {
+                w.WriteString("kind", "mwt");
+                w.WriteStartObject("inner");
+                if (splitter.Inner is UaxWordTokenizer innerUax)
+                {
+                    w.WriteString("kind", "uax");
+                    w.WriteString("data", innerUax.Data.Name);
+                }
+                else
+                {
+                    w.WriteString("kind", "rule");
+                }
+
+                w.WriteEndObject();
+                if (splitter.MinCutPercent != 50)
+                {
+                    w.WriteNumber("minCutPercent", splitter.MinCutPercent);
+                }
+
+                w.WriteNumber("encoder", encoders.FindIndex(e => ReferenceEquals(e, splitter.Head.Encoder)));
+                w.WriteStartObject("head");
+                splitter.Head.WriteConfig(w);
+                w.WriteEndObject();
+            }
+            else if (pipeline.Tokenizer is NeuralWordSegmenter segmenter)
+            {
+                w.WriteString("kind", "segmenter");
+                w.WriteNumber("encoder", encoders.FindIndex(e => ReferenceEquals(e, segmenter.Head.Encoder)));
+                w.WriteStartObject("head");
+                segmenter.Head.WriteConfig(w);
+                w.WriteEndObject();
+            }
             else
             {
                 w.WriteString("kind", "rule");
@@ -292,12 +396,21 @@ public static class PipelineFile
 
             w.WriteEndObject();
             w.WriteStartArray("encoders");
-            foreach (IEncoder encoder in encoders)
+            for (int i = 0; i < encoders.Count; i++)
             {
+                IEncoder encoder = encoders[i];
                 w.WriteStartObject();
-                w.WriteString("kind", encoder.Kind);
+                w.WriteString("kind", graphs.ContainsKey(i) ? TransformerEncoder.EncoderKind : encoder.Kind);
                 w.WriteStartObject("settings");
-                encoder.WriteSettings(w);
+                if (graphs.TryGetValue(i, out (string File, string Sha256) graph))
+                {
+                    ((TrainableTransformerEncoder)encoder).WriteGraphSettings(w, graph.File, graph.Sha256);
+                }
+                else
+                {
+                    encoder.WriteSettings(w);
+                }
+
                 w.WriteEndObject();
                 w.WriteEndObject();
             }

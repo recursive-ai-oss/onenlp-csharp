@@ -26,6 +26,20 @@ internal sealed class StateModule : NnModule
     {
         var heads = new List<ITrainableComponent>();
         var encoders = new List<IEncoder>();
+
+        // A trained word segmenter is the pipeline's tokenizer; its tagger and encoder come first, so a file without one numbers its weights as before.
+        Tagger? tokenizerHead = pipeline.Tokenizer switch
+        {
+            NeuralWordSegmenter segmenter => segmenter.Head,
+            NeuralMultiwordSplitter splitter => splitter.Head,
+            _ => null,
+        };
+        if (tokenizerHead is not null)
+        {
+            heads.Add(tokenizerHead);
+            encoders.Add(tokenizerHead.Encoder);
+        }
+
         foreach (IPipelineComponent component in pipeline.Components)
         {
             if (component is ITrainableComponent head)
@@ -42,12 +56,13 @@ internal sealed class StateModule : NnModule
     }
 
     /// <summary>The weights of encoders and heads under their stable names. Every head must be initialized.</summary>
-    public static StateModule ForWeights(IReadOnlyList<IEncoder> encoders, IReadOnlyList<ITrainableComponent> heads)
+    public static StateModule ForWeights(IReadOnlyList<IEncoder> encoders, IReadOnlyList<ITrainableComponent> heads, IEnumerable<int>? skipEncoders = null)
     {
         var state = new StateModule();
+        HashSet<int> skip = skipEncoders is null ? [] : [.. skipEncoders];
         for (int i = 0; i < encoders.Count; i++)
         {
-            if (encoders[i].Weights is { } module)
+            if (!skip.Contains(i) && encoders[i].Weights is { } module)
             {
                 state.Add("encoder" + i.ToString(CultureInfo.InvariantCulture), module);
             }

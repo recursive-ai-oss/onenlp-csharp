@@ -201,7 +201,7 @@ internal static class Program
                         sb.Append(m.FirstWord + 1).Append('-').Append(m.LastWord + 1).Append('\t').Append(m.Form).Append("\t_\t_\t_\t_\t_\t_\t_\t_\n");
                     }
 
-                    WriteWord(sb, predicted, i, i, sentence.Forms[i], i == 0);
+                    WriteWord(sb, predicted, i, 0, i, sentence.Forms[i], i == 0);
                 }
 
                 sb.Append('\n');
@@ -285,14 +285,14 @@ internal static class Program
                         .Append("\t_\t_\t_\t_\t_\t_\t_\t_\n");
                     for (int j = 0; j < pieces; j++)
                     {
-                        WriteWord(sb, doc, ids[k + j], k + j, words[j], k + j == 0);
+                        WriteWord(sb, doc, ids[k + j], sentence.Start, k + j, words[j], k + j == 0);
                     }
 
                     k += pieces - 1;
                     continue;
                 }
 
-                WriteWord(sb, doc, ids[k], k, doc[ids[k]].ToString(), k == 0);
+                WriteWord(sb, doc, ids[k], sentence.Start, k, doc[ids[k]].ToString(), k == 0);
             }
 
             sb.Append('\n');
@@ -301,12 +301,20 @@ internal static class Program
         return doc.Length;
     }
 
-    // HEAD and DEPREL are placeholders (the first word is the root, the rest hang off it) so that the scorer accepts the file.
-    private static void WriteWord(StringBuilder sb, Doc doc, int tokenIndex, int position, string form, bool root)
+    // HEAD and DEPREL come from the parser when the model has one; without one they are placeholders (the first word is the root, the
+    // rest hang off it) so that the scorer accepts the file.
+    private static void WriteWord(StringBuilder sb, Doc doc, int tokenIndex, int sentenceStart, int position, string form, bool root)
     {
         Token t = doc[tokenIndex];
+        string attachment = root ? "0\troot" : "1\tdep";
+        if (t.Dep.Length > 0)
+        {
+            int head = t.HeadIndex == tokenIndex ? 0 : t.HeadIndex - sentenceStart + 1;
+            attachment = head + "\t" + (head == 0 ? "root" : t.Dep);
+        }
+
         sb.Append(position + 1).Append('\t').Append(form).Append('\t').Append(Cell(t.Lemma)).Append('\t').Append(Cell(t.Pos)).Append('\t')
-            .Append(Cell(t.Tag)).Append('\t').Append(Cell(t.Morph)).Append('\t').Append(root ? "0\troot" : "1\tdep").Append("\t_\t_\n");
+            .Append(Cell(t.Tag)).Append('\t').Append(Cell(t.Morph)).Append('\t').Append(attachment).Append("\t_\t_\n");
     }
 
     private static string Cell(string value) => value.Length == 0 ? "_" : value;

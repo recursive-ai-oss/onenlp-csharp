@@ -1,0 +1,14 @@
+<Project>
+  <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
+       To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
+  <ItemGroup>
+    <ChineseWeight Include="segmenter.onenlp" Size="43476326" Sha256="6520915c3d6cfa6d238012e52cdae03641154b8d9fc81e31ee8e1ffcd934b3cb"
+                  Recipe="recipes/zh/fast" Data="UD Chinese-GSDSimp r2.18 (CC BY-SA 4.0)" Contents="word segmenter (character B/I tagger), the pipeline's tokenizer" />
+    <ChineseWeight Include="tagging.onenlp" Size="35523536" Sha256="3f773289d49b3b905e35993c6928266919ac74effa95c9f0c8ef061b5857bc59"
+                  Recipe="recipes/zh/fast" Data="UD Chinese-GSDSimp r2.18 (CC BY-SA 4.0)" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
+    <ChineseWeight Include="parser.onenlp" Size="39260234" Sha256="eb5a8e1dc60ac5536dc1e22bb9b43dc704ea0cda22c5b12f5ba3b157aef88457"
+                  Recipe="recipes/zh/fast" Data="UD Chinese-GSDSimp r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />
+    <ChineseWeight Include="ner.onenlp" Size="52586086" Sha256="97ac3eb877d88cef2bea9628310259acf8c655663e47de3b509b1708c6287c5d"
+                  Recipe="recipes/zh/fast" Data="UNER Chinese-GSDSIMP (CC BY-SA 4.0)" Contents="entity recognizer (PER, LOC, ORG)" />
+  </ItemGroup>
+</Project>

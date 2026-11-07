@@ -47,6 +47,7 @@ case "$target" in
   fast-settings) maxlen=1024 ;;
   pipeline-config) maxlen=16384 ;;
   pipeline-file) maxlen=65536 ;;
+  onnx-patch) maxlen=262144 ;;
   *) echo "unknown target '$target'" >&2; exit 2 ;;
 esac
 

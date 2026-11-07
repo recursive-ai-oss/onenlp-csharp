@@ -1,0 +1,29 @@
+<Project>
+  <!-- Shared by the multilingual embeddings packages: with a weights directory (property EmbeddingsWeightsDir or environment variable
+       ONENLP_EMBEDDINGS_E5_WEIGHTS), check every file listed in the project's weights.manifest.props against its sha256 and embed it.
+       Without one the project still builds (for development) but cannot be packed. -->
+  <PropertyGroup>
+    <EmbeddingsWeightsDir Condition="'$(EmbeddingsWeightsDir)' == ''">$(ONENLP_EMBEDDINGS_E5_WEIGHTS)</EmbeddingsWeightsDir>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildProjectDirectory)/weights.manifest.props" />
+
+  <Target Name="EmbedEmbeddingsWeights" BeforeTargets="AssignTargetPaths" Condition="'$(EmbeddingsWeightsDir)' != ''">
+    <ItemGroup>
+      <_Weight Include="@(EmbeddingsWeight)" Path="$([MSBuild]::EnsureTrailingSlash('$(EmbeddingsWeightsDir)'))%(Identity)" WeightName="%(Identity)" />
+    </ItemGroup>
+    <Error Condition="!Exists('%(_Weight.Path)')" Text="Weights file '%(_Weight.WeightName)' is missing from '$(EmbeddingsWeightsDir)'. Put the files listed in weights.manifest.props there (tools/embeddings/make_shards.sh writes them)." />
+    <GetFileHash Files="@(_Weight->'%(Path)')" Algorithm="SHA256" HashEncoding="hex">
+      <Output TaskParameter="Items" ItemName="_WeightHashed" />
+    </GetFileHash>
+    <Error Condition="!$([System.String]::Equals('%(_WeightHashed.FileHash)', '%(_WeightHashed.Sha256)', System.StringComparison.OrdinalIgnoreCase))"
+           Text="Weights file '%(_WeightHashed.WeightName)' does not match the manifest: sha256 %(_WeightHashed.FileHash), expected %(_WeightHashed.Sha256). Use the files listed in weights.manifest.props, or update the manifest and PROVENANCE.md together." />
+    <ItemGroup>
+      <EmbeddedResource Include="@(_WeightHashed)" LogicalName="weights/%(_WeightHashed.WeightName)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="RequireEmbeddingsWeightsToPack" BeforeTargets="GenerateNuspec" Condition="'$(EmbeddingsWeightsDir)' == ''">
+    <Error Text="Packing needs the weights: set the environment variable ONENLP_EMBEDDINGS_E5_WEIGHTS (or the property EmbeddingsWeightsDir) to the directory that holds the files listed in weights.manifest.props." />
+  </Target>
+</Project>

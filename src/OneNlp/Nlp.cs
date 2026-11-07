@@ -105,6 +105,15 @@ public static class Nlp
     /// <exception cref="InvalidOperationException">No model package is available for the text's language; the message names the package to add.</exception>
     public static IReadOnlyList<Span> Entities(string text) => ModelPackages.Get(LanguageOf(text)).Process(text).Ents;
 
+    /// <summary>Finds entities of types you name at run time, such as <c>"contract party"</c> or <c>"governing law"</c>.</summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <param name="types">The type names: 1 to 256 distinct, non-empty strings of at most 200 characters, in any language the model reads.</param>
+    /// <returns>The entities in text order, without overlaps; each <see cref="Span.Label"/> is the type name as given, with a confidence and character offsets into <paramref name="text"/>. Empty when there are none.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> or <paramref name="types"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">No type is given, or a type is invalid.</exception>
+    /// <exception cref="InvalidOperationException">No open-type model is available; the message names the package to add.</exception>
+    public static IReadOnlyList<Span> Entities(string text, params string[] types) => ModelPackages.RecognizeOpen(text, types);
+
     /// <summary>Finds the lemma (dictionary form) of each token of a text.</summary>
     /// <param name="text">The text; may be empty.</param>
     /// <returns>One lemma per token, in token order; empty for a text without tokens.</returns>
@@ -135,7 +144,7 @@ public static class Nlp
 
     /// <summary>Finds numbers, ordinals, percentages, measures and amounts of money in a text of the given language (see <see cref="Quantities(string)"/>).</summary>
     /// <param name="text">The text; may be empty.</param>
-    /// <param name="language">English, French or German: the languages with built-in rules.</param>
+    /// <param name="language">English, French, German, Spanish, Portuguese, Italian, Dutch, Turkish, Hindi or Chinese: the languages with built-in rules.</param>
     /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>. French and German read <c>1 234,56 €</c> and <c>18.000 EUR</c> with the decimal comma and grouped thousands of their country.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
@@ -150,7 +159,7 @@ public static class Nlp
 
     /// <summary>Finds plain numbers and ordinals in a text of the given language (see <see cref="Numbers(string)"/>).</summary>
     /// <param name="text">The text; may be empty.</param>
-    /// <param name="language">English, French or German.</param>
+    /// <param name="language">English, French, German, Spanish, Portuguese, Italian, Dutch, Turkish, Hindi or Chinese.</param>
     /// <returns>The results in text order, with UTF-16 offsets into <paramref name="text"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
@@ -168,7 +177,7 @@ public static class Nlp
 
     /// <summary>Finds the address-like sequences in a text of the given language (see <see cref="Sequences(string)"/>).</summary>
     /// <param name="text">The text; may be empty.</param>
-    /// <param name="language">English, French or German.</param>
+    /// <param name="language">English, French, German, Spanish, Portuguese, Italian, Dutch, Turkish, Hindi or Chinese.</param>
     /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
@@ -188,7 +197,7 @@ public static class Nlp
     /// <summary>Finds dates, times, ranges, durations and recurrences in a text of the given language (see <see cref="Dates(string, DateTimeOffset)"/>).</summary>
     /// <param name="text">The text; may be empty.</param>
     /// <param name="reference">The moment relative expressions are resolved against; wall-clock expressions are read in its offset.</param>
-    /// <param name="language">English, French or German. French and German read <c>04/05/2026</c> as 4 May and use the holidays of France and Germany.</param>
+    /// <param name="language">English, French, German, Spanish, Portuguese, Italian, Dutch, Turkish, Hindi or Chinese. French and German read <c>04/05/2026</c> as 4 May and use the holidays of France and Germany.</param>
     /// <returns>The results in text order without overlaps, with UTF-16 offsets into <paramref name="text"/>. Empty when there are none.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
@@ -209,10 +218,32 @@ public static class Nlp
     /// <summary>Resolves the first date, time or range in a text of the given language to a stretch of time (see <see cref="ParseDate(string, DateTimeOffset)"/>).</summary>
     /// <param name="text">The text; may be empty.</param>
     /// <param name="reference">The moment relative expressions are resolved against; wall-clock expressions are read in its offset.</param>
-    /// <param name="language">English, French or German.</param>
+    /// <param name="language">English, French, German, Spanish, Portuguese, Italian, Dutch, Turkish, Hindi or Chinese.</param>
     /// <returns>The range (start inclusive, end exclusive), or <see langword="null"/> when the text holds no date or time.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
     /// <exception cref="NotSupportedException">No rules for <paramref name="language"/> are built in.</exception>
     public static DateRange? ParseDate(string text, DateTimeOffset reference, Language language) =>
         Dates(text, reference, language).FirstOrDefault(d => d.Range is not null)?.Range;
+
+    /// <summary>Embeds a text as a sentence vector with the default embedding model.</summary>
+    /// <param name="text">The text; may be empty. Text beyond the model's maximum sequence length is cut off.</param>
+    /// <returns>A new array; the default model's vectors have unit length, so the dot product of two is their cosine similarity.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No embedding package is referenced; the message names <c>RecursiveAI.OneNlp.Models.Embeddings</c>.</exception>
+    public static float[] Embed(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        return EmbedderPackages.Get().Embed(text);
+    }
+
+    /// <summary>Embeds many texts with the default embedding model, lazily and in batches.</summary>
+    /// <param name="texts">The texts; enumerated once.</param>
+    /// <returns>One vector per text, in order.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="texts"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException">No embedding package is referenced; the message names <c>RecursiveAI.OneNlp.Models.Embeddings</c>.</exception>
+    public static IEnumerable<float[]> EmbedMany(IEnumerable<string> texts)
+    {
+        ArgumentNullException.ThrowIfNull(texts);
+        return EmbedderPackages.Get().EmbedMany(texts);
+    }
 }

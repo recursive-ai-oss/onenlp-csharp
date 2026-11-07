@@ -292,7 +292,7 @@ public class RecognizerTests
     }
 
     [Fact]
-    public void OnlyEnglishFrenchAndGermanAreBuiltIn() => Assert.Throws<NotSupportedException>(() => Recognizer.For(Language.Spanish));
+    public void OtherLanguagesAreNotBuiltIn() => Assert.Throws<NotSupportedException>(() => Recognizer.For(Language.FromCode("ja")));
 
     [Fact]
     public void HappyPathVerbsFilterByKind()

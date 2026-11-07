@@ -1,0 +1,58 @@
+# Currency rules, Italian. Same format as the English file (see there).
+#
+# [currency.symbol]: form | ISO 4217 code | prefix, suffix or both | confidence (optional).
+# [currency.name]:   forms, comma-separated | ISO 4217 code | value of one in the currency (optional) | confidence (optional).
+# The form of a name after "di" ("5 milioni di euro") is written with the word "di".
+
+[currency.symbol]
+$ | USD | both | 0.9
+US$ | USD | prefix
+A$ | AUD | prefix
+C$ | CAD | prefix
+CA$ | CAD | prefix
+€ | EUR | both
+£ | GBP | both
+¥ | JPY | both | 0.7
+￥ | JPY | both | 0.7
+₹ | INR | both
+₩ | KRW | both
+₽ | RUB | both
+₺ | TRY | both
+₪ | ILS | both
+
+[currency.name]
+euro, euri, di euro | EUR | 1 | 0.95
+centesimo, centesimi, di centesimi | EUR | 0.01 | 0.7
+eurocent | EUR | 0.01
+dollaro, dollari, di dollari, dollaro americano, dollari americani | USD | 1 | 0.9
+dollaro canadese, dollari canadesi | CAD
+dollaro australiano, dollari australiani | AUD
+dollaro neozelandese, dollari neozelandesi | NZD
+franco svizzero, franchi svizzeri | CHF
+sterlina, sterline, lira sterlina, lire sterline, di sterline | GBP | 1 | 0.95
+penny, pence | GBP | 0.01 | 0.7
+yen | JPY
+yuan, renminbi | CNY
+rupia, rupie | INR
+rublo, rubli | RUB
+won | KRW
+peso messicano, pesos messicani | MXN
+rand | ZAR
+real brasiliano | BRL
+lira turca, lire turche | TRY
+corona svedese, corone svedesi | SEK
+corona norvegese, corone norvegesi | NOK
+corona danese, corone danesi | DKK
+shekel, siclo, sicli | ILS
+baht | THB
+dirham | AED | 1 | 0.8
+zloty | PLN
+fiorino, fiorini | HUF
+[currency.code]
+AED, AFN, ALL, AMD, ANG, AOA, ARS, AUD, AWG, AZN, BAM, BBD, BDT, BGN, BHD, BIF, BMD, BND, BOB, BOV, BRL, BSD, BTN, BWP, BYN, BZD
+CAD, CDF, CHE, CHF, CHW, CLF, CLP, CNY, COP, COU, CRC, CUP, CVE, CZK, DJF, DKK, DOP, DZD, EGP, ERN, ETB, EUR, FJD, FKP, GBP, GEL
+GHS, GIP, GMD, GNF, GTQ, GYD, HKD, HNL, HTG, HUF, IDR, ILS, INR, IQD, IRR, ISK, JMD, JOD, JPY, KES, KGS, KHR, KMF, KPW, KRW, KWD
+KYD, KZT, LAK, LBP, LKR, LRD, LSL, LYD, MAD, MDL, MGA, MKD, MMK, MNT, MOP, MRU, MUR, MVR, MWK, MXN, MXV, MYR, MZN, NAD, NGN, NIO
+NOK, NPR, NZD, OMR, PAB, PEN, PGK, PHP, PKR, PLN, PYG, QAR, RON, RSD, RUB, RWF, SAR, SBD, SCR, SDG, SEK, SGD, SHP, SLE, SOS, SRD
+SSP, STN, SVC, SYP, SZL, THB, TJS, TMT, TND, TOP, TRY, TTD, TWD, TZS, UAH, UGX, USD, USN, UYI, UYU, UYW, UZS, VED, VES, VND, VUV
+WST, XAD, XAF, XAG, XAU, XBA, XBB, XBC, XBD, XCD, XCG, XDR, XOF, XPD, XPF, XPT, XSU, XUA, YER, ZAR, ZMW, ZWG

@@ -317,7 +317,7 @@ internal sealed partial class Scan
             j += n;
         }
 
-        if (!Find(j, "weekday", out int wn, out TWord wd) || wd.B == 1)
+        if (!Find(j, "weekday", out int wn, out TWord wd) || wd.B == 1 || Is(j, "nodate"))
         {
             return;
         }
@@ -408,6 +408,17 @@ internal sealed partial class Scan
         return true;
     }
 
+    /// <summary>Spanish and Portuguese "12 de septiembre de 2026": with the <c>of-before-year</c> flag, the word "of" between a month and its year is skipped.</summary>
+    private int SkipOfBeforeYear(int k)
+    {
+        if (_td!.Flags.Contains("of-before-year") && Is(k, "of", out int n) && Dig(k + n, 4) && GapOk(_items[k + n - 1].End, _items[k + n].Start))
+        {
+            return k + n;
+        }
+
+        return k;
+    }
+
     private bool YearAt(int k, out int end, out int year)
     {
         end = k;
@@ -458,7 +469,7 @@ internal sealed partial class Scan
             int k = i + n;
             if (DayNum(k, out int de, out int d, out _) && GapOk(_items[k - 1].End, _items[k].Start) && d <= 31)
             {
-                int yk = de;
+                int yk = SkipOfBeforeYear(de);
                 if (Ch(yk, ',') && Tch(yk - 1, yk))
                 {
                     yk++;
@@ -514,7 +525,7 @@ internal sealed partial class Scan
             {
                 int m = mw2.A;
                 int me = k + mn;
-                int yk = me;
+                int yk = SkipOfBeforeYear(me);
                 if (Ch(yk, ',') && Tch(yk - 1, yk))
                 {
                     yk++;
@@ -574,7 +585,7 @@ internal sealed partial class Scan
                 }
 
                 HolidayRule rule = _td!.Holidays[w.A];
-                int e = j + h.N;
+                int e = SkipOfBeforeYear(j + h.N);
                 if (mode == 0 && j == i && YearAt(e, out int ye, out int y) && CivilCalendar.Holiday(rule, y) is DateTime dated)
                 {
                     r.Add(Day(i, ye, dated, false));
@@ -844,6 +855,8 @@ internal sealed partial class Scan
 
         QuarterOrHalf(i, a, nr, r);
         PartOfPeriod(i, a, nr, r);
+        PostPartOfPeriod(i, a, nr, r);
+        YearThenSeason(i, r);
 
         // The 1990s
         int d = i;
@@ -860,11 +873,31 @@ internal sealed partial class Scan
         }
 
         // French "les années 1990" and German "1990er Jahre": the same decade as "the 1990s".
-        if (Is(i, "decadeprefix", out int dpn) && Dig(i + dpn, 4) && GapOk(_items[i + dpn - 1].End, _items[i + dpn].Start) && Val(i + dpn) % 10 == 0
-            && Val(i + dpn) is >= 1000 and <= 2990 && FreeRight(i + dpn + 1))
+        // Spanish and Portuguese "los años 80", "anos 90": two digits after the prefix; 30 to 90 are the 1900s, 00 to 20 the 2000s. The article may start the expression.
+        int di = i;
+        if (Is(i, "determiner", out int dtn) && Is(i + dtn, "decadeprefix"))
         {
-            var s = new DateTime(Val(i + dpn), 1, 1);
-            r.Add(Per(i, i + dpn + 1, s, s.AddYears(10), Granularity.Decade, false, false));
+            di = i + dtn;
+        }
+
+        if (Is(di, "decadeprefix", out int dpn2) && Dig(di + dpn2, 2) && GapOk(_items[di + dpn2 - 1].End, _items[di + dpn2].Start) && Val(di + dpn2) % 10 == 0
+            && FreeRight(di + dpn2 + 1))
+        {
+            int yy = Val(di + dpn2);
+            var s2 = new DateTime(yy >= 30 ? 1900 + yy : 2000 + yy, 1, 1);
+            r.Add(Per(i, di + dpn2 + 1, s2, s2.AddYears(10), Granularity.Decade, false, false));
+        }
+
+        if (Is(di, "decadeprefix", out int dpn) && Dig(di + dpn, 4) && GapOk(_items[di + dpn - 1].End, _items[di + dpn].Start) && Val(di + dpn) % 10 == 0
+            && Val(di + dpn) is >= 1000 and <= 2990 && FreeRight(di + dpn + 1))
+        {
+            var s = new DateTime(Val(di + dpn), 1, 1);
+            r.Add(Per(i, di + dpn + 1, s, s.AddYears(10), Granularity.Decade, false, false));
+        }
+        else if (Is(i, "decadeprefix", out int dq) && DecadeName(i + dq, out int decadeEnd, out int decadeYear))
+        {
+            var s = new DateTime(decadeYear, 1, 1);
+            r.Add(Per(i, decadeEnd, s, s.AddYears(10), Granularity.Decade, false, false));
         }
         else if (Dig(i, 4) && i + 1 < _items.Count && Tch(i, i + 1) && Val(i) % 10 == 0 && Val(i) is >= 1000 and <= 2990 && Is(i + 1, "decadesuffix", out int dsn))
         {
@@ -884,6 +917,38 @@ internal sealed partial class Scan
             var s = new DateTime(year, 1, 1);
             r.Add(Per(i, e, s, s.AddYears(1), Granularity.Year, false, false, 0.8f));
         }
+    }
+
+    /// <summary>A decade written as a name ("Novanta") or as two digits with an optional apostrophe ("'90", "90") after "anni" / "jaren".</summary>
+    private bool DecadeName(int k, out int end, out int year)
+    {
+        end = k;
+        year = 0;
+        int yy;
+        if (Find(k, "decade", out int n, out TWord w))
+        {
+            yy = w.A;
+            end = k + n;
+        }
+        else
+        {
+            int d = k;
+            if (d < _items.Count && _items[d].Kind == ItemKind.Other && _items[d].End - _items[d].Start == 1 && _t[_items[d].Start] is '\'' or '\u2019')
+            {
+                d++;
+            }
+
+            if (!Dig(d, 2) || Val(d) % 10 != 0 || !FreeRight(d + 1))
+            {
+                return false;
+            }
+
+            yy = Val(d);
+            end = d + 1;
+        }
+
+        year = yy >= 30 ? 1900 + yy : 2000 + yy;
+        return true;
     }
 
     private void QuarterOrHalf(int i, DateTime a, bool nr, List<Cand> r)
@@ -1016,6 +1081,101 @@ internal sealed partial class Scan
             DateTime s = first.AddDays(part * 10);
             DateTime end = part == 2 ? first.AddMonths(1) : s.AddDays(10);
             r.Add(Per(i, e, s, end, Granularity.Month, true, needsRef));
+        }
+    }
+
+    /// <summary>The part follows the period: <c>2021 başında</c>, <c>Mayıs ortasında</c>, <c>2022 के मध्य</c>.</summary>
+    private void PostPartOfPeriod(int i, DateTime a, bool nr, List<Cand> r)
+    {
+        int ye;
+        int k;
+        bool needs = false;
+        DateTime first;
+        Granularity g;
+        if (YearAt(i, out ye, out int y))
+        {
+            first = new DateTime(y, 1, 1);
+            g = Granularity.Year;
+        }
+        else if (Find(i, "month", out int mn, out TWord mw))
+        {
+            ye = i + mn;
+            first = Instance(0, mw.A, 1, a);
+            needs = nr;
+            g = Granularity.Month;
+        }
+        else
+        {
+            return;
+        }
+
+        // The part word may itself begin with the linking word (Hindi "की शुरुआत"), so try it directly before skipping "of".
+        k = ye;
+        int part = -1;
+        int pn = 0;
+        for (int tries = 0; tries < 2 && part < 0; tries++)
+        {
+            if (tries == 1)
+            {
+                if (!Is(ye, "of", out int on))
+                {
+                    break;
+                }
+
+                k = ye + on;
+            }
+
+            if (Is(k, "earlypost", out pn))
+            {
+                part = 0;
+            }
+            else if (Is(k, "midpost", out pn))
+            {
+                part = 1;
+            }
+            else if (Is(k, "latepost", out pn))
+            {
+                part = 2;
+            }
+        }
+
+        if (part < 0)
+        {
+            return;
+        }
+
+        int e = k + pn;
+        if (g == Granularity.Year)
+        {
+            var s = new DateTime(first.Year, (part * 4) + 1, 1);
+            r.Add(Per(i, e, s, part == 2 ? new DateTime(first.Year + 1, 1, 1) : s.AddMonths(4), Granularity.Year, true, false));
+        }
+        else
+        {
+            DateTime s = first.AddDays(part * 10);
+            DateTime end = part == 2 ? first.AddMonths(1) : s.AddDays(10);
+            r.Add(Per(i, e, s, end, Granularity.Month, true, needs));
+        }
+    }
+
+    /// <summary>The year comes first: <c>2021 baharında</c>, <c>2025 के पतझड़</c>.</summary>
+    private void YearThenSeason(int i, List<Cand> r)
+    {
+        if (!YearAt(i, out int ye, out int y))
+        {
+            return;
+        }
+
+        int k = ye;
+        if (Is(k, "of", out int on))
+        {
+            k += on;
+        }
+
+        if (Find(k, "season", out int n, out TWord sw))
+        {
+            var s = new DateTime(y, sw.A, 1);
+            r.Add(Per(i, k + n, s, s.AddMonths(sw.B), Granularity.Season, true, false));
         }
     }
 
@@ -1314,14 +1474,24 @@ internal sealed partial class Scan
             m += dn;
         }
 
-        if (!DayNum(m, out int e2, out int d2, out _) || d2 < d1 || e2 >= _items.Count || !GapOk(_items[e2 - 1].End, _items[e2].Start)
-            || !Find(e2, "month", out int mn, out TWord mw))
+        if (!DayNum(m, out int e2, out int d2, out _) || d2 < d1)
+        {
+            return;
+        }
+
+        // Spanish and Portuguese "del 12 al 20 de agosto": "de" stands between the last day and the month.
+        if (_td!.Flags.Contains("of-before-year") && Is(e2, "of", out int ofn))
+        {
+            e2 += ofn;
+        }
+
+        if (e2 >= _items.Count || !GapOk(_items[e2 - 1].End, _items[e2].Start) || !Find(e2, "month", out int mn, out TWord mw))
         {
             return;
         }
 
         int me = e2 + mn;
-        int yk = me;
+        int yk = SkipOfBeforeYear(me);
         if (Ch(yk, ',') && Tch(yk - 1, yk))
         {
             yk++;
@@ -1468,6 +1638,11 @@ internal sealed partial class Scan
                 if (Is(pk, "in", out int inn) && Is(pk + inn, "the", out int th))
                 {
                     pk += inn + th;
+                }
+                else if (Is(pk, "daypartprefix", out int dpp))
+                {
+                    // Portuguese "amanhã à noite": the preposition and article come as one word.
+                    pk += dpp;
                 }
 
                 if (Find(pk, "daypart", out int dn, out TWord part) && GapOk(_items[pk - 1].End, _items[pk].Start))

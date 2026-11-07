@@ -36,6 +36,8 @@ from student import StudentConfig, StudentEncoder
 TEACHER = "jhu-clsp/mmBERT-base"
 TEACHER_REV = "c5955035435e2bf121cde7f3c8863ef52ff35d82"
 TEACHER_LAYERS = [4, 7, 11, 15, 18]  # hidden_states indices matched to student layers 1..5; layer 6 <- final hidden state
+# attention maps (zero-based teacher layers) matched to student layers 1..6: the layers whose outputs are hidden_states[4, 7, 11, 15, 18, 22]
+TEACHER_ATTN = [3, 6, 10, 14, 17, 21]
 LENGTHS = [(128, 0.25), (256, 0.5), (512, 0.25)]
 
 
@@ -95,23 +97,26 @@ class Data:
         return [rows[i:i + 64] for i in range(0, len(rows), 64)]
 
 
-def teacher_forward(teacher, ids, mask):
+def teacher_forward(teacher, ids, mask, attn=False):
     with torch.no_grad(), torch.autocast("cuda", dtype=torch.bfloat16):
-        out = teacher(input_ids=ids, attention_mask=mask, output_hidden_states=True)
-    return out.last_hidden_state.float(), [out.hidden_states[i].float() for i in TEACHER_LAYERS]
+        out = teacher(input_ids=ids, attention_mask=mask, output_hidden_states=True, output_attentions=attn)
+    maps = [out.attentions[i] for i in TEACHER_ATTN] if attn else None
+    return out.last_hidden_state.float(), [out.hidden_states[i].float() for i in TEACHER_LAYERS], maps
 
 
 class Distiller(nn.Module):
-    def __init__(self, cfg, t_hidden):
+    def __init__(self, cfg, t_hidden, attn_weight=0.0):
         super().__init__()
+        self.attn_weight = attn_weight
         self.student = StudentEncoder(cfg)
         # one learned map per matched layer (TinyBERT's W_h); they are discarded after training
         self.proj = nn.ModuleList([nn.Linear(cfg.hidden, t_hidden) for _ in range(cfg.layers)])
         self.register_buffer("t_mean", torch.zeros(t_hidden))
         self.register_buffer("t_std", torch.ones(t_hidden))
 
-    def losses(self, ids, mask, t_final, t_mid):
-        s_final, s_states = self.student(ids, mask, return_all=True)
+    def losses(self, ids, mask, t_final, t_mid, t_attn=None):
+        probs = [] if t_attn is not None else None
+        s_final, s_states = self.student(ids, mask, return_all=True, probs_out=probs)
         m = mask.bool()
         parts = {}
         mid = 0.0
@@ -127,7 +132,22 @@ class Distiller(nn.Module):
         cos = 1.0 - F.cosine_similarity(pred[m], tgt[m], dim=-1).mean()
         parts["final_mse"] = fin.detach()
         parts["final_cos"] = cos.detach()
-        return fin + 0.5 * cos + mid, parts
+        total = fin + 0.5 * cos + mid
+        if t_attn is not None:
+            # Attention-distribution distillation (Wang et al. 2020 MiniLM section 3.1; per layer as Jiao et al. 2020 section 3.1 Eq. 7):
+            # KL(teacher || student) of the attention probabilities, mean over valid queries; heads are matched one to one when the
+            # counts agree, otherwise the head-averaged distributions are compared.
+            att = 0.0
+            for k, (t, sp) in enumerate(zip(t_attn, probs)):
+                t = t.float()
+                if t.shape[1] != sp.shape[1]:
+                    t, sp = t.mean(1, keepdim=True), sp.mean(1, keepdim=True)
+                kl = (t * (torch.log(t + 1e-8) - torch.log(sp + 1e-8))).sum(-1)  # [b, heads, n]
+                e = kl.mean(1)[m].mean()
+                parts[f"attn{k + 1}"] = e.detach()
+                att = att + e
+            total = total + self.attn_weight * att / len(probs)
+        return total, parts
 
 
 def lr_at(step, a):
@@ -173,7 +193,7 @@ def measure_target_stats(model, teacher, data, a, device):
     for step in range(10 ** 9, 10 ** 9 + 8):  # steps far outside the training range
         ids = torch.from_numpy(data.batch(a.seed, step, a.batch_tokens // 2)).to(device)
         mask = (ids != 0).long()
-        t_final, _ = teacher_forward(teacher, ids, mask)
+        t_final, _, _ = teacher_forward(teacher, ids, mask)
         x = t_final[mask.bool()]
         sums = sums + x.sum(0)
         sq = sq + (x * x).sum(0)
@@ -193,8 +213,9 @@ def evaluate(model, ema_state, teacher, batches, device):
         for b in batches:
             ids = torch.from_numpy(b).to(device)
             mask = (ids != 0).long()
-            t_final, t_mid = teacher_forward(teacher, ids, mask)
-            loss, parts = model.losses(ids, mask, t_final, t_mid)
+            use = model.attn_weight > 0
+            t_final, t_mid, t_attn = teacher_forward(teacher, ids, mask, use)
+            loss, parts = model.losses(ids, mask, t_final, t_mid, t_attn)
             k = int(mask.sum())
             tot += float(loss) * k
             cnt += k
@@ -227,6 +248,12 @@ def main():
     ap.add_argument("--dev-every", type=int, default=2000)
     ap.add_argument("--max-steps", type=int, default=10 ** 9)
     ap.add_argument("--embed-rank", type=int, default=96)
+    ap.add_argument("--hidden", type=int, default=384)
+    ap.add_argument("--heads", type=int, default=12)
+    ap.add_argument("--ffn", type=int, default=1536)
+    ap.add_argument("--layers", type=int, default=6)
+    ap.add_argument("--attn-weight", type=float, default=0.0, help="weight of the attention-distribution term (0 = off)")
+    ap.add_argument("--micro-tokens", type=int, default=0, help="tokens per forward/backward pass inside a step (0 = the whole batch)")
     a = ap.parse_args()
 
     t_start = time.time()
@@ -234,13 +261,13 @@ def main():
     device = "cuda"
     torch.backends.cuda.matmul.allow_tf32 = True
     from transformers import AutoModel
-    teacher = AutoModel.from_pretrained(TEACHER, revision=TEACHER_REV, torch_dtype=torch.bfloat16, attn_implementation="sdpa").to(device).eval()
+    teacher = AutoModel.from_pretrained(TEACHER, revision=TEACHER_REV, torch_dtype=torch.bfloat16, attn_implementation="eager" if a.attn_weight > 0 else "sdpa").to(device).eval()
     for p in teacher.parameters():
         p.requires_grad_(False)
     data = Data(a.tok_dir)
-    cfg = StudentConfig(embed_rank=a.embed_rank)
+    cfg = StudentConfig(embed_rank=a.embed_rank, hidden=a.hidden, heads=a.heads, ffn=a.ffn, layers=a.layers)
     torch.manual_seed(a.seed)
-    model = Distiller(cfg, teacher.config.hidden_size).to(device)
+    model = Distiller(cfg, teacher.config.hidden_size, a.attn_weight).to(device)
     opt = build_optimizer(model, a)
     ema = {k: v.detach().clone().float() for k, v in model.student.state_dict().items()}
     step = 0
@@ -290,11 +317,22 @@ def main():
         lr = lr_at(step, a)
         for g in opt.param_groups:
             g["lr"] = lr * g["lr_mult"]
-        t_final, t_mid = teacher_forward(teacher, ids, mask)
-        with torch.autocast("cuda", dtype=torch.bfloat16):
-            loss, parts = model.losses(ids, mask, t_final, t_mid)
         opt.zero_grad(set_to_none=True)
-        loss.backward()
+        use = a.attn_weight > 0
+        rows = ids.shape[0] if a.micro_tokens <= 0 else max(1, a.micro_tokens // ids.shape[1])
+        total_tokens = int(mask.sum())
+        loss, parts = 0.0, {}
+        for r in range(0, ids.shape[0], rows):
+            mi, mm = ids[r:r + rows], mask[r:r + rows]
+            t_final, t_mid, t_attn = teacher_forward(teacher, mi, mm, use)
+            with torch.autocast("cuda", dtype=torch.bfloat16):
+                l, p = model.losses(mi, mm, t_final, t_mid, t_attn)
+            share = int(mm.sum()) / total_tokens  # each micro-batch is a token-weighted share of the step's mean
+            (l * share).backward()
+            del t_final, t_mid, t_attn
+            loss = loss + l.detach() * share
+            for n, v in p.items():
+                parts[n] = parts.get(n, 0.0) + v * share
         gn = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
         opt.step()
         with torch.no_grad():
@@ -319,7 +357,7 @@ def main():
             log.flush()
             print(rec, flush=True)
         timeout = (time.time() - t_chunk) / 60 >= a.minutes
-        if step % a.ckpt_every == 0 or timeout:
+        if step % a.ckpt_every == 0 or timeout or step >= a.max_steps:
             save(ckpt, {"model": model.state_dict(), "opt": opt.state_dict(), "ema": ema, "step": step, "args": vars(a)})
         if timeout:
             break

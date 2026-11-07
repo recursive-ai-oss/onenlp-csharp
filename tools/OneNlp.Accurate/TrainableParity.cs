@@ -99,7 +99,7 @@ internal static class TrainableParity
         }
     }
 
-    private static float[] Forward(NnModule module, long[] x, int rows, int length, int[] lengths)
+    internal static float[] Forward(NnModule module, long[] x, int rows, int length, int[] lengths)
     {
         using Tensor ids = Tensor.FromSpan<long>(x, Shape.Create(rows, length));
         Tensor h = module switch
@@ -111,7 +111,7 @@ internal static class TrainableParity
         return h.Data<float>().ToArray();
     }
 
-    private sealed class Stats(string name)
+    internal sealed class Stats(string name)
     {
         private double _maxAbs;
         private double _maxRef;

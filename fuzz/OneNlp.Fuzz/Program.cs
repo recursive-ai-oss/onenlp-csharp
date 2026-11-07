@@ -41,6 +41,7 @@ internal static class Program
         ["fast-settings"] = NeuralTargets.FastSettings,
         ["pipeline-config"] = NeuralTargets.PipelineConfig,
         ["pipeline-file"] = NeuralTargets.PipelineFileBytes,
+        ["onnx-patch"] = NeuralTargets.OnnxPatch,
     };
 
     private static int Main(string[] args)
@@ -76,6 +77,9 @@ internal static class Program
                     break;
                 case "pipeline-config":
                     NeuralTargets.SeedPipelineConfig(args[2]);
+                    break;
+                case "onnx-patch":
+                    NeuralTargets.SeedOnnxPatch(args[2]);
                     break;
                 case "pipeline-file":
                     NeuralTargets.SeedPipelineFile(args[2]);

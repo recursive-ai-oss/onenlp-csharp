@@ -17,10 +17,16 @@ internal enum HolidayKind
     Nth,
     Easter,
     Nearest,
+
+    /// <summary>A pinned list of dates from an official calendar, for observances that follow the lunar calendar. Years the list does not cover have no date.</summary>
+    Table,
+
+    /// <summary>A fixed date that moves back one day when it falls on a Sunday (the Dutch King's Day, 27 April).</summary>
+    FixedNotSunday,
 }
 
 /// <summary>How a holiday's date is computed in a year. See <c>docs/recognizers.md</c> for the grammar in rule data.</summary>
-internal readonly record struct HolidayRule(HolidayKind Kind, int N, int Weekday, int Month, int Day, int Plus);
+internal readonly record struct HolidayRule(HolidayKind Kind, int N, int Weekday, int Month, int Day, int Plus, DateTime[]? Dates = null);
 
 /// <summary>
 /// The date/time vocabulary of one language: month, weekday, unit, season, day-part, zone and holiday words, and the role words
@@ -32,7 +38,15 @@ internal sealed class TemporalData
     internal const int RegionGb = 2;
     internal const int RegionFr = 4;
     internal const int RegionDe = 8;
-    internal const int RegionAll = RegionUs | RegionGb | RegionFr | RegionDe;
+    internal const int RegionIt = 1 << 10;
+    internal const int RegionNl = 1 << 11;
+    internal const int RegionEs = 16;
+    internal const int RegionMx = 32;
+    internal const int RegionPt = 64;
+    internal const int RegionBr = 128;
+    internal const int RegionTr = 256;
+    internal const int RegionIn = 512;
+    internal const int RegionAll = RegionUs | RegionGb | RegionFr | RegionDe | RegionEs | RegionMx | RegionPt | RegionBr | RegionIt | RegionNl | RegionTr | RegionIn;
 
     private static readonly HashSet<string> Roles = new(StringComparer.Ordinal)
     {
@@ -44,9 +58,18 @@ internal sealed class TemporalData
         // 15h / 15 Uhr, "et quart", "halb drei", "1990er Jahre".
         "determiner", "agoprefix", "dayaftertomorrow", "daybeforeyesterday", "nextpost", "lastpost", "andhalf", "hourmark", "hourword",
         "plus15", "plus30", "minus15", "minus", "clockcue", "halfbefore", "plusquarter", "minusquarter", "daypartprefix", "decadeprefix", "decadesuffix", "decadeword",
+
+        // Spanish and Portuguese: the article (or the fused preposition and article) that introduces a clock time, "las 15:00", "às 15h".
+        "hourarticle", "plushalf",
+
+        // Turkish and Hindi: the words that close a range after its second end ("10 Nisan'a kadar", "16:00 तक", "... arasında").
+        "rangetail",
+
+        // Turkish and Hindi: the early, middle and late part named after the period ("2021 başında", "2022 के मध्य").
+        "earlypost", "midpost", "latepost", "nodate",
     };
 
-    private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct", "no-lone-day", "bare-hour-24", "determiner-inside-only" };
+    private static readonly HashSet<string> FlagNames = new(StringComparer.Ordinal) { "daypart-direct", "no-lone-day", "bare-hour-24", "determiner-inside-only", "bare-range-24", "word-hour", "of-before-year", "daypart-first", "dot-clock", "bare-hour-range", "spoken-hour-mark" };
 
     private static readonly string[] WeekdayCodes = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
@@ -54,12 +77,15 @@ internal sealed class TemporalData
 
     internal List<HolidayRule> Holidays { get; } = [];
 
+    /// <summary>Glued words that are two words written as one (Dutch <c>zaterdagavond</c>, <c>morgenochtend</c>): a prefix and a suffix from the lists (<c>time.glue</c>).</summary>
+    internal List<(string[] Prefixes, string[] Suffixes)> Glue { get; } = [];
+
     /// <summary>The lower-cased first item of every vocabulary form, to skip positions that cannot start one.</summary>
     internal HashSet<string> Starts { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     internal bool IsEmpty => Words.Count == 0;
 
-    /// <summary>Behaviours the rule data switches on (<c>time.flag</c>): <c>daypart-direct</c> lets a part of the day follow a clock hour without a preposition (German <c>5 Uhr nachmittags</c>); <c>no-lone-day</c> stops "the 25th" being the next 25th (French <c>la 2e place</c> is an ordinal); <c>bare-hour-24</c> lets <c>16</c> be the first end of <c>von 16 bis 18:30 Uhr</c>; <c>determiner-inside-only</c> keeps a determiner out of the span except in <c>Dienstag, den 24. März</c> and day ranges.</summary>
+    /// <summary>Behaviours the rule data switches on (<c>time.flag</c>): <c>daypart-direct</c> lets a part of the day follow a clock hour without a preposition (German <c>5 Uhr nachmittags</c>); <c>no-lone-day</c> stops "the 25th" being the next 25th (French <c>la 2e place</c> is an ordinal); <c>bare-hour-24</c> lets <c>16</c> be the first end of <c>von 16 bis 18:30 Uhr</c>; <c>determiner-inside-only</c> keeps a determiner out of the span except in <c>Dienstag, den 24. März</c> and day ranges; <c>of-before-year</c> lets the word <c>of</c> stand between a month and its year, or a day and its month in a range (Spanish and Portuguese <c>3 de marzo de 2026</c>, <c>del 6 al 10 de abril</c>).</summary>
     internal HashSet<string> Flags { get; } = new(StringComparer.Ordinal);
 
     /// <summary>The region whose conventions apply when the caller names none (<c>time.region</c>): 0 when the data does not say, which means <see cref="RegionUs"/>.</summary>
@@ -115,6 +141,16 @@ internal sealed class TemporalData
                 Need(f, 2, 3);
                 AddForms(f[0], new TWord("zone", Int(f[1], -14 * 60, 14 * 60), f.Length > 2 && f[2] == "z" ? 1 : 0, string.Empty));
                 break;
+            case "time.decade":
+                // "anni Novanta", "jaren negentig": the name stands for the two-digit decade (90 is the 1990s; below 30 is the 2000s and 2010s).
+                Need(f, 2, 2);
+                AddForms(f[0], new TWord("decade", Int(f[1], 0, 90), 0, string.Empty));
+                break;
+            case "time.glue":
+                Need(f, 2, 2);
+                Glue.Add((f[0].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                    f[1].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)));
+                break;
             case "time.flag":
                 Need(f, 1, 1);
                 if (!FlagNames.Contains(f[0]))
@@ -157,7 +193,15 @@ internal sealed class TemporalData
         "gb" => RegionGb,
         "fr" => RegionFr,
         "de" => RegionDe,
-        _ => throw new RecognizerRulesException($"Unknown region '{code}' (expected us, gb, fr, de or all)."),
+        "it" => RegionIt,
+        "nl" => RegionNl,
+        "es" => RegionEs,
+        "mx" => RegionMx,
+        "pt" => RegionPt,
+        "br" => RegionBr,
+        "tr" => RegionTr,
+        "in" => RegionIn,
+        _ => throw new RecognizerRulesException($"Unknown region '{code}' (expected us, gb, fr, de, es, mx, pt, br, it, nl, tr, in or all)."),
     };
 
     /// <summary>The region bit for a caller's region code, or 0 for none or an unknown code.</summary>
@@ -167,6 +211,14 @@ internal sealed class TemporalData
         "gb" => RegionGb,
         "fr" => RegionFr,
         "de" => RegionDe,
+        "it" => RegionIt,
+        "nl" => RegionNl,
+        "es" => RegionEs,
+        "mx" => RegionMx,
+        "pt" => RegionPt,
+        "br" => RegionBr,
+        "tr" => RegionTr,
+        "in" => RegionIn,
         _ => 0,
     };
 
@@ -182,7 +234,7 @@ internal sealed class TemporalData
         }
     }
 
-    private static HolidayRule ParseRule(string rule)
+    internal static HolidayRule ParseRule(string rule)
     {
         string[] p = rule.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         try
@@ -198,8 +250,25 @@ internal sealed class TemporalData
                 case "nth" when p.Length is 4 or 5:
                     return new HolidayRule(
                         HolidayKind.Nth, p[1] == "last" ? -1 : Int(p[1], 1, 5), Weekday(p[2]), Int(p[3], 1, 12), 0, p.Length == 5 ? Int(p[4], -30, 30) : 0);
+                case "fixed-not-sunday" when p.Length == 2:
+                {
+                    (int m, int d) = MonthDay(p[1]);
+                    return new HolidayRule(HolidayKind.FixedNotSunday, 0, 0, m, d, 0);
+                }
+
                 case "easter" when p.Length == 2:
                     return new HolidayRule(HolidayKind.Easter, 0, 0, 0, 0, Int(p[1], -100, 100));
+                case "table" when p.Length >= 2:
+                {
+                    var dates = new DateTime[p.Length - 1];
+                    for (int i = 1; i < p.Length; i++)
+                    {
+                        dates[i - 1] = DateTime.ParseExact(p[i], "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    }
+
+                    return new HolidayRule(HolidayKind.Table, 0, 0, 0, 0, 0, dates);
+                }
+
                 case "nearest" when p.Length == 3:
                 {
                     (int m, int d) = MonthDay(p[2]);
@@ -211,7 +280,7 @@ internal sealed class TemporalData
         {
         }
 
-        throw new RecognizerRulesException($"'{rule}' is not a holiday rule (fixed MM-DD, nth N|last WEEKDAY MONTH [+-DAYS], easter +-DAYS, nearest WEEKDAY MM-DD).");
+        throw new RecognizerRulesException($"'{rule}' is not a holiday rule (fixed MM-DD, fixed-not-sunday MM-DD, nth N|last WEEKDAY MONTH [+-DAYS], easter +-DAYS, nearest WEEKDAY MM-DD, table YYYY-MM-DD ...).");
     }
 
     private static (int Month, int Day) MonthDay(string s)

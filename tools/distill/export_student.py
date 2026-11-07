@@ -38,7 +38,9 @@ def main():
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     st = torch.load(a.ckpt, map_location="cpu", weights_only=False)
-    cfg = StudentConfig(embed_rank=a.embed_rank)
+    ca = st.get("args", {})
+    cfg = StudentConfig(embed_rank=ca.get("embed_rank", a.embed_rank), hidden=ca.get("hidden", 384), heads=ca.get("heads", 12),
+                        ffn=ca.get("ffn", 1536), layers=ca.get("layers", 6))
     model = StudentEncoder(cfg)
     model.load_state_dict({k: v.float() for k, v in st["ema"].items()})
     model.eval()

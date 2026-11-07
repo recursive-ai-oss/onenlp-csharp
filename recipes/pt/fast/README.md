@@ -16,7 +16,7 @@ $R prepare pt_bosque-ud-train.conllu train.conllu          # likewise the dev fi
 $R train-tagging --train train.conllu --dev dev.conllu --out tagging-dir [encoder options] --threads 4
 $R train-parser  --train train.conllu --dev dev.conllu --out parser-dir  [encoder options] --threads 4
 $R ner-convert pt_bosque-ud-train.conllu pt_bosque-ud-train.iob2 ner-train.jsonl     # likewise dev and test
-$R ner-train ner-train.jsonl ner-dev.jsonl ner-dir [encoder options] --threads 4
+$R ner-train ner-train.jsonl ner-dev.jsonl ner-dir --depth 1 --plain 1 --relu 1 --recurrent 1 --recurrent-size 64 --threads 4
 # put the three model.onenlp files in one directory as tagging.onenlp, parser.onenlp, ner.onenlp, then
 $R predict --models models --gold pt_bosque-ud-test.conllu --lexicon pt_bosque-ud-train.conllu --mode gold --out pred-gold.conllu
 $R predict --models models --gold pt_bosque-ud-test.conllu --lexicon pt_bosque-ud-train.conllu --mode raw  --out pred-raw.conllu

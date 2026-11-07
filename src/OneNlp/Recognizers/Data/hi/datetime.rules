@@ -1,0 +1,137 @@
+# Date and time vocabulary, Hindi (hi-IN). Same sections as the other languages; the roles are described in docs/recognizers.md.
+#
+# Dates are day first (3 मार्च 2026, 15/04/2026 is 15 April). A form starting with "=" is case-sensitive, the others are matched without regard to
+# case. Text is in NFC: a letter with a nukta is the base letter and U+093C. Postpositions (को, में, पर, से) are outside the span; "से ... तक"
+# frames a range. "कल" is both yesterday and tomorrow: it is read as tomorrow, and yesterday is "बीता कल" / "बीते कल".
+
+[time.region]
+in
+
+[time.month]
+1 | जनवरी
+2 | फ़रवरी, फरवरी
+3 | मार्च
+4 | अप्रैल, अप्रेल
+5 | मई
+6 | जून
+7 | जुलाई
+8 | अगस्त
+9 | सितंबर, सितम्बर
+10 | अक्टूबर, अक्तूबर
+11 | नवंबर, नवम्बर
+12 | दिसंबर, दिसम्बर
+
+[time.weekday]
+1 | सोमवार
+2 | मंगलवार
+3 | बुधवार
+4 | गुरुवार, बृहस्पतिवार, वीरवार
+5 | शुक्रवार
+6 | शनिवार
+7 | रविवार, इतवार
+
+[time.unit]
+second | सेकंड, सेकेंड, सेकण्ड | 1 | 0
+minute | मिनट | 60 | 0
+hour | घंटा, घंटे, घण्टा, घण्टे | 3600 | 0
+day | दिन, दिनों | 86400 | 0
+week | हफ़्ता, हफ़्ते, हफ्ता, हफ्ते, सप्ताह | 604800 | 0
+month | महीना, महीने, माह, महीनों | 0 | 1
+quarter | तिमाही | 0 | 3
+year | साल, वर्ष, सालों, बरस | 0 | 12
+decade | दशक | 0 | 120
+business day | कार्य दिवस, कामकाजी दिन | 0 | 0
+
+[time.season]
+spring | वसंत, बसंत | 3 | 3
+summer | गर्मी, गर्मियों, गरमी | 6 | 3
+fall | पतझड़, शरद | 9 | 3
+winter | सर्दी, सर्दियों, जाड़ा, जाड़े | 12 | 3
+
+# "रात" (night) is the evening and night of the gold convention: 18:00 to 24:00.
+[time.daypart]
+morning | सुबह, सवेरे, सबेरे | 6 | 12
+afternoon | दोपहर | 12 | 18
+evening | शाम, रात | 18 | 24
+
+[time.word]
+today | आज
+tomorrow | कल
+yesterday | बीता कल, बीते कल, गुज़रा कल
+dayaftertomorrow | परसों
+midnight | आधी रात
+this | इस, इसी
+next | अगले, अगला, अगली, आने वाले, आने वाला, आने वाली
+last | पिछले, पिछला, पिछली, बीते, बीता, बीती, गत
+ago | पहले
+later | बाद
+every | हर
+approx | लगभग, क़रीब, करीब
+of | के, की
+earlypost | की शुरुआत, की शुरूआत, के शुरू में, के आरंभ
+midpost | के मध्य, के बीच में
+latepost | के अंत, के आखिर, के अंतिम दिनों
+weekend | सप्ताहांत, वीकेंड
+hourmark | बजे
+plushalf | साढ़े
+plusquarter | सवा
+minusquarter | पौने
+rangeto | से, -, –, —
+rangetail | तक
+zonebase | =UTC, =GMT
+
+[time.recurrence]
+P1D | day | दैनिक, रोज़ाना, रोजाना
+P1W | week | साप्ताहिक
+P1M | month | मासिक
+P3M | quarter | त्रैमासिक
+P1Y | year | वार्षिक, सालाना
+
+[time.zone]
+=UTC, =GMT | 0 | z
+=IST | 330
+=CET | 60
+=CEST | 120
+=EET | 120
+=EEST | 180
+=MSK | 180
+=EST | -300
+=EDT | -240
+=CST | -360
+=CDT | -300
+=MST | -420
+=MDT | -360
+=PST | -480
+=PDT | -420
+
+# Sources: the National Holidays of India (Republic Day, Independence Day, Gandhi Jayanti) and the festivals on the Government of India central
+# holiday lists (Department of Personnel and Training office memoranda for 2026 and 2027). Most festivals follow the lunar calendar, so they are a
+# pinned table of those lists; years the table does not list give no date. Makar Sankranti is the customary 14 January.
+[time.holiday]
+गणतंत्र दिवस | fixed 01-26 | in
+स्वतंत्रता दिवस | fixed 08-15 | in
+गांधी जयंती, महात्मा गांधी जयंती | fixed 10-02 | in
+मकर संक्रांति | fixed 01-14 | in
+शिक्षक दिवस | fixed 09-05 | in
+बाल दिवस | fixed 11-14 | in
+क्रिसमस, बड़ा दिन | fixed 12-25 | in
+नव वर्ष, नववर्ष | fixed 01-01 | in
+होली | table 2026-03-04 2027-03-22 | in
+दिवाली, दीवाली, दीपावली | table 2026-11-08 2027-10-29 | in
+दशहरा, विजयादशमी | table 2026-10-20 2027-10-09 | in
+रक्षा बंधन, रक्षाबंधन | table 2026-08-28 2027-08-17 | in
+जन्माष्टमी | table 2026-09-04 2027-08-25 | in
+ईद-उल-फ़ित्र, ईद उल फ़ित्र | table 2026-03-21 2027-03-10 | in
+राम नवमी | table 2026-03-26 2027-04-15 | in
+महावीर जयंती | table 2026-03-31 2027-04-19 | in
+बुद्ध पूर्णिमा | table 2026-05-01 2027-05-20 | in
+गुरु नानक जयंती | table 2026-11-24 2027-11-14 | in
+महाशिवरात्रि | table 2026-02-15 2027-03-06 | in
+मुहर्रम | table 2026-06-26 2027-06-16 | in
+
+[time.flag]
+no-lone-day
+bare-hour-24
+daypart-first
+spoken-hour-mark
+bare-hour-range

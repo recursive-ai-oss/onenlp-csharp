@@ -316,3 +316,127 @@ Holidays: `fr` is the French public holidays of the Code du travail L3133-1 (1 J
 - `ce mois-ci` is not read.
 - Belgian and Swiss counting (`septante`, `nonante`, `huitante`) is read; Swiss `Franken` are francs.
 - The French and German unit tables are shorter than the English one.
+
+## Spanish and Portuguese
+
+Spanish (`es`, Spain by default) and Portuguese (`pt`, Brazil by default) are data sets on the same engine: `Data/<lang>/{numbers,units,currency,datetime}.rules`, the holidays inside `datetime.rules`, and the shared sequence rules. Use `Recognizer.For(Language.Spanish)` or the `Nlp` recognizer verbs with a `Language` argument. English, French and German results are unchanged.
+
+### Numbers
+
+- `number.digits` takes `system | iberian` and per-region separators: `decimal.mx | .` and `group.mx | space nbsp nnbsp ,` replace the defaults (`decimal | ,`, `group | space nbsp nnbsp .`) when `RecognitionContext.Region` is `mx`, so `1,234.56` is read in Mexican Spanish and `1.234,56` in Spain's.
+- **Iberian counting.** Tens above twenty join a unit with the connector (`treinta y cinco`, `trinta e cinco`; Spanish `veintiuno` to `veintinueve` are teens of their own). Hundreds are words of kind `hundreds` (`doscientos`, `quinhentos`, `cien`, `ciento`, `cento`) that open a group; `mil` is a `bare-scale`. In Portuguese the connector also links a hundred to what follows (`cento e vinte`) and a thousand to its rest (`dois mil e quinhentos`). `mil millones` as one scale word is not read; write `7.900 millones`.
+- **Ordinals.** An ordinal tens word may be followed by an ordinal unit (`vigésimo tercero`, `décimo quinto`, `décima segunda`); one-word forms (`decimoquinto`) are rows. `number.ordinal-suffix` rows may start with a dot: `.º`, `.ª`, `.er` read `1.º`, `3.ª`, `1.er`. `segundo` after `por` (`por segundo`) and before an object pronoun (Portuguese `segundo ele`) is not an ordinal, and `primera hora` is not one (`number.not-number`).
+- `age.suffix` makes `82 años de edad` / `82 anos de idade` an age; `82 años` alone is a length of time.
+- `phone.space-start | digits | min | max` lets a phone-like number be written as space-separated groups when it starts with one of the digits and has that many in all (`913 45 67 89` in Spain: `6789 | 9 | 9`). Without the section only a leading 0 and 9 to 11 digits count.
+
+### Dates and times
+
+Dates are day first. New data for `time.word` and `time.flag`:
+
+| Item | Meaning |
+|---|---|
+| `time.flag of-before-year` | the `of` word may stand between a month and its year or a holiday and its year: `12 de septiembre de 2026`, `abril de 1987`, `Navidad de 2026`; and between the last day and the month of a day range: `del 12 al 20 de agosto` |
+| `hourarticle` | the article or fused preposition and article that opens a clock time and is part of it: `las 15:00`, `la una`, `às 14:30`. With it (or a `determiner`) a spoken or digit hour is a time when a part of the day or a tail follows (`las diez de la mañana`, `las tres y media`, `às oito da noite`), or when it is above twelve (`a las 15`) |
+| `decadeprefix` | also reads two digits: `los años 80` is 1980-1990, `anos 20` is 2020-2030 (30 to 90 are the 1900s, 00 to 20 the 2000s) |
+| `daypartprefix` | also joins a date and a part of the day when it is one word: `amanhã à noite` |
+
+`noche` and `noite` are 18:00 to 24:00, `tarde` 12:00 to 18:00, `mañana` and `manhã` 06:00 to 12:00 (`mañana` alone is tomorrow). Regions for `time.region` and `RecognitionContext.Region`: `es` (default) and `mx` for Spanish, `br` (default) and `pt` for Portuguese; the region also picks the holiday rows. Holiday sources are statute facts: Spain's national holidays (Estatuto de los Trabajadores art. 37.2 and the yearly BOE list), Mexico's mandatory rest days (Ley Federal del Trabajo art. 74; the Monday holidays are `nth` rules), Brazil's (Leis 662/1949, 10.607/2002, 14.759/2023) and Portugal's (Código do Trabalho art. 234), with the Easter-based feasts (`Carnaval` -48, `Corpus Christi` +60) from the computus.
+
+### Limits (Spanish and Portuguese)
+
+- Weekdays in Portuguese are the full `segunda-feira` forms and the dotted abbreviations; a bare `quarta` or `sexta` is not a weekday.
+- `mil millones`, `una docena y media` and compound measures past two terms are not read.
+- The seasons are the northern-hemisphere meteorological ones, as for English.
+
+## Italian and Dutch
+
+Italian (`it`) and Dutch (`nl`) are data sets on the same engine: `Data/<lang>/{numbers,units,currency,datetime}.rules`, the holidays inside `datetime.rules`, and the shared sequence rules. Use `Recognizer.For(Language.Italian)` or the `Nlp` recognizer verbs with a `Language` argument. The other languages' results are unchanged.
+
+### Numbers
+
+- **`number.digits | system`** takes `italian` and `dutch` besides the earlier names. `dutch` is an alias of `german` (one word below a million, units before tens: `vierentwintig`, `tweeduizend vijfhonderd`). `italian` is one word too, but the tens come before the units (`ventitré`, `trecentoventiquattro`).
+- **`[number.part]`** lists the elided stems that only occur inside a compound: `vent` (twenty, in `ventuno`, `ventotto`), `cent` (in `centotto`), `trent`, `quarant`, and so on, each with its kind and value. A stem is never read alone.
+- A compound word may follow a round thousand (`tweeduizend vijfhonderd`, `duemilacinquecento`), and a teen may precede `honderd` (`twaalfhonderd` is 1200).
+- Decimal comma and dot or space grouping, as for French and German: the CLDR conventions, written as data.
+
+### Dates and times
+
+Dates are day first. New sections and flags:
+
+| Item | Meaning |
+|---|---|
+| `[time.glue]` | splits glued words before reading them: `zaterdagavond` is `zaterdag` + `avond`. Rows are `first words | second words` |
+| `[time.decade]` | names decades (`Trenta | 30`); a two-digit decade after `anni '90` or `anni 90` is read too |
+| `time.flag bare-range-24` | a range of bare hours is a time range when the hours are plausible clock times: `dalle 8 alle 12` |
+| `time.flag word-hour` | a spoken hour with a part of the day is a time: `sei del mattino` |
+| `hourword` | also after the second end of a range: `van 8 tot 12 uur` |
+| holiday rule `fixed-not-sunday MM-DD` | the date, moved to the day before when it falls on a Sunday. Used for Koningsdag (27 April; 26 April when 27 April is a Sunday) |
+
+Regions: `it` and `nl` (they pick the holiday rows). Holiday sources are statute facts: the Italian public holidays (Legge 27 maggio 1949, n. 260, as amended by later laws) and the Dutch general holidays (Algemene termijnenwet art. 3), with the Easter-based feasts from the computus. Customary dates (Ferragosto, Sinterklaasavond, Festa della mamma) are `fixed` or `nth` rows.
+
+### Limits (Italian and Dutch)
+
+- `di N anni` always reads as an age in Italian, so `un contratto di 5 anni` is an age; write `per 5 anni` for a duration.
+- Dutch `uur` is a weak hour word: `8 uur` is a time only with a part of the day, a tail or a range around it.
+- `vanmiddag`, `vanavond` and `vannacht` are cut as `van` (this) plus `middag`, `avond`, `nacht`.
+- Compound measures past two terms are not read.
+
+## Chinese
+
+Chinese (`zh`, Mainland conventions, simplified characters) is a data set on the same engine plus a scanner for text without spaces: `Data/zh/{numbers,units,currency,datetime}.rules` (the `zh.*` sections), the shared sequence rules, and the code in `Scan.Chinese*.cs`. Use `Recognizer.Chinese`, `Recognizer.For(Language.Chinese)` or the `Nlp` recognizer verbs with `Language.Chinese`. The other languages' results are unchanged.
+
+### Numbers, measures and money
+
+- **`number.digits | system chinese`** reads numerals built from digits (`一二三`, `零`, `〇`, `两`) and place words (`十`, `百`, `千`, `万`, `亿`), with `零` as the filler (`一百零一`, `两千零二十`), mixed forms (`3万`, `2.5亿`) and decimals (`零点零五`). Fractions and percentages: `百分之五`, `三分之一`, `5%`.
+- **Ordinals** are `第` plus a number (`第三`, `第一百零一`).
+- **A lone numeral needs a counting word.** `一个`, `一杯` and `一次` are not numbers on their own; a numeral is a number when it is two or more characters, carries a digit, or stands in a construct (a measure, money, a date). The measure word stays outside the span.
+- **Measures** (`zh.unit`): length, weight, area, volume, speed, temperature (`零下二十度`, `摄氏`), age (`岁`, `周岁`, inside the span). `斤` is the jin and `亩` the mu (Chinese market units, named as such in the values).
+- **Money** (`zh.currency`): `元`, `块`, `角`, `分`, `人民币`, `美元`, symbols and ISO codes, and compounds (`三块五`, `两元五角`).
+- **Sequences** are found in a masked pass: text outside ASCII word characters is treated as a boundary, so e-mail, URL, IP and phone numbers are found directly beside Chinese characters. A hashtag is `#x#` (a pair) or `#x`.
+
+### Dates and times
+
+Rules in `zh.*` sections of `datetime.rules`: day words (`今天`, `后天`), weekdays (`周一`, `星期天`, `礼拜三`), dates in `2026年3月18日`, `3月18号` and `2026-03-18` forms, relative periods (`下个月`, `去年`, `三天前`, `两周后`), parts of the day (`早上` is 06:00-09:00, `下午`, `晚上`), clock times (`3点半`, `下午三点十分`, `15:30`), ranges (`从周一到周五`, `3点到5点`; the `从` is inside the span), durations (`两年零三个月` is `P2Y3M`; `零` between terms is a gap word, `半` is a half), sets (`每天`, `每周三`, `每个月`) and holidays. `北京时间` is inside a time span and gives the +08:00 zone.
+
+Holidays (`[zh.holiday]`): fixed ones (`国庆节`, `劳动节`, `元旦`, `儿童节`), nth-weekday ones (`母亲节`), `复活节` from the computus, and the lunar ones (`春节`, `大年初一`, `除夕`, `元宵节`, `端午节`, `中秋节`) plus `清明节`, which read the pinned table `[zh.lunar]` of Gregorian dates for **2022 to 2030**; other years do not resolve. Statutory holidays follow the State Council's Measures for National Holidays; the compensatory working days of a year's notice are not modelled.
+
+### Limits (Chinese)
+
+- `5号线` (line 5) and `三块` (three pieces or three yuan) are ambiguous; the readings follow the context words in the rules, and money is read only with a currency construct.
+- A bare `3点` is read as a clock hour as written, with no part of the day.
+- `年初` and `年底` are not read for years; `90年代` is read, a two-digit decade (`九十年代` as a number of years) is not.
+- Lunar festivals and `清明节` resolve only for 2022-2030. The 2028-2030 rows come from the astronomical calendar, not from a published notice.
+- Only simplified characters are covered by the rules and the gold set.
+## Turkish and Hindi
+
+Turkish (`tr`) and Hindi (`hi`) are data sets on the same engine (`Data/<lang>/{numbers,units,currency,datetime}.rules`). Use `Recognizer.For(Language.Turkish)` or `Language.Hindi`, or the `Nlp` recognizer verbs with a `Language` argument. The other languages' results are unchanged (their test predictions are byte-identical to before).
+
+### Numbers
+
+- **`number.digits | system`** takes `devanagari` digits (read as ASCII digits of the same value; Indian grouping `12,34,567`, lakh and crore as scale words) and `native-digits`. **`case | turkic`** folds `İ`/`I` to `i`/`ı` before matching, with offsets unchanged.
+- Number words follow the language: Turkish compounds are separate words (`yüz yirmi üç bin dört yüz elli`); `on bir` (tens plus unit) is accepted. Hindi has an irregular table for 1 to 100 (generated into `numbers.rules`) and the scale words `सौ`, `हज़ार`, `लाख`, `करोड़`, `अरब`, `खरब`. A decimal number before a scale word multiplies (`1.5 करोड़`).
+- **Digit ordinals** take an apostrophe ending in Turkish (`5'inci`); the ending is outside the number.
+- **`[percent.prefix]`**: percent before the number (Turkish `%12`, `yüzde on iki`).
+
+### Dates and times
+
+Day first. Case endings after an apostrophe (`3 Mart'ta`, `20.03.2026'da`) are outside the span. New items:
+
+| Item | Meaning |
+|---|---|
+| holiday rule `table YYYY-MM-DD ...` | a pinned list of dates, for observances that follow the lunar calendar; years not listed have no date |
+| regions `tr`, `in` | pick the holiday rows (national days; Ramazan and Kurban Bayramı 2025-2030 from the Diyanet lists; Hindi gazetted holidays 2026 and 2027) |
+| roles `earlypost`, `midpost`, `latepost` | the part of a period named after it: `2021 başında`, `Mayıs ortasında`, `2022 के मध्य`, `मई की शुरुआत`: a year or month, an optional `of` word, then the part. They give an approximate range, as `early 2021` does |
+| a season after the year | `2021 baharında`, `2025 के पतझड़` |
+| role `nodate` | phrases that must not be read as a weekday (`pazar yerinde`, the market) |
+| roles `plushalf`, `plusquarter`, `minusquarter` | Hindi `साढ़े तीन बजे`, `सवा चार`, `पौने पाँच` |
+| role `rangetail` | the words that close a range after its second end (`10 Nisan'a kadar`, `16:00 तक`, `arasında`) |
+| flags `daypart-first`, `dot-clock`, `bare-hour-range`, `spoken-hour-mark` | `akşam 7`, `saat 15.30`, a range of bare hours (`9-17`), a spoken hour with its mark |
+| `phone.space-start` | Hindi: ten-digit mobile numbers in two groups, and landlines with a trunk 0 (`0141 234 5678`) |
+
+### Limits (Turkish and Hindi)
+
+- Ramazan and Kurban Bayramı are listed for 2025-2030 only. Hindi lunar holidays are listed for 2026 and 2027 only (Bakrid is left out: the published lists disagree).
+- Inflected forms of Turkish month and weekday names are listed in the rule data, not derived: a rare case ending is not read.
+- Hindi `रात` reads as evening to midnight (18:00-24:00) and `कल` as tomorrow unless a past word is nearby.
+- Early, middle and late parts are only read after a four-digit year or a month name.

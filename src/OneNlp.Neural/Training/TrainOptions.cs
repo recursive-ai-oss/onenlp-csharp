@@ -3,7 +3,7 @@ using RecursiveAI.OneNlp.Data;
 
 namespace RecursiveAI.OneNlp.Neural.Training;
 
-/// <summary>Settings for <see cref="PipelineTraining.Train"/>. Every property has a default that trains a small model sensibly.</summary>
+/// <summary>Settings for <see cref="PipelineTraining.Train(Pipeline, IReadOnlyList{Example}, TrainOptions, CancellationToken)"/>. Every property has a default that trains a small model sensibly.</summary>
 public sealed class TrainOptions
 {
     /// <summary>The most passes over the training examples. Default 10.</summary>
@@ -88,7 +88,7 @@ public sealed class TrainOptions
 /// <param name="IsBest">Whether that evaluation set a new best score.</param>
 public sealed record TrainProgress(long Step, int Epoch, float Loss, float LearningRate, double? DevScore, bool IsBest);
 
-/// <summary>What <see cref="PipelineTraining.Train"/> did.</summary>
+/// <summary>What <see cref="PipelineTraining.Train(Pipeline, IReadOnlyList{Example}, TrainOptions, CancellationToken)"/> did.</summary>
 /// <param name="Steps">The total number of optimizer steps, counting any before a resume.</param>
 /// <param name="Epochs">The number of epochs finished.</param>
 /// <param name="Completed"><see langword="false"/> when the run was cancelled before it finished.</param>

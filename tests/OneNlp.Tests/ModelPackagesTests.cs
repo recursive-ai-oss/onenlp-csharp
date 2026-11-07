@@ -71,28 +71,4 @@ public class ModelPackagesTests
     [Fact]
     public void UnknownLanguageCannotBeRegistered() =>
         Assert.Throws<ArgumentException>(() => ModelPackages.Register(Language.Unknown, "Test.Package", () => Pipeline.Blank()));
-
-    [Fact]
-    public void AFallbackServesALanguageOnlyWhenNoRegularPackageDoes()
-    {
-        var latvian = Language.FromCode("lv");
-        int fallbackCalls = 0;
-        ModelPackages.RegisterFallback(latvian, "Test.Models.Large", () =>
-        {
-            Interlocked.Increment(ref fallbackCalls);
-            return Pipeline.Blank(latvian);
-        });
-        Assert.True(ModelPackages.IsRegistered(latvian));
-        Pipeline viaFallback = ModelPackages.Get(latvian);
-        Assert.Equal(1, fallbackCalls);
-
-        // A fast-tier package registered later wins, and the fallback is not asked again.
-        var lithuanian = Language.FromCode("lt");
-        ModelPackages.RegisterFallback(lithuanian, "Test.Models.Large", () => throw new InvalidOperationException("the fallback must not load"));
-        Pipeline fast = Pipeline.Blank(lithuanian);
-        ModelPackages.Register(lithuanian, "Test.Models.Lithuanian", () => fast);
-        Assert.Same(fast, ModelPackages.Get(lithuanian));
-        Assert.Same(viaFallback, ModelPackages.Get(latvian));
-        Assert.Throws<ArgumentException>(() => ModelPackages.RegisterFallback(Language.Unknown, "Test.Models.Large", () => Pipeline.Blank()));
-    }
 }

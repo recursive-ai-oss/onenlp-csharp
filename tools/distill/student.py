@@ -52,13 +52,19 @@ class Attention(nn.Module):
         self.value = Dense(c.hidden, c.hidden)
         self.output = Dense(c.hidden, c.hidden)
 
-    def forward(self, x, mask, manual):
+    def forward(self, x, mask, manual, probs_out=None):
         b, n, d = x.shape
         h, dh = self.heads, d // self.heads
         q = self.query(x).view(b, n, h, dh).transpose(1, 2)
         k = self.key(x).view(b, n, h, dh).transpose(1, 2)
         v = self.value(x).view(b, n, h, dh).transpose(1, 2)
-        if manual:
+        if probs_out is not None:
+            # training with an attention objective: the probabilities are needed, so attention is written out (boolean mask)
+            s = (q @ k.transpose(-1, -2)) * (1.0 / math.sqrt(dh))
+            p = torch.softmax(s.float().masked_fill(~mask, -1e9), dim=-1)
+            probs_out.append(p)
+            a = p.to(v.dtype) @ v
+        elif manual:
             s = (q @ k.transpose(-1, -2)) * (1.0 / math.sqrt(dh)) + mask
             a = torch.softmax(s, dim=-1) @ v
         else:
@@ -77,8 +83,8 @@ class Layer(nn.Module):
         self.output = Dense(c.ffn, c.hidden)
         self.output_norm = nn.LayerNorm(c.hidden, eps=c.eps)
 
-    def forward(self, x, mask, manual):
-        x = self.attn_norm(x + self.attention(x, mask, manual))
+    def forward(self, x, mask, manual, probs_out=None):
+        x = self.attn_norm(x + self.attention(x, mask, manual, probs_out))
         return self.output_norm(x + self.output(F.gelu(self.intermediate(x))))
 
 
@@ -112,7 +118,7 @@ class StudentEncoder(nn.Module):
         self.encoder = Encoder(c)
         self.manual_attention = False
 
-    def forward(self, input_ids, attention_mask, return_all=False):
+    def forward(self, input_ids, attention_mask, return_all=False, probs_out=None):
         if self.manual_attention:
             mask = (1.0 - attention_mask[:, None, None, :].to(torch.float32)) * -1e9  # additive, as OneModel's attention takes it
         else:
@@ -120,7 +126,7 @@ class StudentEncoder(nn.Module):
         x = self.embeddings(input_ids)
         states = []
         for layer in self.encoder.layer:
-            x = layer(x, mask, self.manual_attention)
+            x = layer(x, mask, self.manual_attention, probs_out)
             states.append(x)
         return (x, states) if return_all else x
 

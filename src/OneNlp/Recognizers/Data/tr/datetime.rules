@@ -1,0 +1,132 @@
+# Date and time vocabulary, Turkish (tr-TR). Same sections as the other languages; the roles are described in docs/recognizers.md.
+#
+# Dates are day first (3 Mart 2026, 15.04.2026 and 15/04/2026 are 15 April). A form starting with "=" is case-sensitive, the others are matched
+# without regard to case. A case ending written after an apostrophe ("3 Mart'ta", "20.03.2026'da") is outside the span.
+# Vowel harmony makes the endings of "from ... to" ranges vary ('dan 'den 'tan 'ten; 'a 'e 'ya 'ye kadar); each variant is a form.
+
+[time.region]
+tr
+
+[time.month]
+1 | ocak, ocakta, ocaktan, ocağa
+2 | şubat, şubatta, şubattan, şubata
+3 | mart, martta, marttan, marta
+4 | nisan, nisanda, nisandan, nisana
+5 | mayıs, mayısta, mayıstan, mayısa
+6 | haziran, haziranda, hazirandan, hazirana
+7 | temmuz, temmuzda, temmuzdan, temmuza
+8 | ağustos, ağustosta, ağustostan, ağustosa
+9 | eylül, eylülde, eylülden, eylüle
+10 | ekim
+11 | kasım
+12 | aralık
+
+[time.weekday]
+1 | pazartesi, pazartesiden, pazartesiye | pazartesileri
+2 | salı, salıda, salıdan, salıya | salıları
+3 | çarşamba, çarşambada, çarşambadan, çarşambaya | çarşambaları
+4 | perşembe, perşembede, perşembeden, perşembeye | perşembeleri
+5 | cuma, cumada, cumadan, cumaya | cumaları
+6 | cumartesi, cumartesiden, cumartesiye | cumartesileri
+7 | pazar, pazara, pazardan | pazarları
+
+[time.unit]
+second | saniye, saniyeler, sn | 1 | 0
+minute | dakika, dakikalar, dk | 60 | 0
+hour | saat, saatler | 3600 | 0
+day | gün, günler | 86400 | 0
+week | hafta, haftalar | 604800 | 0
+month | ay, aylar | 0 | 1
+quarter | çeyrek, üç aylık dönem | 0 | 3
+year | yıl, yıllar, sene, seneler | 0 | 12
+business day | iş günü, iş günleri | 0 | 0
+
+[time.season]
+spring | ilkbahar, ilkbaharı, ilkbaharında, bahar, baharı, baharında | 3 | 3
+summer | yaz, yazı, yazında, yazın | 6 | 3
+fall | sonbahar, sonbaharı, sonbaharında, güz, güzün | 9 | 3
+winter | kış, kışı, kışında, kışın | 12 | 3
+
+[time.daypart]
+morning | sabah, sabahı, sabahleyin | 6 | 12
+afternoon | öğleden sonra, öğleden sonrası | 12 | 18
+evening | akşam, akşamı, akşamleyin | 18 | 24
+night | gece, gecesi | 20 | 24
+
+[time.word]
+today | bugün
+tomorrow | yarın
+yesterday | dün
+dayaftertomorrow | öbür gün, öbürsü gün
+daybeforeyesterday | evvelsi gün, evvelki gün, önceki gün
+tonight | bu gece
+noon | öğlen, öğle, öğle vakti
+midnight | gece yarısı
+this | bu
+next | gelecek, önümüzdeki, sonraki
+last | geçen, geçtiğimiz, önceki
+ago | önce
+later | sonra
+every | her
+approx | yaklaşık
+earlypost | 'ın başında, 'in başında, 'un başında, 'ün başında, ’ın başında, ’in başında, ’un başında, ’ün başında, başında, başı, başlarında
+midpost | 'ın ortasında, 'in ortasında, 'un ortasında, 'ün ortasında, ’ın ortasında, ’in ortasında, ’un ortasında, ’ün ortasında, ortasında, ortası, ortalarında
+nodate | pazar yeri, pazar yerinde, pazar yerine, pazar yerini, pazar yerleri, pazar alanı
+latepost | 'ın sonunda, 'in sonunda, 'un sonunda, 'ün sonunda, ’ın sonunda, ’in sonunda, ’un sonunda, ’ün sonunda, sonunda, sonu, sonlarında
+weekend | hafta sonu
+hourarticle | saat
+rangeto | -, –, —, ile, 'dan, 'den, 'tan, 'ten, ’dan, ’den, ’tan, ’ten
+rangetail | arasında, kadar, dek, 'a kadar, 'e kadar, 'ya kadar, 'ye kadar, 'a dek, 'e dek, 'ya dek, 'ye dek, ’a kadar, ’e kadar, ’ya kadar, ’ye kadar
+zonebase | =UTC, =GMT
+
+[time.recurrence]
+P1D | day | günlük, her günkü
+P1W | week | haftalık
+P1M | month | aylık
+P3M | quarter | üç aylık
+P1Y | year | yıllık
+
+[time.zone]
+=UTC, =GMT | 0 | z
+=CET | 60
+=CEST | 120
+=EET | 120
+=EEST | 180
+=TRT | 180
+=MSK | 180
+=EST | -300
+=EDT | -240
+=CST | -360
+=CDT | -300
+=MST | -420
+=MDT | -360
+=PST | -480
+=PDT | -420
+
+# Sources: the national public holidays of Law 2429 (Ulusal Bayram ve Genel Tatiller Hakkında Kanun); the religious holidays are the first days
+# of the Ramazan and Kurban festivals in the official calendar of the Diyanet (Presidency of Religious Affairs), a pinned table because they follow
+# the lunar calendar. Years the table does not list give no date. Mothers' and Fathers' Day are customary dates.
+[time.holiday]
+Yılbaşı, Yeni Yıl, Yılbaşı Günü | fixed 01-01 | tr
+Sevgililer Günü | fixed 02-14 | tr
+Kadınlar Günü, Dünya Kadınlar Günü | fixed 03-08 | tr
+Ulusal Egemenlik ve Çocuk Bayramı, Çocuk Bayramı | fixed 04-23 | tr
+Emek ve Dayanışma Günü, İşçi Bayramı | fixed 05-01 | tr
+Anneler Günü | nth 2 sun 5 | tr
+Gençlik ve Spor Bayramı | fixed 05-19 | tr
+Babalar Günü | nth 3 sun 6 | tr
+Demokrasi ve Millî Birlik Günü, Demokrasi ve Milli Birlik Günü | fixed 07-15 | tr
+Zafer Bayramı | fixed 08-30 | tr
+Cumhuriyet Bayramı | fixed 10-29 | tr
+Öğretmenler Günü | fixed 11-24 | tr
+Noel | fixed 12-25 | tr
+Yılbaşı Gecesi | fixed 12-31 | tr
+Ramazan Bayramı, Şeker Bayramı | table 2025-03-30 2026-03-20 2027-03-09 2028-02-26 2029-02-14 2030-02-04 | tr
+Kurban Bayramı | table 2025-06-06 2026-05-27 2027-05-16 2028-05-05 2029-04-24 2030-04-13 | tr
+
+[time.flag]
+no-lone-day
+bare-hour-24
+daypart-first
+dot-clock
+bare-hour-range

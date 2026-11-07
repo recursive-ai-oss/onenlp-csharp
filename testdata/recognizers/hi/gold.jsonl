@@ -1,0 +1,79 @@
+{"id":"05c6deae6b55","text":"वह छठे स्थान पर रहा।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":6,"type":"ordinal","text":"छठे","value":"6"}]}
+{"id":"146060207ed2","text":"फ़ाइल में 5,00,000 पंक्तियाँ हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":10,"end":18,"type":"number","text":"5,00,000","value":"500000"}]}
+{"id":"152915ce6bfa","text":"प्रदर्शनी में एक हज़ार नौ सौ लोग आए।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":14,"end":28,"type":"number","text":"एक हज़ार नौ सौ","value":"1900"}]}
+{"id":"1b6d0e069705","text":"रात में -8 °C हो गया।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":13,"type":"temperature","text":"-8 °C","value":"-8 celsius"}]}
+{"id":"1dd84276ab77","text":"बाग़ में अठारह पेड़ लगे हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":14,"type":"number","text":"अठारह","value":"18"}]}
+{"id":"24d471187e69","text":"कमरे में पाँच कुर्सियाँ हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":13,"type":"number","text":"पाँच","value":"5"}]}
+{"id":"252f4dcd21e2","text":"40 प्रतिशत छात्र पास हुए।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":10,"type":"percentage","text":"40 प्रतिशत","value":"40"}]}
+{"id":"259198478b78","text":"यह 2025 के पतझड़ में हुआ।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":3,"end":16,"type":"daterange","text":"2025 के पतझड़","value":"2025-09-01/2025-12-01","grain":"season","approx":true}]}
+{"id":"2a9f923425aa","text":"पेंटिंग 1.5 करोड़ रुपये में बिकी।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":23,"type":"currency","text":"1.5 करोड़ रुपये","value":"15000000 INR"}]}
+{"id":"2b48428f9821","text":"टैग #vasant2026 और खाता @pariyojana_dal।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":15,"type":"hashtag","text":"#vasant2026"},{"start":24,"end":39,"type":"mention","text":"@pariyojana_dal"}]}
+{"id":"2d29c2314bca","text":"स्वतंत्रता दिवस की तैयारी चल रही है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":15,"type":"date","text":"स्वतंत्रता दिवस","value":"2026-08-15","grain":"day"}]}
+{"id":"2d2dc03005cb","text":"4 साल की बच्ची खो गई।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":8,"type":"age","text":"4 साल की","value":"4 year"}]}
+{"id":"3674d4f8c18f","text":"उसने दसवीं वर्षगाँठ मनाई।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":10,"type":"ordinal","text":"दसवीं","value":"10"}]}
+{"id":"39ebb2dc5bee","text":"ड्रेस 60 डॉलर की है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":13,"type":"currency","text":"60 डॉलर","value":"60 USD"}]}
+{"id":"3bdc11caf3bb","text":"उसके चाचा 60 साल के हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":10,"end":19,"type":"age","text":"60 साल के","value":"60 year"}]}
+{"id":"3c1fd0199299","text":"4 दिन पहले उसने फ़ोन किया।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":10,"type":"date","text":"4 दिन पहले","value":"2026-03-14","grain":"day"}]}
+{"id":"3f84e3bfc152","text":"दुकान 10:00-18:00 के बीच खुली है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":17,"type":"timerange","text":"10:00-18:00","value":"T10:00/T18:00","grain":"minute"}]}
+{"id":"3ff527c7f42e","text":"बाहर 30 डिग्री सेल्सियस है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":23,"type":"temperature","text":"30 डिग्री सेल्सियस","value":"30 celsius"}]}
+{"id":"3ffb7aca9075","text":"केक 250 रुपये का है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":13,"type":"currency","text":"250 रुपये","value":"250 INR"}]}
+{"id":"40afe687f72b","text":"नंबर 0141 234 5678 है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":18,"type":"phone","text":"0141 234 5678"}]}
+{"id":"417be22dd57d","text":"रास्ता 4 घंटे का था।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":13,"type":"duration","text":"4 घंटे","value":"14400"}]}
+{"id":"495e476fc062","text":"पानी का तापमान 40 डिग्री है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":24,"type":"temperature","text":"40 डिग्री","value":"40 degree"}]}
+{"id":"4affff920b9b","text":"बीसवीं सदी बीत गई।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":6,"type":"ordinal","text":"बीसवीं","value":"20"}]}
+{"id":"4c997c7c7214","text":"सर्वर 10.20.30.40 पर है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":17,"type":"ip","text":"10.20.30.40"}]}
+{"id":"4db9c6e5cf6d","text":"मेला जून के अंत में लगेगा।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":15,"type":"daterange","text":"जून के अंत","value":"2026-06-21/2026-07-01","grain":"month","approx":true}]}
+{"id":"4ecf810a5044","text":"बिल्ली 9 महीने की है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":17,"type":"age","text":"9 महीने की","value":"9 month"}]}
+{"id":"52fc958338fb","text":"दोनों तरफ़ सौ लोग थे।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":11,"end":13,"type":"number","text":"सौ","value":"100"}]}
+{"id":"53468dd3a56a","text":"तालिका 2 GB जगह लेती है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":11,"type":"dimension","text":"2 GB","value":"2 gigabyte"}]}
+{"id":"57661eb5795a","text":"चुनाव 2021 की शुरुआत में हुए।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":20,"type":"daterange","text":"2021 की शुरुआत","value":"2021-01-01/2021-05-01","grain":"year","approx":true}]}
+{"id":"5a1233662ec8","text":"दाम 15% बढ़े।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"percentage","text":"15%","value":"15"}]}
+{"id":"5fcabd426afd","text":"उसने इक्कीस किताबें पढ़ीं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":11,"type":"number","text":"इक्कीस","value":"21"}]}
+{"id":"666f8212cff3","text":"बाग़ 7वीं गली में है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":9,"type":"ordinal","text":"7वीं","value":"7"}]}
+{"id":"68c59c81d891","text":"दुकान में तीन करोड़ लोग आए।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":10,"end":19,"type":"number","text":"तीन करोड़","value":"30000000"}]}
+{"id":"6a4717c0ba98","text":"बैटरी 80% भरी है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":9,"type":"percentage","text":"80%","value":"80"}]}
+{"id":"6f2fc4490c43","text":"किताब के दो सौ पचास पन्ने पढ़े गए।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":19,"type":"number","text":"दो सौ पचास","value":"250"}]}
+{"id":"7238b4f6bfb6","text":"लाभ पाँच प्रतिशत रहा।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":16,"type":"percentage","text":"पाँच प्रतिशत","value":"5"}]}
+{"id":"75c4d89bf189","text":"आयोजन अगस्त 2026 में है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":16,"type":"daterange","text":"अगस्त 2026","value":"2026-08-01/2026-09-01","grain":"month"}]}
+{"id":"7b84e1ee14af","text":"माप 2.718 निकला।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":9,"type":"number","text":"2.718","value":"2.718"}]}
+{"id":"7cc4f49b35f8","text":"3रे दर्जे के छात्र यात्रा पर गए।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":3,"type":"ordinal","text":"3रे","value":"3"}]}
+{"id":"8014a2ad5fae","text":"पहचान 2b9d4f1a-1c2e-4a3b-8d9e-0f1a2b3c4d5e है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":42,"type":"guid","text":"2b9d4f1a-1c2e-4a3b-8d9e-0f1a2b3c4d5e"}]}
+{"id":"810af6c94910","text":"ओवन 180 °C तक गरम हुआ।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":10,"type":"temperature","text":"180 °C","value":"180 celsius"}]}
+{"id":"8b88149a252a","text":"नमी 62.5% है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":9,"type":"percentage","text":"62.5%","value":"62.5"}]}
+{"id":"928f0a01a06c","text":"लिखें: mohan.rao@udaharan.com।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":29,"type":"email","text":"mohan.rao@udaharan.com"}]}
+{"id":"9383fded4222","text":"टीम ग्यारह खिलाड़ियों के साथ उतरी।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":10,"type":"number","text":"ग्यारह","value":"11"}]}
+{"id":"95dc5299db5e","text":"कक्षा 16:45 बजे है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":15,"type":"time","text":"16:45 बजे","value":"T16:45","grain":"minute"}]}
+{"id":"97231b2c592f","text":"कॉपी ₹15 की है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":8,"type":"currency","text":"₹15","value":"15 INR"}]}
+{"id":"989be88d1af3","text":"तापमान का अंतर -3 रहा।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":17,"type":"number","text":"-3","value":"-3"}]}
+{"id":"99710e949b88","text":"बैग €80 का है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":7,"type":"currency","text":"€80","value":"80 EUR"}]}
+{"id":"9d2c72cf304e","text":"जन्म 3/11/1985 का है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":14,"type":"date","text":"3/11/1985","value":"1985-11-03","grain":"day"}]}
+{"id":"9f2bf6110c81","text":"कल हम निकलेंगे।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":2,"type":"date","text":"कल","value":"2026-03-19","grain":"day"}]}
+{"id":"a03a3379d604","text":"नगर में चौंसठ मंदिर हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":13,"type":"number","text":"चौंसठ","value":"64"}]}
+{"id":"a35fe5e9ef69","text":"काम 2022 के मध्य में पूरा हुआ।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":16,"type":"daterange","text":"2022 के मध्य","value":"2022-05-01/2022-09-01","grain":"year","approx":true}]}
+{"id":"a7a67110cb87","text":"रिपोर्ट हर हफ़्ते आती है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":17,"type":"set","text":"हर हफ़्ते","value":"P1W","grain":"week"}]}
+{"id":"a81110b8987a","text":"सूरज निकला और सब जाग गए।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
+{"id":"b03c063995a6","text":"पता www.udaharan.org/khabar है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":27,"type":"url","text":"www.udaharan.org/khabar"}]}
+{"id":"b442818a52af","text":"बैग 8 किलो का है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":10,"type":"dimension","text":"8 किलो","value":"8 kilogram"}]}
+{"id":"b5dd922e6f15","text":"तीसवाँ दिन पूरा हुआ।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":6,"type":"ordinal","text":"तीसवाँ","value":"30"}]}
+{"id":"b7287d093d8e","text":"किराया 12,500 रुपये हो गया।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":7,"end":19,"type":"currency","text":"12,500 रुपये","value":"12500 INR"}]}
+{"id":"b7ba942bd9a8","text":"गलियारा 15 मीटर लंबा है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":8,"end":15,"type":"dimension","text":"15 मीटर","value":"15 meter"}]}
+{"id":"c07e8a632f4c","text":"डिब्बे में 3 लीटर पानी आया।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":11,"end":17,"type":"dimension","text":"3 लीटर","value":"3 liter"}]}
+{"id":"c36c6fea9bd3","text":"सोमवार को मिलते हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":6,"type":"date","text":"सोमवार","value":"2026-03-23","grain":"day"}]}
+{"id":"c50c13f2166f","text":"दुकान में 30 फ़ीसदी छूट है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":10,"end":19,"type":"percentage","text":"30 फ़ीसदी","value":"30"}]}
+{"id":"c7ddd3104706","text":"संगीत समारोह 7 जून 2026 को होगा।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":13,"end":23,"type":"date","text":"7 जून 2026","value":"2026-06-07","grain":"day"}]}
+{"id":"c97b2a933070","text":"टीम हर मंगलवार काम करती है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":14,"type":"set","text":"हर मंगलवार","value":"XXXX-WXX-2","grain":"day"}]}
+{"id":"c9dd07730238","text":"बच्चे की लंबाई 110 सेमी है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":15,"end":23,"type":"dimension","text":"110 सेमी","value":"110 centimeter"}]}
+{"id":"cc590b2117ed","text":"तुम कल शाम आना।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":10,"type":"datetimerange","text":"कल शाम","value":"2026-03-19T18:00/2026-03-20T00:00","grain":"hour","approx":true}]}
+{"id":"d129ce0d3cfc","text":"अंतिम दिन 10 अप्रैल 2026 है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":10,"end":24,"type":"date","text":"10 अप्रैल 2026","value":"2026-04-10","grain":"day"}]}
+{"id":"d1a2b82a021f","text":"बैठक कल 11:00 बजे है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":17,"type":"datetime","text":"कल 11:00 बजे","value":"2026-03-19T11:00","grain":"minute"}]}
+{"id":"d261b2eeb60c","text":"शिशु 2 सप्ताह का है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":16,"type":"age","text":"2 सप्ताह का","value":"2 week"}]}
+{"id":"e7ff20eae75e","text":"मेला 3-7 जून को है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":5,"end":12,"type":"daterange","text":"3-7 जून","value":"2026-06-03/2026-06-08","grain":"day"}]}
+{"id":"eb146a5ddfb5","text":"टीम अगले हफ़्ते छुट्टी पर है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":15,"type":"daterange","text":"अगले हफ़्ते","value":"2026-03-23/2026-03-30","grain":"week"}]}
+{"id":"eb1f6bff3e44","text":"कोर्स 3 महीने चलेगा।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":13,"type":"duration","text":"3 महीने","value":"P3M"}]}
+{"id":"f17542a72ad0","text":"गलियारे में 1,500 कुर्सियाँ थीं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":12,"end":17,"type":"number","text":"1,500","value":"1500"}]}
+{"id":"f3971df7cef4","text":"शहर 40 किमी दूर है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":4,"end":11,"type":"dimension","text":"40 किमी","value":"40 kilometer"}]}
+{"id":"f49a0b40e3fe","text":"इमारत की 12वीं मंज़िल पर।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":14,"type":"ordinal","text":"12वीं","value":"12"}]}
+{"id":"fd13e710951f","text":"पहली कक्षा पहली मंज़िल पर है।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":0,"end":4,"type":"ordinal","text":"पहली","value":"1"},{"start":11,"end":15,"type":"ordinal","text":"पहली","value":"1"}]}
+{"id":"fd169d0b2fbc","text":"मैंने एक कप चाय पी।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[]}
+{"id":"fe6941dd7fae","text":"योजना पिछले महीने बदली।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":6,"end":17,"type":"daterange","text":"पिछले महीने","value":"2026-02-01/2026-03-01","grain":"month"}]}
+{"id":"ffc563f08ee1","text":"सूची में तैंतीस नाम हैं।","reference":"2026-03-18T10:30:00","timezone":"UTC","items":[{"start":9,"end":15,"type":"number","text":"तैंतीस","value":"33"}]}

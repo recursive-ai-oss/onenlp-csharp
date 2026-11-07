@@ -1,0 +1,577 @@
+# Dutch recognizer gold set, authoring source. Read docs/recognizer-gold.md for the schema and the labelling rules (the section on Italian and Dutch
+# lists what differs from English).
+#
+# One sentence per line. An expression is written [[text|type|value|grain|flags]]; trailing empty fields may be dropped.
+# {nbsp} and {nnbsp} stand for U+00A0 and U+202F. flags: 'approx' and/or 'alt=<value>;<value>'.
+# '@ref <ISO timestamp>' sets the reference time (UTC) for the lines below it; '@split dev|test' assigns the lines below it.
+# build.py turns this file into gold.jsonl (dev) and test.jsonl (test).
+
+@ref 2026-03-18T10:30:00
+@split test
+
+# ---- numbers
+Er waren [[1.250|number|1250]] plaatsen in de grote zaal.
+De verhouding is [[3,14|number|3.14]] in deze reeks.
+Er hebben zich [[vijfentwintig|number|25]] mensen ingeschreven.
+Het rapport telt [[honderdtwintig|number|120]] pagina's.
+Ze telde [[veertig|number|40]] vogels op het meer.
+Er zijn meer dan [[twee miljoen|number|2000000]] exemplaren gedrukt.
+De score is met [[-7|number|-7]] punten veranderd na de herziening.
+Koop [[een dozijn|number|12]] eieren en wat melk.
+Ze haalde [[zevenennegentig|number|97]] voor het examen.
+Het bestand bevat [[1000000|number|1000000]] regels.
+De planeet heeft ongeveer [[7,9 miljard|number|7900000000]] inwoners.
+Lees hoofdstuk [[12|number|12]] voor het examen.
+Er zijn [[zeventien|number|17]] leerlingen geslaagd.
+Er ontbreken [[eenenzeventig|number|71]] stemmen om te winnen.
+Er zijn in totaal [[12.345.678|number|12345678]] regels geanalyseerd.
+Ze vonden [[dertigduizend|number|30000]] munten in het wrak.
+De gemiddelde fout was [[0,001|number|0.001]] over de hele reeks.
+Er waren [[driehonderdvierentwintig|number|324]] gasten op het feest.
+Er kwamen ongeveer [[duizend|number|1000]] mensen naar de conferentie.
+We hebben [[tweehonderd|number|200]] stoelen nodig voor de zaal.
+Er zijn nog [[tachtig|number|80]] plaatsen in de bus.
+De score kwam in de laatste ronde op [[4.500,75|number|4500.75]].
+Ze verkochten [[tweeduizend vijfhonderd|number|2500]] kaartjes in totaal.
+Het rapport somt [[achtentwintig|number|28]] kostenposten op.
+We kregen [[honderdtachtig|number|180]] antwoorden op de enquête.
+Zij heeft [[drieëntwintig|number|23]] planten op het balkon.
+
+# ---- ordinals
+Ze werd [[derde|ordinal|3]] in de race.
+Hij kocht de [[3e|ordinal|3]] druk van de atlas.
+Hij won de [[1e|ordinal|1]] prijs op de kermis.
+Het kantoor ligt op de [[tweede|ordinal|2]] verdieping.
+Ze vierde haar [[vijftiende|ordinal|15]] verjaardag met vrienden.
+Het was de [[honderdste|ordinal|100]] schooldag.
+Ze was de [[drieëntwintigste|ordinal|23]] in de rij.
+De winkel zit op de [[5de|ordinal|5]] verdieping van het centrum.
+Het bedrijf vierde zijn [[tiende|ordinal|10]] verjaardag in stilte.
+Ze was de [[duizendste|ordinal|1000]] klant van de winkel.
+Ze speelden de [[negende|ordinal|9]] symfonie van Beethoven.
+Hij pakte de [[vierde|ordinal|4]] plek links.
+Ze woont op de [[21ste|ordinal|21]] verdieping van de toren.
+Er wordt in deze cursus over de [[eenentwintigste|ordinal|21]] eeuw gesproken.
+Ze won de [[eerste|ordinal|1]] etappe van de ronde.
+
+# ---- percentages
+De verkoop is met [[12%|percentage|12]] gestegen in de periode.
+[[50 procent|percentage|50]] van de kiezers bleef thuis.
+De werkloosheid daalde naar [[3,5%|percentage|3.5]] in de peiling.
+Ongeveer [[twaalf procent|percentage|12]] van de ondervraagden weigerde te antwoorden.
+De test slaagde met [[99,9%|percentage|99.9]] nauwkeurigheid.
+De inflatie steeg in [[een maand|duration|P1M]] met [[0,5 procent|percentage|0.5]].
+De batterij staat weer op [[100%|percentage|100]] op de telefoon.
+Ongeveer [[7%|percentage|7]] van het personeel werkt thuis.
+De lening heeft een rente van [[4,25%|percentage|4.25]] en een looptijd van [[tien jaar|duration|P10Y]].
+Ze gaf [[honderd procent|percentage|100]] op de training.
+De index verloor [[3%|percentage|3]] in een enkele handel.
+Slechts [[vijfentachtig procent|percentage|85]] van de stoelen was bezet.
+Aan de kassa krijg je [[15 procent|percentage|15]] korting.
+Het saldo daalt [[elk jaar|set|P1Y|year]] met [[2 %|percentage|2]].
+
+# ---- dimensions
+Het pad is in totaal [[12 kilometer|dimension|12 kilometer]] lang.
+Het station ligt [[5 km|dimension|5 kilometer]] hiervandaan.
+Hij is [[180 cm|dimension|180 centimeter]] lang.
+De kamer is [[6 meter|dimension|6 meter]] breed.
+Zaag de plank precies op [[3 centimeter|dimension|3 centimeter]].
+We hebben [[2,5 kilometer|dimension|2.5 kilometer]] gelopen voor de lunch.
+Het zwembad is in het midden [[10 m|dimension|10 meter]] diep.
+Doe [[500 gram|dimension|500 gram]] bloem in de kom.
+Het pakket weegt in totaal [[75 kg|dimension|75 kilogram]].
+Giet [[250 ml|dimension|250 milliliter]] melk in de pan.
+Ze drinkt [[2 liter|dimension|2 liter]] water op het werk.
+Het appartement beslaat [[100 m²|dimension|100 square meter]] op de begane grond.
+De auto rijdt [[90 km/u|dimension|90 kilometer per hour]] op deze weg.
+Het bestand is gecomprimeerd [[4 GB|dimension|4 gigabyte]] groot.
+De motor levert [[75 kW|dimension|75 kilowatt]] op vol vermogen.
+De boerderij strekt zich uit over [[3 hectare|dimension|3 hectare]] in het noorden.
+Het perceel meet in totaal [[200 vierkante meter|dimension|200 square meter]].
+
+# ---- temperatures
+Het is [[25 °C|temperature|25 celsius]] in de schaduw.
+De thermometer wijst [[72 °F|temperature|72 fahrenheit]] aan op de veranda.
+Water kookt bij [[100 graden Celsius|temperature|100 celsius]] op zeeniveau.
+Buiten is het nu [[-5 °C|temperature|-5 celsius]].
+Aan de kust wordt het [[morgen|date|2026-03-19|day]] [[20 graden|temperature|20 degree]].
+De oven staat op [[180°C|temperature|180 celsius]] voor het bakken.
+De temperatuur in het lab is constant [[293 K|temperature|293 kelvin]].
+Zet de oven op [[200 graden Celsius|temperature|200 celsius]] en wacht.
+Hij had [[38,5 °C|temperature|38.5 celsius]] koorts toen hij thuiskwam.
+De diepvries staat permanent op [[-18 °C|temperature|-18 celsius]].
+In New York was het [[gisteren|date|2026-03-17|day]] [[30 graden Fahrenheit|temperature|30 fahrenheit]].
+
+# ---- ages
+De jongen, [[5 jaar oud|age|5 year]], slaapt al.
+Een mevrouw van [[90 jaar oud|age|90 year]] woont op de begane grond.
+Een puppy van [[18 maanden oud|age|18 month]] zoekt een gezin.
+Een baby van [[3 weken oud|age|3 week]] is opgenomen in het ziekenhuis.
+Kinderen van [[12 jaar oud|age|12 year]] wonnen de prijs.
+Een [[40-jarige|age|40 year]] man is door de politie gehoord.
+Het katje, [[7 dagen oud|age|7 day]], heeft zijn ogen geopend.
+Een [[65-jarige|age|65 year]] klant stelde de vraag.
+De tweeling, [[2 jaar oud|age|2 year]], kruipt door het huis.
+Een getuige van [[30 jaar oud|age|30 year]] is ondervraagd.
+Het [[5-jarige|age|5 year]] kind tekent de hele tijd.
+
+# ---- money
+Het kaartje kost [[20 €|currency|20 EUR]] bij de ingang.
+Hij betaalde [[€ 1.234,56|currency|1234.56 EUR]] voor de fiets.
+De huur is [[800 euro|currency|800 EUR]] voor dit studio.
+De koffie kost [[€ 2,50|currency|2.5 EUR]] aan de bar.
+Hij verdiende in totaal [[18.000 EUR|currency|18000 EUR]].
+Het dossier kost [[CHF 50|currency|50 CHF]] aan het loket.
+De rekening bedraagt [[3.000 dollar|currency|3000 USD]] in totaal.
+Ze gaf [[12 pond sterling|currency|12 GBP]] uit op de markt.
+Het is [[50 cent|currency|0.5 EUR]] per stuk.
+De prijs is [[5 miljoen euro|currency|5000000 EUR]] voor alles.
+Hij is haar [[€ 1.200|currency|1200 EUR]] huur schuldig.
+Het kaartje kost [[$15|currency|15 USD]] in Chicago.
+Het basisabonnement kost maar [[9,99 euro|currency|9.99 EUR]] in totaal.
+De kosten zijn [[vijftien euro|currency|15 EUR]] per dossier.
+Het lidmaatschap kost [[£20|currency|20 GBP]] in totaal.
+Hij kreeg [[tweeduizend euro|currency|2000 EUR]] bonus.
+De terugbetaling was maar [[75 cent|currency|0.75 EUR]].
+
+# ---- e-mail
+Schrijf naar [[jan.jansen@voorbeeld.nl|email]] voor meer details.
+Stuur het bestand naar [[support+factuur@mail.voorbeeld.org|email]] ter controle.
+Haar nieuwe adres is [[a.b_c-d@sub.voorbeeld.co.uk|email]] sinds kort.
+Neem contact op met [[info@voorbeeld.net|email]] of bel het secretariaat.
+Schrijf naar [[hr@voorbeeld.com|email]] en naar [[verkoop@voorbeeld.com|email]] tegelijk.
+De afzender was [[niet-antwoorden@meldingen.voorbeeld.io|email]] alweer.
+Stuur het door naar [[maria.garcia@voorbeeld.es|email]] meteen.
+Gebruik [[team@voorbeeld.com|email]] voor je vragen.
+Het bericht komt van [[voornaam.achternaam@voorbeeld.nl|email]] en wacht op antwoord.
+Ons contactadres is [[contact@voorbeeld.be|email]] voor elke aanvraag.
+
+# ---- URL
+Bekijk [[https://www.voorbeeld.nl/producten|url]] voor de lijst.
+Onze website is al lang [[www.voorbeeld.com|url]].
+De tarieven staan op [[voorbeeld.nl/tarieven|url]] en zijn actueel.
+Download de gids op [[https://docs.voorbeeld.org/gids/start?lang=nl|url]] voor de cursus.
+De opslagplaats staat op [[http://git.voorbeeld.net/project.git|url]] voor iedereen.
+Open [[https://voorbeeld.com/a/b/c.html#einde|url]] om verder te lezen.
+De helppagina staat op [[ftp://files.voorbeeld.org/pub/|url]] voor klanten.
+Kijk op [[https://shop.voorbeeld.be/winkelwagen|url]], daar is het.
+Zie [[www.voorbeeld.nl/contact|url]] voor de openingstijden.
+De blog staat hier: [[https://blog.voorbeeld.nl/2026/maart|url]] en is open.
+
+# ---- IP addresses
+De server reageert vanaf het begin op [[192.168.0.12|ip]].
+De gateway is [[10.0.0.1|ip]] op dit netwerk.
+De publieke DNS is [[8.8.8.8|ip]] voor alle werkplekken.
+Blokkeer [[203.0.113.45|ip]] in de firewall.
+De IPv6-host is [[2001:db8::1|ip]] in het lab.
+De test mislukte meerdere keren op [[198.51.100.7|ip]].
+De router [[fe80::1ff:fe23:4567:890a|ip]] reageert niet meer.
+Het loopback-adres is [[127.0.0.1|ip]] op elke machine.
+Maak verbinding met [[172.16.254.3|ip]] voor de onderbreking.
+De node [[2001:db8:85a3::8a2e:370:7334|ip]] ligt eruit.
+
+# ---- phone numbers
+Bel [[020 555 0123|phone]] om te reserveren.
+De centrale is bereikbaar op [[+31 20 555 0123|phone]] op kantoor.
+Bel me op [[+31 6 5550 0123|phone]] als je te laat bent.
+Het nummer is [[020-555 0123|phone]] in het telefoonboek.
+Bel terug naar [[+31 (0)20 555 0123|phone]] als het nodig is.
+De fax is al lang [[(020) 555 0123|phone]].
+Ons kantoor in Antwerpen is op [[+32 3 555 01 23|phone]] bereikbaar.
+Kies [[+31 6 1234 5678|phone]] voor het noodgeval.
+De directe lijn is al lang [[010 555 0178|phone]].
+De klantenservice is bereikbaar op [[+31 30 555 0199|phone]].
+
+# ---- hashtags and mentions
+Volg de draad onder [[#OneNLP|hashtag]] voor nieuws.
+Het trefwoord [[#zomer2026|hashtag]] staat bovenaan de lijst.
+Voeg [[#nieuwigheden|hashtag]] en [[#dotnet|hashtag]] toe aan het bericht.
+Deel met [[#vrijdag_foto|hashtag]] op het netwerk.
+De draad [[#Utrecht2026|hashtag]] blijft rustig.
+De draad [[#goedemorgen|hashtag]] komt [[elke week|set|P1W|week]] terug.
+Voeg [[#recept_van_de_dag|hashtag]] toe aan je bericht.
+De meningen staan onder [[#reacties|hashtag]] en [[#kwaliteit|hashtag]] op dezelfde plek.
+Het thema [[#Rotterdam2027|hashtag]] wint aan kracht.
+De uitdaging [[#marathon_2026|hashtag]] begint [[morgen|date|2026-03-19|day]].
+Bedankt [[@recursiveai|mention]] voor de snelle verbetering.
+Vraag het aan [[@jane_doe|mention]] en [[@dotnet|mention]] voor het vervolg.
+Meld [[@maria_g|mention]] op de draad.
+Een grote dank aan [[@open_source_fan|mention]] voor de oplossing.
+Zet [[@team_nlp|mention]] in de kopie van het bericht.
+Bedankt [[@jan_de_vries|mention]] voor het zorgvuldig nalezen.
+Stuur de link naar [[@piet_75|mention]] voor de vergadering.
+Waarschuw [[@support_nl|mention]] en [[@admin|mention]] over het probleem.
+Deze draad is gestart door [[@het_kleine_team|mention]] op het platform.
+Antwoord [[@sanne_b|mention]] meteen.
+
+# ---- GUIDs
+Het pakket [[0f8fad5b-d9cb-469f-a165-70867728950e|guid]] is bezorgd.
+De node [[1b4e28ba-2fa1-11d2-883f-0016d3cca427|guid]] reageert niet meer.
+Het spoor [[886313e1-3b8a-5372-9b90-0c9aee199e5d|guid]] wordt bewaard.
+De identifier is [[3f2504e0-4f89-11d3-9a0c-0305e82c3301|guid]] in de database.
+De sleutel [[123e4567-e89b-12d3-a456-426614174000|guid]] is verlopen.
+De token [[550e8400-e29b-41d4-a716-446655440000|guid]] is ingetrokken.
+De sessie [[6ba7b810-9dad-11d1-80b4-00c04fd430c8|guid]] is beëindigd.
+Het record [[c9a646d3-9c61-4cb7-bfcd-ee2522c8f633|guid]] is gedupliceerd.
+Het bestand [[7d444840-9dc0-11d1-b245-5ffdce74fad2|guid]] staat in quarantaine.
+De bestelling [[9b2f3c1e-5a4d-4e8b-8f6a-1d2c3b4a5f60|guid]] wacht.
+
+# ---- dates: explicit
+De deadline is op [[20 maart 2026|date|2026-03-20|day]] voor iedereen.
+Haar verjaardag valt op [[20 juni 2026|date|2026-06-20|day]] zoals altijd.
+Lever het formulier in voor [[15-04-2026|date|2026-04-15|day]] alstublieft.
+Hij is geboren op [[15 april 1990|date|1990-04-15|day]] in Utrecht.
+Het feest is op [[5 mei|date|2026-05-05|day]] in de club.
+De huur eindigt op [[1 december 2026|date|2026-12-01|day]] voor iedereen.
+We zien elkaar [[vrijdag 27 maart|date|2026-03-27|day]] op de gebruikelijke plek.
+Het museum heropent op [[3 april|date|2026-04-03|day]] na de werkzaamheden.
+Het contract begint op [[1 januari 2027|date|2027-01-01|day]] zoals afgesproken.
+De schrikkeldag [[29 februari 2028|date|2028-02-29|day]] komt snel dichterbij.
+Het rapport is gedateerd [[2026-04-15|date|2026-04-15|day]] in de kop.
+De optocht is op [[14 juli|date|2026-07-14|day]] zoals altijd.
+Hij tekende op [[3 maart 2026|date|2026-03-03|day]] voor getuigen.
+Haar papieren verlopen op [[31 december 2026|date|2026-12-31|day]] zonder uitzondering.
+Ze is verhuisd op [[12 augustus 2019|date|2019-08-12|day]] vanwege haar werk.
+
+# ---- dates: relative
+Ik bel je [[morgen|date|2026-03-19|day]] over het plan.
+[[Gisteren|date|2026-03-17|day]] was het koud en vochtig.
+Het rapport moet [[vandaag|date|2026-03-18|day]] voor sluitingstijd klaar zijn.
+We vertrekken [[overmorgen|date|2026-03-20|day]] naar de kust.
+Het gebeurde [[eergisteren|date|2026-03-16|day]] bij de club.
+De cursus begint weer [[volgende maandag|date|2026-03-23|day]] zoals gewoonlijk.
+Laten we [[komende vrijdag|date|2026-03-20|day]] afspreken om te tekenen.
+Ik zag hem [[afgelopen vrijdag|date|2026-03-13|day]] op de markt.
+Kom [[deze vrijdag|date|2026-03-20|day]] bij ons eten.
+Hij komt [[donderdag|date|2026-03-19|day]] met de monsters.
+We lanceren [[over 2 dagen|date|2026-03-20|day]] als alles goed gaat.
+Het pakket is [[3 dagen geleden|date|2026-03-15|day]] verstuurd per post.
+Het dossier moet [[over twee weken|date|2026-04-01|day]] uiterlijk binnen zijn.
+Hij is [[een week geleden|date|2026-03-11|day]] naar de kust vertrokken.
+De reis begint [[over drie weken|date|2026-04-08|day]] vanaf het station.
+Het examen is [[volgende woensdag|date|2026-03-25|day]] in de grote zaal.
+We gaan [[zondag|date|2026-03-22|day]] wandelen als het mooi weer is.
+We spreken [[volgende week vrijdag|date|2026-03-27|day]] af op kantoor.
+
+# ---- dates: holidays and computed days
+We komen samen met [[Kerstmis|date|2026-12-25|day]] in familiekring.
+[[Pasen|date|2026-04-05|day]] komt met rasse schreden naderbij.
+We reizen met [[Pasen 2027|date|2027-03-28|day]] met de kinderen.
+Het kantoor is op [[Tweede Paasdag|date|2026-04-06|day]] gesloten.
+De winkels sluiten voor [[Hemelvaartsdag|date|2026-05-14|day]] in de stad.
+Het feest wordt uitgesteld tot [[Tweede Pinksterdag|date|2026-05-25|day]] dit keer.
+De musea zijn gesloten op [[Nieuwjaarsdag|date|2027-01-01|day]] zonder uitzondering.
+Ze gaan voor [[Valentijnsdag|date|2027-02-14|day]] naar Venetië.
+De kinderen houden van [[Halloween|date|2026-10-31|day]] boven alles.
+Het is vrij op [[Koningsdag|date|2026-04-27|day]] in het hele land.
+Het plan voor [[Koningsdag 2031|date|2031-04-26|day]] ligt al klaar.
+Het boeket is voor [[Moederdag|date|2026-05-10|day]] bij ons thuis.
+De kaart is voor [[Vaderdag|date|2026-06-21|day]] bij ons thuis.
+Het vuurwerk is voor [[Oudejaarsavond|date|2026-12-31|day]] op het plein.
+Het gedenkteken is open op [[Bevrijdingsdag|date|2026-05-05|day]] voor iedereen.
+De club komt samen op de [[derde donderdag van april|date|2026-04-16|day]] in het centrum.
+De audit is op de [[laatste vrijdag van maart|date|2026-03-27|day]] zoals gepland.
+De koning leest de troonrede voor op [[Prinsjesdag|date|2026-09-15|day]] in Den Haag.
+De kinderen zetten hun schoen voor [[Sinterklaasavond|date|2026-12-05|day]] bij de open haard.
+De winkels zijn op [[Goede Vrijdag|date|2026-04-03|day]] gewoon open.
+De kerk is vol op [[Eerste Kerstdag|date|2026-12-25|day]] net als altijd.
+Er is een herdenking op [[Dodenherdenking|date|2026-05-04|day]] op de Dam.
+
+# ---- date ranges
+Het team is [[volgende week|daterange|2026-03-23/2026-03-30|week]] afwezig voor een training.
+We hebben de cijfers [[deze week|daterange|2026-03-16/2026-03-23|week]] al nagekeken.
+De fout verscheen [[vorige week|daterange|2026-03-09/2026-03-16|week]] in de test.
+Het nieuwe tarief gaat [[volgende maand|daterange|2026-04-01/2026-05-01|month]] in.
+De omzet was [[vorige maand|daterange|2026-02-01/2026-03-01|month]] beter dan verwacht.
+De begroting sluit [[deze maand|daterange|2026-03-01/2026-04-01|month]] voor controle.
+De volkstelling is [[volgend jaar|daterange|2027-01-01/2028-01-01|year]] in alle regio's.
+Ze zijn [[vorig jaar|daterange|2025-01-01/2026-01-01|year]] verhuisd na de overstroming.
+Het plan geldt alleen voor [[dit jaar|daterange|2026-01-01/2027-01-01|year]].
+Het festival is in [[juni 2027|daterange|2027-06-01/2027-07-01|month]] in de oude stad.
+Het boek verschijnt in [[maart 2026|daterange|2026-03-01/2026-04-01|month]] bij de uitgever.
+Het verdrag is in [[1969|daterange|1969-01-01/1970-01-01|year]] ondertekend na lange onderhandelingen.
+De Spelen staan gepland voor [[2031|daterange|2031-01-01/2032-01-01|year]] in de hoofdstad.
+De cijfers van het [[derde kwartaal 2026|daterange|2026-07-01/2026-10-01|quarter]] volgen.
+De groei was traag in het [[eerste kwartaal van 2026|daterange|2026-01-01/2026-04-01|quarter]] over het algemeen.
+Het meeste werk gebeurt in de [[tweede helft van 2026|daterange|2026-07-01/2027-01-01|half]] volgens het plan.
+De muziek veranderde sterk in [[de jaren negentig|daterange|1990-01-01/2000-01-01|decade]] en daarna.
+De conferentie is [[van 6 tot 10 april|daterange|2026-04-06/2026-04-11|day]] in Oslo.
+We zijn [[van 1 tot 15 juni|daterange|2026-06-01/2026-06-16|day]] weg voor een reis.
+De cursus loopt [[van 4 mei tot 8 mei|daterange|2026-05-04/2026-05-09|day]] in het centrum.
+Laten we [[dit weekend|daterange|2026-03-21/2026-03-23|day]] gaan wandelen als het weer meewerkt.
+Ze komen [[volgend weekend|daterange|2026-03-28/2026-03-30|day]] op bezoek met de kinderen.
+De winkel is [[van maandag tot vrijdag|daterange|2026-03-23/2026-03-28|day|alt=2026-03-16/2026-03-21]] dicht voor werkzaamheden.
+De meren zitten [[deze zomer|daterange|2026-06-01/2026-09-01|season|approx]] weer vol zoals altijd.
+Het heeft [[afgelopen winter|daterange|2025-12-01/2026-03-01|season|approx]] veel gesneeuwd in het noorden.
+Het bedrijf is in de [[lente van 2021|daterange|2021-03-01/2021-06-01|season|approx]] door vrienden opgericht.
+Het album verscheen in de [[herfst van 2025|daterange|2025-09-01/2025-12-01|season|approx]] met goede recensies.
+Ze toerden in de [[zomer van 2024|daterange|2024-06-01/2024-09-01|season|approx]] door Europa met een kleine groep.
+Het bedrijf begon [[begin 2021|daterange|2021-01-01/2021-05-01|year|approx]] met een paar mensen.
+De verkoop piekte [[medio 2022|daterange|2022-05-01/2022-09-01|year|approx]] voor de daling.
+Het product werd [[eind 2023|daterange|2023-09-01/2024-01-01|year|approx]] uit de handel genomen na een lang leven.
+De regen zou [[begin mei|daterange|2026-05-01/2026-05-11|month|approx]] moeten ophouden in dit gebied.
+De tuin is prachtig [[medio april|daterange|2026-04-11/2026-04-21|month|approx]] in de stad.
+De oogst eindigt [[eind juni|daterange|2026-06-21/2026-07-01|month|approx]] in de streek.
+Het programma groeit in [[de jaren 2030|daterange|2030-01-01/2040-01-01|decade]] volgens het plan.
+
+# ---- times
+De vergadering begint om [[15:00|time|T15:00|minute]] precies.
+De deuren gaan om [[15:30|time|T15:30|minute]] open zoals gewoonlijk.
+De trein vertrekt om [[15.45 uur|time|T15:45|minute]] van spoor één.
+De lunch wordt om [[12 uur|time|T12:00|hour]] geserveerd in het hotel.
+De server herstart om [[middernacht|time|T00:00|hour]] in de baai.
+De wekker gaat om [[7:05|time|T07:05|minute]] in het appartement.
+Het logboek toont een fout om [[10:15:30|time|T10:15:30|second]] precies.
+Meestal eten we om [[5 uur 's middags|time|T17:00|hour]] thuis.
+De dienst begint om [[09:00|time|T09:00|minute]] in het depot.
+De bar sluit om [[23:00|time|T23:00|minute]] in de oude stad.
+Het congres eindigt om [[18:45|time|T18:45|minute]] in de kleine zaal.
+Het gesprek is om [[15:00 CET|time|T15:00+01:00|minute]] op de lijn.
+Het venster opent om [[12:00 UTC|time|T12:00Z|minute]] voor alle teams.
+Afspraak om [[half vier|time|T15:30|minute]] voor het stadhuis.
+Het café opent om [[half één|time|T12:30|minute]] in het centrum.
+De les begint om [[acht uur 's ochtends|time|T08:00|hour]] in het lokaal.
+Wacht op ze [[rond 15:00|time|T15:00|minute|approx]] of iets later.
+De video stopte om [[23:59:59|time|T23:59:59|second]] precies.
+We zien elkaar om [[kwart over drie|time|T15:15|minute]] in het gebruikelijke café.
+Het eten staat om [[8 uur 's avonds|time|T20:00|hour]] bij ons thuis klaar.
+De trein vertrekt om [[kwart voor negen|time|T08:45|minute]] van het perron.
+
+# ---- datetimes
+Laten we er [[morgen om 15:00|datetime|2026-03-19T15:00|minute]] over praten voor het plan.
+De review is [[vrijdag om 10:30|datetime|2026-03-20T10:30|minute]] in het bijgebouw.
+De lancering staat op [[25 maart om 12 uur|datetime|2026-03-25T12:00|hour]] op het hoofdpodium.
+De back-up draait op [[2026-04-01 14:00|datetime|2026-04-01T14:00|minute]] op de server.
+De workshop begint [[volgende maandag om 9:00|datetime|2026-03-23T09:00|minute]] stipt.
+Het gesprek eindigde [[gisteren om 17:15|datetime|2026-03-17T17:15|minute]] na een lange uitwisseling.
+De vlucht vertrekt op [[5 mei 2026 om 8:00|datetime|2026-05-05T08:00|minute]] van poort B.
+Laten we afspreken [[donderdag om 18:00|datetime|2026-03-19T18:00|minute]] in de bar.
+De levering is [[overmorgen om 8:30|datetime|2026-03-20T08:30|minute]] zonder mankeren.
+Het concert begint [[zaterdag om 21:00|datetime|2026-03-21T21:00|minute]] op het plein.
+De deadline is [[30 juni 2026 om 23:59|datetime|2026-06-30T23:59|minute]] voor iedereen.
+Het logboek meldt [[2026-06-30T09:15:00Z|datetime|2026-06-30T09:15:00Z|second]] als tijdstip.
+De overschrijving komt aan op [[2 april om 16:20|datetime|2026-04-02T16:20|minute]] bij de bank.
+
+# ---- time ranges
+De winkel is open [[van 9 tot 17 uur|timerange|T09:00/T17:00|hour]] in het noorden.
+De lessen zijn [[tussen 14 en 16 uur|timerange|T14:00/T16:00|hour]] in het lokaal.
+De praktijk ontvangt [[van 8:30 tot 12:00|timerange|T08:30/T12:00|minute]] zonder afspraak.
+De pauze is [[van 12:00 tot 13:30|timerange|T12:00/T13:30|minute]] in de kantine.
+Het café is open [[van 7 tot 11 uur|timerange|T07:00/T11:00|hour]] op de hoek.
+De zaal is gereserveerd [[van 10:00 tot 12:30|timerange|T10:00/T12:30|minute]] voor het team.
+Bel ons [[tussen 9:00 en 11:30|timerange|T09:00/T11:30|minute]] op kantoor.
+De loketten zijn [[9:00-17:00|timerange|T09:00/T17:00|minute]] open doordeweeks.
+Het zwembad is [[van 18:00 tot 20:00|timerange|T18:00/T20:00|minute]] dicht voor de lessen.
+De markt is [[van 6 tot 13 uur|timerange|T06:00/T13:00|hour]] op het plein.
+Bezoek is mogelijk [[van 14 tot 18 uur|timerange|T14:00/T18:00|hour]] alleen.
+
+# ---- date-time ranges
+Ik ben [[morgenochtend|datetimerange|2026-03-19T06:00/2026-03-19T12:00|hour|approx]] vrij om te praten.
+Het team komt [[vanmiddag|datetimerange|2026-03-18T12:00/2026-03-18T18:00|hour|approx]] om te beginnen.
+De band speelt [[zaterdagavond|datetimerange|2026-03-21T18:00/2026-03-22T00:00|hour|approx]] op het plein.
+Het heeft [[gisterochtend|datetimerange|2026-03-17T06:00/2026-03-17T12:00|hour|approx]] geregend in de hele regio.
+De postbode komt meestal [[zondagochtend|datetimerange|2026-03-22T06:00/2026-03-22T12:00|hour|approx]] langs.
+We zien elkaar [[morgenmiddag|datetimerange|2026-03-19T12:00/2026-03-19T18:00|hour|approx]] in het café.
+De film is [[vanavond|datetimerange|2026-03-18T18:00/2026-03-19T00:00|hour|approx]] op de zender.
+Laten we [[morgen van 14:00 tot 16:00|datetimerange|2026-03-19T14:00/2026-03-19T16:00|minute]] afspreken om te beslissen.
+Het examen is [[maandag van 9:00 tot 11:00|datetimerange|2026-03-23T09:00/2026-03-23T11:00|minute]] in het lokaal.
+We zijn [[vrijdagmiddag|datetimerange|2026-03-20T12:00/2026-03-20T18:00|hour|approx]] vrij om elkaar te zien.
+De stage loopt [[van 5 mei om 9:00 tot 6 mei om 12:00|datetimerange|2026-05-05T09:00/2026-05-06T12:00|minute]] in de bergen.
+
+# ---- durations
+De vergadering duurt uiteindelijk [[twee uur|duration|7200]].
+De overtocht duurt [[3 dagen|duration|259200]] bij ruw weer.
+Hij wachtte [[45 minuten|duration|2700]] op het station.
+Het project duurde [[1 jaar en 6 maanden|duration|P1Y6M]] voor het stopte.
+De stage duurt [[3 maanden|duration|P3M]] zonder resultaat.
+Het verlof is [[twee weken|duration|1209600]] vanaf het begin.
+De baby sliep [[anderhalf uur|duration|5400]] zonder onderbreking.
+De pauze duurt [[30 seconden|duration|30]] en dan gaan we verder.
+Ze rende [[2 uur en 30 minuten|duration|9000]] zonder te stoppen.
+De garantie is [[5 jaar|duration|P5Y]] vanaf de aankoop.
+De film duurt [[90 minuten|duration|5400]] zonder pauze.
+Hij woonde [[tien jaar|duration|P10Y]] in Utrecht voor hij vertrok.
+De termijn is [[zestig dagen|duration|5184000]] na ontvangst.
+Het onderzoek duurde in totaal [[18 maanden|duration|P18M]].
+Wacht [[een uur|duration|3600]] en probeer het dan opnieuw.
+
+# ---- sets
+De cursus is [[elke maandag|set|XXXX-WXX-1|day]] in het bijgebouw.
+Ze rent [[elke dag|set|P1D|day]] zonder uitzondering.
+Het team komt [[elke week|set|P1W|week]] samen in de grote zaal.
+De facturen worden [[elke maand|set|P1M|month]] door de bank verstuurd.
+Ze bezoekt haar moeder [[om de twee weken|set|P2W|week]] met de trein.
+Het overleg is [[elke maandag om 9:00|set|XXXX-WXX-1T09:00|minute]] in de kantoortuin.
+De kermis komt [[elk jaar|set|P1Y|year]] terug op hetzelfde veld.
+Het afval wordt [[elke dag|set|P1D|day]] opgehaald in de stad.
+Het koor repeteert [[elke vrijdag|set|XXXX-WXX-5|day]] na het werk.
+De pomp draait [[elke 3 uur|set|PT3H|hour]] tijdens de rit.
+De krant verschijnt [[dagelijks|set|P1D|day]] in de regio.
+De brief gaat [[elke woensdag om 14:00|set|XXXX-WXX-3T14:00|minute]] naar de abonnees.
+Het bulletin komt [[wekelijks|set|P1W|week]] op de lijst.
+De huur is [[maandelijks|set|P1M|month]] verschuldigd volgens het contract.
+Het comité komt [[elke zondag|set|XXXX-WXX-7|day]] bijeen op school.
+
+# ---- nothing to find
+Er ligt een kat op de bank in de woonkamer.
+De koffie is uitstekend in dit kleine café.
+We hebben lang gepraat over moderne literatuur.
+De zee was kalm en de lucht was helder.
+Niemand wist waar de sleutel lag.
+Ze las een boeiende roman in de trein.
+Het project vordert goed volgens het team.
+Een man liep zwijgend de bakkerij binnen.
+De buurvrouw geeft haar bloemen zorgvuldig water.
+De kinderen spelen op het schoolplein.
+De chef proefde de soep en glimlachte.
+Dit boek vertelt het verhaal van een oude zeeman.
+De etalage van de boekhandel is erg mooi.
+We zoeken een eenvoudige en duurzame oplossing.
+Voordat hij vertrok sloot hij alle ramen.
+
+# ================================ development split ================================
+
+@split dev
+@ref 2026-03-18T10:30:00
+
+# ---- numbers
+In de doos zitten [[2.400|number|2400]] schroeven.
+Het gemiddelde is [[2,75|number|2.75]] per wedstrijd.
+Ze nodigde [[tweeëndertig|number|32]] vrienden uit voor het diner.
+Het boek heeft [[driehonderdvijftig|number|350]] pagina's.
+Er kwamen [[eenenveertig|number|41]] brieven binnen.
+Het fonds is [[drie miljoen euro|currency|3000000 EUR]] waard.
+De score daalde met [[-3|number|-3]] punten.
+Hij bestelde [[zes|number|6]] koffie voor het team.
+Het museum ontving [[vijftienduizend|number|15000]] bezoekers.
+Ze las [[honderdeen|number|101]] pagina's op één avond.
+Op dat schip zaten [[twaalfhonderd|number|1200]] passagiers.
+Ze gaven [[1.000.000|number|1000000]] uit aan reclame.
+Het team scoorde [[negentien|number|19]] punten.
+De route heeft [[achtenzestig|number|68]] bochten.
+Hij las [[achthonderd|number|800]] pagina's in [[een week|duration|604800]].
+Op de kermis kwamen [[tweeduizend|number|2000]] mensen.
+
+# ---- ordinals
+Ze won de [[tweede|ordinal|2]] prijs van de jury.
+Hij werd [[zevende|ordinal|7]] bij de marathon.
+Hij woont op de [[zesde|ordinal|6]] verdieping van dat gebouw.
+Het was de [[vijfde|ordinal|5]] keer dat ze belde.
+Dit is zijn [[twaalfde|ordinal|12]] roman.
+Het is het [[dertigste|ordinal|30]] jaar sinds de oprichting.
+We zijn bij de [[8e|ordinal|8]] vergadering van de maand.
+Hij eindigde op de [[2de|ordinal|2]] plaats in de poule.
+De club viert zijn [[vijftigste|ordinal|50]] verjaardag.
+De [[vijfentwintigste|ordinal|25]] editie begint morgen.
+
+# ---- percentages
+[[18%|percentage|18]] van de stemmen ging verloren.
+[[Zestig procent|percentage|60]] van de leden heeft geantwoord.
+De rente stijgt sinds januari naar [[2,75%|percentage|2.75]].
+De korting op boeken loopt op tot [[30 procent|percentage|30]].
+Het rendement was maar [[0,8%|percentage|0.8]].
+Het signaal staat op [[45%|percentage|45]] op het scherm.
+
+# ---- dimensions
+De wedstrijd is in totaal [[42 kilometer|dimension|42 kilometer]] lang.
+De tafel is precies [[2 meter|dimension|2 meter]] lang.
+Je hebt [[300 gram|dimension|300 gram]] suiker nodig.
+De tank bevat [[50 liter|dimension|50 liter]] benzine.
+De kamer meet in totaal [[25 m²|dimension|25 square meter]].
+De trein rijdt [[300 km/u|dimension|300 kilometer per hour]] op het rechte stuk.
+Er is nog [[512 GB|dimension|512 gigabyte]] vrij op de schijf.
+De kabel is ongeveer [[15 cm|dimension|15 centimeter]] lang.
+De vrachtwagen vervoert [[12 ton|dimension|12 tonne]] grind.
+De tank bevat [[1.500 liter|dimension|1500 liter]] water.
+
+# ---- temperatures
+Buiten is het nu [[15 °C|temperature|15 celsius]].
+De kamer staat in de winter op [[68 °F|temperature|68 fahrenheit]].
+IJs smelt normaal bij [[0 °C|temperature|0 celsius]].
+De wijn wordt geserveerd op ongeveer [[12 graden|temperature|12 degree]].
+De motor bereikte [[90 graden Celsius|temperature|90 celsius]] bergop.
+Morgen wordt het [[-2 °C|temperature|-2 celsius]] op de toppen.
+
+# ---- ages
+Een jongen van [[16 jaar oud|age|16 year]] won de race.
+Een meisje van [[6 maanden oud|age|6 month]] slaapt rustig.
+Een opa van [[85 jaar oud|age|85 year]] vertelt verhalen in de kroeg.
+Een [[70-jarige|age|70 year]] vrouw wandelt [[elke dag|set|P1D|day]].
+
+# ---- money
+De lunch kostte [[15 €|currency|15 EUR]] per persoon.
+Hij betaalde [[€ 2.500,00|currency|2500 EUR]] aan borg.
+Het boek kost [[€ 12,90|currency|12.9 EUR]] in de boekhandel.
+De boete is [[100 euro|currency|100 EUR]] voor te late betalers.
+Het kaartje kost [[$20|currency|20 USD]] in New York.
+Ze eisten [[2 miljoen dollar|currency|2000000 USD]] schadevergoeding.
+Het wisselgeld is maar [[35 cent|currency|0.35 EUR]].
+De winnaar krijgt [[duizend euro|currency|1000 EUR]] prijs.
+
+# ---- sequences
+Schrijf naar [[persdienst@voorbeeld.nl|email]] voor vrijdagavond.
+Het portaal staat op [[https://portaal.voorbeeld.nl/inloggen|url]] sinds kort.
+De testserver heeft het adres [[10.1.2.3|ip]] in het netwerk.
+Bel [[030 555 0147|phone]] voor informatie.
+Volg [[#feest2026|hashtag]] en schrijf naar [[@gemeente_utrecht|mention]] voor details.
+De regel [[2d3b4f10-ae8d-4f21-9d3c-5b7a6e1f0c42|guid]] staat dubbel in het logboek.
+Het contact is [[hulp@voorbeeld.com|email]] en de site [[www.voorbeeld.nl|url]] reageert.
+Het gratis nummer is [[+31 800 555 0123|phone]] vanaf een vast toestel.
+
+# ---- dates
+De verhuizing staat gepland op [[7 april 2026|date|2026-04-07|day]] in de ochtend.
+Het examen is [[maandag 6 april|date|2026-04-06|day]] in de aula.
+Ze trouwen op [[12 september 2026|date|2026-09-12|day]] op het platteland.
+Het werk is klaar op [[30 april|date|2026-04-30|day]] zonder uitstel.
+Het rapport verscheen op [[18-06-2019|date|2019-06-18|day]] laat in de avond.
+Ik kom [[morgen|date|2026-03-19|day]] na de lunch langs.
+Ze hebben elkaar [[gisteren|date|2026-03-17|day]] gezien voor een kop koffie.
+Het kaartje verloopt [[over 10 dagen|date|2026-03-28|day]] zonder uitstel.
+Ze schreef [[2 weken geleden|date|2026-03-04|day]] zonder antwoord.
+De markt opent [[volgende zaterdag|date|2026-03-28|day|alt=2026-03-21]] op het plein.
+We vieren feest met [[Pasen|date|2026-04-05|day]] allemaal samen.
+Het vuurwerk is gepland voor [[Oud en Nieuw|date|2026-12-31|day]] op de dijk.
+Het concert is op de [[eerste maandag van mei|date|2026-05-04|day]] in de schouwburg.
+
+# ---- date ranges
+De bouwplaats is [[vorige week|daterange|2026-03-09/2026-03-16|week]] dicht vanwege vakantie.
+Het saldo komt [[volgende maand|daterange|2026-04-01/2026-05-01|month]] op de bank.
+Het project start in [[september 2026|daterange|2026-09-01/2026-10-01|month]] met een paar mensen.
+Het museum is in [[2019|daterange|2019-01-01/2020-01-01|year]] geopend na de restauratie.
+Het rapport van het [[tweede kwartaal 2026|daterange|2026-04-01/2026-07-01|quarter]] is te laat.
+De tentoonstelling is [[van 2 tot 20 mei|daterange|2026-05-02/2026-05-21|day]] met gratis toegang.
+We gaan [[volgende zomer|daterange|2026-06-01/2026-09-01|season|approx]] naar de bergen met de neven.
+De groep is ontstaan [[eind 2019|daterange|2019-09-01/2020-01-01|year|approx]] in een kelder.
+We spreken elkaar [[medio mei|daterange|2026-05-11/2026-05-21|month|approx]] voor het saldo.
+De bouw is [[begin 2027|daterange|2027-01-01/2027-05-01|year|approx]] klaar als het meezit.
+
+# ---- times and datetimes
+Het hek gaat elke ochtend om [[08:15|time|T08:15|minute]] open.
+Het diner wordt om [[20:30|time|T20:30|minute]] geserveerd in de zaal.
+De laatste rit vertrekt om [[22:00|time|T22:00|minute]] van de pier.
+De dienst begint om [[zes uur 's ochtends|time|T06:00|hour]] in het magazijn.
+De zitting is [[donderdag om 11:00|datetime|2026-03-19T11:00|minute]] in de rechtszaal.
+De vlucht landt [[morgen om 6:40|datetime|2026-03-19T06:40|minute]] op Schiphol.
+Het feest begint [[zaterdag om 19:30|datetime|2026-03-21T19:30|minute]] in de tuin.
+De winkel is open [[van 8 tot 12 uur|timerange|T08:00/T12:00|hour]] volgens het bord.
+De les is [[tussen 16:00 en 18:00|timerange|T16:00/T18:00|minute]] in lokaal twee.
+Ik kom [[morgenavond|datetimerange|2026-03-19T18:00/2026-03-20T00:00|hour|approx]] even langs.
+We zien elkaar [[zaterdagmiddag|datetimerange|2026-03-21T12:00/2026-03-21T18:00|hour|approx]] in het park.
+
+# ---- durations and sets
+De reis duurt [[vier uur|duration|14400]] met de trein.
+Hij werkte [[6 maanden|duration|P6M]] in Spanje.
+De wachttijd was maar [[20 minuten|duration|1200]].
+De opleiding duurt in totaal [[twee jaar|duration|P2Y]].
+De aanbesteding blijft [[15 dagen|duration|1296000]] open na publicatie.
+Hij neemt het medicijn [[elke 8 uur|set|PT8H|hour]] na de maaltijd.
+Ze sport [[elke dinsdag|set|XXXX-WXX-2|day]] in de sportschool.
+De krant ligt [[elke zaterdag|set|XXXX-WXX-6|day]] in de winkel.
+Het verslag is [[jaarlijks|set|P1Y|year]] verplicht.
+
+# ---- nothing
+De hond slaapt onder de keukentafel.
+We hebben de hele avond over muziek gepraat.
+Oma bakt een appeltaart.
+De trein zat vol vermoeide toeristen.
+Er is geen nieuws van het bedrijf.

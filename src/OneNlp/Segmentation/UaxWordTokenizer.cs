@@ -168,6 +168,13 @@ public sealed class UaxWordTokenizer : IWordTokenizer
             }
         }
 
+        // Italian text sets an elided article before a space ("l' idea", "un' altra"): the apostrophe stays with the word, as UD Italian writes it.
+        if (_data.ElisionBeforeSpace && end < n && text[end] is '\'' or '\u2019' && (end + 1 >= n || !char.IsLetterOrDigit(text[end + 1]))
+            && end > pos && _elisions.Contains(text.AsSpan(pos, end - pos)) && IsLetterRun(text.AsSpan(pos, end - pos)))
+        {
+            return end + 1;
+        }
+
         if (end - pos == 1 && Array.IndexOf(_data.MarkRuns, text[pos]) >= 0)
         {
             // A run of marks ("...", "--", "?!", "$$$") is one token.
@@ -380,6 +387,14 @@ public sealed class UaxWordTokenizer : IWordTokenizer
             return;
         }
 
+        // Italian partitive article ("ci sono dei bambini") against the contraction after a noun ("l'elenco dei bambini"): one word or two pieces.
+        if (_data.ItalianEncliticVerbs && _data.ContextualSplits.Count > 0 && _contextual.TryGetValue(token, out SegmentationData.ContextualSplit? partitive)
+            && IsSingleWordContext(tokens, text, partitive))
+        {
+            tokens.Add(new TokenBoundary(pos, token.Length));
+            return;
+        }
+
         // Contractions and verbs with enclitic pronouns (Spanish): one piece for each word of the multiword token.
         if (_data.HasMultiwordTokens && _data.TryMultiwordWords(token, out string[] words) && SegmentationData.PieceLengths(token, words) is { } pieceLengths)
         {
@@ -451,7 +466,22 @@ public sealed class UaxWordTokenizer : IWordTokenizer
             int mark = token.IndexOfAny('\'', '\u2019');
             if (mark > 0 && mark < token.Length - 1 && _elisions.Contains(token[..mark]) && char.IsLetterOrDigit(token[mark + 1]))
             {
-                tokens.Add(new TokenBoundary(pos, mark + 1));
+                // Italian "dell'amico": the elided preposition is itself a multiword token (di + l'), so it is cut into its pieces.
+                if (_data.ItalianEncliticVerbs && _data.TryMultiwordWords(token[..(mark + 1)], out string[] elidedWords)
+                    && SegmentationData.PieceLengths(token[..(mark + 1)], elidedWords) is { } elidedLengths)
+                {
+                    int at = pos;
+                    foreach (int length in elidedLengths)
+                    {
+                        tokens.Add(new TokenBoundary(at, length));
+                        at += length;
+                    }
+                }
+                else
+                {
+                    tokens.Add(new TokenBoundary(pos, mark + 1));
+                }
+
                 Split(text, pos + mark + 1, end, tokens);
                 return;
             }

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- A consumer of the packed packages, as a user's project would be: it restores RecursiveAI.OneNlp and (with WithModel=true) the Embeddings
+       model package from a folder feed (environment variable ONENLP_CONSUMER_FEED), never from project references. Not part of the
+       solution. Run it with run.sh. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).ModelConsumer.Embeddings</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).ModelConsumer.Embeddings</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <!-- Which model packages are referenced: none, en, multi or both. -->
+    <Models Condition="'$(Models)' == ''">en</Models>
+    <DefineConstants Condition="'$(Models)' == 'none'">$(DefineConstants);NO_MODEL</DefineConstants>
+    <DefineConstants Condition="'$(Models)' == 'multi' Or '$(Models)' == 'both'">$(DefineConstants);MULTI</DefineConstants>
+    <DefineConstants Condition="'$(Models)' == 'both'">$(DefineConstants);BOTH</DefineConstants>
+    <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ONENLP_CONSUMER_FEED)</RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RecursiveAI.OneNlp" VersionOverride="$(Version)" />
+    <PackageReference Include="RecursiveAI.OneNlp.Models.Embeddings" VersionOverride="$(Version)" Condition="'$(Models)' == 'en' Or '$(Models)' == 'both'" />
+    <PackageReference Include="RecursiveAI.OneNlp.Models.Embeddings.Multilingual" VersionOverride="$(Version)" Condition="'$(Models)' == 'multi' Or '$(Models)' == 'both'" />
+  </ItemGroup>
+
+</Project>

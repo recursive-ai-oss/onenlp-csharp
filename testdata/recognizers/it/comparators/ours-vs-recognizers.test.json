@@ -1,0 +1,1139 @@
+{
+  "system": "OneNLP recognizers (it)",
+  "reference": "Microsoft.Recognizers.Text 1.8.13 (it)",
+  "dataset": "recognizer-gold-it test",
+  "rows": [
+    {
+      "type": "number",
+      "gold": 26,
+      "f1": {
+        "ours": {
+          "estimate": 98.03921568627452,
+          "low": 93.54838709677419,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 56.09756097560975,
+          "low": 41.935483870967744,
+          "high": 69.23076923076923,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 41.941654710664764,
+          "low": 28.00361336946702,
+          "high": 56.81818181818182,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 82.6086956521739,
+          "low": 63.1578947368421,
+          "high": 96.29629629629629,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 17.391304347826093,
+          "low": 3.7037037037037095,
+          "high": 36.8421052631579,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      }
+    },
+    {
+      "type": "ordinal",
+      "gold": 15,
+      "f1": {
+        "ours": {
+          "estimate": 96.55172413793103,
+          "low": 87.5,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 58.53658536585366,
+          "low": 37.03703703703704,
+          "high": 74.4186046511628,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 38.01513877207737,
+          "low": 20.682926829268297,
+          "high": 61.29032258064516,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "percentage",
+      "gold": 14,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 72.72727272727273,
+          "low": 47.05882352941177,
+          "high": 92.3076923076923,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 27.272727272727266,
+          "low": 7.692307692307693,
+          "high": 52.94117647058823,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 62.5,
+          "low": 25,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 37.5,
+          "low": 0,
+          "high": 75,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "dimension",
+      "gold": 17,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 88.23529411764706,
+          "low": 74.07407407407408,
+          "high": 97.5609756097561,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 11.764705882352942,
+          "low": 2.439024390243901,
+          "high": 25.925925925925924,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      }
+    },
+    {
+      "type": "temperature",
+      "gold": 11,
+      "f1": {
+        "ours": {
+          "estimate": 90.9090909090909,
+          "low": 73.6842105263158,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 95.65217391304348,
+          "low": 84.21052631578948,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": -4.743083003952577,
+          "low": -16.66666666666667,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 90.9090909090909,
+          "low": 70,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 9.090909090909093,
+          "low": 0,
+          "high": 30,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "age",
+      "gold": 11,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 5.714285714285714,
+          "low": 0,
+          "high": 19.51219512195122,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 94.28571428571429,
+          "low": 80.48780487804878,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      }
+    },
+    {
+      "type": "currency",
+      "gold": 17,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 82.92682926829268,
+          "low": 68.75,
+          "high": 94.11764705882354,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 17.07317073170732,
+          "low": 5.882352941176464,
+          "high": 31.25,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 70.58823529411765,
+          "low": 46.15384615384615,
+          "high": 90.9090909090909,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 29.411764705882348,
+          "low": 9.090909090909093,
+          "high": 53.84615384615385,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      }
+    },
+    {
+      "type": "email",
+      "gold": 11,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "url",
+      "gold": 10,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "ip",
+      "gold": 10,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "phone",
+      "gold": 10,
+      "f1": {
+        "ours": {
+          "estimate": 90,
+          "low": 72.72727272727273,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 80,
+          "low": 53.333333333333336,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 10,
+          "low": -15.23809523809524,
+          "high": 38.888888888888886,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "hashtag",
+      "gold": 12,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 75,
+          "low": 55.55555555555556,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 25,
+          "low": 0,
+          "high": 44.44444444444444,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "mention",
+      "gold": 12,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "guid",
+      "gold": 10,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "date",
+      "gold": 57,
+      "f1": {
+        "ours": {
+          "estimate": 99.1304347826087,
+          "low": 97.24770642201835,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 75.92592592592592,
+          "low": 65.06024096385542,
+          "high": 85,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 23.20450885668278,
+          "low": 14.285714285714292,
+          "high": 34.21428571428571,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 97.5609756097561,
+          "low": 91.66666666666667,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 2.439024390243901,
+          "low": 0,
+          "high": 8.333333333333329,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "time",
+      "gold": 20,
+      "f1": {
+        "ours": {
+          "estimate": 92.3076923076923,
+          "low": 78.57142857142857,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 82.05128205128206,
+          "low": 63.829787234042556,
+          "high": 97.87234042553192,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 10.256410256410248,
+          "low": -10,
+          "high": 28.57142857142857,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "datetime",
+      "gold": 13,
+      "f1": {
+        "ours": {
+          "estimate": 92.3076923076923,
+          "low": 73.33333333333333,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 84.61538461538461,
+          "low": 61.53846153846154,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 7.692307692307693,
+          "low": -20,
+          "high": 35.71428571428571,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "daterange",
+      "gold": 35,
+      "f1": {
+        "ours": {
+          "estimate": 91.42857142857143,
+          "low": 81.08108108108108,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 76.47058823529412,
+          "low": 63.013698630136986,
+          "high": 88.88888888888889,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 14.957983193277315,
+          "low": -1.4695830485304242,
+          "high": 32.680851063829785,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 61.53846153846154,
+          "low": 42.10526315789474,
+          "high": 80,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 38.46153846153846,
+          "low": 20,
+          "high": 57.89473684210526,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      }
+    },
+    {
+      "type": "timerange",
+      "gold": 11,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 95.23809523809524,
+          "low": 82.3529411764706,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 4.761904761904759,
+          "low": 0,
+          "high": 17.647058823529406,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "datetimerange",
+      "gold": 11,
+      "f1": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 90.9090909090909,
+          "low": 66.66666666666667,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 27.272727272727273,
+          "low": 0,
+          "high": 60,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 63.63636363636363,
+          "low": 33.33333333333333,
+          "high": 91.66666666666667,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      }
+    },
+    {
+      "type": "duration",
+      "gold": 18,
+      "f1": {
+        "ours": {
+          "estimate": 94.44444444444444,
+          "low": 80,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 84.84848484848484,
+          "low": 66.66666666666667,
+          "high": 97.14285714285714,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 9.595959595959599,
+          "low": -11.310782241014806,
+          "high": 30,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "set",
+      "gold": 17,
+      "f1": {
+        "ours": {
+          "estimate": 97.14285714285714,
+          "low": 90,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": -2.857142857142861,
+          "low": -10,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 0,
+          "low": 0,
+          "high": 0,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "within noise"
+      }
+    },
+    {
+      "type": "temporal (any subtype)",
+      "gold": 147,
+      "f1": {
+        "ours": {
+          "estimate": 95.91836734693878,
+          "low": 92.35668789808918,
+          "high": 98.66666666666667,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 80.41958041958041,
+          "low": 74.6376811594203,
+          "high": 85.81314878892734,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 15.498786927358367,
+          "low": 9.28330928330928,
+          "high": 22.342657342657347,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 99.29078014184397,
+          "low": 97.67441860465117,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 83.47826086956522,
+          "low": 76.85185185185185,
+          "high": 90.19607843137256,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 15.812519272278749,
+          "low": 9.264705882352942,
+          "high": 22.179638364779876,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      }
+    },
+    {
+      "type": "all but date/time, duration, set",
+      "gold": 186,
+      "f1": {
+        "ours": {
+          "estimate": 97.58713136729223,
+          "low": 95.1219512195122,
+          "high": 99.48717948717949,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 53.58361774744027,
+          "low": 49.333333333333336,
+          "high": 58.100558659217874,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 44.00351361985196,
+          "low": 38.80144618117782,
+          "high": 48.65351115172631,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 100,
+          "low": 100,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 66.66666666666667,
+          "low": 56.626506024096386,
+          "high": 76.47058823529412,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 33.33333333333333,
+          "low": 23.529411764705884,
+          "high": 43.373493975903614,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      }
+    },
+    {
+      "type": "all types",
+      "gold": 368,
+      "f1": {
+        "ours": {
+          "estimate": 96.48648648648648,
+          "low": 94.45196211096076,
+          "high": 98.24561403508773,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 51.01010101010101,
+          "low": 48.046550290939315,
+          "high": 54.24610051993068,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 45.476385476385474,
+          "low": 41.93933161953728,
+          "high": 48.951895635282305,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      },
+      "value_accuracy": {
+        "ours": {
+          "estimate": 99.64664310954063,
+          "low": 98.88475836431226,
+          "high": 100,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "reference": {
+          "estimate": 79.39914163090128,
+          "low": 74.13793103448276,
+          "high": 84.18972332015811,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "difference": {
+          "estimate": 20.24750147863935,
+          "low": 15.409048445215532,
+          "high": 25.481834293309703,
+          "resamples": 1000,
+          "seed": 20260101
+        },
+        "verdict": "ahead"
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>$(PackagePrefix)$(LibName).Models.Embeddings.Multilingual.Shard1</AssemblyName>
+    <RootNamespace>$(PackagePrefix)$(LibName).Models.Embeddings.Multilingual.Shard1</RootNamespace>
+    <PackageId>$(PackagePrefix)$(LibName).Models.Embeddings.Multilingual.Shard1</PackageId>
+    <Description>spaCy-class NLP for .NET: part 1 of 3 of the multilingual-e5-small weights (a byte range of the ONNX file, kept under the NuGet size limit). Add RecursiveAI.OneNlp.Models.Embeddings.Multilingual, not this package. Unaffiliated with other projects named OneNLP.</Description>
+    <PackageTags>$(PackageTags);embeddings;sentence-embeddings;model</PackageTags>
+    <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <Import Project="../OneNlp.Models.Embeddings.Multilingual/EmbedWeights.targets" />
+
+  <ItemGroup>
+    <None Include="PACKAGE.md" Pack="true" PackagePath="/" />
+    <None Include="weights.manifest.props" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-MIT" Pack="true" PackagePath="/" />
+    <None Include="../../LICENSE-APACHE" Pack="true" PackagePath="/" />
+    <None Include="../OneNlp.Models.Embeddings.Multilingual/THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

@@ -73,7 +73,7 @@ PipelineFile.Save(pipeline, "tagger.onenlp");   // kind "transformer-trainable":
 | Kind | Class | Trains | Weights in the pipeline file |
 |---|---|---|---|
 | `transformer` | `TransformerEncoder` | no (frozen ONNX graph) | none; file names and hash only |
-| `transformer-trainable` | `TrainableTransformerEncoder` | yes | the layers (not the frozen token table) |
+| `transformer-trainable` | `TrainableTransformerEncoder` | yes | the layers (not the frozen token table); `PipelineFile.Save` to a path replaces it by `transformer` over a written graph (see below) |
 
 Both reference the exported model and tokenizer by name (`TransformerEncoder.ModelDirectory`). The trainable kind reads the token table from the exported model again on load and overwrites the layers from the checkpoint, so the model file must still be there.
 
@@ -123,6 +123,45 @@ One fine-tuning step (24 sequences of 32 pieces, 8 threads, 110,344,721 trainabl
 The C# step takes 1.7 times the PyTorch step, inside the 3x rule. Gradient clipping (about 6 times) and the AdamW update (1.7 times) are the slowest parts relative to PyTorch. The full recipe ran at about 6.6 s per step on batches of 500 words (about 700 pieces), peak resident memory 11 GB.
 
 Fine-tuning proof (`recipes/accurate/en-tagging`, `--finetune`; `PROVENANCE.md`): one 26-minute chunk, 236 steps (0.58 epoch of UD English-EWT r2.18 train), development UPOS 96.894 at step 200 (the frozen encoder reached 96.39 on development), test UPOS 97.07 [96.79, 97.35], 0.84 [0.62, 1.07] above the frozen encoder's 96.23 and 2.78 [2.44, 3.16] above spaCy's 94.29.
+
+## Fine-tuned weights written back to ONNX
+
+The trainable modules are about three times slower at inference than OneModel's graph runtime on the same weights, so a fine-tuned encoder is not served by them. `TrainableTransformerEncoder.ExportOnnx(path)` writes the fine-tuned weights into an ONNX file of the graph the encoder was loaded from, and `PipelineFile.Save(pipeline, path)` does it for every fine-tuned transformer in the pipeline.
+
+```csharp
+PipelineFile.Save(pipeline, "tagger.onenlp");   // also writes tagger.encoder0.onnx beside it
+using var loaded = PipelineFile.Load("tagger.onenlp");   // the encoder is a TransformerEncoder on the written graph
+```
+
+- **What is written.** A copy of the original export in which only the values of the layers' weights (and the token table, if it trained) differ. The graph, its operators, constants and every other byte are unchanged. The file is as large as the original (about 1.2 GB for mmBERT-base, 142 MB for the student), is written beside the pipeline file as `<name>.encoder<N>.onnx` and is referred to by that plain file name, looked up in the pipeline file's directory. The two files travel together. Loading from a stream cannot find it and says so.
+- **How.** `OnnxWeightPatcher` (no dependency) indexes the file's protobuf fields with reads at offsets (`onnx.proto3`: ModelProto.graph, GraphProto.node and .initializer, TensorProto dims, data_type, name, raw_data; the protobuf encoding specification), then writes the output field by field: untouched fields are copied as byte ranges, a replaced initializer is re-encoded with its new `raw_data`. Linear weights go back to the graph's `[in, out]` layout. A BERT-family graph adds one token-type vector to every position row; the position table is written with it folded in and the token-type table zeroed, which gives the graph the same sums. The PyTorch exporter stores equal tensors once and names the others with `Identity` nodes (the zero biases of a fresh model): a replacement for such a name becomes an initializer and the node is dropped; a tensor shared with a name that is not being replaced is refused. Tensors in external data files, non-float32 weights and results over 2 GiB are refused with `NotSupportedException`.
+- **Bounds.** Every length is compared with the bytes left in its parent before it is read; names are at most 4 KiB; a node larger than 64 KiB is never read; at most 4 million fields per message; the output is written under a temporary name and renamed, and nothing is left behind on failure.
+- **Keeping the weights in the pipeline file.** `PipelineFile.Save(pipeline, path, exportEncoderGraphs: false)`, or saving to a stream, stores them inside the file as before. The pipeline then loads as a trainable encoder: it can be trained further, and it runs on the slower modules. Pipeline files written before this existed still load.
+- **Token table.** An encoder that trained its token table can be saved this way too (the table goes into the graph, not the pipeline file), which the 1 GiB cap of the pipeline file previously forbade.
+
+### Measured
+
+Hidden states of the written graph against the trainable modules the weights came from, on the 200 parity texts above (5,255 tokens, one text per run, 8 threads, fast mode), and ONNX Runtime 1.31.1 (CPU, black box) on the same written file against the modules' states (`tools/OneNlp.Accurate export-parity`, `tools/accurate/ort_hidden_compare.py`, `tools/accurate/export-rows.sh`):
+
+| Encoder | Comparison | max abs | largest value | min cosine |
+|---|---|---:|---:|---:|
+| student, fine-tuned (`r3-upos-en`) | OneModel graph vs modules | 6.5e-5 | 4.5 | 1.00000000 |
+| | ONNX Runtime vs modules | 1.9e-4 | 4.5 | 0.99999976 |
+| mmBERT-base, fine-tuned 25 steps | OneModel graph vs modules | 6.9e-4 | 40.3 | 0.99999999 |
+| | ONNX Runtime vs modules | 1.2e-3 | 40.3 | 0.99999976 |
+
+UPOS on EWT r2.18 test (gold tokens): the student scores 95.88 [95.55, 96.19] through the written graph, as before, with no token whose prediction differs from the inline pipeline's (25,094 tokens). The mmBERT run, 25 steps from the frozen start (a smoke fine-tune, not a recipe), scores 90.67 [90.22, 91.09] through the written graph and also has no differing token.
+
+Indicative speed, tagger over the first 400 sentences of the EWT test split (6,305 tokens), batches of 32 documents, median of 2 repetitions after a warm-up, shared host (load 10 to 16), not a gated row:
+
+| Encoder | Threads | Trainable modules | Written graph | Ratio |
+|---|---:|---:|---:|---:|
+| student | 1 | 811 tok/s | 2,690 | 3.3 |
+| student | 8 | 1,914 | 11,474 | 6.0 |
+| mmBERT-base | 1 | 99 | 270 | 2.7 |
+| mmBERT-base | 8 | 268 | 983 | 3.7 |
+
+Tests: `tests/OneNlp.Tests/OnnxExportTests.cs` (the three fixture families: perturbed weights give the modules' vectors from the graph, unchanged weights give the original's, a trained table, hostile files, the paired pipeline file and its inline alternative). Fuzz target `onnx-patch` (`fuzz/README.md`).
 
 ## The distilled student
 

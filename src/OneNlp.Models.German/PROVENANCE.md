@@ -5,7 +5,7 @@ The package packs three saved pipelines (`weights.manifest.props` lists name, si
 | File | Components | Data | Seed |
 |---|---|---|---|
 | `tagging.onenlp` | sentencizer, tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, on a fast hash-embedding encoder (ReLU, one window layer, one bidirectional LSTM layer of 64 units per direction; `recipes/de/fast/PROVENANCE.md`) | UD German-GSD r2.18, train and dev | 1 |
-| `parser.onenlp` | biaffine dependency parser with sentence starts, fast encoder and a two-layer bidirectional LSTM | UD German-GSD r2.18, train and dev | 7 |
+| `parser.onenlp` | biaffine dependency parser with sentence starts, fast encoder and a one LSTM layer of 128 units per direction, arc 128, label 64, product label features (`docs/parser.md`)  | UD German-GSD r2.18, train and dev | 7 |
 | `ner.onenlp` | entity recognizer (BILUO tagging, constrained decoding; PER, LOC, ORG, MISC), fast encoder | GermEval 2014, train and dev | 7 |
 
 The sentencizer saved in `tagging.onenlp` is not used by the packaged pipeline; the parser predicts sentence starts. The tokenizer is the UAX #29 word tokenizer with the German data (`docs/segmentation.md`).

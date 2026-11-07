@@ -10,7 +10,7 @@ namespace RecursiveAI.OneNlp.Neural.Encoders;
 /// <c>MatMul</c> node whose name is the module path (<c>/model/layers.0/attn/Wqkv/MatMul</c>), stored [in, out]. The loader finds each weight through that node
 /// and transposes it to [out, in]. A graph written another way (for example by the dynamo exporter) is rejected with a message, never guessed at.
 /// </remarks>
-internal sealed class OnnxEncoderWeights
+internal sealed partial class OnnxEncoderWeights
 {
     private readonly Dictionary<string, TensorData> _data;
     private readonly Dictionary<string, string> _matmul = new(StringComparer.Ordinal);

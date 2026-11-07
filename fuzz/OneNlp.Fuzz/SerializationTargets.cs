@@ -27,6 +27,9 @@ internal static class SerializationTargets
         a.SetSentenceStart(0, true);
         a.SetSentenceStart(7, true);
         a.SetEntities([new SpanSpec(0, 2, "PER", 0.9f), new SpanSpec(5, 6, "LOC")]);
+        a.SetCats([new KeyValuePair<string, float>("HISTORY", 0.75f), new KeyValuePair<string, float>("SCIENCE", 0.125f)]);
+        a.SetSpans("sc", [new SpanSpec(0, 2, "PERSON", 0.9f), new SpanSpec(1, 2, "NAME", 0.6f), new SpanSpec(0, 4, "EVENT")]);
+        a.SetSpans("other", [new SpanSpec(5, 7, "PLACE", 0.5f)]);
         docs.Add(a);
         docs.Add(Nlp.Analyze(""));
         docs.Add(Nlp.Analyze("plain words only"));

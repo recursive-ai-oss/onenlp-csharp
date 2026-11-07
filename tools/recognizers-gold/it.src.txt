@@ -1,0 +1,578 @@
+# Italian recognizer gold set, authoring source. Read docs/recognizer-gold.md for the schema and the labelling rules (the section on Italian and Dutch
+# lists what differs from English).
+#
+# One sentence per line. An expression is written [[text|type|value|grain|flags]]; trailing empty fields may be dropped.
+# {nbsp} and {nnbsp} stand for U+00A0 and U+202F. flags: 'approx' and/or 'alt=<value>;<value>'.
+# '@ref <ISO timestamp>' sets the reference time (UTC) for the lines below it; '@split dev|test' assigns the lines below it.
+# build.py turns this file into gold.jsonl (dev) and test.jsonl (test).
+
+@ref 2026-03-18T10:30:00
+@split test
+
+# ---- numbers
+C'erano [[1.250|number|1250]] posti nella sala grande.
+Il rapporto è [[3,14|number|3.14]] in questa serie.
+Si sono iscritte [[venticinque|number|25]] persone al rifugio.
+Il rapporto conta [[centoventi|number|120]] pagine.
+Ha contato [[quaranta|number|40]] uccelli sul lago.
+Sono state stampate più di [[due milioni|number|2000000]] di copie.
+Il punteggio è variato di [[-7|number|-7]] punti dopo la revisione.
+Compra [[una dozzina|number|12]] di uova e del latte.
+Ha preso [[novantasette|number|97]] all'esame.
+Il file contiene [[1000000|number|1000000]] righe.
+Il pianeta ha circa [[7,9 miliardi|number|7900000000]] di abitanti.
+Leggete il capitolo [[12|number|12]] prima dell'esame.
+Hanno superato la prova [[diciassette|number|17]] studenti.
+Mancano [[settantuno|number|71]] voti per vincere.
+Sono state analizzate [[12.345.678|number|12345678]] righe in tutto.
+Hanno trovato [[trentamila|number|30000]] monete nel relitto.
+L'errore medio misurato era [[0,001|number|0.001]] su tutta la serie.
+C'erano [[trecentoventiquattro|number|324]] invitati alla festa.
+Sono venute circa [[mille|number|1000]] persone alla conferenza.
+Servono [[duecento|number|200]] sedie per la sala.
+Restano [[ottanta|number|80]] posti sul pullman.
+Il punteggio ha raggiunto [[4.500,75|number|4500.75]] nell'ultimo turno.
+Ha mangiato [[tre quarti|number|0.75]] della torta da solo.
+Hanno venduto [[duemilacinquecento|number|2500]] biglietti in [[un giorno|duration|86400]].
+Il rapporto elenca [[ventotto|number|28]] voci di spesa.
+Abbiamo ricevuto [[centottanta|number|180]] risposte al sondaggio.
+
+# ---- ordinals
+Ha finito [[terzo|ordinal|3]] nella gara.
+Ha comprato la [[3ª|ordinal|3]] edizione dell'atlante.
+Ha vinto il [[1º|ordinal|1]] premio della fiera.
+L'ufficio è al [[secondo|ordinal|2]] piano.
+Ha festeggiato il suo [[quindicesimo|ordinal|15]] compleanno con gli amici.
+Era il [[centesimo|ordinal|100]] giorno di scuola.
+Era [[ventitreesimo|ordinal|23]] nella fila d'attesa.
+Il negozio è al [[5°|ordinal|5]] piano del centro.
+L'azienda ha festeggiato il [[decimo|ordinal|10]] anniversario in silenzio.
+Era la [[millesima|ordinal|1000]] cliente del negozio.
+Hanno suonato la [[nona|ordinal|9]] sinfonia di Beethoven.
+Ha preso il [[quarto|ordinal|4]] posto a sinistra.
+Abita al [[21º|ordinal|21]] piano della torre.
+Si parla del [[ventunesimo|ordinal|21]] secolo in questo corso.
+Ha vinto la [[prima|ordinal|1]] tappa del giro.
+
+# ---- percentages
+Le vendite sono aumentate del [[12%|percentage|12]] nel periodo.
+Il [[50 per cento|percentage|50]] degli elettori è rimasto a casa.
+La disoccupazione è scesa al [[3,5%|percentage|3.5]] nel sondaggio.
+Circa il [[dodici per cento|percentage|12]] degli intervistati ha rifiutato di rispondere.
+Il test è riuscito con il [[99,9%|percentage|99.9]] di precisione.
+L'inflazione ha guadagnato lo [[0,5 per cento|percentage|0.5]] in [[un mese|duration|P1M]].
+La batteria è di nuovo al [[100%|percentage|100]] sul telefono.
+Circa il [[7%|percentage|7]] del personale lavora da casa.
+Il prestito ha un tasso del [[4,25%|percentage|4.25]] su [[dieci anni|duration|P10Y]].
+Ha dato il [[cento per cento|percentage|100]] in allenamento.
+L'indice ha perso il [[3%|percentage|3]] in una sola seduta.
+Solo l'[[ottantacinque per cento|percentage|85]] dei posti era occupato.
+Alla cassa si applica uno sconto del [[15 per cento|percentage|15]].
+Il saldo cala del [[2 %|percentage|2]] [[ogni anno|set|P1Y|year]].
+
+# ---- dimensions
+Il sentiero è lungo [[12 chilometri|dimension|12 kilometer]] in tutto.
+La stazione è a [[5 km|dimension|5 kilometer]] da qui.
+Misura [[180 cm|dimension|180 centimeter]] di altezza.
+La stanza è larga [[6 metri|dimension|6 meter]] per intero.
+Tagliate l'asse a [[3 centimetri|dimension|3 centimeter]] esatti.
+Abbiamo camminato per [[2,5 chilometri|dimension|2.5 kilometer]] prima di pranzo.
+La piscina è profonda [[10 m|dimension|10 meter]] nel mezzo.
+Aggiungete [[500 grammi|dimension|500 gram]] di farina nella ciotola.
+Il pacco pesa [[75 kg|dimension|75 kilogram]] in totale.
+Versate [[250 ml|dimension|250 milliliter]] di latte nel pentolino.
+Beve [[2 litri|dimension|2 liter]] d'acqua al lavoro.
+L'appartamento copre [[100 m²|dimension|100 square meter]] a terra.
+L'auto viaggia a [[90 km/h|dimension|90 kilometer per hour]] su questa strada.
+Il file pesa [[4 GB|dimension|4 gigabyte]] una volta compresso.
+Il motore eroga [[75 kW|dimension|75 kilowatt]] a pieno regime.
+La tenuta si estende per [[3 ettari|dimension|3 hectare]] a nord.
+Il terreno misura [[200 metri quadrati|dimension|200 square meter]] in tutto.
+
+# ---- temperatures
+Ci sono [[25 °C|temperature|25 celsius]] all'ombra.
+Il termometro segna [[72 °F|temperature|72 fahrenheit]] in veranda.
+L'acqua bolle a [[100 gradi Celsius|temperature|100 celsius]] a livello del mare.
+Fuori ci sono [[-5 °C|temperature|-5 celsius]] ormai.
+Sulla costa ci saranno [[20 gradi|temperature|20 degree]] [[domani|date|2026-03-19|day]].
+Il forno è regolato a [[180°C|temperature|180 celsius]] per la cottura.
+La temperatura del laboratorio è di [[293 K|temperature|293 kelvin]] costanti.
+Impostate il forno a [[200 gradi centigradi|temperature|200 celsius]] e aspettate.
+Ha avuto [[38,5 °C|temperature|38.5 celsius]] di febbre rientrando.
+Il congelatore sta a [[-18 °C|temperature|-18 celsius]] in permanenza.
+A New York c'erano [[30 gradi Fahrenheit|temperature|30 fahrenheit]] [[ieri|date|2026-03-17|day]].
+
+# ---- ages
+Il bambino, [[di 5 anni|age|5 year]], dorme già.
+Una signora [[di 90 anni|age|90 year]] abita al piano terra.
+Un cucciolo [[di 18 mesi|age|18 month]] cerca una famiglia.
+Una neonata [[di 3 settimane|age|3 week]] è stata ricoverata all'ospedale.
+I ragazzi [[di 12 anni|age|12 year]] hanno vinto il premio.
+Un uomo [[di 40 anni|age|40 year]] è stato sentito dalla polizia.
+Il gattino, [[di 7 giorni|age|7 day]], ha aperto gli occhi.
+Una cliente [[di 65 anni|age|65 year]] ha posto la domanda.
+I gemelli, [[di 2 anni|age|2 year]], gattonano per casa.
+Una testimone [[di 30 anni|age|30 year]] è stata interrogata.
+Il paziente ha [[80 anni di età|age|80 year]] e vive da solo.
+
+# ---- money
+Il biglietto costa [[20 €|currency|20 EUR]] all'ingresso.
+Ha pagato [[1.234,56 €|currency|1234.56 EUR]] per la bicicletta.
+L'affitto è di [[800 euro|currency|800 EUR]] per questo monolocale.
+Il caffè costa [[€ 2,50|currency|2.5 EUR]] al banco.
+Ha guadagnato [[18.000 EUR|currency|18000 EUR]] in tutto.
+La pratica costa [[CHF 50|currency|50 CHF]] allo sportello.
+Il conto ammonta a [[3.000 dollari|currency|3000 USD]] in tutto.
+Ha speso [[12 sterline|currency|12 GBP]] al mercato.
+Fanno [[50 centesimi|currency|0.5 EUR]] al pezzo.
+Il prezzo è di [[5 milioni di euro|currency|5000000 EUR]] per tutto.
+Gli deve [[1.200 €|currency|1200 EUR]] di affitto.
+Il biglietto costa [[$15|currency|15 USD]] a Chicago.
+L'abbonamento base costa solo [[9,99 euro|currency|9.99 EUR]] in tutto.
+Le spese sono di [[quindici euro|currency|15 EUR]] a pratica.
+La quota d'iscrizione è di [[£20|currency|20 GBP]] in tutto.
+Ha ricevuto [[duemila euro|currency|2000 EUR]] di premio.
+Il rimborso è stato di [[75 centesimi|currency|0.75 EUR]] soltanto.
+
+# ---- e-mail
+Scrivete a [[mario.rossi@esempio.it|email]] per maggiori dettagli.
+Mandate il file a [[supporto+fattura@posta.esempio.org|email]] per il controllo.
+Il suo nuovo indirizzo è [[a.b_c-d@sub.esempio.co.uk|email]] da poco.
+Contattate [[info@esempio.net|email]] oppure chiamate la segreteria.
+Scrivete a [[risorse@esempio.com|email]] e a [[vendite@esempio.com|email]] insieme.
+Il mittente era [[non-rispondere@notifiche.esempio.io|email]] ancora una volta.
+Inoltratelo a [[maria.garcia@esempio.es|email]] subito.
+Usate [[squadra@esempio.com|email]] per le domande.
+Il messaggio arriva da [[nome.cognome@esempio.it|email]] e attende risposta.
+Il nostro recapito è [[contatti@esempio.ch|email]] per ogni richiesta.
+
+# ---- URL
+Consultate [[https://www.esempio.it/prodotti|url]] per l'elenco.
+Il nostro sito è [[www.esempio.com|url]] da molto tempo.
+Le tariffe sono su [[esempio.it/tariffe|url]] e aggiornate.
+Scaricate la guida da [[https://docs.esempio.org/guida/inizio?lang=it|url]] prima del corso.
+Il deposito è su [[http://git.esempio.net/progetto.git|url]] per tutti.
+Aprite [[https://esempio.com/a/b/c.html#fine|url]] per vedere il seguito.
+La pagina d'aiuto si trova su [[ftp://files.esempio.org/pub/|url]] per i clienti.
+Guardate [[https://shop.esempio.ch/carrello|url]], è lì.
+Vedi [[www.esempio.com/contatti|url]] per gli orari.
+Il blog è qui: [[https://blog.esempio.it/2026/marzo|url]] ed è aperto.
+
+# ---- IP addresses
+Il server risponde su [[192.168.0.12|ip]] fin dall'inizio.
+Il gateway è [[10.0.0.1|ip]] su questa rete.
+Il DNS pubblico è [[8.8.8.8|ip]] per tutte le postazioni.
+Bloccate [[203.0.113.45|ip]] nel firewall.
+L'host IPv6 è [[2001:db8::1|ip]] in laboratorio.
+Il test è fallito su [[198.51.100.7|ip]] più volte.
+Il router [[fe80::1ff:fe23:4567:890a|ip]] non risponde più.
+L'indirizzo di loopback è [[127.0.0.1|ip]] su ogni macchina.
+Collegatevi a [[172.16.254.3|ip]] prima dell'interruzione.
+Il nodo [[2001:db8:85a3::8a2e:370:7334|ip]] è fuori servizio.
+
+# ---- phone numbers
+Chiamate lo [[06 555 0123|phone]] per prenotare.
+Il centralino risponde al [[+39 06 555 0123|phone]] in ufficio.
+Scrivetemi al [[+39 320 555 0123|phone]] in caso di ritardo.
+Il numero è lo [[06-5550123|phone]] sull'elenco.
+Richiamate il [[+39 (06) 555 0123|phone]] se serve.
+Il fax è lo [[02.555.0123|phone]] da tempo.
+Il nostro ufficio svizzero è al [[+41 91 555 01 23|phone]] e risponde in fretta.
+Componete il [[+39 333 555 0145|phone]] per l'urgenza.
+La linea diretta è lo [[011 555 0178|phone]] da sempre.
+Il servizio clienti risponde al [[+39 02 555 0199|phone]] al telefono.
+
+# ---- hashtags and mentions
+Seguite il filo sotto [[#OneNLP|hashtag]] per le novità.
+La parola chiave [[#estate2026|hashtag]] è in cima all'elenco.
+Aggiungete [[#novità|hashtag]] e [[#dotnet|hashtag]] al post.
+Condividete con [[#venerdì_foto|hashtag]] sul social.
+Il tema [[#Roma2026|hashtag]] resta tranquillo.
+Il filo [[#buongiorno|hashtag]] torna [[ogni settimana|set|P1W|week]].
+Aggiungete [[#ricetta_del_giorno|hashtag]] alla pubblicazione.
+I pareri sono raccolti sotto [[#opinioni|hashtag]] e [[#qualità|hashtag]] nello stesso posto.
+Il tema [[#Torino2027|hashtag]] sta salendo.
+La sfida [[#maratona_2026|hashtag]] parte [[domani|date|2026-03-19|day]].
+Grazie a [[@recursiveai|mention]] per la correzione rapida.
+Chiedete a [[@jane_doe|mention]] e a [[@dotnet|mention]] per il seguito.
+Segnalate [[@maria_g|mention]] sul filo.
+Un grazie a [[@open_source_fan|mention]] per la correzione.
+Mettete [[@squadra_nlp|mention]] in copia del post.
+Grazie a [[@marco_rossi|mention]] per la rilettura attenta.
+Inviate il link a [[@pietro_75|mention]] prima della riunione.
+Avvisate [[@supporto_it|mention]] e [[@admin|mention]] del problema.
+Questo filo è stato lanciato da [[@la_piccola_squadra|mention]] sulla piattaforma.
+Rispondete a [[@giulia_b|mention]] subito.
+
+# ---- GUIDs
+Il pacco [[0f8fad5b-d9cb-469f-a165-70867728950e|guid]] è stato consegnato.
+Il nodo [[1b4e28ba-2fa1-11d2-883f-0016d3cca427|guid]] non risponde più.
+La traccia [[886313e1-3b8a-5372-9b90-0c9aee199e5d|guid]] viene conservata.
+L'identificativo è [[3f2504e0-4f89-11d3-9a0c-0305e82c3301|guid]] nel database.
+La chiave [[123e4567-e89b-12d3-a456-426614174000|guid]] è scaduta.
+Il token [[550e8400-e29b-41d4-a716-446655440000|guid]] è stato revocato.
+La sessione [[6ba7b810-9dad-11d1-80b4-00c04fd430c8|guid]] è terminata.
+Il record [[c9a646d3-9c61-4cb7-bfcd-ee2522c8f633|guid]] è stato duplicato.
+Il file [[7d444840-9dc0-11d1-b245-5ffdce74fad2|guid]] è in quarantena.
+L'ordine [[9b2f3c1e-5a4d-4e8b-8f6a-1d2c3b4a5f60|guid]] è in attesa.
+
+# ---- dates: explicit
+La scadenza è [[il 20 marzo 2026|date|2026-03-20|day]] per tutti.
+Il suo compleanno cade [[il 20 giugno 2026|date|2026-06-20|day]] come sempre.
+Consegnate il modulo entro [[il 15/04/2026|date|2026-04-15|day]] per favore.
+È nato [[il 15 aprile 1990|date|1990-04-15|day]] a Torino.
+La festa si tiene [[il 5 maggio|date|2026-05-05|day]] al circolo.
+L'affitto scade [[il 1º dicembre 2026|date|2026-12-01|day]] per tutti.
+Ci vediamo [[venerdì 27 marzo|date|2026-03-27|day]] nel solito posto.
+Il museo riapre [[il 3 aprile|date|2026-04-03|day]] dopo i lavori.
+Il contratto inizia [[il 1 gennaio 2027|date|2027-01-01|day]] come concordato.
+Il giorno bisestile [[29 febbraio 2028|date|2028-02-29|day]] arriva presto.
+Il rapporto è datato [[2026-04-15|date|2026-04-15|day]] nell'intestazione.
+La parata si tiene [[il 14 luglio|date|2026-07-14|day]] come da tradizione.
+Ha firmato [[il 3 marzo 2026|date|2026-03-03|day]] davanti ai testimoni.
+I documenti scadono [[il 31 dicembre 2026|date|2026-12-31|day]] senza eccezioni.
+Si è trasferita [[il 12 agosto 2019|date|2019-08-12|day]] per lavoro.
+
+# ---- dates: relative
+Ti chiamo [[domani|date|2026-03-19|day]] per il piano.
+[[Ieri|date|2026-03-17|day]] ha fatto freddo e umido.
+Il rapporto è dovuto [[oggi|date|2026-03-18|day]] prima della chiusura.
+Partiamo [[dopodomani|date|2026-03-20|day]] per la costa.
+È successo [[l'altro ieri|date|2026-03-16|day]] al circolo.
+Il corso riprende [[lunedì prossimo|date|2026-03-23|day]] come sempre.
+Incontriamoci [[venerdì prossimo|date|2026-03-27|day|alt=2026-03-20]] per firmare.
+L'ho visto [[venerdì scorso|date|2026-03-13|day]] al mercato.
+Venite [[questo venerdì|date|2026-03-20|day]] a cena da noi.
+Arriverà [[giovedì|date|2026-03-19|day]] con i campioni.
+Lanciamo [[tra 2 giorni|date|2026-03-20|day]] se tutto va bene.
+Il pacco è stato spedito [[3 giorni fa|date|2026-03-15|day]] per posta.
+La pratica è dovuta [[tra due settimane|date|2026-04-01|day]] al massimo.
+È partito [[una settimana fa|date|2026-03-11|day]] per la costa.
+Il viaggio comincia [[tra tre settimane|date|2026-04-08|day]] dalla stazione.
+L'esame si tiene [[mercoledì prossimo|date|2026-03-25|day]] nell'aula grande.
+Andremo a camminare [[domenica|date|2026-03-22|day]] se il tempo regge.
+
+# ---- dates: holidays and computed days
+Ci ritroviamo a [[Natale|date|2026-12-25|day]] in famiglia.
+[[Pasqua|date|2026-04-05|day]] si avvicina a grandi passi.
+Viaggiamo a [[Pasqua 2027|date|2027-03-28|day]] con i bambini.
+L'ufficio è chiuso a [[Pasquetta|date|2026-04-06|day]] come previsto.
+I negozi chiudono per [[l'Ascensione|date|2026-05-14|day]] in città.
+Il cimitero è aperto a [[Ognissanti|date|2026-11-01|day]] per tutti.
+I musei chiudono a [[Capodanno|date|2027-01-01|day]] senza eccezioni.
+Partono per [[San Valentino|date|2027-02-14|day]] a Venezia.
+I bambini adorano [[Halloween|date|2026-10-31|day]] più di tutto.
+Il pranzo è per [[Ferragosto|date|2026-08-15|day]] al mare.
+Il mazzo di fiori è per [[la festa della mamma|date|2026-05-10|day]] da noi.
+Il biglietto è per [[la festa del papà|date|2026-03-19|day]] da noi.
+Il ballo si tiene a [[San Silvestro|date|2026-12-31|day]] in piazza.
+Il corteo è previsto per [[la festa del Lavoro|date|2026-05-01|day]] sulla piazza.
+I carri sfilano a [[martedì grasso|date|2027-02-09|day]] nella via principale.
+Il club si riunisce [[il terzo giovedì di aprile|date|2026-04-16|day]] al centro.
+L'audit si tiene [[l'ultimo venerdì di marzo|date|2026-03-27|day]] come previsto.
+La sfilata è per [[la festa della Repubblica|date|2026-06-02|day]] a Roma.
+Il corteo parte per [[la festa della Liberazione|date|2026-04-25|day]] dalla piazza.
+I negozi sono chiusi per [[l'Immacolata|date|2026-12-08|day]] come da tradizione.
+La befana arriva con [[l'Epifania|date|2027-01-06|day]] per i bambini.
+Si pranza in famiglia a [[Santo Stefano|date|2026-12-26|day]] come da tradizione.
+
+# ---- date ranges
+La squadra è assente [[la settimana prossima|daterange|2026-03-23/2026-03-30|week]] per un corso.
+Abbiamo riletto i numeri [[questa settimana|daterange|2026-03-16/2026-03-23|week]] già.
+Il bug è apparso [[la settimana scorsa|daterange|2026-03-09/2026-03-16|week]] nei test.
+La nuova tariffa parte [[il mese prossimo|daterange|2026-04-01/2026-05-01|month]] al sud.
+Il fatturato era migliore [[il mese scorso|daterange|2026-02-01/2026-03-01|month]] del previsto.
+Il bilancio si chiude [[questo mese|daterange|2026-03-01/2026-04-01|month]] per revisione.
+Il censimento si svolge [[l'anno prossimo|daterange|2027-01-01/2028-01-01|year]] in tutte le regioni.
+Si sono trasferiti [[l'anno scorso|daterange|2025-01-01/2026-01-01|year]] dopo l'alluvione.
+Il piano copre [[quest'anno|daterange|2026-01-01/2027-01-01|year]] soltanto.
+Il festival si tiene a [[giugno 2027|daterange|2027-06-01/2027-07-01|month]] nel centro storico.
+Il libro esce a [[marzo 2026|daterange|2026-03-01/2026-04-01|month]] per l'editore.
+Il trattato fu firmato nel [[1969|daterange|1969-01-01/1970-01-01|year]] dopo lunghe trattative.
+I Giochi sono previsti per il [[2031|daterange|2031-01-01/2032-01-01|year]] nella capitale.
+I risultati del [[terzo trimestre 2026|daterange|2026-07-01/2026-10-01|quarter]] seguiranno.
+La crescita è stata lenta nel [[primo trimestre del 2026|daterange|2026-01-01/2026-04-01|quarter]] nel complesso.
+Il grosso del lavoro si fa nel [[secondo semestre 2026|daterange|2026-07-01/2027-01-01|half]] secondo il piano.
+La musica è cambiata molto negli [[anni Novanta|daterange|1990-01-01/2000-01-01|decade]] e dopo.
+La conferenza si tiene [[dal 6 al 10 aprile|daterange|2026-04-06/2026-04-11|day]] a Oslo.
+Siamo assenti [[dal 1º al 15 giugno|daterange|2026-06-01/2026-06-16|day]] per un viaggio.
+Il corso dura [[dal 4 maggio all'8 maggio|daterange|2026-05-04/2026-05-09|day]] in centro.
+Andiamo a camminare [[questo fine settimana|daterange|2026-03-21/2026-03-23|day]] se il tempo regge.
+Ci fanno visita [[il fine settimana prossimo|daterange|2026-03-28/2026-03-30|day]] con i bambini.
+Il negozio è chiuso [[dal lunedì al venerdì|daterange|2026-03-23/2026-03-28|day|alt=2026-03-16/2026-03-21]] per lavori.
+I laghi sono affollati [[quest'estate|daterange|2026-06-01/2026-09-01|season|approx]] come sempre.
+Ha nevicato molto [[l'inverno scorso|daterange|2025-12-01/2026-03-01|season|approx]] al nord.
+L'azienda è stata fondata nella [[primavera 2021|daterange|2021-03-01/2021-06-01|season|approx]] da alcuni amici.
+L'album è uscito in [[autunno 2025|daterange|2025-09-01/2025-12-01|season|approx]] con buone recensioni.
+Hanno fatto un tour in Europa nell'[[estate 2024|daterange|2024-06-01/2024-09-01|season|approx]] con un piccolo gruppo.
+L'azienda è partita a [[inizio 2021|daterange|2021-01-01/2021-05-01|year|approx]] con poche persone.
+Le vendite hanno toccato il picco a [[metà 2022|daterange|2022-05-01/2022-09-01|year|approx]] prima del calo.
+Il prodotto è stato ritirato a [[fine 2023|daterange|2023-09-01/2024-01-01|year|approx]] dopo una lunga vita.
+Le piogge dovrebbero smettere a [[inizio maggio|daterange|2026-05-01/2026-05-11|month|approx]] in zona.
+Il giardino è splendido a [[metà aprile|daterange|2026-04-11/2026-04-21|month|approx]] in città.
+Il raccolto finisce a [[fine giugno|daterange|2026-06-21/2026-07-01|month|approx]] nella zona.
+Il programma crescerà negli [[anni 2030|daterange|2030-01-01/2040-01-01|decade]] secondo il piano.
+
+# ---- times
+La riunione comincia alle [[15:00|time|T15:00|minute]] precise.
+Le porte aprono alle [[15:30|time|T15:30|minute]] come al solito.
+Il treno parte alle [[15.45|time|T15:45|minute]] dalla stazione centrale.
+Il pranzo è servito a [[mezzogiorno|time|T12:00|hour]] in albergo.
+Il server si riavvia a [[mezzanotte|time|T00:00|hour]] nella baia.
+La sveglia suona alle [[7:05|time|T07:05|minute]] nell'appartamento.
+Il registro mostra un errore alle [[10:15:30|time|T10:15:30|second]] esatte.
+Di solito si mangia alle [[cinque del pomeriggio|time|T17:00|hour]] a casa.
+Il servizio comincia alle [[09:00|time|T09:00|minute]] al deposito.
+Il bar chiude alle [[23:00|time|T23:00|minute]] nel centro storico.
+Il convegno finisce alle [[18:45|time|T18:45|minute]] nella saletta.
+La chiamata è alle [[15:00 CET|time|T15:00+01:00|minute]] sulla linea.
+La finestra si apre alle [[12:00 UTC|time|T12:00Z|minute]] per tutte le squadre.
+Appuntamento alle [[tre e mezza del pomeriggio|time|T15:30|minute]] davanti al municipio.
+Il bar apre a [[mezzogiorno e mezzo|time|T12:30|minute]] in centro.
+Il corso comincia alle [[otto di mattina|time|T08:00|hour]] nell'aula grande.
+Aspettali [[verso le 15:00|time|T15:00|minute|approx]] o poco dopo.
+Il video si è fermato alle [[23:59:59|time|T23:59:59|second]] precise.
+Ci vediamo alle [[3 del pomeriggio|time|T15:00|hour]] al solito bar.
+La cena è alle [[otto di sera|time|T20:00|hour]] a casa nostra.
+
+# ---- datetimes
+Parliamone [[domani alle 15:00|datetime|2026-03-19T15:00|minute]] per il piano.
+La revisione è [[venerdì alle 10:30|datetime|2026-03-20T10:30|minute]] nell'annesso.
+Il lancio è fissato per [[il 25 marzo a mezzogiorno|datetime|2026-03-25T12:00|hour]] sul palco principale.
+Il backup gira il [[2026-04-01 14:00|datetime|2026-04-01T14:00|minute]] sul server.
+Il laboratorio inizia [[lunedì prossimo alle 9:00|datetime|2026-03-23T09:00|minute]] in punto.
+La chiamata si è conclusa [[ieri alle 17:15|datetime|2026-03-17T17:15|minute]] dopo un lungo scambio.
+Il volo parte [[il 5 maggio 2026 alle 8:00|datetime|2026-05-05T08:00|minute]] dal gate B.
+Vediamoci [[giovedì alle 18:00|datetime|2026-03-19T18:00|minute]] al bar.
+La consegna è [[dopodomani alle 8:30|datetime|2026-03-20T08:30|minute]] senza falta.
+Il concerto inizia [[sabato alle 21:00|datetime|2026-03-21T21:00|minute]] in piazza.
+Il termine è [[il 30 giugno 2026 alle 23:59|datetime|2026-06-30T23:59|minute]] per tutti.
+Il registro riporta [[2026-06-30T09:15:00Z|datetime|2026-06-30T09:15:00Z|second]] come orario.
+Il bonifico arriva [[il 2 aprile alle 16:20|datetime|2026-04-02T16:20|minute]] in banca.
+
+# ---- time ranges
+Il negozio è aperto [[dalle 9 alle 17|timerange|T09:00/T17:00|hour]] a nord.
+I corsi si tengono [[tra le 14 e le 16|timerange|T14:00/T16:00|hour]] in aula.
+Lo studio riceve [[dalle 8:30 alle 12:00|timerange|T08:30/T12:00|minute]] senza appuntamento.
+La pausa è [[dalle 12:00 alle 13:30|timerange|T12:00/T13:30|minute]] in mensa.
+Il bar apre [[dalle 7 alle 11|timerange|T07:00/T11:00|hour]] all'angolo.
+La sala è prenotata [[dalle 10:00 alle 12:30|timerange|T10:00/T12:30|minute]] per la squadra.
+Chiamateci [[tra le 9:00 e le 11:30|timerange|T09:00/T11:30|minute]] in ufficio.
+Gli sportelli sono aperti [[9:00-17:00|timerange|T09:00/T17:00|minute]] nei giorni feriali.
+La piscina è chiusa [[dalle 18:00 alle 20:00|timerange|T18:00/T20:00|minute]] per i corsi.
+Il mercato si tiene [[dalle 6 alle 13|timerange|T06:00/T13:00|hour]] in piazza.
+Le visite sono possibili [[dalle 14 alle 18|timerange|T14:00/T18:00|hour]] soltanto.
+
+# ---- date-time ranges
+Sono libero [[domani mattina|datetimerange|2026-03-19T06:00/2026-03-19T12:00|hour|approx]] per parlare.
+La squadra arriva [[oggi pomeriggio|datetimerange|2026-03-18T12:00/2026-03-18T18:00|hour|approx]] per iniziare.
+Il gruppo suona [[sabato sera|datetimerange|2026-03-21T18:00/2026-03-22T00:00|hour|approx]] in piazza.
+Ha piovuto [[ieri mattina|datetimerange|2026-03-17T06:00/2026-03-17T12:00|hour|approx]] su tutta la regione.
+Il postino passa [[domenica mattina|datetimerange|2026-03-22T06:00/2026-03-22T12:00|hour|approx]] di solito.
+Ci vediamo [[domani pomeriggio|datetimerange|2026-03-19T12:00/2026-03-19T18:00|hour|approx]] al bar.
+Il film va in onda [[stasera|datetimerange|2026-03-18T18:00/2026-03-19T00:00|hour|approx]] sul canale.
+Troviamoci [[domani dalle 14:00 alle 16:00|datetimerange|2026-03-19T14:00/2026-03-19T16:00|minute]] per decidere.
+L'esame si tiene [[lunedì dalle 9:00 alle 11:00|datetimerange|2026-03-23T09:00/2026-03-23T11:00|minute]] in aula.
+Siamo liberi [[venerdì pomeriggio|datetimerange|2026-03-20T12:00/2026-03-20T18:00|hour|approx]] per incontrarci.
+Lo stage va [[dal 5 maggio alle 9:00 al 6 maggio alle 12:00|datetimerange|2026-05-05T09:00/2026-05-06T12:00|minute]] in quota.
+
+# ---- durations
+La riunione dura [[due ore|duration|7200]] alla fine.
+La traversata richiede [[3 giorni|duration|259200]] con il mare grosso.
+Ha aspettato [[45 minuti|duration|2700]] alla stazione.
+Il progetto è durato [[1 anno e 6 mesi|duration|P1Y6M]] prima di fermarsi.
+Il tirocinio dura [[3 mesi|duration|P3M]] senza esito.
+Il congedo dura [[due settimane|duration|1209600]] dall'inizio.
+La bimba ha dormito [[un'ora e mezza|duration|5400]] senza interruzioni.
+La pausa dura [[30 secondi|duration|30]] poi si riprende.
+Ha corso per [[2 ore e 30 minuti|duration|9000]] senza sosta.
+La garanzia dura [[5 anni|duration|P5Y]] dall'acquisto.
+Il film dura [[90 minuti|duration|5400]] senza intervallo.
+Ha vissuto [[dieci anni|duration|P10Y]] a Torino prima di partire.
+Il termine scade dopo [[sessanta giorni|duration|5184000]] dal ricevimento.
+Lo studio è durato [[18 mesi|duration|P18M]] in tutto.
+Aspetta [[un'ora|duration|3600]] poi riprova.
+
+# ---- sets
+Il corso si tiene [[ogni lunedì|set|XXXX-WXX-1|day]] nell'annesso.
+Corre [[ogni giorno|set|P1D|day]] senza eccezioni.
+La squadra si riunisce [[ogni settimana|set|P1W|week]] nella sala grande.
+Le fatture partono [[ogni mese|set|P1M|month]] dalla banca.
+Va a trovare la madre [[ogni due settimane|set|P2W|week]] in treno.
+Il punto è [[ogni lunedì alle 9:00|set|XXXX-WXX-1T09:00|minute]] nell'open space.
+La fiera torna [[ogni anno|set|P1Y|year]] nello stesso campo.
+I rifiuti sono ritirati [[tutti i giorni|set|P1D|day]] in città.
+Il coro prova [[tutti i venerdì|set|XXXX-WXX-5|day]] dopo il lavoro.
+La pompa gira [[ogni 3 ore|set|PT3H|hour]] a turno.
+Il giornale esce [[quotidianamente|set|P1D|day]] in regione.
+La lettera parte [[ogni mercoledì alle 14:00|set|XXXX-WXX-3T14:00|minute]] per gli abbonati.
+Il bollettino esce [[settimanalmente|set|P1W|week]] sulla lista.
+L'affitto è dovuto [[mensilmente|set|P1M|month]] da contratto.
+Il comitato si riunisce [[tutte le domeniche|set|XXXX-WXX-7|day]] a scuola.
+
+# ---- nothing to find
+C'è un gatto sul divano del salotto.
+Il caffè è eccellente in questo piccolo bar.
+Abbiamo discusso a lungo di letteratura moderna.
+Il mare era calmo e il cielo sereno.
+Nessuno sapeva dove fosse la chiave.
+Ha letto un romanzo appassionante sul treno.
+Il progetto va avanti bene secondo la squadra.
+Un uomo è entrato in panetteria in silenzio.
+La vicina annaffia i fiori con cura.
+I bambini giocano nel cortile della scuola.
+Lo chef ha assaggiato la zuppa e ha sorriso.
+Questo libro racconta la storia di un vecchio marinaio.
+La vetrina della libreria è molto bella.
+Cerchiamo una soluzione semplice e duratura.
+Prima di partire ha chiuso tutte le finestre.
+
+# ================================ development split ================================
+
+@split dev
+@ref 2026-03-18T10:30:00
+
+# ---- numbers
+Nella scatola ci sono [[2.400|number|2400]] viti.
+La media è [[2,75|number|2.75]] per partita.
+Ha invitato [[trentadue|number|32]] amici alla cena.
+Il libro ha [[trecentocinquanta|number|350]] pagine.
+Sono arrivate [[quarantuno|number|41]] lettere questa mattina.
+Il fondo vale [[tre milioni di euro|currency|3000000 EUR]].
+Il punteggio è sceso di [[-3|number|-3]] punti.
+Ha ordinato [[sei|number|6]] caffè per la squadra.
+Il museo ha ricevuto [[quindicimila|number|15000]] visitatori.
+Il prezzo è cambiato [[due|number|2]] volte in [[un giorno|duration|86400]].
+Ha letto [[centouno|number|101]] pagine in una sera.
+Su quella nave c'erano [[milleduecento|number|1200]] passeggeri.
+Hanno speso [[1.000.000|number|1000000]] in pubblicità.
+La squadra ha segnato [[diciannove|number|19]] punti.
+Il percorso ha [[sessantotto|number|68]] curve.
+Ha letto [[ottocento|number|800]] pagine in [[una settimana|duration|604800]].
+Alla sagra sono venute [[duemila|number|2000]] persone.
+
+# ---- ordinals
+Ha vinto il [[secondo|ordinal|2]] premio della giuria.
+È arrivato [[settimo|ordinal|7]] alla maratona.
+Abita al [[sesto|ordinal|6]] piano di quel palazzo.
+Era la [[quinta|ordinal|5]] volta che chiamava.
+Questo è il suo [[dodicesimo|ordinal|12]] romanzo.
+È il [[trentesimo|ordinal|30]] anno dalla fondazione.
+Siamo alla [[8ª|ordinal|8]] riunione del mese.
+Ha chiuso al [[2º|ordinal|2]] posto del girone.
+Ricorre il [[cinquantesimo|ordinal|50]] anniversario del club.
+La [[venticinquesima|ordinal|25]] edizione parte [[domani|date|2026-03-19|day]].
+
+# ---- percentages
+Il [[18%|percentage|18]] dei voti è andato perso.
+Hanno risposto il [[sessanta per cento|percentage|60]] degli iscritti.
+Il tasso sale al [[2,75%|percentage|2.75]] da gennaio.
+Lo sconto arriva al [[30 per cento|percentage|30]] sui libri.
+La resa è stata del [[0,8%|percentage|0.8]] soltanto.
+Il segnale è al [[45%|percentage|45]] sul display.
+
+# ---- dimensions
+La gara è di [[42 chilometri|dimension|42 kilometer]] in totale.
+Il tavolo è lungo [[2 metri|dimension|2 meter]] esatti.
+Servono [[300 grammi|dimension|300 gram]] di zucchero.
+Il serbatoio contiene [[50 litri|dimension|50 liter]] di benzina.
+La stanza misura [[25 m²|dimension|25 square meter]] in tutto.
+Il treno viaggia a [[300 km/h|dimension|300 kilometer per hour]] in rettilineo.
+Il disco ha [[512 GB|dimension|512 gigabyte]] liberi.
+Il cavo è lungo [[15 cm|dimension|15 centimeter]] circa.
+Il camion porta [[12 tonnellate|dimension|12 tonne]] di ghiaia.
+La cisterna tiene [[1.500 litri|dimension|1500 liter]] d'acqua.
+
+# ---- temperatures
+Fuori ci sono [[15 °C|temperature|15 celsius]] stamattina.
+La stanza sta a [[68 °F|temperature|68 fahrenheit]] in inverno.
+Il ghiaccio fonde a [[0 °C|temperature|0 celsius]] di norma.
+Il vino va servito a [[12 gradi|temperature|12 degree]] più o meno.
+Il motore ha raggiunto i [[90 gradi Celsius|temperature|90 celsius]] in salita.
+[[Domani|date|2026-03-19|day]] ci saranno [[-2 °C|temperature|-2 celsius]] sulle cime.
+
+# ---- ages
+Un ragazzo [[di 16 anni|age|16 year]] ha vinto la gara.
+Una bambina [[di 6 mesi|age|6 month]] dorme tranquilla.
+Un nonno [[di 85 anni|age|85 year]] racconta storie al bar.
+Una signora ha [[70 anni di età|age|70 year]] e cammina [[ogni giorno|set|P1D|day]].
+
+# ---- money
+Il pranzo è costato [[15 €|currency|15 EUR]] a testa.
+Ha versato [[2.500,00 €|currency|2500 EUR]] di caparra.
+Il libro costa [[€ 12,90|currency|12.9 EUR]] in libreria.
+La multa è di [[100 euro|currency|100 EUR]] per i ritardatari.
+Il biglietto costa [[$20|currency|20 USD]] a New York.
+Hanno chiesto [[2 milioni di dollari|currency|2000000 USD]] di risarcimento.
+Il resto è di [[35 centesimi|currency|0.35 EUR]] soltanto.
+Il premio è di [[mille euro|currency|1000 EUR]] al vincitore.
+
+# ---- sequences
+Scrivete a [[ufficio.stampa@esempio.it|email]] con calma.
+Il portale è su [[https://portale.esempio.it/accesso|url]] da tempo.
+Il server di prova ha l'indirizzo [[10.1.2.3|ip]] in rete.
+Chiamate lo [[055 555 0147|phone]] per le informazioni.
+Seguite [[#festa2026|hashtag]] e scrivete a [[@comune_bologna|mention]] per i dettagli.
+La riga [[2d3b4f10-ae8d-4f21-9d3c-5b7a6e1f0c42|guid]] è duplicata nel registro.
+Il contatto è [[assistenza@esempio.com|email]] e il sito [[www.esempio.it|url]] risponde.
+Il numero verde è il [[+39 800 555 012|phone]] da rete fissa.
+
+# ---- dates
+Il trasloco è fissato per [[il 7 aprile 2026|date|2026-04-07|day]] di mattina.
+L'esame è [[lunedì 6 aprile|date|2026-04-06|day]] nell'aula magna.
+Si sposeranno [[il 12 settembre 2026|date|2026-09-12|day]] in campagna.
+Il lavoro finisce [[il 30 aprile|date|2026-04-30|day]] senza proroghe.
+Il rapporto uscì [[il 18/06/2019|date|2019-06-18|day]] in tarda sera.
+Passo a trovarti [[domani|date|2026-03-19|day]] dopo pranzo.
+Si sono visti [[ieri|date|2026-03-17|day]] per un caffè.
+Il biglietto scade [[tra 10 giorni|date|2026-03-28|day]] senza proroghe.
+Ha scritto [[2 settimane fa|date|2026-03-04|day]] senza risposta.
+Il mercato apre [[sabato prossimo|date|2026-03-28|day|alt=2026-03-21]] in piazza.
+Faremo festa a [[Pasqua|date|2026-04-05|day]] tutti insieme.
+Il pranzo è per [[la festa della Repubblica|date|2026-06-02|day]] in campagna.
+I fuochi sono previsti per [[Ferragosto|date|2026-08-15|day]] sul lungomare.
+Il concerto è [[il primo lunedì di maggio|date|2026-05-04|day]] al teatro.
+
+# ---- date ranges
+Il cantiere chiude [[la settimana scorsa|daterange|2026-03-09/2026-03-16|week]] per ferie.
+Il saldo arriva [[il mese prossimo|daterange|2026-04-01/2026-05-01|month]] in banca.
+Il progetto parte a [[settembre 2026|daterange|2026-09-01/2026-10-01|month]] con poche persone.
+Il museo ha aperto nel [[2019|daterange|2019-01-01/2020-01-01|year]] dopo i restauri.
+Il report del [[secondo trimestre 2026|daterange|2026-04-01/2026-07-01|quarter]] è in ritardo.
+La mostra resta aperta [[dal 2 al 20 maggio|daterange|2026-05-02/2026-05-21|day]] con ingresso libero.
+Andiamo in montagna [[la prossima estate|daterange|2026-06-01/2026-09-01|season|approx]] con i cugini.
+Il gruppo è nato a [[fine 2019|daterange|2019-09-01/2020-01-01|year|approx]] in cantina.
+Ci sentiamo a [[metà maggio|daterange|2026-05-11/2026-05-21|month|approx]] per il saldo.
+Il cantiere finisce a [[inizio 2027|daterange|2027-01-01/2027-05-01|year|approx]] se va bene.
+
+# ---- times and datetimes
+Il cancello apre alle [[08:15|time|T08:15|minute]] ogni mattina.
+La cena è servita alle [[20:30|time|T20:30|minute]] in sala.
+L'ultimo giro parte alle [[22:00|time|T22:00|minute]] dal molo.
+Il turno comincia alle [[sei del mattino|time|T06:00|hour]] al magazzino.
+La seduta è fissata per [[giovedì alle 11:00|datetime|2026-03-19T11:00|minute]] in aula.
+Il volo atterra [[domani alle 6:40|datetime|2026-03-19T06:40|minute]] a Fiumicino.
+La festa inizia [[sabato alle 19:30|datetime|2026-03-21T19:30|minute]] in giardino.
+Il negozio è aperto [[dalle 8 alle 12|timerange|T08:00/T12:00|hour]] al mattino.
+La lezione è [[tra le 16:00 e le 18:00|timerange|T16:00/T18:00|minute]] in aula due.
+Passo [[domani sera|datetimerange|2026-03-19T18:00/2026-03-20T00:00|hour|approx]] a salutare.
+Ci vediamo [[sabato pomeriggio|datetimerange|2026-03-21T12:00/2026-03-21T18:00|hour|approx]] al parco.
+
+# ---- durations and sets
+Il viaggio dura [[quattro ore|duration|14400]] in treno.
+Ha lavorato [[6 mesi|duration|P6M]] in Spagna.
+L'attesa è stata di [[20 minuti|duration|1200]] soltanto.
+Il corso dura [[due anni|duration|P2Y]] in tutto.
+Il bando resta aperto per [[15 giorni|duration|1296000]] dalla pubblicazione.
+Prende la medicina [[ogni 8 ore|set|PT8H|hour]] dopo i pasti.
+Si allena [[ogni martedì|set|XXXX-WXX-2|day]] in palestra.
+Il giornale esce [[ogni sabato|set|XXXX-WXX-6|day]] in edicola.
+Fa il bucato [[ogni settimana|set|P1W|week]] senza fretta.
+Il report è [[annuale|set|P1Y|year]] per legge.
+
+# ---- nothing
+Il cane dorme sotto il tavolo della cucina.
+Abbiamo parlato di musica per tutta la sera.
+La nonna prepara una torta di mele.
+Il treno era pieno di turisti stanchi.
+Nessuna notizia dal fronte dell'azienda.

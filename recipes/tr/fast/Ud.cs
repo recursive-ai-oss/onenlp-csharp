@@ -68,11 +68,18 @@ internal static partial class Program
         List<Example> train = [.. ConllUReader.ReadExamples(Required(args, "train"))];
         List<Example> dev = [.. ConllUReader.ReadExamples(Required(args, "dev"))];
         using Pipeline pipeline = NewTaggingPipeline(args);
+        // --cosine-epochs N: a fixed budget of N epochs with the rate falling along a half cosine after the warm-up (Loshchilov and Hutter 2017).
+        int batchWords = Num(args, "batch-words", 1000);
+        float lr = Flt(args, "lr", 0.002f);
+        int cosineEpochs = Num(args, "cosine-epochs", 0);
+        long stepsPerEpoch = Math.Max(1, train.Sum(e => (long)e.Predicted.Length) / batchWords);
+        RecursiveAI.OneModel.Training.LrSchedule? schedule = cosineEpochs > 0 ? new RecursiveAI.OneModel.Training.WarmupCosineLr(lr, 200, cosineEpochs * stepsPerEpoch) : null;
         return RunTraining(pipeline, train, new TrainOptions
         {
-            Epochs = Num(args, "epochs", 40),
-            BatchWords = Num(args, "batch-words", 1000),
-            LearningRate = Flt(args, "lr", 0.002f),
+            Epochs = cosineEpochs > 0 ? cosineEpochs : Num(args, "epochs", 40),
+            BatchWords = batchWords,
+            LearningRate = lr,
+            Schedule = schedule,
             WarmupSteps = 200,
             Dropout = Flt(args, "dropout", 0.1f),
             Seed = (ulong)Num(args, "seed", 1),
@@ -89,8 +96,18 @@ internal static partial class Program
     {
         string outDir = Required(args, "out");
         int perDoc = Num(args, "sentences-per-doc", 10);
-        List<Example> train = Documents(Required(args, "train"), perDoc);
-        List<Example> dev = Documents(Required(args, "dev"), perDoc);
+        // --predicted-words FILE: train (and select) on the words of the tokenizer in FILE (a splitter.onenlp), with the treebank annotation
+        // projected onto them, the way the parser meets text at run time. --predicted-dev 0 keeps the development file on treebank words.
+        IWordTokenizer? tokenizer = Opt(args, "predicted-words", string.Empty) is { Length: > 0 } tokenizerFile ? PipelineFile.Load(tokenizerFile).Tokenizer : null;
+        List<Example> train = Documents(Required(args, "train"), perDoc, tokenizer);
+        List<Example> dev = Documents(Required(args, "dev"), perDoc, Num(args, "predicted-dev", 1) == 1 ? tokenizer : null);
+        // --extra FILE.conllu: more training sentences (parsed web text, already in the tokenizer's words), added after the treebank's.
+        if (Opt(args, "extra", string.Empty) is { Length: > 0 } extra)
+        {
+            train.AddRange(Documents(extra, perDoc));
+        }
+
+        Console.WriteLine($"projected_tokens={projectedTokens} documents_with_changed_tokens={projectedChanged}");
         using Pipeline pipeline = Pipeline.Blank(Language.Turkish).Add(new Parser(
             MakeEncoder(args, EncoderSeed),
             arcSize: Num(args, "arc", 256),
@@ -118,7 +135,7 @@ internal static partial class Program
 
     // Trains (or resumes from the checkpoint in outDir) until the epochs are done, early stopping triggers, or --seconds is used up;
     // saves model.onenlp when training has finished.
-    private static int RunTraining(Pipeline pipeline, List<Example> train, TrainOptions options, string[] args, string outDir)
+    private static int RunTraining(Pipeline pipeline, List<Example> train, TrainOptions options, string[] args, string outDir, Action<Pipeline, string>? save = null)
     {
         double budget = Opt(args, "seconds", string.Empty) is { Length: > 0 } b ? double.Parse(b, CultureInfo.InvariantCulture) : double.PositiveInfinity;
         using var cts = new CancellationTokenSource();
@@ -135,7 +152,7 @@ internal static partial class Program
         if (result.Completed)
         {
             string model = Path.Combine(outDir, "model.onenlp");
-            PipelineFile.Save(pipeline, model);
+            (save ?? PipelineFile.Save)(pipeline, model);
             Console.WriteLine($"model={model} bytes={new FileInfo(model).Length}");
         }
 
@@ -144,7 +161,7 @@ internal static partial class Program
 
     // Groups consecutive sentences into documents, the way running text arrives: a parser that only ever saw single sentences could not learn
     // where one ends.
-    private static List<Example> Documents(string path, int perDoc)
+    private static List<Example> Documents(string path, int perDoc, IWordTokenizer? tokenizer = null)
     {
         var result = new List<Example>();
         var strings = new StringStore();
@@ -154,18 +171,21 @@ internal static partial class Program
             group.Add(s);
             if (group.Count == perDoc)
             {
-                result.Add(Example.FromReference(Merge(group, strings)));
+                result.Add(Example.FromReference(Words(Merge(group, strings), tokenizer, strings)));
                 group.Clear();
             }
         }
 
         if (group.Count > 0)
         {
-            result.Add(Example.FromReference(Merge(group, strings)));
+            result.Add(Example.FromReference(Words(Merge(group, strings), tokenizer, strings)));
         }
 
         return result;
     }
+
+    private static Doc Words(Doc gold, IWordTokenizer? tokenizer, StringStore strings) =>
+        tokenizer is null ? gold : Project(gold, tokenizer.Tokenize(gold.Text, strings), strings);
 
     private static Doc Merge(List<ConllUSentence> sentences, StringStore strings)
     {
@@ -206,7 +226,7 @@ internal static partial class Program
     // The saved parts in pipeline order. They share the first part's tokenizer and string table, as the packaged pipeline does.
     private static Pipeline LoadParts(string dir, string[] args)
     {
-        string[] parts = Opt(args, "parts", "tagging,parser,ner").Split(',');
+        string[] parts = Opt(args, "parts", "splitter,tagging,parser,ner").Split(',');
         var loaded = new List<Pipeline>();
         foreach (string part in parts)
         {
@@ -223,13 +243,20 @@ internal static partial class Program
         }
 
         bool parser = loaded.Exists(p => p.Components.Any(c => c.Name == "parser"));
-        Pipeline combined = new(loaded[0].Tokenizer, Language.Turkish, loaded[0].Strings);
+        // --tokenizer whole replaces the tokenizer by one that never cuts a word (for comparison with the learned splitter).
+        IWordTokenizer tokenizer = Opt(args, "tokenizer", string.Empty) == "whole" ? new UaxWordTokenizer(SegmentationData.TurkishWhole) : loaded[0].Tokenizer;
+        if (tokenizer is NeuralMultiwordSplitter splitter && Opt(args, "cut", string.Empty) is { Length: > 0 } cut)
+        {
+            splitter.MinCutPercent = Num(args, "cut", 50);
+        }
+
+        Pipeline combined = new(tokenizer, Language.Turkish, loaded[0].Strings);
         foreach (Pipeline part in loaded)
         {
             foreach (IPipelineComponent component in part.Components)
             {
                 // With a parser the parser sets the sentences; without one the saved rule sentencizer stays.
-                if (component.Name == "sentencizer" && parser)
+                if (component.Name == "sentencizer" && parser && Opt(args, "keep-sentencizer", "0") != "1")
                 {
                     continue;
                 }
@@ -251,12 +278,12 @@ internal static partial class Program
         int tokens = 0;
         if (raw)
         {
-            // Ten gold sentences at a time, joined by one space as the text of a running document.
+            // --per-doc gold sentences (default ten) at a time, joined by one space as the text of a running document.
             var chunk = new List<string>();
             foreach (ConllUSentence sentence in ConllUReader.Read(Required(args, "gold")))
             {
                 chunk.Add(sentence.Doc.Text);
-                if (chunk.Count == 10)
+                if (chunk.Count == Num(args, "per-doc", 10))
                 {
                     tokens += WriteRaw(pipeline, string.Join(' ', chunk), sb);
                     chunk.Clear();
@@ -299,9 +326,10 @@ internal static partial class Program
     private static int WriteRaw(Pipeline pipeline, string text, StringBuilder sb)
     {
         Doc doc = pipeline.Process(text);
+        bool learned = pipeline.Tokenizer is NeuralMultiwordSplitter;
         foreach (Span sentence in doc.Sentences)
         {
-            WriteRawSentence(sb, doc, sentence.Start, sentence.End);
+            WriteRawSentence(sb, doc, sentence.Start, sentence.End, learned);
         }
 
         return doc.Length;
@@ -310,18 +338,20 @@ internal static partial class Program
     // Raw text has no multiword token lines: they are found from the pieces. UD Turkish writes a copula or -ki spelled onto its word as a
     // word of its own ("vardır" is "var" + "dır"); the tokenizer cuts such a surface form in two pieces (SegmentationData.Turkish) and
     // TryMatchMultiword says which neighbouring tokens are the two pieces of one.
-    private static void WriteRawSentence(StringBuilder sb, Doc doc, int start, int end)
+    private static void WriteRawSentence(StringBuilder sb, Doc doc, int start, int end, bool learned)
     {
         var groups = new List<(int First, int Last, string Form)>();
         var forms = new Dictionary<int, string>();
         for (int i = start; i + 1 < end; i++)
         {
-            if (SegmentationData.Turkish.TryMatchMultiword(doc, i, out int pieces, out string[]? words))
+            int pieces = 0;
+            string[]? words = null;
+            if (learned ? NeuralMultiwordSplitter.TryMatch(doc, i, out pieces) && (words = PieceTexts(doc, i, pieces)) is not null : SegmentationData.Turkish.TryMatchMultiword(doc, i, out pieces, out words))
             {
                 groups.Add((i - start, i + pieces - 1 - start, doc.Text.Substring(doc[i].Idx, doc[i + pieces - 1].EndIdx - doc[i].Idx)));
                 for (int w = 0; w < pieces; w++)
                 {
-                    forms[i - start + w] = words[w];
+                    forms[i - start + w] = words![w];
                 }
 
                 i += pieces - 1;
@@ -330,6 +360,9 @@ internal static partial class Program
 
         WriteSentence(sb, doc, start, end, groups, i => forms.TryGetValue(i, out string? f) ? f : doc[start + i].ToString());
     }
+
+    private static string[] PieceTexts(Doc doc, int first, int count) =>
+        [.. Enumerable.Range(first, count).Select(k => doc.Text.Substring(doc[k].Idx, doc[k].EndIdx - doc[k].Idx))];
 
     // Writes the words start..end of a document as one CoNLL-U sentence. HEAD and DEPREL are placeholders when no parser ran (the first
     // word is the root, the rest hang off it) so that the scorer accepts the file.
@@ -379,7 +412,12 @@ internal static partial class Program
     // Tokens and sentences of the tokenizer and the rule sentencizer alone, for scoring Tokens, Words and Sentences.
     private static int Segment(string[] args)
     {
-        using Pipeline pipeline = Pipeline.Blank(Language.Turkish).Add("sentencizer", new Dictionary<string, string> { ["language"] = "tr" });
+        // With --models DIR the tokenizer is the one in DIR/splitter.onenlp; otherwise the table-based Turkish tokenizer, or with --tokenizer whole one that never cuts a word.
+        string splitterFile = Path.Combine(Opt(args, "models", "."), "splitter.onenlp");
+        using Pipeline? loaded = Opt(args, "models", string.Empty).Length > 0 ? PipelineFile.Load(splitterFile) : null;
+        Pipeline pipeline = loaded is not null ? new Pipeline(loaded.Tokenizer, Language.Turkish, loaded.Strings)
+            : Opt(args, "tokenizer", "table") == "whole" ? new Pipeline(new UaxWordTokenizer(SegmentationData.TurkishWhole), Language.Turkish) : Pipeline.Blank(Language.Turkish);
+        pipeline.Add("sentencizer", new Dictionary<string, string> { ["language"] = "tr" });
         var sb = new StringBuilder();
         var chunk = new List<string>();
         int tokens = 0;

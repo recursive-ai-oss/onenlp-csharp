@@ -11,6 +11,7 @@ using RecursiveAI.OneNlp.Tokenizers;
 //   finetune-probe --model m.onnx --ids ids.json [--text 3] [--steps 5]   (BERT/XLM-R style graphs)
 //   trainable-parity --model m.onnx --tokenizer tokenizer.json --ids ids.json --ref ref.bin [--texts N] [--batch 8] [--family auto|modernbert|postnorm] [--position-offset 2]
 //   step-time --model m.onnx --tokenizer tokenizer.json [--rows 24] [--length 32] [--steps 4] [--threads 8]
+//   export-parity --pipeline inline.onenlp --model-dir D --graph written.onnx --ids ids.json [--texts N] [--dump hidden.bin]
 //   latency  --model m.onnx --length 64 --batches 1,8 --iters 20 [--threads 8]
 Dictionary<string, string> opt = [];
 for (int i = 1; i + 1 < args.Length; i += 2)
@@ -26,6 +27,7 @@ switch (args.Length > 0 ? args[0] : "")
     case "step-time": StepTime.Run(opt); break;
     case "trainable-parity": TrainableParity.Run(opt); break;
     case "finetune-probe": FineTuneProbe.Run(opt); break;
+    case "export-parity": ExportParity.Run(opt); break;
     default: Console.Error.WriteLine("commands: ids, parity, latency"); return 2;
 }
 

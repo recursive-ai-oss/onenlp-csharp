@@ -138,3 +138,64 @@ Both comparators are mapped into this schema by scripts of ours (`tools/oracles/
 Every type has at least 10 test items. Conventions beyond the English ones: a preposition is outside the span (`à`, `en`, `am`, `im`, `um`, `zum`) except where it belongs to the construct (`dans 3 jours`, `il y a 3 jours`, `vor 3 Tagen`, `de 9h à 17h`, `vom 6. bis 10. April`); a French age includes `âgé de`; a German age is `N Jahre alt` or `40-jährige`; `halb eins` is 12:30 (`alt`: 00:30); unit names in values are the English canonical ones.
 
 Run the comparators with `tools/oracles/comparators_lang.sh <lang> <culture> <gold|test> <out>` (Microsoft.Recognizers.Text 1.8.13 in `fr-fr` or `de-de`; its French and German unit names are mapped to the canonical ones in `map_raw.py`), Duckling with `tools/oracles/duckling_lang.sh`, and ours with `tools/oracles/score_dev.sh <lang> <out> [gold|test]`. Results, with paired 95% intervals and Duckling beside them, are in `testdata/recognizers/{fr,de}/comparators/`.
+
+## Spanish and Portuguese
+
+`testdata/recognizers/{es,pt}/` hold the gold sets in the same schema, written for these languages (never copied from a comparator): `test.jsonl` and `gold.jsonl` (development). Sources: `tools/recognizers-gold/{es,pt}.src.txt`, built by `build.py --lang es|pt`; the test split was fixed and hashed before any rule for the language was written, and only the development split guided the rules (extra development items were added later; the test file is unchanged).
+
+| File | Items | Sentences | sha256 |
+|---|---:|---:|---|
+| `es/test.jsonl` | 348 | 358 | `d3036d0d47b0d2e0a781b4bed8f1b35157859061f0eb1df5fe9b16cb7bb3506a` |
+| `pt/test.jsonl` | 349 | 359 | `822eaecb3fe9104cee8c31fa5dbb71d68b3f1696ea11209e3794b514ae4cde5b` |
+
+Every type has at least 10 test items. Conventions beyond the English ones: a preposition, also fused with an article (`no`, `na`, `do`, `pelo`), is outside the span, except where it belongs to the construct (`dentro de 5 días`, `hace 10 días`, `daqui a 5 dias`, `de 8 h a 12 h`, `das 8h às 12h`); an article that starts the expression is inside it (`el 20 de marzo`, `las 15:00`, `o Dia das Mães`); the fused `às`/`à` before a clock time is inside; ages are `N años de edad` / `N anos de idade` only; `noche`/`noite` is 18:00-24:00. The Spanish gold is Spain's (decimal comma, dot or space grouping); the Portuguese gold is Brazil's, with a few European forms.
+
+Run the comparators with `tools/oracles/comparators_lang.sh <lang> <es-es|pt-br> <gold|test> <out>` (Microsoft.Recognizers.Text 1.8.13; its unit names are mapped in `map_raw.py`), Duckling with `tools/oracles/duckling_lang.sh <lang> <es_ES|pt_PT> ...` (information only), and ours with `tools/oracles/score_dev.sh <lang> <out> [gold|test]`. Results, with paired 95% intervals: `testdata/recognizers/{es,pt}/comparators/`.
+
+## Italian and Dutch
+
+`testdata/recognizers/{it,nl}/` hold the gold sets in the same schema, written for these languages (never copied from a comparator): `test.jsonl` and `gold.jsonl` (development). Sources: `tools/recognizers-gold/{it,nl}.src.txt`, built by `build.py --lang it|nl`; only the development split guided the rules.
+
+| File | Items | Sentences | sha256 |
+|---|---:|---:|---|
+| `it/test.jsonl` | 368 | 370 | `e4fadcf947a4032543205e7948a006e09f6e2cd3453d609ce2de6602e782d865` |
+| `nl/test.jsonl` | 369 | 372 | `0d78115506a09c2261050f0530647b80c400b0428100e745b74d8aa8816fed1b` |
+| `it/gold.jsonl` (dev) | | | `61f613054ce3c69f429be959343ea11640ff7b3b76d75baf7f1d534f261ceb27` |
+| `nl/gold.jsonl` (dev) | | | `d196c8d32d99ed7edffcdac60bb44a0c8e53bd32b76faf48002b1bd51776a8aa` |
+
+The test files were edited once after their first hash (it `3d15d452…`, nl `e1a04260…`), before any score on them was read and without system output: three Italian durations were reworded because `di N anni` reads as an age, incidental dates, durations and sets were labelled or reworded, and the Dutch determiner `de` was moved outside the span in `de derde donderdag van april`, `de laatste vrijdag van maart` and `de eerste maandag van mei`.
+
+Conventions beyond the English ones: a preposition, also fused with an article (`nel`, `dal`, `alle`, `in`, `op`), is outside the span, except where it belongs to the construct (`tra 3 giorni`, `3 giorni fa`, `over 3 dagen`, `dalle 8 alle 12`, `van 8 tot 12 uur`); an Italian age includes `di` (`di 82 anni`); a Dutch age is `N jaar oud` or `N-jarige`.
+
+Run the comparators with `tools/oracles/comparators_lang.sh <lang> <it-it|nl-nl> <gold|test> <out>` (Microsoft.Recognizers.Text 1.8.13), Duckling with `tools/oracles/duckling_lang.sh <lang> <it_IT|nl_NL> ...` (information only), and ours with `tools/oracles/score_dev.sh <lang> <out> [gold|test]`. Results, with paired 95% intervals: `testdata/recognizers/{it,nl}/comparators/`.
+
+## Chinese
+
+`testdata/recognizers/zh/` holds the gold set in the same schema, written for Chinese (never copied from a comparator): `test.jsonl` and `gold.jsonl` (development). Source: `tools/recognizers-gold/zh.src.txt`, built by `build.py --lang zh`; only the development split guided the rules. The same author wrote the gold set and the rules, which the results below do not correct for.
+
+| File | Items | sha256 |
+|---|---:|---|
+| `zh/test.jsonl` | 338 | `4a50aa15f954234f4b800fee45fe5cfeb17642670fa60334553a2c9f2819949b` |
+| `zh/gold.jsonl` (dev) | 189 | `285eac0361893ae6defd14c2bad16c0f68f54a2777507cb81442d08a4832b922` |
+
+The test file was edited once after its first hash (`e728c157…`), before any score on it was read and without system output: incidental lone numerals (`一个`, `一杯`, `一部`, `一口气`, `一次`) were reworded in 12 sentences, because a lone numeral with a counting word is not a number in our convention.
+
+**Test reads.** The first read of the test split gave all types F1 98.8 [97.4, 99.9] against Microsoft.Recognizers.Text 49.8 [46.4, 53.0]; that read is the published row (`comparators/ours.test.score.*`, `ours-vs-recognizers.test.*`). It showed one error that the development split had no item for (`两年零三个月`, a gap word before a duration term), and a rule change followed. The post-change run (all types 99.1, duration 100) is in `comparators/post-fix/`; it is not an independent read, since the change was made after seeing the test error.
+
+Conventions beyond the English ones: measure words stay outside spans; `从` is inside a range; `北京时间` is inside a time; `岁` and `周岁` are inside an age; `斤` is the jin and `亩` the mu.
+
+Run the comparators with `tools/oracles/comparators_lang.sh zh zh-cn <gold|test> <out>` (Microsoft.Recognizers.Text 1.8.13), Duckling with `tools/oracles/duckling_lang.sh zh zh_CN ...` (information only), and ours with `tools/oracles/score_dev.sh zh <out> [gold|test]`.
+## Turkish and Hindi
+
+`testdata/recognizers/{tr,hi}/` hold the gold sets in the same schema, written for these languages (never copied from a comparator): `test.jsonl` and `gold.jsonl` (development). Sources: `tools/recognizers-gold/{tr,hi}.src.txt`, built by `build.py --lang tr|hi`. The test splits were hashed before any rule was written and have not changed; only the development split guided the rules.
+
+| File | sha256 |
+|---|---|
+| `tr/test.jsonl` (316 items, 327 sentences) | `4876a7eb3dd2af542a00da5f682414102c1fb176ed8a6958cec96a3aa42be19a` |
+| `hi/test.jsonl` (324 items, 335 sentences) | `f4358d9849ea40f25d93e73fe4b698415aa84b29efd541d54ba3b372b006a68f` |
+| `tr/gold.jsonl` (dev) | `3cc32a3de4f4fbcb090901b98623b43a8d6e42b0719b535cee4f9e6b9f9c8756` |
+| `hi/gold.jsonl` (dev) | `896be443c66c8a3cea3c739e916243d7d63b843500807df2b31ea91bd73cd559` |
+
+Conventions beyond the English ones: a case ending after an apostrophe (`'da`, `'inci`) is outside the span; a Hindi postposition (`को`, `में`, `पर`, `से`) is outside the span, except the ones that frame a range (`से ... तक`) and the age endings (`का`, `की`, `के`), which are inside; `बजे` is inside a clock time; the closing words of a worded range (`arasında`, `kadar`, `तक`) are inside the range only when the range is worded; `रात` is evening 18:00-24:00; `कल` is tomorrow. Early, middle and late parts and seasons are approximate ranges.
+
+Comparators: `tools/oracles/comparators_lang.sh <lang> <tr-tr|hi-in> <gold|test> <out>`; Duckling `tools/oracles/duckling_lang.sh <lang> <tr_TR|hi_IN> ...` (information only); ours `tools/oracles/score_dev.sh <lang> <out> [gold|test]`; `tools/oracles/regress_check.sh <other tree> <out> <langs>` compares test predictions with another build byte for byte.

@@ -3,7 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>$(PackagePrefix)$(LibName).Bench</RootNamespace>
-    <AssemblyName>$(PackagePrefix)$(LibName).Bench</AssemblyName>
+    <!-- BenchmarkDotNet's out-of-process runs find the project by looking for <assembly name>.csproj, so the assembly is named like the file. -->
+    <AssemblyName>OneNlp.Bench</AssemblyName>
     <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn);CA1822;CA1002;CA1819</NoWarn>
   </PropertyGroup>

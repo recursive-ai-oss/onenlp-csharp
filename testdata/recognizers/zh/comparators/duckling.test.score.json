@@ -1,0 +1,1109 @@
+{
+  "system": "Duckling rasa/duckling 0.2.0.2-r4 (zh_CN)",
+  "dataset": "recognizer-gold-zh test",
+  "sentences": 348,
+  "rows": [
+    {
+      "type": "number",
+      "gold": 21,
+      "pred": 50,
+      "precision": {
+        "estimate": 34,
+        "low": 20,
+        "high": 48.07692307692308,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 80.95238095238095,
+        "low": 62.5,
+        "high": 95.83333333333333,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 47.88732394366197,
+        "low": 30.952380952380953,
+        "high": 62.33766233766234,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 63.013698630136986,
+        "low": 47.22222222222222,
+        "high": 75.26881720430107,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 17,
+      "value_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 85.71428571428571,
+        "low": 70,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "ordinal",
+      "gold": 12,
+      "pred": 12,
+      "precision": {
+        "estimate": 91.66666666666667,
+        "low": 70.58823529411765,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 91.66666666666667,
+        "low": 70.58823529411765,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 91.66666666666667,
+        "low": 70.58823529411765,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 11,
+      "value_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "percentage",
+      "gold": 14,
+      "pred": 0,
+      "precision": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "dimension",
+      "gold": 18,
+      "pred": 11,
+      "precision": {
+        "estimate": 90.9090909090909,
+        "low": 70,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 55.55555555555556,
+        "low": 33.333333333333336,
+        "high": 77.77777777777777,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 68.96551724137932,
+        "low": 45.45454545454545,
+        "high": 86.66666666666667,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 75.86206896551724,
+        "low": 55.17241379310345,
+        "high": 90.9090909090909,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 10,
+      "value_accuracy": {
+        "estimate": 60,
+        "low": 27.272727272727273,
+        "high": 90,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 60,
+        "low": 27.272727272727273,
+        "high": 90,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 54.54545454545455,
+        "low": 22.22222222222222,
+        "high": 83.33333333333333,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "temperature",
+      "gold": 11,
+      "pred": 9,
+      "precision": {
+        "estimate": 77.77777777777777,
+        "low": 44.44444444444444,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 63.63636363636363,
+        "low": 33.333333333333336,
+        "high": 90.9090909090909,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 70,
+        "low": 40,
+        "high": 94.11764705882354,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 90,
+        "low": 70.58823529411764,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 7,
+      "value_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 77.77777777777777,
+        "low": 44.44444444444444,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "age",
+      "gold": 12,
+      "pred": 0,
+      "precision": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "currency",
+      "gold": 19,
+      "pred": 11,
+      "precision": {
+        "estimate": 72.72727272727273,
+        "low": 37.5,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 42.10526315789474,
+        "low": 20,
+        "high": 64.28571428571429,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 53.333333333333336,
+        "low": 28.571428571428573,
+        "high": 75.86206896551724,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 62.283737024221445,
+        "low": 38.70967741935483,
+        "high": 80.29197080291969,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 8,
+      "value_accuracy": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 11.11111111111111,
+        "low": 0,
+        "high": 40,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "email",
+      "gold": 10,
+      "pred": 10,
+      "precision": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "url",
+      "gold": 10,
+      "pred": 10,
+      "precision": {
+        "estimate": 30,
+        "low": 0,
+        "high": 63.63636363636363,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 30,
+        "low": 0,
+        "high": 63.63636363636363,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 30,
+        "low": 0,
+        "high": 63.63636363636363,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "ip",
+      "gold": 10,
+      "pred": 0,
+      "precision": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "phone",
+      "gold": 11,
+      "pred": 20,
+      "precision": {
+        "estimate": 55,
+        "low": 31.818181818181817,
+        "high": 77.77777777777777,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 70.96774193548387,
+        "low": 48.275862068965516,
+        "high": 87.5,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 70.96774193548387,
+        "low": 48.275862068965516,
+        "high": 87.50000000000001,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "hashtag",
+      "gold": 10,
+      "pred": 0,
+      "precision": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "mention",
+      "gold": 10,
+      "pred": 0,
+      "precision": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "guid",
+      "gold": 10,
+      "pred": 0,
+      "precision": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "date",
+      "gold": 40,
+      "pred": 33,
+      "precision": {
+        "estimate": 96.96969696969697,
+        "low": 90.625,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 80,
+        "low": 66.66666666666667,
+        "high": 90.9090909090909,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 87.67123287671232,
+        "low": 79.01234567901234,
+        "high": 94.28571428571429,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 87.67123287671232,
+        "low": 79.01234567901234,
+        "high": 94.28571428571429,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 32,
+      "value_accuracy": {
+        "estimate": 96.875,
+        "low": 89.47368421052632,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 96.875,
+        "low": 89.47368421052632,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 96.875,
+        "low": 89.47368421052632,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "time",
+      "gold": 19,
+      "pred": 29,
+      "precision": {
+        "estimate": 34.48275862068966,
+        "low": 16,
+        "high": 54.285714285714285,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 52.63157894736842,
+        "low": 27.272727272727273,
+        "high": 76.19047619047619,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 41.666666666666664,
+        "low": 20.512820512820515,
+        "high": 62.5,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 79.82261640798227,
+        "low": 64.39024390243902,
+        "high": 90.7563025210084,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 10,
+      "value_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 72.22222222222223,
+        "low": 47.36842105263158,
+        "high": 92.3076923076923,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "datetime",
+      "gold": 15,
+      "pred": 0,
+      "precision": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "daterange",
+      "gold": 28,
+      "pred": 27,
+      "precision": {
+        "estimate": 33.333333333333336,
+        "low": 16.666666666666668,
+        "high": 52,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 32.142857142857146,
+        "low": 15,
+        "high": 50,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 32.72727272727273,
+        "low": 15.873015873015873,
+        "high": 50,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 76.12456747404845,
+        "low": 60.37735849056604,
+        "high": 87.90983606557378,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 9,
+      "value_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 45,
+        "low": 23.076923076923077,
+        "high": 66.66666666666667,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "timerange",
+      "gold": 11,
+      "pred": 12,
+      "precision": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "datetimerange",
+      "gold": 12,
+      "pred": 0,
+      "precision": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "duration",
+      "gold": 21,
+      "pred": 21,
+      "precision": {
+        "estimate": 85.71428571428571,
+        "low": 68.42105263157895,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 85.71428571428571,
+        "low": 68,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 85.71428571428571,
+        "low": 70.58823529411765,
+        "high": 97.5609756097561,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 90.47619047619048,
+        "low": 78.7878787878788,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 18,
+      "value_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 100,
+        "low": 100,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 94.73684210526316,
+        "low": 82.3529411764706,
+        "high": 100,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "set",
+      "gold": 14,
+      "pred": 0,
+      "precision": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 0,
+        "low": 0,
+        "high": 0,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 0
+    },
+    {
+      "type": "temporal (any subtype)",
+      "gold": 125,
+      "pred": 147,
+      "precision": {
+        "estimate": 51.70068027210884,
+        "low": 42.5,
+        "high": 61.29032258064516,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 60.8,
+        "low": 52.23880597014925,
+        "high": 69.02654867256638,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 55.88235294117647,
+        "low": 47.2972972972973,
+        "high": 64.84375,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 96.47317526993882,
+        "low": 94.18860921006844,
+        "high": 98.53971650173844,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 76,
+      "value_accuracy": {
+        "estimate": 65.78947368421052,
+        "low": 54.794520547945204,
+        "high": 76.19047619047619,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 65.78947368421052,
+        "low": 54.794520547945204,
+        "high": 76.19047619047619,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 44.91525423728814,
+        "low": 36,
+        "high": 53.78151260504202,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "all but date/time, duration, set",
+      "gold": 178,
+      "pred": 262,
+      "precision": {
+        "estimate": 29.389312977099237,
+        "low": 22.25705329153605,
+        "high": 38.13559322033898,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 43.258426966292134,
+        "low": 36.15819209039548,
+        "high": 50.609756097560975,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 35,
+        "low": 27.906976744186046,
+        "high": 42.67990074441688,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 43.07425097698654,
+        "low": 35.23506775974569,
+        "high": 51.670419984677174,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 53,
+      "value_accuracy": {
+        "estimate": 77.35849056603773,
+        "low": 66,
+        "high": 87.71929824561404,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 77.35849056603773,
+        "low": 66,
+        "high": 87.71929824561404,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 70.96774193548387,
+        "low": 58.62068965517241,
+        "high": 81.66666666666667,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    },
+    {
+      "type": "all types",
+      "gold": 338,
+      "pred": 475,
+      "precision": {
+        "estimate": 30.736842105263158,
+        "low": 25.291828793774318,
+        "high": 36.794582392776526,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "recall": {
+        "estimate": 43.19526627218935,
+        "low": 37.79761904761905,
+        "high": 48.23529411764706,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "f1": {
+        "estimate": 35.916359163591636,
+        "low": 30.521091811414394,
+        "high": 41.37931034482759,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "relaxed_f1": {
+        "estimate": 45.76271186440678,
+        "low": 39.82390167843713,
+        "high": 51.549075761520434,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "resolvable": 122,
+      "value_accuracy": {
+        "estimate": 89.34426229508196,
+        "low": 83.87096774193549,
+        "high": 94.4,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "full_accuracy": {
+        "estimate": 89.34426229508196,
+        "low": 83.87096774193549,
+        "high": 94.4,
+        "resamples": 1000,
+        "seed": 20260101
+      },
+      "overlap_value_accuracy": {
+        "estimate": 76.15894039735099,
+        "low": 69.32515337423312,
+        "high": 83.01886792452831,
+        "resamples": 1000,
+        "seed": 20260101
+      }
+    }
+  ]
+}

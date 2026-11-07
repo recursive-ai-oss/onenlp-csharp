@@ -97,7 +97,7 @@ public sealed class TrainableTransformerOptions
 /// frozen embedding table is read from the model again on load. This class is not safe for concurrent calls.
 /// </para>
 /// </remarks>
-public sealed class TrainableTransformerEncoder : IEncoder
+public sealed partial class TrainableTransformerEncoder : IEncoder
 {
     /// <summary>The kind name a saved pipeline uses for this encoder.</summary>
     public const string EncoderKind = "transformer-trainable";

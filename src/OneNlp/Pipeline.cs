@@ -15,6 +15,10 @@ public sealed class Pipeline : IDisposable
 {
     private readonly List<IPipelineComponent> _components = [];
 
+    // Set by Create: the trained components of the model package that Add<T>() has not taken yet.
+    private List<IPipelineComponent>? _available;
+    private string _packageId = string.Empty;
+
     /// <summary>Creates a pipeline with no components.</summary>
     /// <param name="tokenizer">The first step, which creates documents.</param>
     /// <param name="language">The language the pipeline is for.</param>
@@ -45,6 +49,62 @@ public sealed class Pipeline : IDisposable
     /// </summary>
     /// <param name="language">The language of the pipeline; English gets English tokenization data, any other language (or none) the neutral defaults.</param>
     public static Pipeline Blank(Language language = default) => new(Segmentation.UaxWordTokenizer.For(language), language);
+
+    /// <summary>
+    /// Makes a pipeline for a language from the model package that is referenced for it, with the package's tokenizer and no components
+    /// yet: choose them with <see cref="Add{T}"/> (spaCy's <c>spacy.load</c> with everything excluded, then opted in).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <see cref="Tier.Fast"/> uses the language's fast-tier package (for example <c>RecursiveAI.OneNlp.Models.German</c>), otherwise
+    /// <c>RecursiveAI.OneNlp.Models.Multilingual</c>. <see cref="Tier.Accurate"/> uses <c>RecursiveAI.OneNlp.Models.Multilingual.Large</c>
+    /// when referenced, otherwise <c>RecursiveAI.OneNlp.Models.Multilingual</c>. Packages register themselves when the application starts; nothing is
+    /// discovered by reflection and nothing is downloaded.
+    /// </para>
+    /// <para>The weights are read on each call into a new copy that the pipeline owns, so a created pipeline shares nothing with the pipelines the <see cref="Nlp"/> verbs use. Dispose it.</para>
+    /// </remarks>
+    /// <param name="language">The language.</param>
+    /// <param name="tier">The kind of model to load.</param>
+    /// <exception cref="InvalidOperationException">No package is referenced for the language and tier. The message names the package to add.</exception>
+    public static Pipeline Create(Language language, Tier tier = Tier.Fast)
+    {
+        (Pipeline source, string packageId) = ModelPackages.Load(language, tier);
+        return new Pipeline(source.Tokenizer, language, source.Strings)
+        {
+            _available = [.. source.Components],
+            _packageId = packageId,
+        };
+    }
+
+    /// <summary>
+    /// Adds the trained component of type <typeparamref name="T"/> from the model package this pipeline was created from (see
+    /// <see cref="Create"/>), after the existing components. Components run in the order they are added, so add the tagger before
+    /// components that read tags. Components of the package that are never added are released when the pipeline is disposed.
+    /// </summary>
+    /// <typeparam name="T">The component class, for example <c>Tagger</c>, <c>Parser</c> or <c>EntityRecognizer</c>.</typeparam>
+    /// <returns>This pipeline.</returns>
+    /// <exception cref="InvalidOperationException">The pipeline was not made by <see cref="Create"/>; or the package has no (further) component of this type (the message lists what it still has).</exception>
+    public Pipeline Add<T>()
+        where T : class, IPipelineComponent
+    {
+        if (_available is null)
+        {
+            throw new InvalidOperationException("Add<T>() takes a trained component from a model package: make the pipeline with Pipeline.Create(language, tier), or pass the component to Add(component).");
+        }
+
+        int at = _available.FindIndex(static c => c is T);
+        if (at < 0)
+        {
+            string added = _components.Exists(static c => c is T) ? $"A {typeof(T).Name} was already added to this pipeline. " : string.Empty;
+            string has = _available.Count == 0 ? "nothing more" : string.Join(", ", _available.Select(static c => c.GetType().Name));
+            throw new InvalidOperationException($"{added}The model package {_packageId} has no {typeof(T).Name} to add; it still has: {has}.");
+        }
+
+        IPipelineComponent component = _available[at];
+        Add(component);
+        _available.RemoveAt(at);
+        return this;
+    }
 
     /// <summary>Adds a component after the existing ones.</summary>
     /// <param name="component">The component; the pipeline takes ownership and disposes it with the pipeline.</param>
@@ -122,9 +182,18 @@ public sealed class Pipeline : IDisposable
         return ProcessManyAsyncCore(texts, batchSize, cancellationToken);
     }
 
-    /// <summary>Disposes the components that implement <see cref="IDisposable"/>.</summary>
+    /// <summary>Disposes the components, and the tokenizer, that implement <see cref="IDisposable"/>.</summary>
     public void Dispose()
     {
+        (Tokenizer as IDisposable)?.Dispose();
+        if (_available is not null)
+        {
+            foreach (IPipelineComponent component in _available)
+            {
+                (component as IDisposable)?.Dispose();
+            }
+        }
+
         foreach (IPipelineComponent component in _components)
         {
             (component as IDisposable)?.Dispose();

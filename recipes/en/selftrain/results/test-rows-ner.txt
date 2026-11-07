@@ -1,0 +1,7 @@
+UNER English-EWT test (commit 8ed072de), gold tokens, 2077 sentences, 1088 gold entities; entity recognizer of the assembled English model; reference spaCy 3.8.18 default configuration on the same data.
+row micro-F1: ours 63.09 [60.01, 65.89] reference 62.32 [59.42, 65.33] difference 0.77 [-1.92, 3.33] within_noise=True
+row micro-precision: ours 70.95 [67.54, 74.27] reference 67.97 [64.80, 71.11] difference 2.98 [-0.18, 6.06] within_noise=True
+row micro-recall: ours 56.80 [53.58, 60.13] reference 57.54 [54.26, 60.91] difference -0.74 [-3.42, 1.83] within_noise=True
+row F1[LOC]: ours 71.56 [67.09, 75.67] reference 71.43 [66.56, 76.16] difference 0.13 [-3.83, 3.97] within_noise=True
+row F1[ORG]: ours 43.87 [38.29, 48.99] reference 44.33 [39.12, 49.82] difference -0.46 [-5.77, 4.70] within_noise=True
+row F1[PER]: ours 69.40 [64.96, 73.26] reference 68.05 [63.91, 71.83] difference 1.35 [-2.51, 5.16] within_noise=True

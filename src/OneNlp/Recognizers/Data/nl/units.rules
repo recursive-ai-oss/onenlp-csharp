@@ -1,0 +1,69 @@
+# Units that follow a number, Dutch. Fields: canonical name | dimension | surface forms, comma-separated | confidence (optional).
+# A form starting with "=" is case-sensitive; the others are matched without regard to case. Canonical names are the English ones.
+
+[unit]
+millimeter | length | mm, millimeter, millimeters
+centimeter | length | cm, centimeter, centimeters
+meter | length | =m, meter, meters
+kilometer | length | km, kilometer, kilometers
+inch | length | duim, duimen
+foot | length | voet
+yard | length | yard, yards
+mile | length | mijl, mijlen
+nautical mile | length | zeemijl, zeemijlen
+
+milligram | mass | mg, milligram
+gram | mass | =g, gram, grammen
+kilogram | mass | kg, kilo, kilo's, kilogram, kilogrammen
+tonne | mass | ton, tonnen, =t
+pound | mass | lb, lbs
+ounce | mass | ons, onzen
+
+milliliter | volume | ml, milliliter
+centiliter | volume | cl, centiliter
+deciliter | volume | dl, deciliter
+liter | volume | =l, =L, liter, liters
+hectoliter | volume | hl, hectoliter
+gallon | volume | gallon, gallons
+cubic meter | volume | m3, m³, kubieke meter, kuub
+
+square meter | area | m2, m², vierkante meter, vierkante meters
+square kilometer | area | km2, km², vierkante kilometer, vierkante kilometers
+square centimeter | area | cm2, cm², vierkante centimeter
+acre | area | acre, acres
+hectare | area | ha, hectare
+
+kilometer per hour | speed | km/u, km/h, kmh, kilometer per uur, kilometers per uur
+mile per hour | speed | mph, mijl per uur
+meter per second | speed | m/s, meter per seconde, meters per seconde
+knot | speed | knoop, knopen, kn, kt, kts
+
+bit | information | bit, bits
+byte | information | byte, bytes, =B
+kilobyte | information | =KB, =kB, kilobyte
+megabyte | information | =MB, megabyte
+gigabyte | information | =GB, gigabyte
+terabyte | information | =TB, terabyte
+petabyte | information | =PB, petabyte
+kilobit | information | =Kb, kbit, kilobit
+megabit | information | =Mb, mbit, megabit
+gigabit | information | =Gb, gbit, gigabit
+
+watt | power | watt, =W
+kilowatt | power | =kW, kilowatt
+megawatt | power | =MW, megawatt
+horsepower | power | pk, paardenkracht, pk's
+
+celsius | temperature | °c, ºC, ˚C, ° c, graden celsius, graad celsius, celsius
+fahrenheit | temperature | °f, ºF, ˚F, ° f, graden fahrenheit, graad fahrenheit, fahrenheit
+kelvin | temperature | kelvin, graden kelvin
+degree | temperature | graad, graden, °, º, ˚ | 0.6
+
+[unit.compound]
+kilometer | meter | 1000
+meter | centimeter | 100
+centimeter | millimeter | 10
+meter | millimeter | 1000
+kilogram | gram | 1000
+gram | milligram | 1000
+liter | milliliter | 1000

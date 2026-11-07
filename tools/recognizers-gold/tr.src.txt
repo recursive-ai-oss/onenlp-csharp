@@ -1,0 +1,501 @@
+# Turkish recognizer gold set, authoring source. Read docs/recognizer-gold.md for the schema and the labelling rules (the sections on
+# Turkish and Hindi list what differs from English).
+#
+# One sentence per line. An expression is written [[text|type|value|grain|flags]]; trailing empty fields may be dropped.
+# {nbsp} and {nnbsp} stand for U+00A0 and U+202F. flags: 'approx' and/or 'alt=<value>;<value>'.
+# '@ref <ISO timestamp>' sets the reference time (UTC) for the lines below it; '@split dev|test' assigns the lines below it.
+# build.py turns this file into gold.jsonl (dev) and test.jsonl (test). Conventions: Turkish of Turkey (decimal comma, dot grouping,
+# %12 with the sign first); a case suffix written after an apostrophe ('da, 'ye, 'si) is outside the span, except the ordinal ending of a
+# digit ordinal (5'inci), which is part of it; a postposition that completes the expression (sonra, önce, arasında, kadar) is inside it.
+
+@ref 2026-03-18T10:30:00
+@split test
+
+# ---- numbers
+Salonda [[1.250|number|1250]] koltuk var.
+Oran bu seride [[3,14|number|3.14]] olarak ölçüldü.
+Kursa [[yirmi beş|number|25]] kişi katıldı.
+Raporda [[yüz yirmi üç|number|123]] sayfa var.
+Gölde [[kırk|number|40]] kuş saydık.
+Kitaptan [[iki milyon|number|2000000]] adet basıldı.
+Puan farkı [[-7|number|-7]] çıktı.
+Marketten [[bir düzine|number|12]] yumurta aldım.
+Sınavdan [[doksan yedi|number|97]] aldı.
+Dosyada [[1000000|number|1000000]] satır var.
+Gezegende yaklaşık [[7,9 milyar|number|7900000000]] insan yaşıyor.
+[[On yedi|number|17]] öğrenci sınavı geçti.
+Salonda [[üç yüz yirmi dört|number|324]] davetli vardı.
+Havuzda yaklaşık [[otuz bin|number|30000]] sikke bulundu.
+Ortalama hata [[0,001|number|0.001]] çıktı.
+Bu yıl müzeye [[2.500.000|number|2500000]] ziyaretçi geldi.
+Otobüste [[seksen|number|80]] yer kaldı.
+Toplam [[12.345.678|number|12345678]] satır işlendi.
+Kutuda [[iki bin beş yüz|number|2500]] vida var.
+Meydanda yaklaşık [[bin|number|1000]] kişi vardı.
+Lütfen [[42|number|42]] numaralı sayfaya bakın.
+Endeks [[4.500,75|number|4500.75]] puana çıktı.
+
+# ---- ordinals
+Yarışta [[üçüncü|ordinal|3]] oldu.
+Atlasın [[3'üncü|ordinal|3]] baskısını aldı.
+[[1'inci|ordinal|1]] ödülü bir ressam kazandı.
+Ofis [[ikinci|ordinal|2]] katta.
+[[On beşinci|ordinal|15]] doğum gününü arkadaşlarıyla kutladı.
+Bugün dersin [[yüzüncü|ordinal|100]] günü.
+[[21'inci|ordinal|21]] yüzyılda yaşıyoruz.
+Şirket [[yirmi üçüncü|ordinal|23]] yılını kutluyor.
+Takım ligde [[dördüncü|ordinal|4]] sırada.
+Dairesi [[5'inci|ordinal|5]] katta.
+[[Dokuzuncu|ordinal|9]] bölümü dün okudu.
+Konser [[2'nci|ordinal|2]] gün çok kalabalıktı.
+[[Bininci|ordinal|1000]] müşteri hediye kazandı.
+Gol [[8'inci|ordinal|8]] dakikada geldi.
+
+# ---- percentages
+Satışlar geçen çeyrekte [[%12|percentage|12]] arttı.
+Seçmenlerin [[yüzde 50|percentage|50]]'si evde kaldı.
+İşsizlik [[%3,5|percentage|3.5]] oldu.
+Katılımcıların [[yüzde on iki|percentage|12]]'si cevap vermedi.
+Faiz oranı [[%0,75|percentage|0.75]] seviyesinde.
+Gelir [[yüzde 8|percentage|8]] düştü.
+Telefonun pili [[%100|percentage|100]] doldu.
+Mağaza [[%25|percentage|25]] indirim yapıyor.
+Nüfusun [[yüzde yirmi|percentage|20]]'si genç.
+Bu ay enflasyon [[%1,2|percentage|1.2]] seviyesinde.
+Çocukların [[yüzde 90|percentage|90]]'ı okula gidiyor.
+Aday oyların [[%48,3|percentage|48.3]]'ünü aldı.
+
+# ---- dimensions
+Yürüyüş yolu [[12 kilometre|dimension|12 kilometer]] uzunluğunda.
+İstasyon buradan [[5 km|dimension|5 kilometer]] uzakta.
+Boyu [[180 cm|dimension|180 centimeter]] kadar.
+Oda [[6 metre|dimension|6 meter]] genişliğinde.
+Paket [[2 kg|dimension|2 kilogram]] ağırlığında.
+Şişede [[1,5 litre|dimension|1.5 liter]] su var.
+Araç [[90 km/saat|dimension|90 kilometer per hour]] hızla gitti.
+Dosya [[250 MB|dimension|250 megabyte]] boyutunda.
+Daire [[120 metrekare|dimension|120 square meter]] büyüklüğünde.
+Bavul en fazla [[23 kilogram|dimension|23 kilogram]] olmalı.
+Masa [[75 santimetre|dimension|75 centimeter]] yüksekliğinde.
+Liman [[3 mil|dimension|3 mile]] ötede.
+Cihaz [[500 gram|dimension|500 gram]] geliyor.
+Motor [[40 kW|dimension|40 kilowatt]] güç üretiyor.
+Bardağa [[250 ml|dimension|250 milliliter]] süt koydu.
+
+# ---- temperatures
+Gölgede [[25 °C|temperature|25 celsius]] var.
+Termometre verandada [[72 °F|temperature|72 fahrenheit]] gösteriyor.
+Su deniz seviyesinde [[100 santigrat derece|temperature|100 celsius]]'de kaynar.
+Geceleri dışarıda [[-5 °C|temperature|-5 celsius]] oluyor.
+Oda [[22 derece|temperature|22 degree]] civarında.
+Süt dolapta [[4 °C|temperature|4 celsius]]'de saklanmalı.
+Hava yarın [[18 derece|temperature|18 degree]] olacak.
+Fırını [[200 °C|temperature|200 celsius]]'ye ısıtın.
+Yüzey [[300 kelvin|temperature|300 kelvin]] sıcaklığında.
+Deniz bugün [[15 santigrat derece|temperature|15 celsius]].
+Sıcaklık gece [[-12 °C|temperature|-12 celsius]]'ye düştü.
+Hastanın ateşi [[38,5 derece|temperature|38.5 degree]] çıktı.
+
+# ---- ages
+Çocuk [[5 yaşında|age|5 year]] ve uyuyor.
+Alt katta [[90 yaşındaki|age|90 year]] bir hanım yaşıyor.
+[[18 aylık|age|18 month]] bir kedi yuva arıyor.
+Hastaneye [[3 haftalık|age|3 week]] bir bebek yatırıldı.
+[[40 yaşındaki|age|40 year]] sürücü durduruldu.
+Oğlu [[12 yaşında|age|12 year]] ve piyano çalıyor.
+Dedesi [[85 yaşında|age|85 year]] ama hâlâ bahçeyle uğraşıyor.
+[[7 yaşındaki|age|7 year]] çocuk bugün okula başladı.
+Bahçede [[2 yaşında|age|2 year]] bir köpek var.
+Kızı henüz [[6 aylık|age|6 month]].
+Evde [[10 günlük|age|10 day]] bir bebek var.
+
+# ---- money
+Bilet gişede [[20 TL|currency|20 TRY]].
+Bisiklet için [[1.234,56 TL|currency|1234.56 TRY]] ödedi.
+Kira ayda [[800 euro|currency|800 EUR]].
+Kahve barda [[2,50 €|currency|2.5 EUR]].
+Bilet [[₺45|currency|45 TRY]]'ye satılıyor.
+Telefon [[$499|currency|499 USD]] fiyatla geldi.
+Sipariş toplam [[150 dolar|currency|150 USD]] tuttu.
+Fatura [[75 lira|currency|75 TRY]] çıktı.
+Yarışmanın ödülü [[10.000 TL|currency|10000 TRY]].
+Şirket [[3 milyon avro|currency|3000000 EUR]] yatırım aldı.
+Araç [[250.000 ₺|currency|250000 TRY]]'ye satıldı.
+Hesaba [[100 USD|currency|100 USD]] yatırdı.
+Ev [[2,5 milyon TL|currency|2500000 TRY]]'ye satıldı.
+Para üstü [[75 kuruş|currency|0.75 TRY]] çıktı.
+Tutar [[€12,40|currency|12.4 EUR]] olarak görünüyor.
+Çay [[5 TL|currency|5 TRY]]'ye satılıyor.
+
+# ---- e-mail
+Daha fazla bilgi için [[ahmet.yilmaz@ornek.com.tr|email]] adresine yazın.
+Dosyayı [[destek+fatura@posta.ornek.org|email]] adresine gönderin.
+Yeni adresi [[a.b_c-d@alt.ornek.co.uk|email]] olarak değişti.
+[[bilgi@ornek.net|email]] ile iletişime geçin veya sekreterliği arayın.
+[[ik@ornek.com|email]] ve [[satis@ornek.com|email]] adreslerine birlikte yazın.
+Gönderen [[yanit-yok@bildirim.ornek.io|email]] adresiydi.
+Mesajı [[ayse.demir@ornek.com.tr|email]] adresine hemen iletin.
+Sorularınız için [[ekip@ornek.com|email]] adresini kullanın.
+Mesaj [[ad.soyad@ornek.gov.tr|email]] adresinden geldi ve yanıt bekliyor.
+İletişim adresimiz [[iletisim@ornek.edu.tr|email]] olarak kaldı.
+
+# ---- URL
+Listeyi görmek için [[https://www.ornek.com.tr/urunler|url]] sayfasına bakın.
+Sitemiz [[www.ornek.com|url]] adresinde yayında.
+Fiyatlar [[ornek.com.tr/fiyatlar|url]] sayfasında güncel.
+Kılavuzu kurstan önce [[https://docs.ornek.org/kilavuz/baslangic?dil=tr|url]] adresinden indirin.
+Depo [[http://git.ornek.net/proje.git|url]] adresinde duruyor.
+Gerisini görmek için [[https://ornek.com/a/b/c.html#son|url]] sayfasını açın.
+Yardım sayfası [[ftp://dosyalar.ornek.org/pub/|url]] adresinde müşteriler için hazır.
+Bak, [[https://magaza.ornek.com.tr/sepet|url]] sayfası orada duruyor.
+Çalışma saatleri için [[www.ornek.com.tr/iletisim|url]] sayfasına bakın.
+Blog artık [[https://blog.ornek.com.tr/2026/mart|url]] adresinde ve herkese açık.
+
+# ---- IP addresses
+Sunucu [[192.168.0.12|ip]] adresinde yanıt veriyor.
+Ağ geçidi bu ağda [[10.0.0.1|ip]] adresi.
+Herkese açık DNS [[8.8.8.8|ip]] adresidir.
+Güvenlik duvarında [[203.0.113.45|ip]] adresini engelleyin.
+Laboratuvardaki IPv6 sunucusu [[2001:db8::1|ip]] adresinde.
+Deneme [[198.51.100.7|ip]] adresinde birkaç kez başarısız oldu.
+[[fe80::1ff:fe23:4567:890a|ip]] adresindeki yönlendirici artık yanıt vermiyor.
+Her makinede geri döngü adresi [[127.0.0.1|ip]].
+Kesintiden önce [[172.16.254.3|ip]] adresine bağlanın.
+[[2001:db8:85a3::8a2e:370:7334|ip]] adresindeki düğüm devre dışı.
+
+# ---- phone numbers
+Rezervasyon için [[0212 345 67 89|phone]] numarasını arayın.
+Santral mesai saatlerinde [[+90 212 345 67 89|phone]] numarasında.
+Cep numaram [[0532 123 45 67|phone]] rehberde kayıtlı.
+Gerekirse [[(0212) 345 67 89|phone]] numarasını yeniden arayın.
+Faks numarası [[0216-345-67-89|phone]] hep aynı.
+Ankara şubemiz [[0312 123 45 67|phone]] numarasında.
+Acil durumda [[+90 532 123 45 67|phone]] numarasını arayın.
+Doğrudan hat [[0850 123 45 67|phone]] numarasıdır.
+Müşteri hizmetleri [[+90 850 222 33 44|phone]] numarasından yanıt veriyor.
+Gecikirseniz [[0533-123-45-67|phone]] numarasına yazın.
+
+# ---- hashtags and mentions
+Haberler için [[#OneNLP|hashtag]] başlığını izleyin.
+Listenin başında [[#yaz2026|hashtag]] etiketi var.
+Gönderiye [[#haberler|hashtag]] ve [[#dotnet|hashtag]] ekleyin.
+Ağda [[#fotoğraf_cuması|hashtag]] etiketiyle paylaşın.
+[[#İstanbul2026|hashtag]] başlığı sakin ilerliyor.
+Hızlı düzeltme için [[@recursiveai|mention]] hesabına teşekkürler.
+Bir sonraki konuyu [[@jane_doe|mention]] ve [[@dotnet|mention]] hesaplarına sorun.
+Konuda [[@mehmet_k|mention]] hesabını uyarın.
+Yamayı gönderen [[@acik_kaynak_fan|mention]] hesabına çok teşekkürler.
+Gönderiye [[@nlp_ekibi|mention]] hesabını da ekleyin.
+Fotoğrafları bulmak için [[#Izmir2026|hashtag]] etiketini kullanın.
+Yorumlar [[#musteri_gorusleri|hashtag]] başlığı altında toplanıyor.
+Dikkatli inceleme için [[@elif_s|mention]] hesabına teşekkürler.
+Toplantıdan önce bağlantıyı [[@ali_75|mention]] hesabına gönderin.
+Sorunu [[@destek_tr|mention]] hesabına bildirin.
+Teşekkürler [[@zeynep_a|mention]] ve [[@kodcu|mention]] hesaplarına.
+Yarışmaya [[#kodlama_gunu|hashtag]] etiketiyle katılın.
+Buluşma [[#Ankara2026|hashtag]] başlığı altında.
+Fotoğraf [[#sonbahar|hashtag]] etiketiyle paylaşıldı.
+
+# ---- GUIDs
+Kayıttaki kimlik [[3f2504e0-4f89-11d3-9a0c-0305e82c3301|guid]] değeri.
+[[123e4567-e89b-12d3-a456-426614174000|guid]] anahtarının süresi doldu.
+[[550e8400-e29b-41d4-a716-446655440000|guid]] belirteci iptal edildi.
+Klasör [[{6ba7b810-9dad-11d1-80b4-00c04fd430c8}|guid]] kilitli.
+Kayıttan [[6BA7B811-9DAD-11D1-80B4-00C04FD430C8|guid]] satırını silin.
+Oturum [[f47ac10b-58cc-4372-a567-0e02b2c3d479|guid]] sona erdi.
+Parti [[9b2c1e04-7d3a-4f5b-8c6d-1a2b3c4d5e6f|guid]] hazır.
+Paket [[0f8fad5b-d9cb-469f-a165-70867728950e|guid]] teslim edildi.
+Düğüm [[1b4e28ba-2fa1-11d2-883f-0016d3cca427|guid]] artık yanıt vermiyor.
+İz kaydı [[886313e1-3b8a-5372-9b90-0c9aee199e5d|guid]] saklanıyor.
+
+# ---- dates: explicit
+Son başvuru [[20 Mart 2026|date|2026-03-20|day]]'de sona eriyor.
+Doğum günü [[20 Haziran 2026|date|2026-06-20|day]]'de.
+Formu [[15.04.2026|date|2026-04-15|day]] tarihine kadar teslim edin.
+[[15 Nisan 1990|date|1990-04-15|day]]'da İzmir'de doğdu.
+Sözleşme [[2026-05-04|date|2026-05-04|day]] tarihli.
+Yeni dönem [[1 Ocak 2027|date|2027-01-01|day]]'de başlıyor.
+Toplantı [[5 Mayıs|date|2026-05-05|day]]'ta yapılacak.
+Kongre [[12/09/2026|date|2026-09-12|day]] tarihinde toplanıyor.
+Final [[3 Şubat 2027|date|2027-02-03|day]]'de oynanacak.
+Fatura [[30 Eylül 2026|date|2026-09-30|day]] tarihinde kesildi.
+Tatil [[14 Ağustos|date|2026-08-14|day]]'ta başlıyor.
+Mezuniyet [[9 Temmuz 2026|date|2026-07-09|day]]'da yapılacak.
+Kapanış [[31 Aralık 2026|date|2026-12-31|day]]'de.
+
+# ---- dates: relative
+[[Yarın|date|2026-03-19|day]] yağmur bekleniyor.
+Rapor [[bugün|date|2026-03-18|day]] kapanıştan önce teslim edilmeli.
+Mağazayı [[dün|date|2026-03-17|day]] kapattık.
+Toplantı [[Cuma|date|2026-03-20|day]] günü yapılacak.
+[[Gelecek Pazartesi|date|2026-03-23|day]] dönüyorum.
+[[Geçen Salı|date|2026-03-17|day|alt=2026-03-10]] burada değildi.
+[[Öbür gün|date|2026-03-20|day]] sınav var.
+Olay [[evvelsi gün|date|2026-03-16|day]] kulüpte oldu.
+[[3 gün sonra|date|2026-03-21|day]] yola çıkacağız.
+Paket [[5 gün önce|date|2026-03-13|day]] postaya verildi.
+Buluşalım, [[gelecek Cuma|date|2026-03-27|day|alt=2026-03-20]] imzalayalım.
+[[Perşembe|date|2026-03-19|day]] günü numuneler gelecek.
+Gezi [[2 hafta sonra|date|2026-04-01|day]] başlıyor.
+
+# ---- dates: holidays
+[[Yılbaşı|date|2027-01-01|day]]'nda müzeler kapalı.
+[[Cumhuriyet Bayramı|date|2026-10-29|day]]'nda resmî geçit var.
+Çiçekler [[Anneler Günü|date|2026-05-10|day]] için.
+Kart [[Babalar Günü|date|2026-06-21|day]] için hazırlandı.
+[[Zafer Bayramı|date|2026-08-30|day]]'nda tören yapılacak.
+[[Ramazan Bayramı|date|2026-03-20|day]]'nda aile toplanır.
+[[Kurban Bayramı|date|2026-05-27|day]]'nda bankalar kapalı.
+Sevgilisiyle [[Sevgililer Günü|date|2027-02-14|day]]'nde Venedik'e gidecek.
+[[Öğretmenler Günü|date|2026-11-24|day]]'nde okullarda kutlama var.
+[[Emek ve Dayanışma Günü|date|2026-05-01|day]]'nde meydanlar dolacak.
+[[Ulusal Egemenlik ve Çocuk Bayramı|date|2026-04-23|day]]'nda çocuklar sahnede.
+[[Ramazan Bayramı 2027|date|2027-03-09|day]]'nde tatil planlıyoruz.
+[[Noel|date|2026-12-25|day]]'de ailecek buluşacağız.
+[[Yılbaşı 2028|date|2028-01-01|day]]'nda yeni ofise taşınıyoruz.
+
+# ---- date ranges
+Ofis [[gelecek hafta|daterange|2026-03-23/2026-03-30|week]] kapalı.
+Rakamlara [[bu hafta|daterange|2026-03-16/2026-03-23|week]] bakıyoruz.
+Hata [[geçen hafta|daterange|2026-03-09/2026-03-16|week]] ortaya çıktı.
+Yeni tarife [[gelecek ay|daterange|2026-04-01/2026-05-01|month]] başlıyor.
+Bütçe [[bu ay|daterange|2026-03-01/2026-04-01|month]] kapanacak.
+Satışlar [[geçen yıl|daterange|2025-01-01/2026-01-01|year]] arttı.
+Plan [[bu yıl|daterange|2026-01-01/2027-01-01|year]] için geçerli.
+Sayım [[gelecek yıl|daterange|2027-01-01/2028-01-01|year]] yapılacak.
+Festival [[Haziran 2027|daterange|2027-06-01/2027-07-01|month]]'de eski şehirde.
+Kitap [[Mart 2026|daterange|2026-03-01/2026-04-01|month]]'de çıkıyor.
+Anlaşma [[1969|daterange|1969-01-01/1970-01-01|year]]'da imzalandı.
+Oyunlar [[2031|daterange|2031-01-01/2032-01-01|year]]'de planlanıyor.
+Kongre [[6 Nisan'dan 10 Nisan'a kadar|daterange|2026-04-06/2026-04-11|day]] Oslo'da.
+Kurs [[4-8 Mayıs|daterange|2026-05-04/2026-05-09|day]] arasında merkezde.
+Ekip [[1 Haziran - 15 Haziran|daterange|2026-06-01/2026-06-16|day]] seyahatte olacak.
+Hava güzel olursa [[bu hafta sonu|daterange|2026-03-21/2026-03-23|day]] yürüyüşe çıkarız.
+Misafirler [[gelecek hafta sonu|daterange|2026-03-28/2026-03-30|day]] geliyor.
+Bu araştırma [[2020'den 2024'e kadar|daterange|2020-01-01/2025-01-01|year]] sürdü.
+Göller [[bu yaz|daterange|2026-06-01/2026-09-01|season|approx]] dolacak.
+Şirket [[2021 baharında|daterange|2021-03-01/2021-06-01|season|approx]] arkadaşlar arasında kuruldu.
+Albüm [[2025 sonbaharında|daterange|2025-09-01/2025-12-01|season|approx]] çıktı.
+Kuzeyde [[geçen kış|daterange|2025-12-01/2026-03-01|season|approx]] çok kar yağdı.
+Şirket [[2021 başında|daterange|2021-01-01/2021-05-01|year|approx]] küçük bir ekiple başladı.
+Satışlar [[2022 ortasında|daterange|2022-05-01/2022-09-01|year|approx]] zirve yaptı.
+Ürün [[2023 sonunda|daterange|2023-09-01/2024-01-01|year|approx]] satıştan kalktı.
+Yağmurlar [[Mayıs başında|daterange|2026-05-01/2026-05-11|month|approx]] dinmeli.
+
+# ---- times
+Toplantı [[saat 15:00|time|T15:00|minute]]'te başlıyor.
+Kapılar [[saat 15:30|time|T15:30|minute]]'da açılıyor.
+Ders [[saat 15|time|T15:00|hour]]'te bitiyor.
+Yemek [[öğlen|time|T12:00|hour]] servis edilir.
+Sunucu [[gece yarısı|time|T00:00|hour]] yeniden başlıyor.
+Çalar saatim [[saat 7.05|time|T07:05|minute]]'te çalıyor.
+Kayıtta hata [[saat 10:15:30|time|T10:15:30|second]]'da görünüyor.
+Kahvaltı [[sabah 8|time|T08:00|hour]]'de lobide servis ediliyor.
+Çay [[akşam 5|time|T17:00|hour]]'te evde içilir.
+Servis [[09:00|time|T09:00|minute]]'da garajda başlıyor.
+Bar [[saat 23|time|T23:00|hour]]'te kapanıyor.
+Konferans [[saat 18.45|time|T18:45|minute]]'te küçük salonda bitiyor.
+Görüşme [[saat 15:00 CET|time|T15:00+01:00|minute]]'te hat üzerinden yapılacak.
+Pencere [[saat 12:00 UTC|time|T12:00Z|minute]]'de açılıyor.
+Belediyenin önünde [[öğleden sonra 3|time|T15:00|hour]]'te buluşalım.
+
+# ---- datetimes
+Bunu [[yarın saat 15:00|datetime|2026-03-19T15:00|minute]]'te konuşalım.
+İnceleme [[Cuma saat 10.30|datetime|2026-03-20T10:30|minute]]'da yapılacak.
+Açılış [[25 Mart 2026 saat 14:00|datetime|2026-03-25T14:00|minute]]'te.
+Yedekleme [[2026-04-01 14:00|datetime|2026-04-01T14:00|minute]] sunucuda çalışıyor.
+Teslim [[20 Mart 2026 saat 09:00|datetime|2026-03-20T09:00|minute]]'da.
+Sunum [[bugün saat 17:00|datetime|2026-03-18T17:00|minute]]'de başlıyor.
+Eğitim [[Pazartesi saat 9|datetime|2026-03-23T09:00|hour]]'da.
+Randevu [[15 Nisan saat 18:30|datetime|2026-04-15T18:30|minute]]'da.
+Ekip [[Perşembe saat 14:00|datetime|2026-03-19T14:00|minute]]'te toplanıyor.
+Yangın alarmı [[dün saat 22:15|datetime|2026-03-17T22:15|minute]]'te çaldı.
+Duyuru [[yarın öğlen|datetime|2026-03-19T12:00|hour]] yapılacak.
+
+# ---- time ranges
+Mağaza [[09:00-17:00|timerange|T09:00/T17:00|minute]] arasında açık.
+Ofis [[saat 9'dan 17'ye kadar|timerange|T09:00/T17:00|hour]] açık.
+Dersler [[14:00 ile 16:00 arasında|timerange|T14:00/T16:00|minute]] salonda.
+Muayene [[08:30 - 12:00|timerange|T08:30/T12:00|minute]] randevusuz.
+Mola [[12:00-13:30|timerange|T12:00/T13:30|minute]] aralığında kantinde.
+Toplantı [[saat 10:00'dan 11:30'a kadar|timerange|T10:00/T11:30|minute]] sürecek.
+Havuz [[09.00 - 17.00|timerange|T09:00/T17:00|minute]] arasında açık.
+Prova [[20:00 ile 22:00 arasında|timerange|T20:00/T22:00|minute]] yapılacak.
+Gösteri [[18:00-20:00|timerange|T18:00/T20:00|minute]] arasında.
+Okul [[08:00-15:00|timerange|T08:00/T15:00|minute]] arasında açık.
+Kütüphane [[saat 8'den 12'ye kadar|timerange|T08:00/T12:00|hour]] hizmet veriyor.
+
+# ---- date-time ranges
+[[Yarın sabah|datetimerange|2026-03-19T06:00/2026-03-19T12:00|hour|approx]] konuşmak için müsaitim.
+Ekip [[bu öğleden sonra|datetimerange|2026-03-18T12:00/2026-03-18T18:00|hour|approx]] başlamak için geliyor.
+Grup [[Cumartesi akşamı|datetimerange|2026-03-21T18:00/2026-03-22T00:00|hour|approx]] meydanda çalıyor.
+[[Dün sabah|datetimerange|2026-03-17T06:00/2026-03-17T12:00|hour|approx]] bütün bölgede yağmur yağdı.
+Toplantı [[bu akşam|datetimerange|2026-03-18T18:00/2026-03-19T00:00|hour|approx]] yapılacak.
+Misafirler [[yarın akşam|datetimerange|2026-03-19T18:00/2026-03-20T00:00|hour|approx]] geliyor.
+Yürüyüş [[Pazar sabahı|datetimerange|2026-03-22T06:00/2026-03-22T12:00|hour|approx]] başlıyor.
+Kayıp [[dün akşam|datetimerange|2026-03-17T18:00/2026-03-18T00:00|hour|approx]] bildirildi.
+Teslimat [[yarın öğleden sonra|datetimerange|2026-03-19T12:00/2026-03-19T18:00|hour|approx]] yapılacak.
+Telefon [[bu sabah|datetimerange|2026-03-18T06:00/2026-03-18T12:00|hour|approx]] çaldı.
+
+# ---- durations
+Toplantı toplam [[iki saat|duration|7200]] sürüyor.
+Yolculuk kötü havada [[3 gün|duration|259200]] sürer.
+İstasyonda [[45 dakika|duration|2700]] bekledi.
+Proje durmadan önce [[1 yıl 6 ay|duration|P1Y6M]] sürdü.
+Test [[30 saniye|duration|30]] sürüyor.
+Kurs [[5 hafta|duration|3024000]] boyunca devam edecek.
+Sözleşme [[altı ay|duration|P6M]] geçerli.
+Bir çekim [[2 saat 30 dakika|duration|9000]] sürdü.
+Çalışma [[10 yıl|duration|P10Y]] boyunca sürdü.
+Tatil [[bir hafta|duration|604800]] sürecek.
+Ödev [[iki gün|duration|172800]] içinde teslim edilecek.
+Film [[90 dakika|duration|5400]] uzunluğunda.
+
+# ---- sets
+Kurs [[her Pazartesi|set|XXXX-WXX-1|day]] ekte veriliyor.
+Servis [[her gün|set|P1D|day]] çalışıyor.
+Ekip [[her hafta|set|P1W|week]] üçüncü salonda toplanıyor.
+Faturalar [[her ay|set|P1M|month]] bankaya gönderiliyor.
+Tören [[her yıl|set|P1Y|year]] yapılıyor.
+Yoga [[her Cuma|set|XXXX-WXX-5|day]] salonda yapılıyor.
+[[Haftalık|set|P1W|week]] rapor Pazartesi sabahı hazır.
+[[Aylık|set|P1M|month]] toplantı yeni salonda yapılıyor.
+[[Yıllık|set|P1Y|year]] denetim ağustosta başlıyor.
+Eğitim [[her Pazartesi saat 9:00|set|XXXX-WXX-1T09:00|minute]]'da başlar.
+Nöbetçi [[her gün saat 12:00|set|T12:00|minute]]'de değişir.
+Sınav [[iki haftada bir|set|P2W|week]] yapılıyor.
+
+# ---- nothing to find
+Bir kitap aldım ve eve gittim.
+Kediler bahçede oynuyor.
+Bu proje çok büyük.
+Hiçbir şey bulamadık.
+Konuyu daha sonra konuşalım.
+Kapıyı açık bıraktı.
+Ne zaman geleceğini bilmiyorum.
+Hep birlikte çalıştık.
+Çok teşekkürler.
+Mutlu olmak için bir sebep yok.
+Bir şey söylemedi.
+Pazar yerinde taze sebze satılıyor.
+Çocuklar parkta koşuyor.
+Sınıfta kimse yoktu.
+Yemek çok güzel olmuş.
+
+# ---- year boundary and leap day
+@ref 2026-12-31T23:30:00
+Yeni yıl partisi [[yarın akşam|datetimerange|2027-01-01T18:00/2027-01-02T00:00|hour|approx]] başlıyor.
+Rapor [[gelecek ay|daterange|2027-01-01/2027-02-01|month]] hazır olacak.
+@ref 2028-02-28T09:00:00
+Sipariş [[yarın|date|2028-02-29|day]] gelecek.
+Etkinlik [[2 gün sonra|date|2028-03-01|day]] başlıyor.
+
+@split dev
+@ref 2026-03-18T10:30:00
+
+# ---- numbers
+Koridorda [[1.500|number|1500]] sandalye duruyordu.
+Ölçüm [[2,718|number|2.718]] çıktı.
+Listede [[otuz üç|number|33]] isim var.
+Kitabın [[iki yüz elli|number|250]] sayfası okundu.
+Mağazaya [[üç milyon|number|3000000]] kişi girdi.
+Sıcaklık farkı [[-3|number|-3]] oldu.
+Fırından [[iki düzine|number|24]] ekmek çıktı.
+Takım [[on bir|number|11]] oyuncuyla sahaya çıktı.
+Her [[iki|number|2]] tarafta [[yüz|number|100]] kişi vardı.
+Dosya [[5.000.000|number|5000000]] satır içeriyor.
+Odada [[beş|number|5]] sandalye var.
+Sergiyi [[bin dokuz yüz|number|1900]] kişi gezdi.
+
+# ---- ordinals
+[[Birinci|ordinal|1]] sınıf [[birinci|ordinal|1]] katta.
+Bahçe [[7'nci|ordinal|7]] sokakta.
+[[Yirminci|ordinal|20]] yüzyıl bitti.
+Sevgili [[onuncu|ordinal|10]] yıldönümünü kutladı.
+[[3'üncü|ordinal|3]] sınıf öğrencileri geziye gitti.
+Atlet [[altıncı|ordinal|6]] oldu.
+Bina [[12'nci|ordinal|12]] katında.
+[[Otuzuncu|ordinal|30]] gün tamamlandı.
+
+# ---- percentages
+Fiyatlar [[%15|percentage|15]] yükseldi.
+Öğrencilerin [[yüzde 40|percentage|40]]'ı sınavı geçti.
+Nem [[%62,5|percentage|62.5]] seviyesinde.
+Kâr [[yüzde beş|percentage|5]] oldu.
+Pil [[%80|percentage|80]] dolu.
+Mağazada [[yüzde 30|percentage|30]] indirim var.
+
+# ---- dimensions
+Koridor [[15 metre|dimension|15 meter]] uzunluğunda.
+Şehir [[40 km|dimension|40 kilometer]] uzakta.
+Çanta [[8 kg|dimension|8 kilogram]] geldi.
+Kutuya [[3 litre|dimension|3 liter]] su sığdı.
+Çocuğun boyu [[110 cm|dimension|110 centimeter]].
+Tablo [[2 gigabayt|dimension|2 gigabyte]] yer kaplıyor.
+
+# ---- temperatures
+Dışarıda [[30 °C|temperature|30 celsius]] var.
+Gece [[-8 °C|temperature|-8 celsius]] oldu.
+Fırın [[180 santigrat derece|temperature|180 celsius]] ısındı.
+Su [[40 derece|temperature|40 degree]] sıcaklığında.
+
+# ---- ages
+[[4 yaşında|age|4 year]] bir kız çocuğu kayboldu.
+Kedi [[9 aylık|age|9 month]].
+Amcası [[60 yaşında|age|60 year]].
+Bebek [[2 haftalık|age|2 week]].
+
+# ---- money
+Defter [[15 TL|currency|15 TRY]]'ye satılıyor.
+Kira [[12.500 TL|currency|12500 TRY]] oldu.
+Çanta [[€80|currency|80 EUR]].
+Elbise [[60 dolar|currency|60 USD]].
+Tablo [[1,5 milyon dolar|currency|1500000 USD]]'a satıldı.
+Pasta [[25 lira|currency|25 TRY]] tuttu.
+
+# ---- sequences
+Yazın: [[mert.kaya@ornek.com|email]].
+Adres [[www.ornek.org/haber|url]].
+Sunucu [[10.20.30.40|ip]] adresinde.
+Numara [[0242 123 45 67|phone]].
+Etiket [[#bahar2026|hashtag]] ve hesap [[@proje_ekibi|mention]].
+Kimlik [[2b9d4f1a-1c2e-4a3b-8d9e-0f1a2b3c4d5e|guid]].
+
+# ---- dates
+Son gün [[10 Nisan 2026|date|2026-04-10|day]]'de.
+Konser [[7 Haziran 2026|date|2026-06-07|day]]'da.
+Doğum [[3.11.1985|date|1985-11-03|day]] tarihli.
+[[Yarın|date|2026-03-19|day]] yola çıkıyoruz.
+[[Pazartesi|date|2026-03-23|day]] günü görüşelim.
+[[4 gün önce|date|2026-03-14|day]] aradı.
+[[Cumhuriyet Bayramı|date|2026-10-29|day]] için hazırlık sürüyor.
+
+# ---- date ranges
+Ekip [[gelecek hafta|daterange|2026-03-23/2026-03-30|week]] izinli.
+Plan [[geçen ay|daterange|2026-02-01/2026-03-01|month]] değişti.
+Etkinlik [[Ağustos 2026|daterange|2026-08-01/2026-09-01|month]]'de.
+Fuar [[3-7 Haziran|daterange|2026-06-03/2026-06-08|day]] arasında.
+
+# ---- times and datetimes
+Ders [[saat 16:45|time|T16:45|minute]]'te.
+Toplantı [[yarın saat 11:00|datetime|2026-03-19T11:00|minute]]'de.
+Mağaza [[10:00-18:00|timerange|T10:00/T18:00|minute]] arasında açık.
+Sen [[yarın akşam|datetimerange|2026-03-19T18:00/2026-03-20T00:00|hour|approx]] gel.
+
+# ---- durations and sets
+Yol [[4 saat|duration|14400]] sürdü.
+Kurs [[3 ay|duration|P3M]] sürecek.
+Takım [[her Salı|set|XXXX-WXX-2|day]] çalışıyor.
+Rapor [[her hafta|set|P1W|week]] geliyor.
+
+# ---- nothing
+Güneş doğdu ve herkes uyandı.
+Bir bardak çay içtim.
+
+@ref 2026-03-18T10:30:00
+@split dev
+Seçim [[2021 başında|daterange|2021-01-01/2021-05-01|year|approx]] yapıldı.
+Proje [[2022 ortasında|daterange|2022-05-01/2022-09-01|year|approx]] bitti.
+Bu [[2019 sonunda|daterange|2019-09-01/2020-01-01|year|approx]] oldu.
+Toplantı [[2021 baharında|daterange|2021-03-01/2021-06-01|season|approx]] yapılacak.
+Fuar [[Eylül sonunda|daterange|2026-09-21/2026-10-01|month|approx]] açılacak.
