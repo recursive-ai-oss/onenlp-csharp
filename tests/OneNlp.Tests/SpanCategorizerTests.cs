@@ -145,6 +145,11 @@ public class SpanCategorizerTests : IDisposable
         Assert.Throws<ArgumentException>(() => new SpanCategorizer(encoder, sizes: [2, 2]));
         Assert.Throws<ArgumentException>(() => new SpanCategorizer(encoder, sizes: [0]));
         Assert.Throws<ArgumentOutOfRangeException>(() => new SpanCategorizer(encoder, threshold: 0f));
+        var head = new SpanCategorizer(encoder);
+        Assert.Equal(0.8f, head.Threshold);
+        head.Threshold = 0.3f;
+        Assert.Equal(0.3f, head.Threshold);
+        Assert.Throws<ArgumentOutOfRangeException>(() => head.Threshold = 1.5f);
     }
 
     [Fact]

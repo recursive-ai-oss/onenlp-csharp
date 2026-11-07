@@ -24,7 +24,7 @@ Normative behaviour of the word tokenizer and the sentence segmenter. Language-n
 
 ## Sentences
 
-The `sentencizer` component writes sentence starts from the sentence boundaries of UAX #29 section 5, snapped to tokens: a sentence starts at the first token that begins at or after a Unicode boundary. Token 0 always starts one. Data may list tokens after which no sentence starts (English `Mr.`, `Dr.`). It is rule-based: UAX #29 does not break before a lower-case word after a full stop, nor split web text that has no end punctuation, so it scores below a trained segmenter.
+The `sentencizer` component writes sentence starts from the sentence boundaries of UAX #29 section 5, snapped to tokens: a sentence starts at the first token that begins at or after a Unicode boundary. Token 0 always starts one. Data may list tokens after which no sentence starts (English `Mr.`, `Dr.`). `Pipeline.Add("sentencizer")` takes the data of the pipeline's language unless its settings name `data` or `language`; with an unknown language the boundaries are Unicode's. A full stop after an abbreviation that can also end a sentence (`the U.S. He said`) is left to Unicode's rules. It is rule-based: UAX #29 does not break before a lower-case word after a full stop, nor split web text that has no end punctuation, so it scores below a trained segmenter.
 
 ## Measurement
 

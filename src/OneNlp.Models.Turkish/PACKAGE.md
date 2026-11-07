@@ -4,6 +4,8 @@
 
 > **Early preview.** The weights are development models and will be retrained; the API will change.
 
+**Measured.** UD Turkish-BOUN r2.18 test (and Turkish-WikiNER test for entities), against spaCy 3.8.18 trained with its default configuration on the same data (95% paired bootstrap intervals are in the results table). Gold words: UPOS 88.97 against 88.04 and UFeats 78.15 against 78.30 (within noise), lemmas 85.11 against 80.24 and LAS 62.80 against 57.87 (ahead). Raw text: UPOS 86.02 against 86.82 and LAS 57.53 against 55.86 (within noise). Entities micro F1 67.40 against 65.82 (within noise). No headline row in the results table is behind spaCy. Data lineage: UD Turkish-BOUN and Turkish-WikiNER (CC BY-SA 4.0); the weights carry share-alike lineage where the data does. Size: 154.7 MiB of weights. Speed against the managed reference is measured at the release gate.
+
 ```csharp
 using RecursiveAI.OneNlp;
 

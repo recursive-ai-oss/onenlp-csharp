@@ -4,6 +4,8 @@
 
 > **Early preview.** The weights are development models and will be retrained; the API will change.
 
+**Measured.** UD French-GSD r2.18 test (and WikiNER French test for entities), against spaCy 3.8.18 trained with its default configuration on the same data (95% paired bootstrap intervals are in the results table). Gold words: UPOS 96.77 against 97.07, UFeats 96.34 against 96.41, lemmas 97.51 against 97.49 and LAS 86.69 against 85.98 (all within noise). Raw text: UPOS 96.06 against 91.80 and LAS 85.97 against 78.10 (ahead). Entities micro F1 82.48 against 75.50 (ahead). No headline row in the results table is behind spaCy. Data lineage: UD French-GSD (CC BY-SA 4.0) and WikiNER (CC BY 4.0 labels over Wikipedia text, so share-alike lineage); the weights carry share-alike lineage where the data does. Size: 81.9 MiB of weights. Speed against the managed reference is measured at the release gate.
+
 ```csharp
 using RecursiveAI.OneNlp;
 

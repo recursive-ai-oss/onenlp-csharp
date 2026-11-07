@@ -147,11 +147,23 @@ public sealed class Pipeline : IDisposable
 
     /// <summary>Adds a component created by name from the <see cref="ComponentRegistry"/>.</summary>
     /// <param name="name">The registered name.</param>
-    /// <param name="settings">Settings for the component's factory, or <see langword="null"/>.</param>
+    /// <param name="settings">Settings for the component's factory, or <see langword="null"/>. For <c>sentencizer</c>, without <c>data</c> or <c>language</c> the pipeline's own language picks the segmentation data.</param>
     /// <returns>This pipeline.</returns>
     /// <exception cref="InvalidOperationException">No component has this name.</exception>
     /// <exception cref="ArgumentException">A component with the same name is already in the pipeline.</exception>
-    public Pipeline Add(string name, IReadOnlyDictionary<string, string>? settings = null) => Add(ComponentRegistry.Create(name, settings));
+    public Pipeline Add(string name, IReadOnlyDictionary<string, string>? settings = null)
+    {
+        // A sentencizer added by name to a pipeline for a language takes that language's abbreviations (English "Mr." does not end a
+        // sentence) unless the settings name the data or the language; without this the pipeline's language is lost on the way to the factory.
+        if (name == Segmentation.SentencizerComponent.ComponentName && Language != Language.Unknown
+            && (settings is null || !(settings.ContainsKey("data") || settings.ContainsKey("language"))))
+        {
+            var merged = new Dictionary<string, string>(settings ?? new Dictionary<string, string>(), StringComparer.Ordinal) { ["language"] = Language.Code };
+            settings = merged;
+        }
+
+        return Add(ComponentRegistry.Create(name, settings));
+    }
 
     /// <summary>Tokenizes a text and runs every component on it.</summary>
     /// <param name="text">The text; may be empty. The returned document keeps this string and its offsets are into it.</param>
