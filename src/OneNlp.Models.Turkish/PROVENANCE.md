@@ -6,7 +6,7 @@ The package packs four saved pipelines (`weights.manifest.props` lists name, siz
 |---|---|---|---|
 | `splitter.onenlp` | the pipeline's tokenizer: whole-word Turkish UAX #29 tokenizer plus a trained multiword-token splitter (B/I tagger over characters, fast encoder width 128 with a bidirectional LSTM) | UD Turkish-BOUN r2.18, train and dev | 1 |
 | `tagging.onenlp` | sentencizer, tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, on a fast hash-embedding encoder (width 384, 96-wide embeddings, one ReLU window layer and a bidirectional LSTM of 64, Turkish lower-casing) | UD Turkish-BOUN r2.18, train and dev | 1 |
-| `parser.onenlp` | biaffine dependency parser with sentence starts, fast encoder and a two-layer bidirectional LSTM | UD Turkish-BOUN r2.18, train and dev | 7 |
+| `parser.onenlp` | biaffine dependency parser with sentence starts, fast encoder and a two-layer bidirectional LSTM, dropout 0.45 | UD Turkish-BOUN r2.18, train and dev, projected onto the splitter's words; plus 60,239 sentences of web text parsed by earlier parsers of the recipe and kept where two of them agree on at least 80% of the words (below) | 7 |
 | `ner.onenlp` | entity recognizer (BILUO tagging, constrained decoding; PER, ORG, LOC), fast encoder | Turkish-WikiNER, train and dev (PERSON, ORG, GPE and LOC kept; GPE and LOC are both LOC; other types are O) | 7 |
 
 The sentencizer saved in `tagging.onenlp` is not used by the packaged pipeline; the parser predicts sentence starts. The tokenizer is the UAX #29 word tokenizer with the whole-word Turkish data (`docs/segmentation.md`) followed by the trained multiword-token splitter.
@@ -23,7 +23,7 @@ The sentencizer saved in `tagging.onenlp` is not used by the packaged pipeline; 
 | Turkish-WikiNER, `turkish-wikiner-test.iob2` (converted) | HF revision 99df1dd7 | eval only | CC BY-SA 4.0 | `ee907c75bcc5fdec3c3ac57977bf851d19abadefd71ebad7f8e910cd1a51e084` |
 
 - **Share-alike lineage:** yes (UD Turkish-BOUN, Turkish-WikiNER). Credit is in `THIRD-PARTY-NOTICES.md`.
-- **Label generator:** none; labels are the datasets' gold annotations (Turkish-WikiNER is the dataset authors' annotation).
+- **Label generator:** none for the gold data. The parser's extra sentences are labelled by earlier parsers trained by this recipe on UD Turkish-BOUN only (Turkish text from FineWeb-2, ODC-By 1.0, and Wikipedia, CC BY-SA; `distill/text/tr.jsonl` of the fetch tooling, already cleared of evaluation overlap; a second check found 0 of the 60,239 sentences equal to a BOUN dev, BOUN test or PUD test sentence and 0 sharing an 8-word run with one). sha256 of the extra file: `952187e9b2f54a3a09f7304f6d36dc06db90db1d9e28f79a7dbf18cfb317c67f`.
 - **Pretrained components:** none.
 - **Evaluation sets:** the test files above, read by `predict`, `ner-eval` and the scorer. 6 of the 979 BOUN test sentences also occur in the training file as exact text; the official split is kept (`tools/fetch/tr/MANIFEST.md`).
 - **Licence of the weights:** `MIT OR Apache-2.0`.
