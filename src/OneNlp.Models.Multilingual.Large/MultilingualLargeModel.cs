@@ -12,12 +12,12 @@ namespace RecursiveAI.OneNlp.Models.Multilingual.Large;
 /// <para>
 /// Referencing this package is all the <see cref="Nlp"/> verbs need: the package adds a module initializer to the project that references it, which
 /// calls <see cref="Register"/>. The model is accurate-tier: a language that also has a fast-tier package keeps using that package for the plain verbs, and this model serves the accurate-tier request.
-/// Nothing is downloaded and nothing is discovered by reflection. The 1.3 GB of weights are read the first time a verb needs any of the
+/// Nothing is downloaded and nothing is discovered by reflection. The weights are read the first time a verb needs any of the
 /// languages; the encoder is then shared by all of them.
 /// </para>
 /// <para>
-/// The weights live in embedded resources of this assembly (the heads, the settings, the tokenizer) and of the part assemblies (the encoder's layers in two
-/// halves and the token table in four row ranges), so that every package stays under the size limit of nuget.org.
+/// The weights live in embedded resources of this assembly (the heads, the tokenizer) and of the part assemblies (the encoder's ONNX graph in six
+/// consecutive pieces), so that every package stays under the size limit of nuget.org. The encoder runs on OneModel's inference runtime.
 /// </para>
 /// </remarks>
 public static class MultilingualLargeModel

@@ -4,7 +4,7 @@ namespace RecursiveAI.OneNlp.Models.Multilingual.Large.Encoder1;
 public static class Part
 {
     /// <summary>The name of the weights file this part carries.</summary>
-    public const string FileName = "encoder-layers.ckpt.part1";
+    public const string FileName = "encoder.onnx.part1";
 
     /// <summary>Opens the slice for reading.</summary>
     /// <returns>A readable, seekable stream over the embedded bytes. The caller disposes it.</returns>

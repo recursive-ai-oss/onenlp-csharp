@@ -4,7 +4,7 @@ namespace RecursiveAI.OneNlp.Models.Multilingual.Large.TokenTable4;
 public static class Part
 {
     /// <summary>The name of the weights file this part carries.</summary>
-    public const string FileName = "token-table-03.bin";
+    public const string FileName = "encoder.onnx.part6";
 
     /// <summary>Opens the slice for reading.</summary>
     /// <returns>A readable, seekable stream over the embedded bytes. The caller disposes it.</returns>
