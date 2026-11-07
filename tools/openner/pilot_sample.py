@@ -18,11 +18,15 @@ def main():
     ap.add_argument("--seed", type=int, default=20261107)
     ap.add_argument("--start", type=int, default=0)
     ap.add_argument("--count", type=int, default=50)
+    ap.add_argument("--exclude", help="file of passage ids (one per line) not to draw, e.g. an earlier sample-ids.txt")
     a = ap.parse_args()
     rows = []
     for f in sorted(glob.glob(a.labels + "/block-*.jsonl")):
         rows += [json.loads(l) for l in open(f, encoding="utf-8")]
     rows.sort(key=lambda r: r["id"])
+    if a.exclude:
+        skip = {int(x) for x in open(a.exclude).read().split()}
+        rows = [r for r in rows if r["id"] not in skip]
     pick = sorted(random.Random(a.seed).sample(range(len(rows)), a.n))
     with open(a.labels + "/sample-ids.txt", "w") as f:
         f.write("\n".join(str(rows[i]["id"]) for i in pick) + "\n")
