@@ -3,7 +3,7 @@
 #
 #   env: RECIPE_DLL  the built recipes/zh/fast recipe (its train-segmenter command is language-neutral)
 #        DATA        data root of the corpus spec     SPEC  corpus.json      OUT  output root (one directory per language)
-#        [LANGS="ja th vi lzh"] [THREADS=4] [SECONDS_PER_LANG=1500]
+#        [LANGS="ja th vi lzh"] [SEED=1] [THREADS=4] [SECONDS_PER_LANG=1500]
 #
 # Run it again with the same environment until every language prints "completed=True". Development data only: no test file is read.
 # The recipe is the one the Chinese segmenter was trained with (width 192, two-layer bidirectional LSTM); the epoch budget follows the size of
@@ -33,5 +33,5 @@ EOF
   dotnet "$RECIPE_DLL" train-segmenter --language "$L" --train "$DATA/$TRAIN" --dev "$DATA/$DEV" --out "$OUT/$L" \
     --width 192 --depth 2 --norm-rows 16384 --prefix-rows 4096 --suffix-rows 4096 --shape-rows 1024 --neighbour-rows 8192 --context-rows 8192 \
     --bigram-rows 32768 --embed-width 64 --relu 1 --recurrent 2 --recurrent-size 96 --dropout 0.5 --lr 0.001 --batch-words 1000 \
-    --cosine-epochs "$EPOCHS" --patience 100 --threads "${THREADS:-4}" --seconds "${SECONDS_PER_LANG:-1500}" | tail -n 6
+    --cosine-epochs "$EPOCHS" --seed "${SEED:-1}" --patience 100 --threads "${THREADS:-4}" --seconds "${SECONDS_PER_LANG:-1500}" | tail -n 6
 done

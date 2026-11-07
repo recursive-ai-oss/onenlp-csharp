@@ -65,8 +65,15 @@ internal static class Program
     // spaces, so raw-text rows and the packaged Chinese pipeline cut words with it instead of the Unicode word rules.
     private static Pipeline? segmenterSource;
 
+    // --spec FILE: the corpus description every command reads its languages and files from (see recipes/accurate/common).
+    private static CorpusSpec? corpus;
+
+    // --segmenter-dir DIR: DIR/<code>/model.onenlp for each language whose text is not separated by spaces (tools/accurate/train_segmenters.sh).
+    private static readonly Dictionary<string, Pipeline> Segmenters = new(StringComparer.Ordinal);
+
     private static IWordTokenizer TokenizerFor(Language language) =>
-        language.Code == "zh" && segmenterSource is not null ? segmenterSource.Tokenizer : UaxWordTokenizer.For(language);
+        Segmenters.TryGetValue(language.Code, out Pipeline? own) ? own.Tokenizer
+        : language.Code == "zh" && segmenterSource is not null ? segmenterSource.Tokenizer : UaxWordTokenizer.For(language);
 
     private static int Main(string[] args)
     {
@@ -125,6 +132,23 @@ internal static class Program
         if (Opt(args, "zh-segmenter", string.Empty) is { Length: > 0 } path)
         {
             segmenterSource = PipelineFile.Load(path);
+        }
+
+        if (Opt(args, "spec", string.Empty) is { Length: > 0 } specPath)
+        {
+            corpus = CorpusSpec.Load(specPath);
+        }
+
+        if (Opt(args, "segmenter-dir", string.Empty) is { Length: > 0 } dir)
+        {
+            foreach (string sub in Directory.GetDirectories(dir))
+            {
+                string file = Path.Combine(sub, "model.onenlp");
+                if (File.Exists(file))
+                {
+                    Segmenters[Path.GetFileName(sub)] = PipelineFile.Load(file);
+                }
+            }
         }
     }
 
@@ -210,7 +234,7 @@ internal static class Program
         float lr = Flt(args, "lr", 1e-4f);
         int warmup = Num(args, "warmup", 40);
         string[] heads = Opt(args, "heads", "tagger,morphologizer,lemmatizer,parser,ner").Split(',');
-        CorpusSpec? spec = Opt(args, "spec", string.Empty) is { Length: > 0 } specPath ? CorpusSpec.Load(specPath) : null;
+        CorpusSpec? spec = corpus;
         string[] nerLangs = heads.Contains("ner") ? [.. langs.Where(l => spec is not null ? spec.Contains(l) && spec[l].Ner.Count > 0 : NerSets.ContainsKey(l))] : [];
         int balance = Num(args, "balance", 1);
         predictLimit = Num(args, "predict-limit", 0);
@@ -391,6 +415,33 @@ internal static class Program
             }
         }
 
+        // --warm-from CKPT --warm-langs en,de,...: a fresh run (no last.ckpt in --out yet) that starts from the weights of an earlier run with fewer languages.
+        // Tensors are copied by name (the encoder as it is, each head through the name of its language), the optimizer starts new and warms up again.
+        if (Opt(args, "warm-from", string.Empty) is { Length: > 0 } warmPath && !File.Exists(Path.Combine(outDir, "last.ckpt")))
+        {
+            string[] warmLangs = Required(args, "warm-langs").Split(',');
+            List<ITrainableComponent> allHeads = [.. pipeline.Components.OfType<ITrainableComponent>()];
+            string[] newNames = [.. allHeads.Select(h => h.Name)];
+            string[] oldNames = [.. newNames.Where(n => warmLangs.Contains(n[(n.LastIndexOf('-') + 1)..]))];
+            var target = new List<(string, RecursiveAI.OneModel.Tensors.Tensor)>();
+            if (encoder.Weights is { } encoderWeights)
+            {
+                target.AddRange(encoderWeights.StateDict().Select(t => ("encoder0." + t.Name, t.Tensor)));
+            }
+
+            for (int i = 0; i < allHeads.Count; i++)
+            {
+                target.AddRange(allHeads[i].Weights.StateDict().Select(t => ("head" + i.ToString(CultureInfo.InvariantCulture) + "." + t.Name, t.Tensor)));
+            }
+
+            WarmStartReport report = WarmStart.Apply(warmPath, target, oldNames, newNames);
+            Console.WriteLine($"warm start: copied={report.Copied} missing={report.Missing} mismatched={report.Mismatched} unused={report.Unused}");
+            foreach (string note in report.Notes)
+            {
+                Console.WriteLine("  " + note);
+            }
+        }
+
         var hasTag = langs.ToDictionary(l => l, l => Available("tagger", train, stores[l]));
         Func<IReadOnlyList<Example>, double> score = examples =>
         {
@@ -399,6 +450,11 @@ internal static class Program
             foreach (string lang in langs)
             {
                 var mine = examples.Where(e => ReferenceEquals(e.Predicted.Strings, stores[lang])).ToList();
+                if (mine.Count == 0)
+                {
+                    continue;  // a language with no dev documents is not seen by selection
+                }
+
                 var metrics = new List<string>();
                 if (heads.Contains("morphologizer")) { metrics.Add("UPOS"); metrics.Add("UFeats"); }
                 // Turkish BOUN leaves XPOS empty ("_") on about half its tokens, so that row is not meaningful there.
@@ -599,15 +655,34 @@ internal static class Program
     {
         foreach (string lang in langs)
         {
-            (string dir, string prefix) = Treebanks[lang];
-            string sub = split == "test" ? "eval" : "train";
-            string root = Path.Combine(data, sub, "ud", dir);
-            if (!Directory.Exists(root))
+            string root;
+            string[] names;
+            if (corpus is not null)
             {
-                root = Path.Combine(data, sub, dir);
+                // The gating treebank's test split, or its dev split when the release has one (a language that holds dev out of train has no dev file).
+                string? rel = split == "test" ? corpus[lang].Gating.Test : corpus[lang].Gating.Dev;
+                if (rel is null)
+                {
+                    Console.WriteLine($"{lang}: no {split} file, skipped");
+                    continue;
+                }
+
+                root = Path.Combine(data, Path.GetDirectoryName(rel)!);
+                names = [Path.GetFileNameWithoutExtension(rel)];
+            }
+            else
+            {
+                (string dir, string prefix) = Treebanks[lang];
+                string sub = split == "test" ? "eval" : "train";
+                root = Path.Combine(data, sub, "ud", dir);
+                if (!Directory.Exists(root))
+                {
+                    root = Path.Combine(data, sub, dir);
+                }
+
+                names = split == "test" && lang == "it" ? ["it_parlamint-ud-test", "it_markit-ud-test"] : [$"{prefix}-{split}"];
             }
 
-            string[] names = split == "test" && lang == "it" ? ["it_parlamint-ud-test", "it_markit-ud-test"] : [$"{prefix}-{split}"];
             ITrainableComponent[] mine = headsOf(lang);
             ITrainableComponent[] ud = [.. mine.Where(h => h.Kind != "ner")];
             foreach (string name in names)
@@ -621,7 +696,17 @@ internal static class Program
                 }
             }
 
-            if (NerSets.TryGetValue(lang, out var ns) && nerStores.TryGetValue(lang, out StringStore? nerStore))
+            if (corpus is not null)
+            {
+                // With several entity sets (Indonesian, Norwegian) the first is scored; the head trains on all of them.
+                CorpusEntitySet? set = corpus[lang].Ner.Count > 0 ? corpus[lang].Ner[0] : null;
+                string? file = set is null ? null : split == "test" ? set.Test : set.Dev;
+                if (file is not null && nerStores.TryGetValue(lang, out StringStore? corpusStore) && mine.Any(h => h.Kind == "ner"))
+                {
+                    PredictNer(encoder, [.. mine.Where(h => h.Kind == "ner")], Path.Combine(data, file), lang, corpusStore, outDir, split);
+                }
+            }
+            else if (NerSets.TryGetValue(lang, out var ns) && nerStores.TryGetValue(lang, out StringStore? nerStore))
             {
                 string nerRoot = split == "test" ? Path.Combine(data, "eval", ns.EvalDir) : Path.Combine(data, "train", ns.Dir);
                 PredictNer(encoder, [.. mine.Where(h => h.Kind == "ner")], Path.Combine(nerRoot, $"{ns.Prefix}-{split}.iob2"), lang, nerStore, outDir, split);
@@ -639,7 +724,7 @@ internal static class Program
         Directory.CreateDirectory(outDir);
         predictLimit = Num(args, "predict-limit", 0);
         nerTestLimit = Num(args, "ner-test", 3000);
-        string[] langs = Opt(args, "langs", "en,de,fr,es,pt,it,nl,tr,zh").Split(',');
+        string[] langs = Opt(args, "langs", corpus is not null ? string.Join(',', corpus.Languages.Select(l => l.Code)) : "en,de,fr,es,pt,it,nl,tr,zh").Split(',');
         using FileStream graph = File.OpenRead(Path.Combine(dir, "encoder.onnx"));
         using Stream tokenizerJson = File.OpenRead(Path.Combine(dir, "tokenizer.json"));
         using TransformerEncoder encoder = TransformerEncoder.FromStreams(graph, tokenizerJson, SubwordPooling.Mean, expandWordForms: true);
@@ -671,8 +756,17 @@ internal static class Program
         string dir = Required(args, "export");
         string lang = Required(args, "lang");
         predictLimit = Num(args, "predict-limit", 100);
-        (string td, string prefix) = Treebanks[lang];
-        string gold = Path.Combine(Required(args, "data"), "eval", "ud", td, lang == "it" ? "it_markit-ud-test.conllu" : $"{prefix}-test.conllu");
+        string gold;
+        if (corpus is not null)
+        {
+            gold = Path.Combine(Required(args, "data"), corpus[lang].Gating.Test ?? throw new ArgumentException(lang + " has no test file."));
+        }
+        else
+        {
+            (string td, string prefix) = Treebanks[lang];
+            gold = Path.Combine(Required(args, "data"), "eval", "ud", td, lang == "it" ? "it_markit-ud-test.conllu" : $"{prefix}-test.conllu");
+        }
+
         var load = Stopwatch.StartNew();
         // The packaged model's way: the encoder from its ONNX graph on the inference runtime (see the model package), heads from the per-language file.
         using FileStream graph = File.OpenRead(Path.Combine(dir, "encoder.onnx"));
