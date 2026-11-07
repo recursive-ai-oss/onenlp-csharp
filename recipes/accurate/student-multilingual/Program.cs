@@ -17,7 +17,7 @@ namespace RecursiveAI.OneNlp.Recipes.AccurateStudent;
 
 // Accurate-tier recipe: one fine-tuned distilled student encoder shared by the heads of one or more languages.
 //
-//   train --langs de,tr --data DIR --onnx student-v1.onnx --tokenizer tokenizer.json --out DIR [--export DIR]
+//   train --langs de,tr [--languages tools/fetch/ud/languages.tsv] --data DIR --onnx student-v1.onnx --tokenizer tokenizer.json --out DIR [--export DIR]
 //         [--steps N] [--lr X] [--warmup N] [--batch-words N] [--sentences-per-doc N] [--seed N] [--threads N]
 //         [--budget-seconds S] [--eval-every STEPS] [--checkpoint-every STEPS] [--heads tagger,morphologizer,lemmatizer,parser]
 //
@@ -107,6 +107,7 @@ internal static class Program
     private static int Train(string[] args)
     {
         string[] langs = Required(args, "langs").Split(',');
+        languagesFile = Opt(args, "languages", string.Empty) is { Length: > 0 } catalogue ? catalogue : null;
         string data = Required(args, "data");
         string outDir = Required(args, "out");
         int perDoc = Num(args, "sentences-per-doc", 4);
@@ -128,7 +129,7 @@ internal static class Program
         var stores = new Dictionary<string, StringStore>();
         foreach (string lang in langs)
         {
-            (string dir, string prefix) = Treebanks[lang];
+            (string dir, string prefix) = Treebank(lang, data);
             string root = Path.Combine(data, "train", "ud", dir);
             if (!Directory.Exists(root))
             {
@@ -314,7 +315,7 @@ internal static class Program
             bool raw = Num(args, "raw", 0) == 1;
             foreach (string lang in langs.Where(l => predictLangs.Length == 0 || predictLangs.Contains(l)))
             {
-                (string dir, string prefix) = Treebanks[lang];
+                (string dir, string prefix) = Treebank(lang, data);
                 string sub = split == "test" ? "eval" : "train";
                 string root = Path.Combine(data, sub, "ud", dir);
                 if (!Directory.Exists(root))
@@ -332,7 +333,7 @@ internal static class Program
                     if (raw)
                     {
                         using Pipeline tokenizer = RawTokenizer(lang, Opt(args, "tokenizers", string.Empty));
-                        PredictRaw(encoder, ud, tokenizer, SegmentationData.For(Language.FromCode(lang)), gold, Path.Combine(outDir, $"pred-raw-{name}.conllu"));
+                        PredictRaw(encoder, ud, tokenizer, SegmentationData.For(LanguageOf(lang)), gold, Path.Combine(outDir, $"pred-raw-{name}.conllu"));
                     }
                 }
 
@@ -347,6 +348,56 @@ internal static class Program
         return 0;
     }
 
+    // The gating treebank of a language: the nine built-in rows above, otherwise the row of the language catalogue (--languages FILE, a tab-separated file with a
+    // header and the columns language, gating, ...; tools/fetch/ud/languages.tsv) whose gating treebank has been fetched as DATA/train/ud/<code>_<treebank>.
+    // So adding a language is a data line: fetch its treebank and name its code in --langs.
+    private static string? languagesFile;
+
+    private static (string Dir, string Prefix) Treebank(string code, string data)
+    {
+        if (Treebanks.TryGetValue(code, out var known))
+        {
+            return known;
+        }
+
+        if (languagesFile is not null)
+        {
+            string[] header = File.ReadLines(languagesFile).First().Split('\t');
+            int gating = Array.IndexOf(header, "gating");
+            foreach (string line in File.ReadLines(languagesFile).Skip(1))
+            {
+                string[] cols = line.Split('\t');
+                if (gating < 0 || cols.Length <= gating || !cols[gating].StartsWith("UD_", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                // UD_German-GSD -> gsd
+                string treebank = cols[gating][(cols[gating].LastIndexOf('-') + 1)..].ToLowerInvariant();
+                string dir = code + "_" + treebank;
+                if (Directory.Exists(Path.Combine(data, "train", "ud", dir)))
+                {
+                    return (dir, dir + "-ud");
+                }
+            }
+        }
+
+        throw new ArgumentException($"No gating treebank is known for '{code}': add it to the language catalogue given with --languages and fetch it.");
+    }
+
+    // A language the library has no data for is analysed with the language-neutral UAX #29 rules.
+    private static Language LanguageOf(string code)
+    {
+        try
+        {
+            return Language.FromCode(code);
+        }
+        catch (ArgumentException)
+        {
+            return Language.Unknown;
+        }
+    }
+
     // The shared fine-tuned encoder is written once as an ONNX file (the graph runtime serves it), and each language's heads are written as
     // a pipeline over a SharedEncoder, which holds no encoder weights: the model package registers the one real encoder under SharedName.
     private const string SharedName = "student-multilingual";
@@ -359,7 +410,7 @@ internal static class Program
         var shared = new SharedEncoder(encoder, SharedName);
         foreach (string lang in langs)
         {
-            using Pipeline pipe = Pipeline.Blank(Language.FromCode(lang));
+            using Pipeline pipe = Pipeline.Blank(LanguageOf(lang));
             pipe.Add(MultiwordFormsComponent.ComponentName, new Dictionary<string, string> { ["language"] = lang });
             foreach (ScopedHead scoped in trained.Components.OfType<ScopedHead>().Where(h => h.Name.EndsWith("-" + lang, StringComparison.Ordinal)))
             {
@@ -393,7 +444,7 @@ internal static class Program
     // language's data.
     private static Pipeline RawTokenizer(string lang, string dir)
     {
-        Language language = Language.FromCode(lang);
+        Language language = LanguageOf(lang);
         string file = dir.Length == 0 ? string.Empty : Path.Combine(dir, lang + ".onenlp");
         if (file.Length > 0 && File.Exists(file))
         {
