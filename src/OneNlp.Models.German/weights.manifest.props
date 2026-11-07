@@ -4,7 +4,7 @@
   <ItemGroup>
     <GermanWeight Include="tagging.onenlp" Size="37387816" Sha256="9551d090788d24898486fda8532a93bd3fbe821bfd71785fb3423ef869df6192"
                   Recipe="recipes/de/fast" Data="UD German-GSD r2.18 (CC BY-SA 4.0)" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
-    <GermanWeight Include="parser.onenlp" Size="46233241" Sha256="bb21d812d517f1f6ec8f90df375b0bc5996b9cfaf890e8ad8ddb8f8a24ff21b4"
+    <GermanWeight Include="parser.onenlp" Size="37484091" Sha256="65f96c89ae0a0c87f84957c2d323d81bdd5f061028691c4d75c4a8e6b899160e"
                   Recipe="recipes/de/fast" Data="UD German-GSD r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />
     <GermanWeight Include="ner.onenlp" Size="35681975" Sha256="f0afd41dd4545c02e58811b5c76a4a4ee3b2475bb7b1596114dcda73b524ee28"
                   Recipe="recipes/de/fast" Data="GermEval 2014 (CC BY 4.0)" Contents="entity recognizer (PER, LOC, ORG, MISC)" />

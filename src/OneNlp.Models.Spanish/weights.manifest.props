@@ -4,7 +4,7 @@
   <ItemGroup>
     <SpanishWeight Include="tagging.onenlp" Size="37076267" Sha256="99c3343df18f156d661bf3632fc160de6ddf0b0000d00952858a3353db345e60"
                   Recipe="recipes/es/fast" Data="UD Spanish-AnCora r2.18 (CC BY 4.0)" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
-    <SpanishWeight Include="parser.onenlp" Size="46033528" Sha256="0e4a5757c048902f7bc150e85901dfd5c7e210b3e153641778256730945a6073"
+    <SpanishWeight Include="parser.onenlp" Size="37481754" Sha256="17c9f37cc7539a68edc3030309b18192f4e85a552595f12d468f676b1b03a8a5"
                   Recipe="recipes/es/fast" Data="UD Spanish-AnCora r2.18 (CC BY 4.0)" Contents="biaffine dependency parser, sentence starts" />
     <SpanishWeight Include="ner.onenlp" Size="35682482" Sha256="0e8eda9a203296556c88b135a10800ae41ee248eea25984a6b0c1c4a00becd7e"
                   Recipe="recipes/es/fast" Data="WikiNER Spanish wp3 (CC BY 4.0 labels over Wikipedia text)" Contents="entity recognizer (PER, LOC, ORG, MISC)" />

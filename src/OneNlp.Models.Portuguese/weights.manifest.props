@@ -4,7 +4,7 @@
   <ItemGroup>
     <PortugueseWeight Include="tagging.onenlp" Size="36696933" Sha256="d9bfe33eb4080660cff562c9b9289933a83e3c009fabbec7e1e57c6a980442f5"
                   Recipe="recipes/pt/fast" Data="UD Portuguese-Bosque r2.18 (CC BY-SA 4.0)" Contents="sentencizer, morphologizer, lemmatizer" />
-    <PortugueseWeight Include="parser.onenlp" Size="46033533" Sha256="277a4526586eb4233f552373923f2bccadb3495afc70956924ba8ca4a08566d4"
+    <PortugueseWeight Include="parser.onenlp" Size="37481759" Sha256="2a3a0277c1e4ac99b31361434a80aa2c78540684195aa411d33c2e502aac1b5e"
                   Recipe="recipes/pt/fast" Data="UD Portuguese-Bosque r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />
     <PortugueseWeight Include="ner.onenlp" Size="35678318" Sha256="3d81efdbb1017159ba8076153188d33bb0c0953da46c2a93510a41f752a96ef1"
                   Recipe="recipes/pt/fast" Data="Universal NER Portuguese-Bosque (CC BY-SA 4.0)" Contents="entity recognizer (PER, LOC, ORG)" />

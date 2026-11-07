@@ -439,3 +439,61 @@ For information (`docs/references.md`): Stanza 1.5.1 raw text UPOS 88.82, LAS 70
 **Misses:** none. Everything is within noise or ahead; MLAS (-1.93) is inside the noise rule.
 
 Indicative speed (1 thread, load average 8-13 on the shared worker, raw development text; Catalyst has no Chinese model, so there is no managed row): segmenter alone 22-23k words/s (3.7 kB allocated per word); segmenter and tagging 16-17k words/s; the whole pipeline (segmenter, tagging, parser, entities) 4.5-4.6k words/s.
+
+## Parser speed (one LSTM layer, product label features)
+
+Every fast-tier parser was retrained with the setting in `docs/parser.md` ("Speed configuration"): English `english.onenlp` is now 117.5 MB (sha256 `ac0080ad...ed9b`; the tagging and entity models are unchanged, only the parser part differs). Training data, seeds and licences are those of the earlier parsers (UD treebanks, CC BY-SA 4.0 / CC BY 4.0; the models keep share-alike lineage); selection used each language's development file with the earlier early-stopping rule (patience 6), and each test file was read for the final models (see the note below for the two languages where a smaller setting was scored on test before the larger one was chosen on dev).
+
+### Speed (indicative: 1 thread, batches of 32 documents, raw test text, x64 worker, load average 14 to 23)
+
+| Model | Parser head, before | Parser head, after | Full pipeline, before | Full pipeline, after |
+|---|---|---|---|---|
+| English | 137 to 145 us/token (5.3k tokens/s), 4,974 B/token | 30 us/token (32.5k tokens/s), 2,563 B/token | 4.9k to 5.0k tokens/s, 5,516 B/token | 26.3k tokens/s, 3,105 B/token |
+| German | about 150 us/token | 32 us/token | | |
+| Dutch | 151 | 30 | | |
+| Portuguese | 169 | 29 | | |
+| Spanish | 156 | 28 | | |
+| French | 126 | 20 | | |
+| Italian | 80 | 46 | | |
+| Chinese | 142 | 48 | | |
+
+The English parser alone: 137 us/token by component before (LSTM 81, label scorer 52, projections 9, arcs and tree 8) and 20 us/token after in the per-component profile. Peak working set of the English full pipeline 939 MB (was 1,083 MB). The other languages' rows are the parser file alone (its own encoder 10 to 13 us/token is included in the full-pipeline figure, not in the head column).
+
+### English, UD English-EWT r2.18 test (hash `fa024f43...c494a`), paired bootstrap 95% CI, 1,000 resamples, seed 1, reference spaCy 3.8.18 default configuration on the same data
+
+| Mode | Metric | Ours | spaCy | Earlier parser | Within noise |
+|---|---|---|---|---|---|
+| gold tokens | UAS | 85.26 [84.38, 86.13] | 85.40 | 85.77 | yes |
+| | LAS | 81.53 [80.62, 82.43] | 81.96 | 81.68 | yes |
+| | CLAS | 76.78 [75.68, 77.86] | 77.28 | 76.76 | yes |
+| | MLAS | 69.36 [68.23, 70.47] | 71.14 | 69.17 | yes |
+| raw text | UAS | 80.74 [79.78, 81.71] | 81.34 | 81.80 | yes |
+| | LAS | 77.26 [76.28, 78.25] | 78.53 | 78.13 | yes |
+| | CLAS | 72.19 [71.00, 73.35] | 74.34 | 73.04 | yes |
+| | MLAS | 65.30 [64.12, 66.48] | 69.05 | 65.61 | no (behind; not a gated row) |
+| raw text | Sentences | 71.08 [69.06, 72.98] | 72.66 | 76.15 | yes |
+
+Tagging rows are those of the unchanged tagging model (gold UPOS 94.16, UFeats 95.15, lemmas 96.11; raw UPOS 92.90).
+
+### Other languages, gating treebank test, LAS (UAS, CLAS, MLAS in the committed result files), paired CI against spaCy 3.8.18
+
+| Language | Mode | Ours (earlier parser) | spaCy | Within noise |
+|---|---|---|---|---|
+| German GSD | gold | 76.66 [75.63, 77.72] (78.25) | 77.31 | yes |
+| | raw | 74.87 [73.79, 75.92] (76.75) | 70.77 | ahead |
+| Dutch Alpino | gold | 79.12 [77.87, 80.39] (80.28) | 79.85 | yes |
+| | raw | 78.18 [76.87, 79.46] (79.48) | 79.57 | yes |
+| Portuguese Bosque | gold | 81.80 [81.10, 82.49] (82.74) | 81.96 | yes |
+| | raw | 81.14 [80.44, 81.82] (82.09) | 65.85 | ahead |
+| Spanish AnCora | gold | 86.41 [85.90, 86.89] (87.00) | 85.95 | yes |
+| | raw | 86.15 [85.61, 86.64] (86.70) | 81.82 | ahead |
+| French GSD | gold | 86.96 [85.86, 87.96] (86.62) | 85.98 | yes |
+| | raw | 86.07 [84.92, 87.11] (85.92) | 78.10 | ahead |
+| Italian ParlaMint | gold | 71.55 [70.26, 72.97] (72.57) | 71.39 | yes |
+| | raw | 71.55 [70.27, 72.90] (72.77) | 58.38 | ahead |
+| Chinese GSDSimp | gold words (spaCy trained with `gold_preproc`) | 67.49 [65.94, 69.14] (68.76) | 68.24 | yes |
+| | raw (our segmenter) | 56.93 [55.23, 58.73] (57.88) | 8.59 | ahead |
+
+Every UAS, LAS and CLAS row is within noise or ahead in both modes. MLAS, which also depends on the tagging model, is within noise or ahead in every row of these languages (Chinese gold words: 55.78 [53.92, 57.68] against 58.87). Raw-text rows compare our tokenizer against spaCy's, which is the reason for the large margins.
+
+Note on selection: for Italian and Chinese the 128-unit setting was scored on test before the 192-unit setting was chosen on dev (dev LAS 72.43 and 64.82 against 73.97 and 66.81, and 74.81 and 68.22 for the earlier parsers); the larger setting was chosen because the smaller lost more than 1 point of dev LAS, the rule used for every language.
