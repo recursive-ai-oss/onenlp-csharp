@@ -76,7 +76,7 @@ public class TurkishSegmentationTests
     [Fact]
     public void MissingTurkishModelNamesTheTurkishPackage()
     {
-        InvalidOperationException e = Assert.Throws<InvalidOperationException>(() => ModelPackages.Get(Language.Turkish));
+        ModelNotAvailableException e = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.Turkish));
         Assert.Contains("RecursiveAI.OneNlp.Models.Turkish", e.Message, StringComparison.Ordinal);
         Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", e.Message, StringComparison.Ordinal);
     }

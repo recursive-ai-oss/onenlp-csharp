@@ -40,6 +40,24 @@ public sealed class Pipeline : IDisposable
     /// <summary>The interning table shared by every document this pipeline creates.</summary>
     public StringStore Strings { get; }
 
+    /// <summary>
+    /// The longest text, in UTF-16 characters, that <see cref="Process(string)"/> and <see cref="ProcessMany"/> accept (spaCy's <c>nlp.max_length</c>).
+    /// Unless set, it follows <see cref="Nlp.MaxLength"/> (1,000,000 by default), so one setting bounds the <see cref="Nlp"/> verbs and every pipeline.
+    /// </summary>
+    /// <value>At least 1. A text longer than this is refused with an <see cref="ArgumentOutOfRangeException"/> that names the limit; memory use grows with the text, so a service that takes untrusted text should keep the default or lower it.</value>
+    /// <exception cref="ArgumentOutOfRangeException">Set to less than 1.</exception>
+    public int MaxLength
+    {
+        get => _maxLength > 0 ? _maxLength : Nlp.MaxLength;
+        set
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
+            _maxLength = value;
+        }
+    }
+
+    private int _maxLength;
+
     /// <summary>The components in the order they run.</summary>
     public IReadOnlyList<IPipelineComponent> Components => _components;
 
@@ -65,7 +83,7 @@ public sealed class Pipeline : IDisposable
     /// </remarks>
     /// <param name="language">The language.</param>
     /// <param name="tier">The kind of model to load.</param>
-    /// <exception cref="InvalidOperationException">No package is referenced for the language and tier. The message names the package to add.</exception>
+    /// <exception cref="ModelNotAvailableException">No package is referenced for the language and tier. The message names the package to add.</exception>
     public static Pipeline Create(Language language, Tier tier = Tier.Fast)
     {
         (Pipeline source, string packageId) = ModelPackages.Load(language, tier);
@@ -138,9 +156,10 @@ public sealed class Pipeline : IDisposable
     /// <summary>Tokenizes a text and runs every component on it.</summary>
     /// <param name="text">The text; may be empty. The returned document keeps this string and its offsets are into it.</param>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="text"/> is longer than <see cref="MaxLength"/>.</exception>
     public Doc Process(string text)
     {
-        ArgumentNullException.ThrowIfNull(text);
+        Nlp.CheckLength(text, MaxLength, nameof(text), "Pipeline.MaxLength");
         Doc doc = Tokenizer.Tokenize(text, Strings);
         Process(doc);
         return doc;
@@ -165,6 +184,7 @@ public sealed class Pipeline : IDisposable
     /// <param name="texts">The texts.</param>
     /// <param name="batchSize">Texts per batch, at least 1.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="batchSize"/> is less than 1.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">A text is longer than <see cref="MaxLength"/>; raised when that text is reached.</exception>
     public IEnumerable<Doc> ProcessMany(IEnumerable<string> texts, int batchSize = 64)
     {
         ArgumentNullException.ThrowIfNull(texts);
@@ -180,6 +200,7 @@ public sealed class Pipeline : IDisposable
     /// <param name="batchSize">Texts per batch, at least 1.</param>
     /// <param name="cancellationToken">Stops the enumeration.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="batchSize"/> is less than 1.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">A text is longer than <see cref="MaxLength"/>; raised when that text is reached.</exception>
     public IAsyncEnumerable<Doc> ProcessManyAsync(IAsyncEnumerable<string> texts, int batchSize = 64, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(texts);
@@ -205,12 +226,18 @@ public sealed class Pipeline : IDisposable
         }
     }
 
+    private string CheckedItem(string text)
+    {
+        Nlp.CheckLength(text, MaxLength, "texts", "Pipeline.MaxLength");
+        return text;
+    }
+
     private IEnumerable<Doc> ProcessManyCore(IEnumerable<string> texts, int batchSize)
     {
         var batch = new List<Doc>(batchSize);
         foreach (string text in texts)
         {
-            batch.Add(Tokenizer.Tokenize(text ?? throw new ArgumentException("A text is null.", nameof(texts)), Strings));
+            batch.Add(Tokenizer.Tokenize(CheckedItem(text ?? throw new ArgumentException("A text is null.", nameof(texts))), Strings));
             if (batch.Count == batchSize)
             {
                 RunBatch(batch);
@@ -239,7 +266,7 @@ public sealed class Pipeline : IDisposable
         var batch = new List<Doc>(batchSize);
         await foreach (string text in texts.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
-            batch.Add(Tokenizer.Tokenize(text ?? throw new ArgumentException("A text is null.", nameof(texts)), Strings));
+            batch.Add(Tokenizer.Tokenize(CheckedItem(text ?? throw new ArgumentException("A text is null.", nameof(texts))), Strings));
             if (batch.Count == batchSize)
             {
                 RunBatch(batch);

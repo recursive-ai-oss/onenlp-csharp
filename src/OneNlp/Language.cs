@@ -71,8 +71,8 @@ public readonly struct Language : IEquatable<Language>
     /// <inheritdoc/>
     public override int GetHashCode() => Code.GetHashCode(StringComparison.Ordinal);
 
-    /// <summary>Returns <see cref="Code"/>.</summary>
-    public override string ToString() => Code;
+    /// <summary>Returns <see cref="Code"/>, or <c>Unknown</c> for <see cref="Unknown"/>, so a language always prints as something. <see cref="Code"/> stays the empty string for it.</summary>
+    public override string ToString() => string.IsNullOrEmpty(_code) ? "Unknown" : _code;
 
     /// <summary>Whether two languages have the same code.</summary>
     public static bool operator ==(Language left, Language right) => left.Equals(right);

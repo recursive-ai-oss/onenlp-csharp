@@ -45,7 +45,7 @@ public static class EmbedderPackages
 
     /// <summary>Gets the shared default embedder, loading it on first use.</summary>
     /// <returns>The embedder; do not dispose it.</returns>
-    /// <exception cref="InvalidOperationException">No package is registered. The message names the package to add; models are never downloaded.</exception>
+    /// <exception cref="ModelNotAvailableException">No package is registered. The message names the package to add; models are never downloaded.</exception>
     public static IEmbedder Get()
     {
         Lazy<IEmbedder>? best = null;
@@ -63,7 +63,9 @@ public static class EmbedderPackages
         }
 
         return best?.Value
-            ?? throw new InvalidOperationException($"No embedding model is available. Add the NuGet package {DefaultPackageId}; models are never downloaded.");
+            ?? throw new ModelNotAvailableException(
+                $"No embedding model is available. Add the NuGet package {DefaultPackageId}; models are never downloaded.",
+                Language.Unknown, Tier.Fast, [DefaultPackageId]);
     }
 
     private sealed record Entry(string PackageId, int Priority, Lazy<IEmbedder> Embedder);

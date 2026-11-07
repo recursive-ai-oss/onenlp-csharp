@@ -26,6 +26,57 @@ public sealed class PatternFormatException : FormatException
         : base(message, innerException)
     {
     }
+
+    /// <summary>Creates the exception with the position of the error.</summary>
+    /// <param name="message">What is wrong.</param>
+    /// <param name="lineNumber">The line of the input, counted from 1, or <see langword="null"/> when not known.</param>
+    /// <param name="bytePositionInLine">The UTF-8 byte offset in that line, counted from 0, or <see langword="null"/> when not known.</param>
+    /// <param name="innerException">The cause, or <see langword="null"/>.</param>
+    public PatternFormatException(string message, long? lineNumber, long? bytePositionInLine, Exception? innerException)
+        : base(message, innerException)
+    {
+        LineNumber = lineNumber;
+        BytePositionInLine = bytePositionInLine;
+    }
+
+    /// <summary>The line of the input where the error is, counted from 1 like <c>DataFormatException.LineNumber</c>; <see langword="null"/> when the error is not tied to a line (for example a rule that is well-formed JSON but not a pattern, in a single JSON document).</summary>
+    public long? LineNumber { get; }
+
+    /// <summary>The UTF-8 byte offset in <see cref="LineNumber"/> where the JSON reader stopped, counted from 0 as in <see cref="System.Text.Json.JsonException.BytePositionInLine"/>; <see langword="null"/> when not known.</summary>
+    public long? BytePositionInLine { get; }
+
+    /// <summary>Wraps an error from reading or validating pattern text, with the position when the cause is a JSON syntax error.</summary>
+    /// <param name="prefix">Text before the cause's message.</param>
+    /// <param name="cause">What went wrong while reading.</param>
+    /// <param name="line">The line, counted from 1, when the input is read line by line and the line is known; otherwise the JSON error's own line is used.</param>
+    internal static PatternFormatException From(string prefix, Exception cause, long? line = null)
+    {
+        long? lineNumber = line;
+        long? bytePosition = null;
+        if (cause is JsonException json)
+        {
+            bytePosition = json.BytePositionInLine;
+            lineNumber ??= json.LineNumber is { } l ? l + 1 : null;
+        }
+
+        return new PatternFormatException(prefix + PlainMessage(cause), lineNumber, bytePosition, cause);
+    }
+
+    // ArgumentException appends " (Parameter 'name')" to its message; that names an internal argument of the parser, not something the caller wrote.
+    private static string PlainMessage(Exception cause)
+    {
+        string message = cause.Message;
+        if (cause is ArgumentException { ParamName: { Length: > 0 } name })
+        {
+            int at = message.LastIndexOf(" (", StringComparison.Ordinal);
+            if (at > 0 && message.EndsWith($"'{name}')", StringComparison.Ordinal))
+            {
+                message = message[..at];
+            }
+        }
+
+        return message;
+    }
 }
 
 /// <summary>An entity rule: a label, an optional ID, and either a token pattern or a phrase.</summary>
@@ -172,7 +223,7 @@ public static class PatternJson
         }
         catch (Exception e) when (e is JsonException or InvalidOperationException or ArgumentException or FormatException and not PatternFormatException)
         {
-            throw new PatternFormatException("Invalid pattern JSON: " + e.Message, e);
+            throw PatternFormatException.From("Invalid pattern JSON: ", e);
         }
     }
 
@@ -215,7 +266,7 @@ public static class PatternJson
             }
             catch (Exception e) when (e is JsonException or InvalidOperationException or ArgumentException or FormatException and not PatternFormatException)
             {
-                throw new PatternFormatException("Invalid pattern JSON: " + e.Message, e);
+                throw PatternFormatException.From("Invalid pattern JSON: ", e);
             }
 
             return result;
@@ -248,7 +299,7 @@ public static class PatternJson
             }
             catch (Exception e) when (e is JsonException or InvalidOperationException or ArgumentException or FormatException)
             {
-                throw new PatternFormatException($"Line {line}: {e.Message}", e);
+                throw PatternFormatException.From($"Line {line}: ", e, line);
             }
         }
 
@@ -381,7 +432,7 @@ public static class PatternJson
         }
         catch (Exception e) when (e is JsonException or InvalidOperationException or ArgumentException or FormatException)
         {
-            throw new PatternFormatException("Invalid pattern JSON: " + e.Message, e);
+            throw PatternFormatException.From("Invalid pattern JSON: ", e);
         }
     }
 

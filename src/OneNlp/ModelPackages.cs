@@ -19,6 +19,9 @@ public static class ModelPackages
     /// <summary>The package that carries every language through the accurate tier. Named in the error when no model is available.</summary>
     internal const string MultilingualPackageId = "RecursiveAI.OneNlp.Models.Multilingual";
 
+    /// <summary>The base-size accurate-tier package.</summary>
+    internal const string LargePackageId = "RecursiveAI.OneNlp.Models.Multilingual.Large";
+
     private static readonly Lock Gate = new();
     private static readonly Dictionary<string, List<Entry>> Entries = new(StringComparer.Ordinal);
 
@@ -38,7 +41,17 @@ public static class ModelPackages
     /// <param name="priority">Among several <see cref="Tier.Accurate"/> packages for a language the highest priority is used (the large model over the base one); ignored for the fast tier.</param>
     /// <exception cref="ArgumentException"><paramref name="language"/> is <see cref="Language.Unknown"/>, or <paramref name="packageId"/> is empty.</exception>
     /// <exception cref="InvalidOperationException">A different fast-tier package is already registered for the language.</exception>
-    public static void Register(Language language, Tier tier, string packageId, Func<Pipeline> create, int priority = 0)
+    public static void Register(Language language, Tier tier, string packageId, Func<Pipeline> create, int priority = 0) =>
+        RegisterCore(language, tier, packageId, create, priority, detectable: true);
+
+    /// <summary>Registers like <see cref="Register(Language, Tier, string, Func{Pipeline}, int)"/> for a model that language detection does not take into account (test doubles, which must not change how other texts are read).</summary>
+    internal static void RegisterQuietly(Language language, string packageId, Func<Pipeline> create) =>
+        RegisterCore(language, Tier.Fast, packageId, create, 0, detectable: false);
+
+    internal static void RegisterQuietly(Language language, Tier tier, string packageId, Func<Pipeline> create, int priority = 0) =>
+        RegisterCore(language, tier, packageId, create, priority, detectable: false);
+
+    private static void RegisterCore(Language language, Tier tier, string packageId, Func<Pipeline> create, int priority, bool detectable)
     {
         if (language == Language.Unknown)
         {
@@ -57,7 +70,8 @@ public static class ModelPackages
             Entry? same = list.Find(e => e.Tier == tier && (tier == Tier.Fast || string.Equals(e.PackageId, packageId, StringComparison.Ordinal)));
             if (same is null)
             {
-                list.Add(new Entry(tier, packageId, create, priority));
+                list.Add(new Entry(tier, packageId, create, priority) { Detectable = detectable });
+                Interlocked.Increment(ref _version);
             }
             else if (!string.Equals(same.PackageId, packageId, StringComparison.Ordinal))
             {
@@ -73,9 +87,9 @@ public static class ModelPackages
     /// <summary>Gets the shared pipeline of the package the <see cref="Nlp"/> verbs use for a language, loading it on first use: the fast-tier package if referenced, otherwise the best accurate-tier one.</summary>
     /// <param name="language">The language.</param>
     /// <returns>The pipeline; do not dispose it.</returns>
-    /// <exception cref="InvalidOperationException">No package is registered for the language. The message names the package to add.</exception>
+    /// <exception cref="ModelNotAvailableException">No package is registered for the language. The message names the package to add.</exception>
     public static Pipeline Get(Language language) =>
-        (Resolve(language, Tier.Fast) ?? throw new InvalidOperationException(MissingMessage(language))).Pipeline.Value;
+        (Resolve(language, Tier.Fast) ?? throw Missing(language, Tier.Fast)).Pipeline.Value;
 
     private static Entry? _openEntities;
     private static readonly Lock OpenGate = new();
@@ -100,13 +114,14 @@ public static class ModelPackages
     }
 
     /// <summary>Finds entities of the given types with the registered open-type recognizer.</summary>
-    /// <exception cref="InvalidOperationException">No package is registered; the message names the package to add.</exception>
+    /// <exception cref="ModelNotAvailableException">No package is registered; the message names the package to add.</exception>
     internal static IReadOnlyList<Span> RecognizeOpen(string text, string[] types)
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(types);
-        Entry entry = _openEntities ?? throw new InvalidOperationException(
-            $"No open-type entity model is available. Add the NuGet package {MultilingualPackageId}; models are never downloaded.");
+        Entry entry = _openEntities ?? throw new ModelNotAvailableException(
+            $"No open-type entity model is available. Add the NuGet package {MultilingualPackageId}; models are never downloaded.",
+            Language.Unknown, Tier.Accurate, [MultilingualPackageId]);
         Pipeline pipeline = entry.Pipeline.Value;
         IOpenEntityRecognizer recognizer = pipeline.Components.OfType<IOpenEntityRecognizer>().FirstOrDefault()
             ?? throw new InvalidOperationException($"The pipeline of '{entry.PackageId}' has no open-type entity component.");
@@ -125,7 +140,7 @@ public static class ModelPackages
     /// <summary>Loads a new, unshared copy of the pipeline for a language and tier, for <see cref="Pipeline.Create"/>.</summary>
     internal static (Pipeline Pipeline, string PackageId) Load(Language language, Tier tier)
     {
-        Entry entry = Resolve(language, tier) ?? throw new InvalidOperationException(MissingMessage(language, tier));
+        Entry entry = Resolve(language, tier) ?? throw Missing(language, tier);
         return (entry.Create(), entry.PackageId);
     }
 
@@ -154,41 +169,55 @@ public static class ModelPackages
         }
     }
 
-    internal static string MissingMessage(Language language, Tier tier)
+    // Fast-tier packages that exist, by language code. Packages that are not built yet are never named in an error.
+    private static readonly Dictionary<string, string> FastPackages = new(StringComparer.Ordinal)
     {
-        if (tier == Tier.Fast)
+        ["en"] = "RecursiveAI.OneNlp.Models.English",
+        ["de"] = "RecursiveAI.OneNlp.Models.German",
+        ["fr"] = "RecursiveAI.OneNlp.Models.French",
+        ["pt"] = "RecursiveAI.OneNlp.Models.Portuguese",
+        ["nl"] = "RecursiveAI.OneNlp.Models.Dutch",
+        ["tr"] = "RecursiveAI.OneNlp.Models.Turkish",
+        ["es"] = "RecursiveAI.OneNlp.Models.Spanish",
+        ["it"] = "RecursiveAI.OneNlp.Models.Italian",
+        ["zh"] = "RecursiveAI.OneNlp.Models.Chinese",
+    };
+
+    /// <summary>The error for a language and tier without a model: it carries the packages to add, and its message names them.</summary>
+    internal static ModelNotAvailableException Missing(Language language, Tier tier)
+    {
+        string name = language == Language.Unknown ? "unknown" : language.Code;
+        if (tier == Tier.Accurate)
         {
-            return MissingMessage(language);
+            return new ModelNotAvailableException(
+                $"No accurate-tier model is available for language '{name}'. Add the NuGet package {LargePackageId} (or {MultilingualPackageId}); models are never downloaded.",
+                language, tier, [LargePackageId, MultilingualPackageId]);
         }
 
-        return $"No accurate-tier model is available for language '{(language == Language.Unknown ? "unknown" : language.Code)}'. Add the NuGet package "
-            + $"{MultilingualPackageId} (or {MultilingualPackageId}.Large); models are never downloaded.";
+        if (FastPackages.TryGetValue(language.Code, out string? fast))
+        {
+            return new ModelNotAvailableException(
+                $"No model is available for language '{name}'. Add the NuGet package {fast} (fast tier), or {MultilingualPackageId}; models are never downloaded.",
+                language, tier, [fast, MultilingualPackageId]);
+        }
+
+        return new ModelNotAvailableException(
+            $"No model is available for language '{name}'. Add the NuGet package {MultilingualPackageId}; models are never downloaded.",
+            language, tier, [MultilingualPackageId]);
     }
 
-    /// <summary>The error text for a language without a model: the fast-tier package for the language, or the multilingual package.</summary>
-    internal static string MissingMessage(Language language)
+    /// <summary>Bumped on each registration, so a cached view of the registered languages can tell when it is stale.</summary>
+    internal static int Version => Volatile.Read(ref _version);
+
+    private static int _version;
+
+    /// <summary>The languages for which the <see cref="Nlp"/> verbs have a model (see <see cref="IsRegistered"/>).</summary>
+    internal static Language[] RegisteredLanguages()
     {
-        string add = language == Language.English
-            ? $"RecursiveAI.OneNlp.Models.English (fast tier), or {MultilingualPackageId}"
-            : language == Language.German
-                ? $"RecursiveAI.OneNlp.Models.German (fast tier), or {MultilingualPackageId}"
-                : language == Language.French
-                    ? $"RecursiveAI.OneNlp.Models.French (fast tier), or {MultilingualPackageId}"
-                    : language == Language.Portuguese
-                        ? $"RecursiveAI.OneNlp.Models.Portuguese (fast tier), or {MultilingualPackageId}"
-                    : language == Language.Dutch
-                        ? $"RecursiveAI.OneNlp.Models.Dutch (fast tier), or {MultilingualPackageId}"
-                        : language == Language.Turkish
-                            ? $"RecursiveAI.OneNlp.Models.Turkish (fast tier), or {MultilingualPackageId}"
-                            : language == Language.Spanish
-                                ? $"RecursiveAI.OneNlp.Models.Spanish (fast tier), or {MultilingualPackageId}"
-                            : language == Language.Italian
-                                ? $"RecursiveAI.OneNlp.Models.Italian (fast tier), or {MultilingualPackageId}"
-                            : language == Language.Chinese
-                                ? $"RecursiveAI.OneNlp.Models.Chinese (fast tier), or {MultilingualPackageId}"
-                            : MultilingualPackageId;
-        return $"No model is available for language '{(language == Language.Unknown ? "unknown" : language.Code)}'. Add the NuGet package {add}; "
-            + "models are never downloaded.";
+        lock (Gate)
+        {
+            return [.. Entries.Where(kv => kv.Value.Exists(e => e.Detectable)).Select(kv => Language.FromCode(kv.Key))];
+        }
     }
 
     private sealed class Entry(Tier tier, string packageId, Func<Pipeline> create, int priority)
@@ -200,6 +229,9 @@ public static class ModelPackages
         public int Priority { get; } = priority;
 
         public Func<Pipeline> Create { get; } = create;
+
+        /// <summary>Whether language detection may choose this language for a text it is unsure about.</summary>
+        public bool Detectable { get; init; } = true;
 
         // ExecutionAndPublication: the weights are read once even when several threads ask at the same moment.
         public Lazy<Pipeline> Pipeline { get; } = new(create, LazyThreadSafetyMode.ExecutionAndPublication);
