@@ -214,6 +214,9 @@ public sealed class EditTreeLemmatizer : Lemmatizer
                 tailCount++;
             }
 
+            // An encoder that reads the words of multiword tokens (French du = de + le) has the lemmatizer read them too: the edit tree of the
+            // word "le" is applied to "le", not to the piece "u".
+            bool wordForms = Encoder is IWordFormEncoder { ReadsWordForms: true };
             Span<int> tried = stackalloc int[2 * Candidates]; // bounded by the constant above
             Span<char> lowered = stackalloc char[LowerBuffer]; // forms up to LowerBuffer characters are lower-cased here; longer ones get a string
             for (int d = 0; d < docs.Length; d++)
@@ -224,7 +227,8 @@ public sealed class EditTreeLemmatizer : Lemmatizer
                 for (int t = 0; t < doc.Length; t++)
                 {
                     int r = start + t;
-                    ReadOnlySpan<char> form = doc[t].Text;
+                    string norm = wordForms ? doc[t].Norm : string.Empty;
+                    ReadOnlySpan<char> form = norm.Length > 0 ? norm : doc[t].Text;
                     ReadOnlySpan<char> lower = lowered[..0];
                     if (form.Length <= LowerBuffer)
                     {

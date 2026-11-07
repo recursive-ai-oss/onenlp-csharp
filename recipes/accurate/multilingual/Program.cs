@@ -66,6 +66,16 @@ internal static class Program
     {
         try
         {
+            if (args.Length > 0 && args[0] == "verify-export")
+            {
+                if (Opt(args, "threads", string.Empty).Length > 0)
+                {
+                    TensorCompute.Threads = Num(args, "threads", 8);
+                }
+
+                return VerifyExport(args);
+            }
+
             if (args.Length == 0 || args[0] != "train")
             {
                 Console.Error.WriteLine("usage: train ... (see the comment at the top of Program.cs)");
@@ -417,6 +427,100 @@ internal static class Program
         }
     }
 
+    // verify-export --export DIR --lang pt --data DATA [--predict-limit 100]: the packaged model, rebuilt from its files the way the package does
+    // (encoder from parts, heads from the per-language file), analyses the first sentences of the test file as raw text; the output is written
+    // in the format of --raw predictions so that it can be compared line by line with them.
+    private static int VerifyExport(string[] args)
+    {
+        string dir = Required(args, "export");
+        string lang = Required(args, "lang");
+        predictLimit = Num(args, "predict-limit", 100);
+        (string td, string prefix) = Treebanks[lang];
+        string gold = Path.Combine(Required(args, "data"), "eval", "ud", td, lang == "it" ? "it_markit-ud-test.conllu" : $"{prefix}-test.conllu");
+        using JsonDocument description = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(dir, "encoder.json")));
+        JsonElement shape = description.RootElement.GetProperty("shape");
+        Stream[] table = [.. Directory.GetFiles(dir, "token-table-0?.bin").Order(StringComparer.Ordinal).Select(f => (Stream)File.OpenRead(f))];
+        using Stream layers = new ConcatenatedFiles([Path.Combine(dir, "encoder-layers.ckpt.part1"), Path.Combine(dir, "encoder-layers.ckpt.part2")]);
+        using Stream tokenizerJson = File.OpenRead(Path.Combine(dir, "tokenizer.json"));
+        using TrainableTransformerEncoder encoder = TrainableTransformerEncoder.FromParts(
+            description.RootElement.GetProperty("settings"),
+            shape.GetProperty("vocabularySize").GetInt32(),
+            shape.GetProperty("width").GetInt32(),
+            shape.GetProperty("layers").GetInt32(),
+            shape.GetProperty("feedForwardWidth").GetInt32(),
+            tokenizerJson,
+            table,
+            layers);
+        foreach (Stream t in table)
+        {
+            t.Dispose();
+        }
+
+        SharedEncoder.Register("multilingual-large", encoder);
+        using Pipeline package = PipelineFile.Load(Path.Combine(dir, "heads", lang + ".onenlp"));
+        var tokenizer = new Pipeline(UaxWordTokenizer.For(Language.FromCode(lang)), Language.FromCode(lang));
+        string output = Required(args, "out");
+        var clock = Stopwatch.StartNew();
+        PredictRaw(encoder, [], tokenizer, SegmentationData.For(Language.FromCode(lang)), gold, output, package);
+        double seconds = clock.Elapsed.TotalSeconds;
+        int words = File.ReadLines(output).Count(l => l.Length > 0 && l[0] != '#' && !l.AsSpan(0, Math.Min(l.Length, 8)).Contains('-'));
+        Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"analysed {words} words in {seconds:F1} s with {TensorCompute.Threads} threads: {words / seconds:F0} words/s"));
+        return 0;
+    }
+
+    // The files joined end to end, read as one stream (the layers' checkpoint is shipped in two halves).
+    private sealed class ConcatenatedFiles(string[] files) : Stream
+    {
+        private readonly MemoryStream _all = Join(files);
+
+        private static MemoryStream Join(string[] names)
+        {
+            var ms = new MemoryStream();
+            foreach (string f in names)
+            {
+                using FileStream fs = File.OpenRead(f);
+                fs.CopyTo(ms);
+            }
+
+            ms.Position = 0;
+            return ms;
+        }
+
+        public override bool CanRead => true;
+
+        public override bool CanSeek => true;
+
+        public override bool CanWrite => false;
+
+        public override long Length => _all.Length;
+
+        public override long Position { get => _all.Position; set => _all.Position = value; }
+
+        public override void Flush()
+        {
+        }
+
+        public override int Read(byte[] buffer, int offset, int count) => _all.Read(buffer, offset, count);
+
+        public override int Read(Span<byte> buffer) => _all.Read(buffer);
+
+        public override long Seek(long offset, SeekOrigin origin) => _all.Seek(offset, origin);
+
+        public override void SetLength(long value) => throw new NotSupportedException();
+
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _all.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }
+
     // Entity types to the family scheme. WikiNER and UNER already use PER, ORG, LOC (and MISC); GermEval's OTH is MISC and its derived and
     // partial variants are outside; Turkish-WikiNER keeps PERSON, ORG, GPE and LOC (GPE joins LOC) and drops its other types.
     private static string MapTag(string tag)
@@ -576,16 +680,25 @@ internal static class Program
         return false;
     }
 
-    private static void PredictRaw(IEncoder encoder, ITrainableComponent[] heads, Pipeline tokenizer, SegmentationData data, string gold, string output)
+    private static void PredictRaw(IEncoder encoder, ITrainableComponent[] heads, Pipeline tokenizer, SegmentationData data, string gold, string output, Pipeline? package = null)
     {
         var forms = new MultiwordFormsComponent(tokenizer.Language);
         var sb = new StringBuilder();
         var chunk = new List<string>();
         void Flush()
         {
-            Doc doc = tokenizer.Process(string.Join(' ', chunk));
-            forms.Process(doc);
-            Annotate(encoder, heads, [doc]);
+            Doc doc;
+            if (package is not null)
+            {
+                doc = package.Process(string.Join(' ', chunk));
+            }
+            else
+            {
+                doc = tokenizer.Process(string.Join(' ', chunk));
+                forms.Process(doc);
+                Annotate(encoder, heads, [doc]);
+            }
+
             foreach (Span sentence in doc.Sentences)
             {
                 int first = sentence.Start;
