@@ -122,10 +122,17 @@ internal static partial class Program
         public Pipeline Pipeline { get; } = pipeline;
     }
 
-    // The accurate tier rebuilt from its exported files, the way the package does: the encoder from its parts, the heads from the
-    // per-language files. Read-only use.
-    private static TrainableTransformerEncoder LoadEncoder(string dir)
+    // The accurate tier rebuilt from its exported files, the way the package does: the encoder, the heads from the per-language files.
+    // Two layouts: a graph cut in pieces (encoder.onnx.part1, ...; served by the inference runtime) or trainable-module parts. Read-only use.
+    private static IEncoder LoadEncoder(string dir)
     {
+        if (File.Exists(Path.Combine(dir, "encoder.onnx.part1")))
+        {
+            using Stream graph = new ConcatenatedFiles([.. Directory.GetFiles(dir, "encoder.onnx.part*").OrderBy(f => int.Parse(f[(f.LastIndexOf("part", StringComparison.Ordinal) + 4)..], CultureInfo.InvariantCulture))]);
+            using Stream tokenizer = File.OpenRead(Path.Combine(dir, "tokenizer.json"));
+            return TransformerEncoder.FromStreams(graph, tokenizer, SubwordPooling.Mean, expandWordForms: true);
+        }
+
         using JsonDocument description = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(dir, "encoder.json")));
         JsonElement shape = description.RootElement.GetProperty("shape");
         Stream[] table = [.. Directory.GetFiles(dir, "token-table-0?.bin").Order(StringComparer.Ordinal).Select(f => (Stream)File.OpenRead(f))];
@@ -150,6 +157,12 @@ internal static partial class Program
                 t.Dispose();
             }
         }
+    }
+
+    private static string HeadsFile(string dir, string lang)
+    {
+        string file = Path.Combine(dir, "heads", lang + ".onenlp");
+        return File.Exists(file) ? file : Path.Combine(dir, lang + ".onenlp");
     }
 
     // The two halves of the layers' checkpoint, read as one stream.
@@ -221,12 +234,12 @@ internal static partial class Program
         using var tokenizer = Pipeline.Blank(Language.Hindi);
         EvalOverlap? overlap = Opt(args, "pud", string.Empty) is { Length: > 0 } pud ? new EvalOverlap(pud, tokenizer) : null;
 
-        using TrainableTransformerEncoder encoder = LoadEncoder(weights);
+        using IEncoder encoder = LoadEncoder(weights);
         SharedEncoder.Register(EncoderName, encoder);
         var sources = new List<Source>();
         foreach (string lang in langs)
         {
-            sources.Add(new Source(lang, PipelineFile.Load(Path.Combine(weights, "heads", lang + ".onenlp"))));
+            sources.Add(new Source(lang, PipelineFile.Load(HeadsFile(weights, lang))));
         }
 
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"loaded encoder and {sources.Count} head sets in {clock.Elapsed.TotalSeconds:F1} s, threads={TensorCompute.Threads}"));
@@ -346,7 +359,7 @@ internal static partial class Program
     }
 
     // Encodes the batch once and lets every source's heads read the same vectors: the encoder dominates the cost, the heads are small.
-    private static void WriteBatch(Stream output, List<Source> sources, TrainableTransformerEncoder encoder, List<(int Doc, Doc Tokens)> batch)
+    private static void WriteBatch(Stream output, List<Source> sources, IEncoder encoder, List<(int Doc, Doc Tokens)> batch)
     {
         Doc[] docs = [.. batch.Select(b => b.Tokens)];
         EncodedBatch encoded = encoder.Encode(docs);

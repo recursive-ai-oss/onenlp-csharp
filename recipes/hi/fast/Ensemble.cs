@@ -162,8 +162,8 @@ internal static partial class Program
                     break;
                 }
 
-                // Chunks are labelled by separate processes, so the same sentence can come from two of them.
-                if (!seen.Add(s.Text))
+                // Chunks are labelled by separate processes, so the same sentence can come from two of them. (Scoring runs keep every sentence.)
+                if (!perSource && !seen.Add(s.Text))
                 {
                     duplicates++;
                     continue;

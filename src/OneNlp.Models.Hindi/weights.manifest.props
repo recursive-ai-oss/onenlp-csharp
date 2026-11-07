@@ -2,11 +2,11 @@
   <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
        To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
   <ItemGroup>
-    <HindiWeight Include="tagging.onenlp" Size="36038709" Sha256="efa8565220bb46c7232fe85287df3a3abbbaaf0663b2c82c61d370866bc5a00c"
-                  Recipe="recipes/it/fast" Data="UD Hindi-ParlaMint (CC BY-SA 4.0) and Hindi-MarkIT (CC BY 4.0) r2.18" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
-    <HindiWeight Include="parser.onenlp" Size="39259052" Sha256="ea95770362858bf0fd1c201297008ea9a0e89e675718cda1706aa5cda9f6dd7a"
-                  Recipe="recipes/it/fast" Data="UD Hindi-ParlaMint (CC BY-SA 4.0) and Hindi-MarkIT (CC BY 4.0) r2.18" Contents="biaffine dependency parser, sentence starts" />
-    <HindiWeight Include="ner.onenlp" Size="35681976" Sha256="2f74f2e7dc93f3029cbee8889a0ced83281ef26d4eb65852d63b3c76d8b7b40e"
-                  Recipe="recipes/it/fast" Data="WikiNER Hindi wp3 (CC BY 4.0 labels over Wikipedia text)" Contents="entity recognizer (PER, LOC, ORG, MISC)" />
+    <HindiWeight Include="tagging.onenlp" Size="35774549" Sha256="8f73bba91b4d4b6b4c17c875f55d6e6db543b08f0ba2b7016b763c78632b8877"
+                  Recipe="recipes/hi/fast" Data="Hindi FineWeb-2 text labelled by the accurate tier (ODC-By 1.0 text; labeller SA lineage)" Contents="sentencizer, morphologizer (UPOS, UFeats)" />
+    <HindiWeight Include="parser.onenlp" Size="48363702" Sha256="1f405d76f9e49a902eaed4571606cd0766d2f095b2429393f13a85143a3962e8"
+                  Recipe="recipes/hi/fast" Data="Hindi FineWeb-2 text labelled by the accurate tier (ODC-By 1.0 text; labeller SA lineage)" Contents="biaffine dependency parser, sentence starts" />
+    <HindiWeight Include="ner.onenlp" Size="35677809" Sha256="8ece57eac0ecb3640a599c72d0b6c78abe7216b1d1549cdb1dc8b4f243217efc"
+                  Recipe="recipes/hi/fast" Data="Hindi FineWeb-2 text labelled by the accurate tier (ODC-By 1.0 text; labeller SA lineage)" Contents="entity recognizer (PER, LOC, ORG)" />
   </ItemGroup>
 </Project>

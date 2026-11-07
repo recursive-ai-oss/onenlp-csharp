@@ -3,6 +3,7 @@
 #
 #   evaluate.sh dev   <models-dir> <weights-dir> <out-dir>    the hand-annotated sentences (testdata/hi/selfdev.conllu, testdata/hi/nerspot.iob2)
 #   evaluate.sh final <models-dir> <weights-dir> <out-dir> <hi_pud-ud-test.conllu>
+#   evaluate.sh spacy <models-dir> <weights-dir> <out-dir> <spacy-prediction-dir> <hi_pud-ud-test.conllu>   (after final: same out-dir)
 #                                                            the evaluation treebank, once, for the final model
 #
 # models-dir holds tagging.onenlp, parser.onenlp and ner.onenlp; weights-dir holds the accurate tier's exported files. Needs the repository
@@ -59,6 +60,18 @@ final)
   score labeller-gold "$PUD" "$OUT/labeller-gold/src-ensemble.conllu"
   score labeller-raw "$PUD" "$OUT/labeller-raw/src-ensemble.conllu"
   score segment "$PUD" "$OUT/segment.conllu"
+  ;;
+spacy)
+  # Predictions of the black-box spaCy baseline trained on the same labelled sentences (tools/baselines/spacy/hi_selflabelled.sh), scored the
+  # same way: <pred-dir> holds pred-gold.conllu, pred-raw.conllu and pred-nerspot.tsv (token, labelled tag, predicted tag).
+  PRED=${5:?spaCy prediction directory}
+  PUD=${6:?evaluation treebank}
+  score spacy-gold "$PUD" "$PRED/pred-gold.conllu" "$OUT/student-gold.conllu"
+  score spacy-raw "$PUD" "$PRED/pred-raw.conllu" "$OUT/student-raw.conllu"
+  cut -f1,2 "$PRED/pred-nerspot.tsv" > "$OUT/spacy-nerspot-gold.tsv"
+  cut -f1,3 "$PRED/pred-nerspot.tsv" > "$OUT/spacy-nerspot.tsv"
+  $E span --gold "$OUT/spacy-nerspot-gold.tsv" --pred "$OUT/spacy-nerspot.tsv" --component spacy-ner --language hi --dataset nerspot --resamples 1000 --seed 20261107 \
+    --json "$OUT/spacy-ner.json" --markdown "$OUT/spacy-ner.md" > /dev/null
   ;;
 *) echo "unknown stage $STAGE" >&2; exit 2 ;;
 esac

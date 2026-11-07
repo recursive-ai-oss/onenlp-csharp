@@ -1,38 +1,38 @@
-# Italian fast-tier recipe
+# Hindi fast-tier recipe
 
-Trains the three parts of the Italian fast-tier pipeline with the public `Train` API and writes CoNLL-U predictions for scoring:
+Hindi has no treebank or entity corpus that we may train on (Hindi-HDTB and the Samanantar-sourced entity sets are non-commercial; `docs/ud-licences.md`), and Hindi-PUD is a test set. So the Hindi student is trained on **labels that the accurate tier makes on Hindi web text**, in two steps that this program runs:
 
-| Part | Command | Components | Data |
-|---|---|---|---|
-| `tagging.onenlp` | `train-tagging` | sentencizer, tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer on one `FastEncoder` | the derived `it_gating` train and dev files (UD Italian-ParlaMint and Italian-MarkIT r2.18, 897 and 381 sentences) |
-| `parser.onenlp` | `train-parser` | biaffine dependency parser with sentence starts, fast encoder and a two-layer bidirectional LSTM | the derived `it_gating` train and dev files (UD Italian-ParlaMint and Italian-MarkIT r2.18, 897 and 381 sentences) |
-| `ner.onenlp` | `ner-train` | entity recognizer (BILUO tagging, constrained decoding; PER, LOC, ORG, MISC) on a fast encoder | WikiNER Italian wp3 train, dev |
+1. `label`: the shared multilingual encoder reads each Hindi sentence once; the heads of nine other languages (English, German, French, Spanish, Portuguese, Italian, Dutch, Turkish, Chinese; each trained on its own treebank and entity data) all write their analysis of it. This is zero-shot cross-lingual transfer through a multilingual encoder, with several source languages instead of one (McDonald, Petrov and Hall 2011, multi-source transfer of delexicalized parsers; Conneau et al. 2020 and Wu and Dredze 2019 for transfer through a shared multilingual encoder).
+2. `ensemble`: the nine analyses are combined by agreement (Zhou and Li 2005, tri-training: independently trained models agreeing is the confidence).
+   - UPOS is the plurality label; a UFeats value is kept when more than half of the sources give it.
+   - The tree is the medoid of the nine trees (highest mean unlabelled agreement with the others), with each relation voted among the sources that share its head.
+   - A sentence is kept for syntax when the mean plurality share of its UPOS is at least 0.6, the medoid's mean agreement is at least 0.5, and it has one root.
+   - Entities are spans (type and boundaries) that at least half of the sources produce; a sentence with a span that two or more but fewer than half produce is left out of the entity files.
+   - The thresholds were chosen once, before any student was trained, to keep about half of the sentences. They were not tuned.
 
-Data comes from `tools/fetch/it/fetch.sh`; hashes are in `tools/fetch/it/MANIFEST.md`. The test files are read only by `predict` and `ner-eval`. Every part selects on its development file: early stopping with patience 6 and the best weights restored.
+The student then trains on the kept sentences with `train-tagging` (a morphologizer: UPOS and UFeats), `train-parser` and `ner-train`: the same fast-tier heads and `Train` API as the other languages. There is **no lemmatizer and no XPOS head**: nothing transfers across the nine languages (edit trees are suffix rules of other languages, XPOS sets are language-specific), and a lemmatizer is shipped only if it beats the identity lemma on a check we may use, which none could. The Lemmas row is scored with the identity lemma (`--identity-lemmas`) and is not a model output.
+
+## Data
+
+- **Text:** FineWeb-2 `hin_Deva` (ODC-By 1.0, Common Crawl terms), the Hindi sample of the distillation text (`tools/distill/fetch_data.py`), of which the first 3,200 documents are labelled. Sentences are cut with the Hindi tokenizer and sentencizer (the danda `।` and the full stop). They are kept when they have 5 to 50 tokens, nearly all letters Devanagari and mostly words, and dropped when they share an 8-word run with a Hindi-PUD sentence or repeat. Hits against Hindi-PUD: 0 (the distillation text had already been filtered against the evaluation keys).
+- **Evaluation:** Hindi-PUD is read once, for the final model (`evaluate.sh final`). Selection and checks use 5% of the labelled documents held out (agreement with the labeller only), 17 sentences we annotated ourselves (`testdata/hi/selfdev.conllu`: UPOS, heads and relations in the UD Hindi style) and 91 sentences with hand-labelled entities (`testdata/hi/nerspot.iob2`), both from held-out web documents. The first ranked the source languages and the labelling model, and nothing else.
+
+## Commands
 
 ```
-R="dotnet run -c Release --project recipes/it/fast --"
-$R train-tagging --train it_gating-ud-train.conllu --dev it_gating-ud-dev.conllu --out tagging-dir --plain 1 --relu 1 --depth 1 --recurrent 1 --recurrent-size 64 --lr 0.003 --cosine-epochs 20 --patience 100 --threads 4
-$R train-parser  --train it_gating-ud-train.conllu --dev it_gating-ud-dev.conllu --out parser-dir  [encoder options] --threads 4
-$R ner-convert wikiner-it-wp3-train.iob2 ner-train.jsonl --pieces       # likewise dev; test without --pieces (and with, for ner-eval below)
-$R ner-train ner-train.jsonl ner-dev.jsonl ner-dir [encoder options] --threads 4 --checkpoint-every 100
-# put the three model.onenlp files in one directory as tagging.onenlp, parser.onenlp, ner.onenlp, then
-$R predict --models models --gold it_parlamint-ud-test.conllu --mode gold --out pred-gold.conllu     # gold words and sentences
-$R predict --models models --gold it_parlamint-ud-test.conllu --mode raw  --out pred-raw.conllu      # raw text
-$R ner-eval models/ner.onenlp ner-test.jsonl out-dir [--ref reference-tags.tsv] --pieces-file ner-test-pieces.jsonl
-$R segment --gold it_gating-ud-dev.conllu --out seg.conllu         # tokenizer and sentencizer alone
+R="dotnet run -c Release --project recipes/hi/fast --"
+recipes/hi/fast/label-chunk.sh WEIGHTS TEXT.jsonl PUD.conllu OUT K       # chunk K of 400 documents; 8 chunks were used
+$R ensemble --in OUT/chunk-0000.jsonl.gz,... --out ENS --pos-agree 0.6 --uas-agree 0.5
+recipes/hi/fast/train-part.sh tagging|parser|ner ENS STUDENT              # resumable
+recipes/hi/fast/evaluate.sh dev STUDENT-MODELS WEIGHTS OUT               # hand-annotated sentences
+recipes/hi/fast/evaluate.sh final STUDENT-MODELS WEIGHTS OUT PUD.conllu  # Hindi-PUD, once
+tools/baselines/spacy/hi_selflabelled.sh ...                              # the same-labels baseline
 ```
 
-Score the CoNLL-U files with `tools/OneNlp.Eval ud` (`--ref-pred` for a paired bootstrap against another system's predictions).
+`WEIGHTS` is the directory of the accurate tier's exported files (encoder and `heads/<language>.onenlp`). `label` reads both layouts (trainable parts, or the ONNX graph in pieces) and changes nothing in them. Put the three `model.onenlp` files in one directory as `tagging.onenlp`, `parser.onenlp` and `ner.onenlp` for `predict`, `speed` and the package. `score-sources.sh` and `variants.sh` score the source languages and the pooling variants on the hand-annotated sentences.
 
-Every train command checkpoints (`--checkpoint-every`) and resumes: run it again with the same arguments and it continues, with the same result as an uninterrupted run. `--seconds S` stops cleanly after about `S` seconds.
+## Choices that the evidence settled
 
-Encoder options (`--width --depth --norm-rows --prefix-rows --suffix-rows --shape-rows --prefix --suffix --cased-rows --embed-width --hashes`) replace single settings of `FastEncoder`; without any, the encoder is `FastEncoder.English()`'s configuration. The settings of the shipped model are in `PROVENANCE.md`.
-
-## Multiword tokens
-
-UD Italian writes `del` as one multiword token of the words `di` and `il`, and a verb with enclitic pronouns (`vederlo`) as the verb and the pronouns. The tokenizer cuts such a surface form into pieces (`de`|`l`, `veder`|`lo`; `docs/segmentation.md`), the heads tag and parse the pieces, and `predict` writes the multiword-token line with the treebank's words from `SegmentationData.TryMatchMultiword`, so that scoring sees UD words.
-
-WikiNER keeps `del` whole. A model that reads raw text sees the pieces, so the entity recognizer is trained on `ner-convert --pieces` files (the first piece keeps the tag, later pieces continue the entity), and `ner-eval --pieces-file` gives the model the pieces and scores each original token with the tag of its first piece.
-
-`train-tagging` also takes `--cosine-epochs N` (a fixed budget of N epochs with the rate falling along a half cosine after the warm-up; use it with a large `--patience`). The shipped tagging model uses the flags in the command above: one bidirectional LSTM layer over each document lets a token see words beyond its window neighbours. The parser and entity parts use the default encoder.
+- **Labelling model.** The newer base-size accurate tier (continued training, lemma tables) was tried on the hand-annotated sentences: ensemble UPOS 77.88, UAS 60.58, LAS 46.15, against 79.33, 63.94, 50.48 for the weights the labels came from (within noise on 208 tokens, nominally lower), so the labelling stayed with the earlier weights.
+- **Source languages.** Seven pooling variants (all nine, without English, five to seven of the best single sources) were within noise of each other on those sentences, so all nine are pooled; no weighting.
+- **Segmentation.** UAX #29 plus the sentencizer need no Hindi data: the danda is its own token and ends a sentence. No `SegmentationData.Hindi` exists.

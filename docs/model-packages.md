@@ -14,7 +14,7 @@ A model package carries trained weights for one language (or one task) and makes
 | `RecursiveAI.OneNlp.Models.Multilingual.FrozenEncoder` | the frozen distilled encoder alone, for your own heads | `FrozenStudentEncoder.Create()` | an `IEncoder` |
 | `RecursiveAI.OneNlp.Models.Multilingual.Large` | the base-size accurate tier (`accurate-tier.md`) | `MultilingualLargeModel` | as above, preferred over `.Multilingual` when both are referenced |
 
-There is no Hindi fast-tier package yet (the reason is the training data: `ud-licences.md`). Hindi text is identified, tokenized, split into sentences and run through the Hindi recognizers.
+`RecursiveAI.OneNlp.Models.Hindi` (`HindiModel`) is the fast tier for Hindi: UPOS, features, parse and PER/ORG/LOC entities, with no lemmas or XPOS. There is no allowed Hindi treebank (`ud-licences.md`), so it is trained on web text labelled by the accurate tier (`recipes/hi/fast/README.md`) and is markedly weaker than the other languages. Hindi text is also identified, tokenized, split into sentences and run through the Hindi recognizers without it.
 
 ## What the user does
 

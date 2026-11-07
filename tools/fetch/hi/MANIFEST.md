@@ -49,3 +49,7 @@ Text-level check on the `# text =` line (joined forms for corpora without one): 
 | `notices/hi/ud-hi-pud/LICENSE.txt` | `b278eb53fe50b8bb7fa0d90fb8536c35fdcaa80f9d63812cb51db539555d2a89` |
 | `notices/hi/ud-hi-pud/README.md` | `5ddd43a77e6d947d934bb442a8c9ba79549fb70d54ec8e428ceffc7d7fa864ed` |
 | `notices/hi/naamapadam-hi/README.md` | `2f6a5559ac0c9035f5b8b9c06e67a43f66c4f7b57d048a6ff36aac09b90221f3` |
+
+## Hindi fast tier (self-labelled web text)
+
+The Hindi student does not train on the corpora above. Its text is FineWeb-2 `hin_Deva` (see `recipes/hi/fast/PROVENANCE.md`); `selfdev.py`, `nerspot.py` and `iob2_to_conllu.py` in this directory build the hand-annotated checks in `testdata/hi/`. Hindi-PUD (above, sha256 `3562b7f49420912acad70a45a483f683dcb44624ea92f82e21b29f2ee41a9dff`) is read once, for the final model. Naamapadam stays out of training and of every row.

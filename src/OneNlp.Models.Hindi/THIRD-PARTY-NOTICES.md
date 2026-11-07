@@ -1,4 +1,4 @@
-# Third-party notices: RecursiveAI.OneNlp.Models.Italian
+# Third-party notices: RecursiveAI.OneNlp.Models.Hindi
 
 The code and the weights of this package are licensed `MIT OR Apache-2.0`, Copyright (c) Recursive AI, LLC. The package depends on `RecursiveAI.OneNlp.Neural` and, through it, on `RecursiveAI.OneNlp`, `RecursiveAI.OneModel`, `RecursiveAI.OneModel.Training` and `RecursiveAI.OneFont`, which carry their own notices.
 
@@ -6,10 +6,12 @@ The code and the weights of this package are licensed `MIT OR Apache-2.0`, Copyr
 
 The weights are a trained model, not a copy of the data. They were trained on:
 
-- **Universal Dependencies Italian-ParlaMint r2.18**, <https://github.com/UniversalDependencies/UD_Italian-ParlaMint>, annotations of Italian Senate transcripts from the ParlaMint corpora, licensed Creative Commons Attribution-ShareAlike 4.0 International (<https://creativecommons.org/licenses/by-sa/4.0/>); 326 training sentences, 7 in 8 of them for training and the rest for development (`tools/fetch/fetch_lang.py`, `derive_italian`). The weights are derived from share-alike data and carry this credit.
-- **Universal Dependencies Italian-MarkIT r2.18**, <https://github.com/UniversalDependencies/UD_Italian-MarkIT>, grammar example sentences, licensed Creative Commons Attribution 4.0 International (<https://creativecommons.org/licenses/by/4.0/>); its training split is used for training and its development split for development.
+- **FineWeb-2**, Hindi (`hin_Deva`), Hugging Face, <https://huggingface.co/datasets/HuggingFaceFW/fineweb-2>, released under the Open Data Commons Attribution License 1.0 (<https://opendatacommons.org/licenses/by/1-0/>) and subject to the Common Crawl terms of use (<https://commoncrawl.org/terms-of-use>). Web text from the Common Crawl; 61,268 sentences were labelled and used.
 
-Both were used for tags, morphology, lemmas, the dependency parser and sentence starts.
-- **WikiNER, Italian wp3**, Nothman, Ringland, Radford, Murphy and Curran, "Learning multilingual named entity recognition from Wikipedia" (Artificial Intelligence 194, 2013), <https://figshare.com/articles/dataset/Learning_multilingual_named_entity_recognition_from_Wikipedia/5462500>, licensed Creative Commons Attribution 4.0 International. Its labels are silver annotations projected from Wikipedia links over Wikipedia text, which is licensed Creative Commons Attribution-ShareAlike (<https://creativecommons.org/licenses/by-sa/4.0/>); the entity recognizer is derived from that text and is released under the licence above with this credit. Used for the entity recognizer.
+The labels come from the accurate-tier model `RecursiveAI.OneNlp.Models.Multilingual.Large`, which is derived from:
 
-No other data, pretrained weights or label generators were used. Evaluation data (the official test splits) was not used for training or for choosing settings.
+- **mmBERT-base** (Marone et al. 2025, JHU CLSP), MIT licence.
+- **Universal Dependencies** r2.18 treebanks English-EWT, German-GSD, French-GSD, Spanish-AnCora, Portuguese-Bosque, Italian-ParlaMint and Italian-MarkIT, Dutch-Alpino, Turkish-BOUN, Chinese-GSDSimp, licensed Creative Commons Attribution-ShareAlike 4.0 (CC BY 4.0 for AnCora and MarkIT); credit to the treebanks' authors and to the Universal Dependencies project (<https://universaldependencies.org>). The weights are derived from share-alike data and carry this credit.
+- **Named-entity corpora** UNER (CC BY-SA 4.0), GermEval 2014 (CC BY), WikiNER (CC BY 4.0 labels over Wikipedia text, CC BY-SA) and Turkish-WikiNER (CC BY-SA 4.0), as credited in that package's notices.
+
+No other data, pretrained weights or label generators were used. The Hindi test treebank (UD Hindi-PUD) was used for evaluation only.

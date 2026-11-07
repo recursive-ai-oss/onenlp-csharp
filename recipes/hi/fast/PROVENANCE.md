@@ -1,55 +1,44 @@
-# Provenance: Italian fast tier (`recipes/it/fast`)
+# Provenance: Hindi fast tier (`recipes/hi/fast`)
 
-Format: `docs/provenance.md`. The shipped weights are listed in `src/OneNlp.Models.Italian/weights.manifest.props`.
+## Models
 
-- **Data:** the derived `it_gating` treebank for tags, morphology, lemmas, parser and sentence starts: UD Italian-ParlaMint r2.18 (CC BY-SA 4.0) train minus every eighth sentence, plus UD Italian-MarkIT r2.18 (CC BY 4.0) train, 897 sentences and 28,881 words; development is every eighth ParlaMint train sentence plus MarkIT dev, 381 sentences (`derive_italian` in `tools/fetch/fetch_lang.py`; hashes in `tools/fetch/it/MANIFEST.md`). WikiNER Italian wp3 (CC BY 4.0 labels, silver, over Wikipedia text; our split by article index) train and dev for entities, with articulated prepositions and verbs with enclitics cut into the tokenizer's pieces. The larger Italian treebanks (ISDT, VIT, ParTUT, PoSTWITA, KIParlaForest) are non-commercial and were not fetched. Test files are read only by `predict` and `ner-eval`.
-- **Share-alike lineage:** yes (ParlaMint is CC BY-SA 4.0; WikiNER's text is Wikipedia). Label generator: none. Pretrained components: none.
-- **Configuration:** hash embeddings as in `FastEncoder.English()` (64-wide, one hash function and 32,768 rows for each of lower-cased form, 3-character prefix, 3-character suffix and shape, mixed to 256).
-  - Tagging (seed 1): one ReLU window layer and one bidirectional LSTM layer of 64 units per direction over each document, no layer normalization after the mix (`--plain 1 --relu 1 --depth 1 --recurrent 1 --recurrent-size 64`), AdamW 3e-3, 200 warm-up steps, a half-cosine fall over a fixed 60 epochs (`--lr 0.003 --cosine-epochs 60 --patience 100`), dropout 0.5, 1,000-word batches.
-  - Parser (seed 7): biaffine parser, one bidirectional LSTM layer of 128 units per direction, dropout 0.4, AdamW 2e-3, at most 80 epochs with patience 20, documents of 10 sentences (`--lstm 128 --lstm-layers 1 --dropout 0.4 --epochs 80 --patience 20`).
-  - Entities (seed 7): BILUO tagging with constrained decoding, the default encoder, dropout 0.4, at most 8 epochs with patience 3 (`--epochs 8 --patience 3`).
-- **Produced:** 2026-11-06, AMD Ryzen 9 7950X3D (shared), 2 to 4 training threads per part, in chunks of at most 25 minutes that resume from checkpoints; .NET SDK 10.0.403, OneModel 1.0.0. Tagging: 60 epochs, 1,800 steps, about 8.5 minutes (best on dev at step 1,290, dev mean of UPOS, XPOS, UFeats and lemmas 93.27). Parser: 80 epochs, about 10 minutes (best at step 1,722, dev LAS 74.81). Entities: 8 epochs, 27,405 steps, about 1.5 hours over four chunks (best at step 20,553, dev F1 87.31).
-- **Weights (sha256):** `tagging.onenlp` efa8565220bb46c7232fe85287df3a3abbbaaf0663b2c82c61d370866bc5a00c (36.0 MB); `parser.onenlp` 443df6be06ab59bebcdbaf507878e7109ff3278d389b5afd52783b0fe0853e7d (41.0 MB); `ner.onenlp` 2f74f2e7dc93f3029cbee8889a0ced83281ef26d4eb65852d63b3c76d8b7b40e (35.7 MB).
-- **Choices on the development set only:** tagging was tried with 64 and 128 LSTM units, 20 and 60 epochs and dropout 0.1, 0.3 and 0.5; the dev means were 92.91 (20 epochs), 93.12 (60 epochs), 93.17 (128 units), 93.21 (dropout 0.3) and 93.27 (dropout 0.5), all within noise of each other, and the smallest configuration with the highest score was kept. Parser dev LAS: 74.20 (two layers of 192 units, dropout 0.25), 74.78 (the same, dropout 0.4, 80 epochs), 74.81 (one layer of 128, dropout 0.4, 80 epochs), 75.02 (two layers of 192, dropout 0.5, learning rate 3e-3, 101 epochs); the one-layer 128-unit model was kept because it costs less per token for a difference inside the noise. Tokenization rules were chosen on the training and development files (`docs/segmentation.md`).
-- **Test reads:** one read of the ParlaMint test file for the final tagging and parser models in each mode, and one of the WikiNER test file for the final entity model. Nothing else was scored on test.
-- **Cost** (indicative, one thread on the shared worker at load average about 13, raw test text, `speed`): the whole pipeline (tokenizer, tagging, parser, entities) 7.2k tokens/s, about 4.7 KB managed allocation per token.
-- **Data limits:** 897 training sentences (28,881 words) are a small fraction of what the other fast-tier languages train on. The development set mixes ParlaMint transcripts with MarkIT grammar examples, so dev scores are optimistic about unseen transcripts. 13 of the 375 ParlaMint test sentences and 87 of the 6,234 WikiNER test sentences also occur as exact text in the training files (short fragments); the official splits are kept.
+| File | Size | sha256 | Contents |
+|---|---:|---|---|
+| `tagging.onenlp` | 35,774,549 | `8f73bba91b4d4b6b4c17c875f55d6e6db543b08f0ba2b7016b763c78632b8877` | sentencizer, morphologizer (UPOS, UFeats) |
+| `parser.onenlp` | 48,363,702 | `1f405d76f9e49a902eaed4571606cd0766d2f095b2429393f13a85143a3962e8` | biaffine parser, sentence starts |
+| `ner.onenlp` | 35,677,809 | `8ece57eac0ecb3640a599c72d0b6c78abe7216b1d1549cdb1dc8b4f243217efc` | entity recognizer (PER, ORG, LOC), tagging decoder |
 
-## Results (UD Italian-ParlaMint r2.18 test and WikiNER Italian wp3 test, bootstrap 95% over sentences, 1,000 resamples, seed 1; reference: spaCy 3.8.18 default configuration trained on the same data, `tools/baselines/spacy/lang/PROVENANCE.md`)
+All three are trained with the public `Train` API on Hindi text labelled by the accurate tier; none was trained on any human Hindi annotation. **Share-alike lineage: yes**, through the labeller (below).
 
-Gold words and sentences (the treebank's, as the reference is run; paired with spaCy's predictions):
+## Data
 
-| Metric | Ours | spaCy | Within noise |
+| Dataset | Version, source | Licence | Role |
 |---|---|---|---|
-| UPOS | 94.44 [93.92, 94.96] | 94.10 [93.58, 94.60] | yes |
-| XPOS | 93.74 [93.16, 94.27] | 93.59 [93.04, 94.13] | yes |
-| UFeats | 89.52 [88.85, 90.16] | 87.42 [86.67, 88.14] | no (ahead) |
-| AllTags | 86.31 [85.55, 87.06] | 84.08 [83.30, 84.89] | no (ahead) |
-| Lemmas | 95.18 [94.73, 95.63] | 93.13 [92.58, 93.64] | no (ahead) |
-| UAS | 78.52 [77.27, 79.92] | 77.08 [76.00, 78.21] | yes |
-| LAS | 72.57 [71.24, 74.06] | 71.39 [70.26, 72.58] | yes |
+| FineWeb-2, `hin_Deva` | `HuggingFaceFW/fineweb-2` revision af9c13333eb981300149d5ca60a8e9d659b276b9; the Hindi distillation sample (12,449 documents, 24,000,435 characters; filtered by language score, length and against the evaluation keys of the distillation work, which dropped 1,780 documents) | ODC-By 1.0 and Common Crawl terms of use | train and dev: documents 0 to 3,199 of the sample labelled (61,268 sentences, 1,118,047 tokens after dropping 144 repeats); a document whose index is divisible by 20 is dev |
+| UD Hindi-PUD r2.18 | `hi_pud-ud-test.conllu`, sha256 `3562b7f49420912acad70a45a483f683dcb44624ea92f82e21b29f2ee41a9dff` | CC BY-SA 3.0 | eval only; read once for the final model; no training sentence shares an 8-word run with it |
+| Hand-annotated sentences | `testdata/hi/selfdev.conllu` (17 sentences), `testdata/hi/nerspot.iob2` (91 sentences): our own labels over held-out FineWeb-2 sentences | text ODC-By 1.0, labels ours | dev only |
 
-Raw text (spaCy's tokenizer keeps `del` and `farlo` whole, so its Words and tagging rows lose on multiword tokens):
+Training reads only the ensemble's train and dev files. No UD Hindi-HDTB, Naamapadam, Samanantar or other non-commercial Hindi data is in the lineage of the labeller or of the student: the labeller's heads were trained on the treebanks and entity corpora of nine other languages only.
 
-| Metric | Ours | spaCy | Within noise |
-|---|---|---|---|
-| Tokens | 99.86 [99.76, 99.96] | 99.75 [99.62, 99.87] | yes |
-| Sentences | 96.00 [93.87, 97.86] | 87.55 [83.59, 91.22] | no (ahead) |
-| Words | 99.67 [99.52, 99.80] | 89.73 [88.86, 90.58] | no (ahead) |
-| UPOS | 94.01 [93.45, 94.51] | 83.53 [82.50, 84.48] | no (ahead) |
-| XPOS | 93.32 [92.71, 93.88] | 83.20 [82.15, 84.24] | no (ahead) |
-| UFeats | 89.03 [88.36, 89.72] | 76.92 [75.88, 77.94] | no (ahead) |
-| AllTags | 85.83 [85.05, 86.61] | 73.36 [72.21, 74.42] | no (ahead) |
-| Lemmas | 94.78 [94.29, 95.27] | 83.03 [82.06, 83.97] | no (ahead) |
-| UAS | 78.29 [77.10, 79.62] | 64.08 [62.65, 65.57] | no (ahead) |
-| LAS | 72.77 [71.46, 74.16] | 58.38 [56.92, 59.86] | no (ahead) |
+## Label generator
 
-Entities, WikiNER Italian wp3 test, gold tokens (our model reads the tokenizer's pieces and each token takes the tag of its first piece): micro F1 86.35 [85.73, 87.01] vs 83.54 [82.85, 84.26] (difference +2.80 [2.18, 3.42], ahead); precision 86.60 vs 83.89; recall 86.10 vs 83.20. Per type: LOC 87.89 vs 86.77 (+1.12 [0.39, 1.86], within noise); MISC 77.64 vs 72.06 (+5.57), ORG 82.84 vs 74.79 (+8.06) and PER 89.97 vs 87.34 (+2.64) ahead.
+The accurate tier of the first base-size release: mmBERT-base (MIT; Marone et al. 2025) fine-tuned on UD r2.18 (English-EWT, German-GSD, French-GSD, Spanish-AnCora, Portuguese-Bosque, Italian-ParlaMint and MarkIT, Dutch-Alpino, Turkish-BOUN, Chinese-GSDSimp: CC BY-SA 4.0 and CC BY 4.0) and UNER, GermEval 2014, WikiNER and Turkish-WikiNER (CC BY 4.0 and CC BY-SA 4.0), with a set of heads per language. The heads files had sha256 `e96bd7a9...` (en), `8dfc9548...` (de), `4faaafed...` (fr), `5c659c6e...` (es), `f61b0e00...` (pt), `6b9ea8a5...` (it), `8ed30...` (nl), `1caadd9e...` (tr), `35a37a77...` (zh); the full values are in the history of `src/OneNlp.Models.Multilingual.Large/weights.manifest.props`, and the lineage is in that package's `PROVENANCE.md`. Weights licence MIT; no hosted-LLM labels. Share-alike lineage: yes. The labeller is not redistributed by this package.
 
-Tokenizer alone on the development split, raw text: tokens 99.75 [99.43, 99.93], words 99.61 [99.23, 99.79] (rules alone; the parser sets sentences in the pipeline).
+## Recipe
 
-**Misses:** none. Every row is within noise of spaCy or ahead. The parser rows (UAS 78.5, LAS 72.6) are low in absolute terms because 897 sentences are little data; the reference is trained on the same sentences, so the comparison is fair, but the model is not comparable with systems trained on ISDT (published Stanza, UDPipe 2 and Trankit rows in `docs/references.md` use it).
+- Labelling: 400-document chunks, 9 source heads, one encoder pass per batch of 32 sentences, 8 threads, about 12 minutes per chunk; 8 chunks.
+- Ensemble: `--pos-agree 0.6 --uas-agree 0.5` (README.md). Kept for syntax: 32,756 of 61,268 sentences (31,036 train, 1,720 dev; 429,089 tokens; mean plurality share 0.760, mean medoid agreement 0.614). Kept for entities: 53,100 (50,245 train, 2,855 dev) with 14,750 PER, 1,622 ORG and 7,712 LOC; 8,168 sentences had a contested span and were left out.
+- Tagging: one window layer and a bidirectional LSTM of 64 (`--plain 1 --relu 1 --depth 1 --recurrent 1 --recurrent-size 64`), learning rate 0.003 on a half cosine over 12 epochs, 1,000 words per batch, dropout 0.1, seed 1. Best development step 2,050 of 4,920 (development agreement with the labeller 83.2).
+- Parser: default fast encoder, biaffine head with a two-layer LSTM of 192, 10 epochs, 1,500 words per batch, learning rate 0.002, dropout 0.25, seed 7. Best step 1,993 of 2,848 (development LAS against the labeller 52.9).
+- Entities: default fast encoder, tagging decoder, 8 epochs, learning rate 0.003, dropout 0.4, seed 7. Best step 5,290 of 7,054 (development F1 against the labeller 79.07).
+- Machine: x64 host (AMD Ryzen 9 7950X3D), 4 threads for training, resumable chunks of at most 25 minutes. Wall time: tagging 13.3 min, parser 28 min (two runs), entities 22.9 min.
+- PyTorch timing: no new head design, so not taken.
+- CPU ledger: labelling 8 chunks about 12.4 CPU-hours (8 reserved cores each, an upper bound), training about 4.4, evaluation and checks about 4: about 21 CPU-hours.
 
-## Parser, faster configuration
+## Black-box baseline
 
-The parser part was retrained with one LSTM layer and product label features (`docs/parser.md`, "Speed configuration"): flags `--lstm 192 --lstm-layers 1 --arc 192 --label 96 --label-bilinear 0 --label-product 1`; everything else as above (seed 7, dropout 0.25, 1,500-word batches, ten sentences per document, patience 6 on dev LAS). Data: the derived `it_gating` train and dev files (UD Italian-ParlaMint and Italian-MarkIT r2.18) (CC BY-SA 4.0 or CC BY 4.0 as listed above; share-alike lineage unchanged). Best dev LAS 73.970 at step 751; about 5 minutes on 4 threads of the shared worker; trainer weights hash `d0ef7870e36050939a3e7cfda84f7119036e614cc7ebd7c39f025192bf11e7ce`. File `parser.onenlp`: 39,259,052 bytes, sha256 `ea95770362858bf0fd1c201297008ea9a0e89e675718cda1706aa5cda9f6dd7a`. Test rows, speed and the earlier parser's rows: `docs/results.md`, "Parser speed". The earlier parser is reproduced by the same command without the label and LSTM flags above (defaults of the recipe).
+spaCy 3.8.18 (thinc 8.3.14) `spacy train` on the same labelled sentences (syntax: 31,036 train, 1,720 dev; entities: 50,245 and 2,855). Configs written by `spacy init config --lang hi --pipeline morphologizer,parser --optimize efficiency` (sha256 `a3124bb44d726fac590e2c94c67084fe1d419d91aa3feecf2822e48fa027e0bc`) and `--pipeline ner` (`c914dca7257cd7f0cb0a2039e07a5d25c103f67b71ddc6204f4c1f643b88459e`). One core on an arm64 Mac mini: 23.6 minutes for syntax (16 epochs), 4.8 minutes for entities.
+
+## Results
+
+In `docs/results-table.md`, section "Hindi".
