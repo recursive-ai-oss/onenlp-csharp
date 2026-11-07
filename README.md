@@ -68,14 +68,25 @@ Call-by-call maps, with no compatibility shims:
 
 [docs/results-table.md](docs/results-table.md) has one table: component, language, metric, our score with its interval, the reference, and whether the difference is within noise. In short:
 
-- **Tokenizers** are byte-exact against Hugging Face `tokenizers` and `tiktoken` on twelve model families, and faster than Microsoft.ML.Tokenizers on every timed row.
+- **Tokenizers** are byte-exact against Hugging Face `tokenizers` and `tiktoken` on twelve model families, and at least as fast as Microsoft.ML.Tokenizers on all 47 timed rows (rows the comparator cannot reproduce are listed in the results).
 - **Language ID** is more accurate than Lingua on words, word pairs and sentences, and faster on every row (a few rows below it per language are listed).
 - **Recognizers** score ahead of Microsoft.Recognizers.Text on our hand-labelled sets in ten languages, and faster.
 - **The fast tier** is within noise of spaCy 3.8.18 trained on the same data on the gated UD and entity rows, or ahead of it; the few rows behind are listed by name.
-- **Text classification and span categorization** are ahead of spaCy's defaults on accuracy and F1; span precision is behind.
+- **Text classification and span categorization** are ahead of spaCy's defaults on accuracy and F1; span precision is within noise at the default threshold.
 - **Embeddings** equal sentence-transformers in the same harness; the model cards' own numbers are shown beside them, with the cells neither reproduces.
 
 Speed against Catalyst on the tagging path is measured at the release gate.
+
+## Known gaps
+
+Stated plainly; each is also in [docs/results-table.md](docs/results-table.md).
+
+- English raw-text MLAS is behind spaCy (65.61 against 69.05; an information row). Spanish PER entities, Portuguese and Chinese entity precision are behind spaCy's per type or per metric while the micro F1 is within noise.
+- Speed against Catalyst on the tagging path is measured at the release gate; Catalyst has English models only, so the other languages have no managed speed comparator.
+- The accurate-tier packages and open-type entity recognition are in progress and have no gated rows; the accurate-tier rows that exist are on English only.
+- Embeddings: five MTEB cells are below the model cards for sentence-transformers itself, and ours equal it.
+- Language ID is below Lingua on some languages and short-text buckets (listed in the results).
+- Italian is trained on 897 sentences, since the larger Italian treebanks are non-commercial.
 
 ## Documentation
 
@@ -92,7 +103,7 @@ You need the .NET SDK pinned in `global.json`.
 
 Build output goes to `artifacts/` in the repository (ignored by git). Set `ONENLP_ARTIFACTS` to a directory to put it elsewhere; each checkout gets its own folder under it. Machine-specific MSBuild overrides can go in an ignored `Directory.Build.local.props`. Weights are not in git: the model projects embed them from a directory named by an environment variable (for example `ONENLP_ENGLISH_WEIGHTS`) and check each file against a committed hash; see each project's `PROVENANCE.md`.
 
-The NativeAOT smoke app is `tests/OneNlp.AotSmoke`; publish it with `dotnet publish tests/OneNlp.AotSmoke -c Release -r <rid>` (it needs the platform's native C toolchain and, on Linux, the zlib development package). Run the samples with `dotnet run --project samples/OneNlp.Samples -- all <path to a tokenizer.json>`.
+The NativeAOT smoke app is `tests/OneNlp.AotSmoke`; publish it with `dotnet publish tests/OneNlp.AotSmoke -c Release -r <rid>` (it needs a native C linker: on Linux clang by default, or gcc with `-p:CppCompilerAndLinker=gcc`, and the zlib development package). Run the samples with `dotnet run --project samples/OneNlp.Samples -- all <path to a tokenizer.json>`.
 
 ## Layout
 

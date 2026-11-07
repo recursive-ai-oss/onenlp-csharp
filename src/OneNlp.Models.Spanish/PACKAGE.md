@@ -4,6 +4,8 @@
 
 > **Early preview.** The weights are development models and will be retrained; the API will change.
 
+**Measured.** UD Spanish-AnCora r2.18 test (and WikiNER Spanish test for entities), against spaCy 3.8.18 trained with its default configuration on the same data (95% paired bootstrap intervals are in the results table). Gold words: UPOS 98.11 against 98.18, UFeats 97.71 against 97.74 and lemmas 98.84 against 98.72 (within noise), LAS 87.00 against 85.95 (ahead). Raw text: UPOS 97.86 against 94.81 and LAS 86.70 against 81.82 (ahead). Entities micro F1 82.88 against 83.35 (within noise). Misses: the PER type of the entity recognizer is 1.96 points below spaCy's (paired -1.96 [-2.83, -1.13]) while ORG is ahead. Data lineage: UD Spanish-AnCora (CC BY 4.0) and WikiNER (CC BY 4.0 labels over Wikipedia text, so share-alike lineage); the weights carry share-alike lineage where the data does. Size: 105.1 MiB of weights. Speed against the managed reference is measured at the release gate.
+
 ```csharp
 using RecursiveAI.OneNlp;
 
