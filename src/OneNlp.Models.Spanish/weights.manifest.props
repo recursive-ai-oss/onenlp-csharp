@@ -6,7 +6,7 @@
                   Recipe="recipes/es/fast" Data="UD Spanish-AnCora r2.18 (CC BY 4.0)" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
     <SpanishWeight Include="parser.onenlp" Size="46033528" Sha256="0e4a5757c048902f7bc150e85901dfd5c7e210b3e153641778256730945a6073"
                   Recipe="recipes/es/fast" Data="UD Spanish-AnCora r2.18 (CC BY 4.0)" Contents="biaffine dependency parser, sentence starts" />
-    <SpanishWeight Include="ner.onenlp" Size="35681976" Sha256="6997910ba28da1ad85d87c16003d832db02f9838d182bfd8d3e2e0022aad03cc"
+    <SpanishWeight Include="ner.onenlp" Size="35682482" Sha256="0e8eda9a203296556c88b135a10800ae41ee248eea25984a6b0c1c4a00becd7e"
                   Recipe="recipes/es/fast" Data="WikiNER Spanish wp3 (CC BY 4.0 labels over Wikipedia text)" Contents="entity recognizer (PER, LOC, ORG, MISC)" />
   </ItemGroup>
 </Project>

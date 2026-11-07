@@ -15,7 +15,7 @@ R="dotnet run -c Release --project recipes/es/fast --"
 $R train-tagging --train es_ancora-ud-train.conllu --dev es_ancora-ud-dev.conllu --out tagging-dir --plain 1 --relu 1 --depth 1 --recurrent 1 --recurrent-size 64 --lr 0.003 --cosine-epochs 20 --patience 100 --threads 4
 $R train-parser  --train es_ancora-ud-train.conllu --dev es_ancora-ud-dev.conllu --out parser-dir  [encoder options] --threads 4
 $R ner-convert wikiner-es-wp3-train.iob2 ner-train.jsonl --pieces       # likewise dev; test without --pieces (and with, for ner-eval below)
-$R ner-train ner-train.jsonl ner-dev.jsonl ner-dir [encoder options] --threads 4 --checkpoint-every 100
+$R ner-train ner-train.jsonl ner-dev.jsonl ner-dir --depth 1 --plain 1 --relu 1 --recurrent 1 --recurrent-size 64 --threads 4 --checkpoint-every 100
 # put the three model.onenlp files in one directory as tagging.onenlp, parser.onenlp, ner.onenlp, then
 $R predict --models models --gold es_ancora-ud-test.conllu --mode gold --out pred-gold.conllu     # gold words and sentences
 $R predict --models models --gold es_ancora-ud-test.conllu --mode raw  --out pred-raw.conllu      # raw text
