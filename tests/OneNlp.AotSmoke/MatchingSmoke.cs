@@ -10,7 +10,7 @@ internal static class MatchingSmoke
     {
         Doc doc = Nlp.Analyze("Acme Corp filed case K1234 on 2024 with Paris Hilton, not the other Hilton.");
 
-        var ruler = new EntityRuler { ["CASE_NO"] = Pattern.Shape("Xdddd") };
+        var ruler = new EntityRuler { { "CASE_NO", Pattern.Shape("Xdddd") } };
         ruler.AddPhrase("ORG", "acme corp", "acme");
         ruler.Add("PER", PatternJson.ParsePattern("""[{"TEXT":"Paris"},{"LOWER":{"REGEX":"^hil+ton$"}}]"""));
         var lowerRuler = new EntityRuler(overwriteEnts: false, TokenProperty.Lower);

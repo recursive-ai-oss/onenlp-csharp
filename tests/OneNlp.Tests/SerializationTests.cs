@@ -198,13 +198,13 @@ public class SerializationTests
         using var ms = new MemoryStream();
         foreach (Doc d in docs)
         {
-            d.WriteTo(ms);
+            d.WriteBinary(ms);
         }
 
         ms.Position = 0;
         foreach (Doc d in docs)
         {
-            AssertSame(d, Doc.FromBytes(ms));
+            AssertSame(d, Doc.FromStream(ms));
         }
 
         Assert.Equal(ms.Length, ms.Position);
@@ -304,7 +304,7 @@ public class SerializationTests
         {
             byte[] cut = bytes[..len];
             Assert.Throws<InvalidDataException>(() => Doc.FromBytes(cut));
-            Assert.Throws<InvalidDataException>(() => Doc.FromBytes(new MemoryStream(cut)));
+            Assert.Throws<InvalidDataException>(() => Doc.FromStream(new MemoryStream(cut)));
         }
     }
 
@@ -366,7 +366,7 @@ public class SerializationTests
         // A header that claims 4 GiB of body, then ends.
         header[8] = header[9] = header[10] = header[11] = 0xFF;
         Assert.Throws<InvalidDataException>(() => Doc.FromBytes(header));
-        Assert.Throws<InvalidDataException>(() => Doc.FromBytes(new MemoryStream(header)));
+        Assert.Throws<InvalidDataException>(() => Doc.FromStream(new MemoryStream(header)));
 
         // A string table that claims 2^31 strings in a few bytes.
         byte[] body = [1, 6, 0, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF, 0x07];

@@ -235,7 +235,7 @@ public class RecognizerTests
         Doc doc = pipeline.Process("Pay $5 million to bob@example.com for 3 km by the 1st.");
         Assert.Equal(
             ["$5 million:MONEY", "bob@example.com:EMAIL", "3 km:QUANTITY", "1st:ORDINAL"],
-            doc.Ents.Select(e => e.Text.ToString() + ":" + e.Label));
+            doc.Ents.Select(e => e.Text + ":" + e.Label));
     }
 
     [Fact]
@@ -250,8 +250,8 @@ public class RecognizerTests
             return doc;
         }
 
-        Assert.Equal(["5 million:MISC", "2020:DATE"], Make(false).Ents.Select(e => e.Text.ToString() + ":" + e.Label));
-        Assert.Equal(["5 million dollars:MONEY", "2020:DATE"], Make(true).Ents.Select(e => e.Text.ToString() + ":" + e.Label));
+        Assert.Equal(["5 million:MISC", "2020:DATE"], Make(false).Ents.Select(e => e.Text + ":" + e.Label));
+        Assert.Equal(["5 million dollars:MONEY", "2020:DATE"], Make(true).Ents.Select(e => e.Text + ":" + e.Label));
     }
 
     [Fact]

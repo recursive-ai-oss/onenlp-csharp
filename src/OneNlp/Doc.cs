@@ -23,6 +23,7 @@ namespace RecursiveAI.OneNlp;
 /// each component in turn.
 /// </para>
 /// </remarks>
+[System.Text.Json.Serialization.JsonConverter(typeof(Serialization.DocJsonConverter))]
 public sealed partial class Doc : IEnumerable<Token>
 {
     private const int AttributeCount = 6;

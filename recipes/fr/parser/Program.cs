@@ -7,7 +7,6 @@ using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
-using RecursiveAI.OneNlp.Neural.Training;
 using RecursiveAI.OneNlp.Segmentation;
 
 namespace RecursiveAI.OneNlp.Recipes.FrParser;

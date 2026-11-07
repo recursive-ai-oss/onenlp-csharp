@@ -18,7 +18,7 @@ string[] lines =
 ];
 using Pipeline nlp = Pipeline.Blank(Language.English)
     .Add(new TextClassifier(FastEncoder.English(7)) { OwnsEncoder = true });
-List<Example> examples = [.. JsonlReader.Read(new StringReader(string.Join('\n', lines)), nlp.Strings, new JsonlOptions { Tokenizer = nlp.Tokenizer })];
+List<Example> examples = [.. JsonlReader.Read(new StringReader(string.Join('\n', lines)), nlp)];
 
 // A fixed seed makes the run repeatable; with CheckpointDirectory set, an interrupted run resumes from its last checkpoint.
 TrainResult result = nlp.Train(examples, new TrainOptions { Epochs = 30, Seed = 7, Dropout = 0f, DevExamples = examples });
@@ -32,7 +32,7 @@ Doc doc = loaded.Process("I lost my pin");
 
 (The sample uses its training set as the development set so that it finishes in seconds; real runs keep them apart.)
 
-- **Data.** `JsonlReader` reads JSON Lines (`text`, optional `tokens`, `entities`, `spans`, `cats`); `ConllUReader` reads Universal Dependencies files. `Example` pairs a predicted `Doc` with a reference `Doc`; when the tokenizations differ it aligns them.
+- **Data.** `JsonlReader` reads JSON Lines (`text`, optional `tokens`, `entities`, `spans`, `cats`); `ConllUReader` reads Universal Dependencies files. `Example` pairs a predicted `Doc` with a reference `Doc`; when the tokenizations differ it aligns them. For data already in memory, `Example.Create(nlp, text, [(start, end, "LABEL")])` takes character offsets and tokenizes with the pipeline. A training program needs `using RecursiveAI.OneNlp;` (pipeline, `Example`, `TrainOptions`), `.Neural` (`PipelineFile`), `.Neural.Components` and `.Neural.Encoders`.
 - **Heads.** `Tagger`, `Morphologizer`, `EditTreeLemmatizer`, `Parser`, `EntityRecognizer`, `TextClassifier`, `SpanCategorizer`, on `FastEncoder` or a transformer encoder; and, as trained word tokenizers, `NeuralMultiwordSplitter` (Turkish and similar) and `NeuralWordSegmenter` (Chinese). Heads that share one encoder instance share its work and add their losses.
 - **Options.** `TrainOptions` has epochs, batch size in words, learning rate and schedule, warm-up, weight decay, clipping, dropout, seed, a frozen-encoder switch, the development set (`DevExamples` or a split), the score function (`DevScores.Ud(...)`, `DevScores.Entities()`, `DevScores.Accuracy()`), evaluation interval, patience, `CheckpointDirectory` and a progress callback. The library never writes to the console.
 - **Repeatable.** The batches depend only on the seed and the epoch. A resumed run reaches the same weights as an uninterrupted one (same machine and thread count). The best development checkpoint is restored at the end.

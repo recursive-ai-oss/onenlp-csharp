@@ -67,7 +67,7 @@ internal static class JsonlTarget
         using var stream = new MemoryStream(data.ToArray());
         try
         {
-            foreach (Example e in JsonlReader.Read(stream, null, Limits))
+            foreach (Example e in JsonlReader.Read(stream, strings: null, options: Limits))
             {
                 if (e.Reference.Length != e.Predicted.Length || e.Alignment.XLength != e.Predicted.Length)
                 {

@@ -4,6 +4,7 @@ namespace RecursiveAI.OneNlp;
 /// A view of a run of tokens of a <see cref="Doc"/> with an optional label and a confidence: an entity, a sentence, a rule match or
 /// any slice. It copies nothing. Offsets are character offsets into the original text. The default value is not a span.
 /// </summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(Serialization.SpanJsonConverter))]
 public readonly struct Span : IEquatable<Span>
 {
     private readonly Doc _doc;
@@ -64,8 +65,11 @@ public readonly struct Span : IEquatable<Span>
     /// <summary>The model's confidence from 0 to 1; 1 for rule-based and unscored spans.</summary>
     public float Confidence => _confidence;
 
-    /// <summary>The text from <see cref="StartChar"/> to <see cref="EndChar"/>, whitespace between tokens included: a slice of the original string.</summary>
-    public ReadOnlySpan<char> Text => _doc.Text.AsSpan(StartChar, EndChar - StartChar);
+    /// <summary>The text from <see cref="StartChar"/> to <see cref="EndChar"/>, whitespace between tokens included, as a new string (spaCy's <c>text</c>). Each call copies; see <see cref="TextSpan"/>.</summary>
+    public string Text => _doc.Text.Substring(StartChar, EndChar - StartChar);
+
+    /// <summary>The same text as a slice of the original string, without copying. Compare contents with <see cref="System.MemoryExtensions.SequenceEqual{T}(ReadOnlySpan{T}, ReadOnlySpan{T})"/>; <c>==</c> on spans compares memory.</summary>
+    public ReadOnlySpan<char> TextSpan => _doc.Text.AsSpan(StartChar, EndChar - StartChar);
 
     /// <summary>The text as memory over the original string.</summary>
     public ReadOnlyMemory<char> TextMemory => _doc.Text.AsMemory(StartChar, EndChar - StartChar);
@@ -91,8 +95,8 @@ public readonly struct Span : IEquatable<Span>
     /// <param name="confidence">The new confidence from 0 to 1.</param>
     public Span With(string? label, float confidence = 1f) => new(_doc, _start, _end, label, confidence);
 
-    /// <summary>Copies the span's text into a new string.</summary>
-    public override string ToString() => Text.ToString();
+    /// <summary>Returns <see cref="Text"/>.</summary>
+    public override string ToString() => Text;
 
     /// <summary>Enumerates the span's tokens without allocating.</summary>
     public Enumerator GetEnumerator() => new(this);

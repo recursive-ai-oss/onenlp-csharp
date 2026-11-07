@@ -7,7 +7,6 @@ using RecursiveAI.OneNlp.Matching;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
-using RecursiveAI.OneNlp.Neural.Training;
 #endif
 using RecursiveAI.OneNlp.Tokenizers;
 
@@ -57,7 +56,7 @@ internal static class Program
 
         using var nlp = Pipeline.Create(Language.German, Tier.Fast)
             .Add<Tagger>().Add<Lemmatizer>().Add<DependencyParser>().Add<EntityRecognizer>()
-            .Add(new EntityRuler { ["CASE_NO"] = Pattern.Shape("dd-dddd") });
+            .Add(new EntityRuler { { "CASE_NO", Pattern.Shape("dd-dddd") } });
         Doc d = nlp.Process(text);
         int batch = 0;
         foreach (Doc x in nlp.ProcessMany(texts)) { batch++; }

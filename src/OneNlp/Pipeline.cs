@@ -125,7 +125,7 @@ public sealed class Pipeline : IDisposable
     }
 
     /// <summary>Adds a component after the existing ones.</summary>
-    /// <param name="component">The component; the pipeline takes ownership and disposes it with the pipeline.</param>
+    /// <param name="component">The component; the pipeline takes ownership and disposes it with the pipeline. An <see cref="Matching.EntityRuler"/> without a tokenizer of its own starts splitting its phrases with this pipeline's <see cref="Tokenizer"/>.</param>
     /// <returns>This pipeline, so calls chain.</returns>
     /// <exception cref="ArgumentException">A component with the same <see cref="IPipelineComponent.Name"/> is already in the pipeline.</exception>
     public Pipeline Add(IPipelineComponent component)
@@ -134,6 +134,11 @@ public sealed class Pipeline : IDisposable
         if (_components.Exists(c => string.Equals(c.Name, component.Name, StringComparison.Ordinal)))
         {
             throw new ArgumentException($"The pipeline already has a component named '{component.Name}'.", nameof(component));
+        }
+
+        if (component is Matching.EntityRuler ruler)
+        {
+            ruler.BindTokenizer(Tokenizer);
         }
 
         _components.Add(component);

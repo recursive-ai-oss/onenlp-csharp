@@ -1,7 +1,7 @@
 using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Scoring;
 
-namespace RecursiveAI.OneNlp.Neural.Training;
+namespace RecursiveAI.OneNlp;
 
 /// <summary>
 /// Ready-made development scores for <see cref="TrainOptions.Score"/>, built on the scorers in <c>RecursiveAI.OneNlp.Scoring</c>.
