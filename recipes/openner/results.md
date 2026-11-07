@@ -14,4 +14,4 @@ Span F1 at threshold 0.5, frozen `student-v1`. Asked types are the file's own ty
 
 References. UNER fixed types: spaCy 3.8.18 trained on the same data, 62.32 [59.45, 65.20]; our dedicated NER heads 61.52 (fast tier) and 75.48 (fine-tuned student). B is above spaCy and inside its interval; the dedicated heads are the better choice when the types are fixed. Few-NERD and CrossNER: the GLiNER paper's tables are the published comparison (it uses a much larger, separately trained encoder); our zero-shot numbers are lower and are information rows. The Qwen labels add 4 to 10 points on four of five CrossNER sets, and cost nothing outside the CI on the others; politics is 2.4 points lower, inside the interval.
 
-A CrossNER mean of the five: A 25.9, B 31.1.
+A CrossNER mean of the five: A 26.0, B 31.1.
