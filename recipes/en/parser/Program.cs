@@ -80,7 +80,9 @@ internal static class Program
             labelSize: Int(o, "label", 128),
             contextLayers: Int(o, "context", 0),
             recurrentSize: Int(o, "lstm", 192),
-            recurrentLayers: Int(o, "lstm-layers", 2))
+            recurrentLayers: Int(o, "lstm-layers", 2),
+            labelBilinear: Int(o, "label-bilinear", 1) == 1,
+            labelProduct: Int(o, "label-product", 0) == 1)
         { OwnsEncoder = true });
 
     private static int Train(Dictionary<string, string> o)
