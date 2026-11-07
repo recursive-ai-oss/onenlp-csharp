@@ -6,7 +6,7 @@ The package packs four saved pipelines (`weights.manifest.props` lists name, siz
 |---|---|---|---|
 | `segmenter.onenlp` | the pipeline's tokenizer: a character B/I tagger (`NeuralWordSegmenter`) on a fast hash-embedding encoder with neighbour, wider-context and character-pair tables, two window layers and two 96-unit bidirectional LSTM layers (`recipes/zh/fast/PROVENANCE.md`) | UD Chinese-GSDSimp r2.18, train and dev | 1 |
 | `tagging.onenlp` | sentencizer, tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, on a fast encoder with one window layer and one 64-unit bidirectional LSTM layer, one-character prefix and suffix | UD Chinese-GSDSimp r2.18, train and dev | 1 |
-| `parser.onenlp` | biaffine dependency parser with sentence starts, fast encoder and a two-layer bidirectional LSTM | UD Chinese-GSDSimp r2.18, train and dev | 7 |
+| `parser.onenlp` | biaffine dependency parser with sentence starts, fast encoder and a one LSTM layer of 192 units per direction, arc 192, label 96, product label features (`docs/parser.md`)  | UD Chinese-GSDSimp r2.18, train and dev | 7 |
 | `ner.onenlp` | entity recognizer (BILUO tagging, constrained decoding; PER, LOC, ORG), fast encoder with two hashes per attribute | UNER Chinese-GSDSIMP, train and dev | 7 |
 
 The sentencizer saved in `tagging.onenlp` is not used by the packaged pipeline; the parser predicts sentence starts.

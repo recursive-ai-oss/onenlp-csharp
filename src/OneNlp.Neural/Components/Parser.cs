@@ -59,8 +59,9 @@ public sealed class Parser : DependencyParser
     /// <param name="recurrentLayers">The number of stacked LSTM layers, 1 to 8, when <paramref name="recurrentSize"/> is above 0. Default 1.</param>
     /// <param name="name">The component name, unique in its pipeline. Default <c>parser</c>.</param>
     /// <param name="labelBilinear">Whether the label scorer has a matrix per label (the biaffine classifier of Dozat and Manning 2017), which costs <c>labelSize</c> times <c>labelSize</c> times the number of labels multiply-adds per token, about ten times the rest of the parser. When false the scorer is the linear map of the dependent and head vectors alone. Default true.</param>
+    /// <param name="labelProduct">Whether the label scorer's linear map also sees the element-wise product of the dependent and head vectors, <c>[d; h; d * h]</c>, which gives it multiplicative interactions at three times the dependent width in place of the matrix per label. Default false.</param>
     /// <exception cref="ArgumentOutOfRangeException">A size is out of range.</exception>
-    public Parser(IEncoder encoder, int arcSize = 256, int labelSize = 128, int contextLayers = 2, int recurrentSize = 0, int recurrentLayers = 1, string name = "parser", bool labelBilinear = true)
+    public Parser(IEncoder encoder, int arcSize = 256, int labelSize = 128, int contextLayers = 2, int recurrentSize = 0, int recurrentLayers = 1, string name = "parser", bool labelBilinear = true, bool labelProduct = false)
         : base(name, encoder)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(arcSize, 1);
@@ -79,6 +80,7 @@ public sealed class Parser : DependencyParser
         RecurrentSize = recurrentSize;
         RecurrentLayers = recurrentLayers;
         LabelBilinear = labelBilinear;
+        LabelProduct = labelProduct;
     }
 
     /// <summary>The width of the arc scorer's vectors.</summary>
@@ -98,6 +100,9 @@ public sealed class Parser : DependencyParser
 
     /// <summary>Whether the label scorer has a matrix per label.</summary>
     public bool LabelBilinear { get; }
+
+    /// <summary>Whether the label scorer sees the element-wise product of the dependent and head vectors.</summary>
+    public bool LabelProduct { get; }
 
     /// <summary>The dependency relations, in output order; empty until the parser is initialized.</summary>
     public IReadOnlyList<string> Labels => _labels;
@@ -356,6 +361,11 @@ public sealed class Parser : DependencyParser
             writer.WriteNumber("labelBilinear", 0);
         }
 
+        if (LabelProduct)
+        {
+            writer.WriteNumber("labelProduct", 1);
+        }
+
         writer.WriteStartArray("labels");
         foreach (string label in _labels)
         {
@@ -392,7 +402,8 @@ public sealed class Parser : DependencyParser
             config.TryGetProperty("recurrentSize", out _) ? JsonSettings.Int(config, "recurrentSize", 0, 1024) : 0,
             config.TryGetProperty("recurrentLayers", out _) ? JsonSettings.Int(config, "recurrentLayers", 1, 8) : 1,
             name,
-            JsonSettings.OptionalInt(config, "labelBilinear", 0, 1, 1) == 1)
+            JsonSettings.OptionalInt(config, "labelBilinear", 0, 1, 1) == 1,
+            JsonSettings.OptionalInt(config, "labelProduct", 0, 1, 0) == 1)
         { OwnsEncoder = true };
         parser.Build(labels, new Generator(0));
         return parser;
@@ -428,7 +439,7 @@ public sealed class Parser : DependencyParser
         }
 
         _rootLabel = _labelIds.TryGetValue(RootLabel, out int root) ? root : -1;
-        _module = new ParserModule(Encoder.Width, ArcSize, LabelSize, ContextLayers, RecurrentSize, RecurrentLayers, labels.Length, LabelBilinear, generator);
+        _module = new ParserModule(Encoder.Width, ArcSize, LabelSize, ContextLayers, RecurrentSize, RecurrentLayers, labels.Length, LabelBilinear, LabelProduct, generator);
     }
 
     /// <summary>The gold tree of an example on the predicted tokens, or null when the tokenizations differ.</summary>
@@ -520,6 +531,7 @@ public sealed class Parser : DependencyParser
         private readonly int _width;
         private readonly int _labels;
         private readonly int _labelSize;
+        private readonly bool _labelProduct;
         private readonly Linear[] _window;
         private readonly Linear _arcDep;
         private readonly Linear _arcHead;
@@ -541,8 +553,9 @@ public sealed class Parser : DependencyParser
         private volatile BilinearInference? _bilinearFast;
         private readonly object _bilinearLock = new();
 
-        public ParserModule(int width, int arcSize, int labelSize, int contextLayers, int recurrentSize, int recurrentLayers, int labels, bool labelBilinear, Generator generator)
+        public ParserModule(int width, int arcSize, int labelSize, int contextLayers, int recurrentSize, int recurrentLayers, int labels, bool labelBilinear, bool labelProduct, Generator generator)
         {
+            _labelProduct = labelProduct;
             _width = width;
             _labels = labels;
             _labelSize = labelSize;
@@ -571,7 +584,7 @@ public sealed class Parser : DependencyParser
                 _relBilinear = RegisterModule("rel_bilinear", new Linear(labelSize, labels * labelSize, generator, bias: false));
             }
 
-            _relPair = RegisterModule("rel_pair", new Linear(2 * labelSize, labels, generator));
+            _relPair = RegisterModule("rel_pair", new Linear((labelProduct ? 3 : 2) * labelSize, labels, generator));
             _relPairFast = new FrozenLinear(_relPair);
             _boundary = RegisterModule("boundary", new Linear(top, 2, generator));
             _rootArc = RegisterModule("root_arc", new Embedding(1, arcSize, generator));
@@ -738,7 +751,7 @@ public sealed class Parser : DependencyParser
             RowClassifier pair = _relPairFast.Get();
             BilinearInference? bilinear = _relBilinear is null ? null : FastBilinear();
             var result = new float[count * _labels];
-            float[] joined = new float[2 * size];
+            float[] joined = new float[(_labelProduct ? 3 : 2) * size];
             float[] pairScores = new float[pair.Stride];
             float[] products = bilinear is null ? Array.Empty<float>() : new float[bilinear.Stride];
             for (int i = 0; i < count; i++)
@@ -747,6 +760,15 @@ public sealed class Parser : DependencyParser
                 ReadOnlySpan<float> h = headRows[i] == total ? root[..size] : head.Slice(headRows[i] * size, size);
                 d.CopyTo(joined);
                 h.CopyTo(joined.AsSpan(size));
+                if (_labelProduct)
+                {
+                    // The element-wise product is the diagonal of the per-label bilinear form of Dozat and Manning 2017 §2.2, kept as a cheap interaction.
+                    for (int k = 0; k < size; k++)
+                    {
+                        joined[(2 * size) + k] = d[k] * h[k];
+                    }
+                }
+
                 pair.Logits(joined, pairScores);
                 bilinear?.Products(d, products);
                 for (int c = 0; c < _labels; c++)
@@ -788,7 +810,7 @@ public sealed class Parser : DependencyParser
             Tensor heads = Ops.Concat([p.RelHead, _rootRel.Forward(IntTensor([0]))], 0);
             Tensor d = Ops.Embedding(p.RelDep, IntTensor(depRows));
             Tensor h = Ops.Embedding(heads, IntTensor(headRows));
-            Tensor pair = _relPair.Forward(Ops.Concat([d, h], 1));
+            Tensor pair = _relPair.Forward(_labelProduct ? Ops.Concat([d, h, d * h], 1) : Ops.Concat([d, h], 1));
             if (_relBilinear is null)
             {
                 return pair;

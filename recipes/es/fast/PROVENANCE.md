@@ -75,3 +75,7 @@ Entity F1 on each language's own development file, window-only model (shipped) a
 | German (GermEval) | 66.89 | 66.36 | kept (-0.5) |
 
 Turkish was not tried (its package is being retrained for another reason). English needs no change: the shipped English recognizer already scores LOC 71.56 against spaCy 71.43 (paired +0.13 [-3.83, 3.97]).
+
+## Parser, faster configuration
+
+The parser part was retrained with one LSTM layer and product label features (`docs/parser.md`, "Speed configuration"): flags `--lstm 128 --lstm-layers 1 --arc 128 --label 64 --label-bilinear 0 --label-product 1`; everything else as above (seed 7, dropout 0.25, 1,500-word batches, ten sentences per document, patience 6 on dev LAS). Data: UD Spanish-AnCora r2.18 train and dev (CC BY-SA 4.0 or CC BY 4.0 as listed above; share-alike lineage unchanged). Best dev LAS 86.312 at step 4,447; about 16 minutes on 4 threads of the shared worker; trainer weights hash `5e7a80a16ea0076b23eb87e03eb2d0dfddd67a2cb5c8c7a75f81535ebcb6cd23`. File `parser.onenlp`: 37,481,754 bytes, sha256 `17c9f37cc7539a68edc3030309b18192f4e85a552595f12d468f676b1b03a8a5`. Test rows, speed and the earlier parser's rows: `docs/results.md`, "Parser speed". The earlier parser is reproduced by the same command without the label and LSTM flags above (defaults of the recipe).

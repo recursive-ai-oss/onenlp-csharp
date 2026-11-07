@@ -25,6 +25,7 @@ The package adds a small source file to the project that references it; that fil
 
 The weights are trained on Universal Dependencies Chinese-GSDSimp (CC BY-SA 4.0) and Universal NER Chinese-GSDSIMP (CC BY-SA 4.0), credited in `THIRD-PARTY-NOTICES.md`; `PROVENANCE.md` lists every dataset, recipe and seed. The weights are licensed `MIT OR Apache-2.0`. The training text is Simplified-script; Traditional-script text is segmented and tagged with lower accuracy.
 
+- Measured results against spaCy and others: <https://github.com/recursive-ai-oss/onenlp-csharp/blob/main/docs/results-table.md>
 - Source and documentation: <https://github.com/recursive-ai-oss/onenlp-csharp>
 - Home: <https://recursiveai.org/onenlp/>
 

@@ -5,10 +5,10 @@ The package packs one saved pipeline, `english.onenlp` (`weights.manifest.props`
 | Part | Recipe | Components | Data | Seed | Part file sha256 |
 |---|---|---|---|---|---|
 | tagging | `recipes/en/selftrain` (narrow encoder, 96 wide, no window layer) | tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer | UD English-EWT r2.18 train and dev, plus 290k sentences of FineWeb and Wikipedia text labelled by the previous tagging model (`recipes/en/selftrain/PROVENANCE.md`) | 1 | `f52cb26243c8e16c3fbc45924d51cdaef234c6a057ffd1e5cf15c72baa645dae` (51,981,603 bytes) |
-| parser | `recipes/en/parser` | biaffine dependency parser with sentence starts, two bidirectional LSTM layers of 192; its own fast encoder (96 wide, four window layers) | UD English-EWT r2.18, train and dev | training 7, encoder 1 | `612101ebeb4c62b6239a94c11727a2536537bfdb60245f337075eae1e9ddfccc` (22,108,789 bytes) |
+| parser | `recipes/en/parser` with `--lstm 128 --lstm-layers 1 --arc 128 --label 64 --label-bilinear 0 --label-product 1` | biaffine dependency parser with sentence starts, one bidirectional LSTM layer of 128; its own fast encoder (96 wide, four window layers) | UD English-EWT r2.18, train and dev | training 7, encoder 1 | `5c8147452c3cb3d718d8b818b6481f7d2bf406de927d8d7287c16675ec0ee15a` (13,358,295 bytes; best checkpoint at step 3,934, dev LAS 79.398) |
 | entities | `recipes/en/selftrain` (128 wide, no window layer) | entity recognizer (BILUO tagging, PER, ORG, LOC) | UNER English-EWT commit 8ed072de train and dev, plus 120k labelled sentences of the same text | 1 | `3b38c0ec5d4a2def130aed26eb663f431a0130c55c9d958ef8c8a22462cbba55` (52,112,428 bytes) |
 
-Assembled file: `english.onenlp`, 126,202,180 bytes, sha256 `1414ec7920de0c25b679a557a5508dc7e10429aeeff319aa71f5ba173ec61e48`. The rule sentencizer saved with the tagging part is left out: the parser sets sentence starts. Settings and results: the `PROVENANCE.md` next to each recipe. A single-encoder alternative (`recipes/en/joint`, 23.7 MB, faster, lower scores) is documented in `docs/results.md` and is not packed.
+Assembled file: `english.onenlp`, 117,451,750 bytes, sha256 `ac0080adcb1a9832fe4c5c7b80e22a54da51bfcdac88e0d53986c80e6ce7ed9b`. The rule sentencizer saved with the tagging part is left out: the parser sets sentence starts. Settings and results: the `PROVENANCE.md` next to each recipe. A single-encoder alternative (`recipes/en/joint`, 23.7 MB, faster, lower scores) is documented in `docs/results.md` and is not packed.
 
 ## Datasets
 

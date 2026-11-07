@@ -106,7 +106,9 @@ internal static partial class Program
             labelSize: Num(args, "label", 128),
             contextLayers: Num(args, "context", 0),
             recurrentSize: Num(args, "lstm", 192),
-            recurrentLayers: Num(args, "lstm-layers", 2))
+            recurrentLayers: Num(args, "lstm-layers", 2),
+            labelBilinear: Num(args, "label-bilinear", 1) == 1,
+            labelProduct: Num(args, "label-product", 0) == 1)
         { OwnsEncoder = true });
         return RunTraining(pipeline, train, new TrainOptions
         {

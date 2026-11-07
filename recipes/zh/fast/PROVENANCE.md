@@ -22,3 +22,7 @@ Format: `docs/provenance.md`. The shipped weights are listed in `src/OneNlp.Mode
 - **Training time against PyTorch:** the heads and encoder are the English ones (C#-to-PyTorch CPU ratios 0.5 to 1.7); the ratio was not re-timed.
 
 The dependency-parser and entity numbers on dev are lower than on test (the dev and test files differ in difficulty): the test rows are in `docs/results.md`.
+
+## Parser, faster configuration
+
+The parser part was retrained with one LSTM layer and product label features (`docs/parser.md`, "Speed configuration"): flags `--prefix 1 --suffix 1 --epochs 40 --lstm 192 --lstm-layers 1 --arc 192 --label 96 --label-bilinear 0 --label-product 1`; everything else as above (seed 7, dropout 0.25, 1,500-word batches, ten sentences per document, patience 6 on dev LAS). Data: UD Chinese-GSDSimp r2.18 train and dev (CC BY-SA 4.0 or CC BY 4.0 as listed above; share-alike lineage unchanged). Best dev LAS 66.814 at step 2,313; about 13 minutes on 4 threads of the shared worker; trainer weights hash `f721ccf0d2a578b7bfa9d08e82b003197afa36b9403f1f2dccb1741ac222792c`. File `parser.onenlp`: 39,260,234 bytes, sha256 `eb5a8e1dc60ac5536dc1e22bb9b43dc704ea0cda22c5b12f5ba3b157aef88457`. Test rows, speed and the earlier parser's rows: `docs/results.md`, "Parser speed". The earlier parser is reproduced by the same command without the label and LSTM flags above (defaults of the recipe).

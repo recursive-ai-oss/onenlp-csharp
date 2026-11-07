@@ -58,3 +58,7 @@ Regenerate: `predict` (three modes) then `tools/OneNlp.Eval ud --gold G --pred P
 
 - The parser has its own encoder here. A pipeline that shares one encoder across the tagging heads and the parser trains them together with `Train`.
 - Indicative throughput, raw text through tokenizer and parser, 4 threads: about 10,000 tokens per second (9,350 to 11,210 over three runs), 1.4 KB managed allocation per token.
+
+## Parser, faster configuration
+
+The parser part was retrained with one LSTM layer and product label features (`docs/parser.md`, "Speed configuration"): flags `--lstm 128 --lstm-layers 1 --arc 128 --label 64 --label-bilinear 0 --label-product 1`; everything else as above (seed 7, dropout 0.25, 1,500-word batches, ten sentences per document, patience 6 on dev LAS). Data: UD English-EWT r2.18 train and dev (CC BY-SA 4.0 or CC BY 4.0 as listed above; share-alike lineage unchanged). Best dev LAS 79.398 at step 3,934; about 13 minutes on 4 threads of the shared worker; trainer weights hash `1122697002cfc0155a97644a4ee7b6b949d98c1909c707506009b1e43fcf66e6`. File `parser.onenlp`: 13,358,295 bytes, sha256 `5c8147452c3cb3d718d8b818b6481f7d2bf406de927d8d7287c16675ec0ee15a`. Test rows, speed and the earlier parser's rows: `docs/results.md`, "Parser speed". The earlier parser is reproduced by the same command without the label and LSTM flags above (defaults of the recipe).

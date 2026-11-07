@@ -79,3 +79,7 @@ The published WikiNER numbers (Stanza 92.9, Trankit 92.3 to 92.9) are on another
 - The three models have separate encoders, as in English. A shared encoder is a later change.
 - C#/PyTorch training-time ratio: the architectures are the English ones (tagging 1.7x, morphologizer 1.5x, lemmatizer 0.47x, parser 1.14x, NER 1.25x), so the French recipes were not timed again.
 - `Words` and the tag rows on raw text depend on the contraction pieces: `des` is cut by the word before it (87% right on dev), the others always. Words 99.48 on test.
+
+## Parser, faster configuration
+
+The parser part was retrained with one LSTM layer and product label features (`docs/parser.md`, "Speed configuration"): flags `(recipe `parser`) --lstm 128 --lstm-layers 1 --arc 128 --label 64 --label-bilinear 0 --label-product 1`; everything else as above (seed 7, dropout 0.25, 1,500-word batches, ten sentences per document, patience 6 on dev LAS). Data: UD French-GSD r2.18 train and dev (CC BY-SA 4.0 or CC BY 4.0 as listed above; share-alike lineage unchanged). Best dev LAS 89.429 at step 4,910; about 16 minutes on 4 threads of the shared worker; trainer weights hash `26eba6f5d577f432839c8a6575d7d9a8885d59aafea7587fa9a88809ca3ef305`. File `parser.onenlp`: 13,363,762 bytes, sha256 `19bb90153b1010b38d3b09a2c001238acf62798b8afa16323bb7ff1fed21e6ab`. Test rows, speed and the earlier parser's rows: `docs/results.md`, "Parser speed". The earlier parser is reproduced by the same command without the label and LSTM flags above (defaults of the recipe).

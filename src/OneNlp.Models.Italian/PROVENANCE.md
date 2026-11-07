@@ -5,7 +5,7 @@ The package packs three saved pipelines (`weights.manifest.props` lists name, si
 | File | Components | Data | Seed |
 |---|---|---|---|
 | `tagging.onenlp` | sentencizer, tagger (XPOS), morphologizer (UPOS, UFeats), edit-tree lemmatizer, on a fast hash-embedding encoder with one window layer and one 64-unit bidirectional LSTM layer (ReLU, no layer normalization) | UD Italian-ParlaMint and Italian-MarkIT r2.18, derived training and development files | 1 |
-| `parser.onenlp` | biaffine dependency parser with sentence starts, fast encoder and a 128-unit bidirectional LSTM | the same | 7 |
+| `parser.onenlp` | biaffine dependency parser with sentence starts, fast encoder and a one LSTM layer of 192 units per direction, arc 192, label 96, product label features (`docs/parser.md`)  | the same | 7 |
 | `ner.onenlp` | entity recognizer (BILUO tagging, constrained decoding; PER, LOC, ORG, MISC), fast encoder | WikiNER Italian wp3, train and dev, articulated prepositions and verbs with enclitics cut into the tokenizer's pieces (`ner-convert --pieces`) | 7 |
 
 The sentencizer saved in `tagging.onenlp` is not used by the packaged pipeline; the parser predicts sentence starts. The tokenizer is the UAX #29 word tokenizer with the Italian data (`docs/segmentation.md`).
