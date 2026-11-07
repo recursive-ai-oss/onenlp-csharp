@@ -25,6 +25,8 @@ public static class HeadRegistry
         [EditTreeLemmatizer.ComponentKind] = EditTreeLemmatizer.FromConfig,
         [EntityRecognizer.ComponentKind] = EntityRecognizer.FromConfig,
         [OpenEntityRecognizer.ComponentKind] = OpenEntityRecognizer.FromConfig,
+        [TextClassifier.ComponentKind] = TextClassifier.FromConfig,
+        [SpanCategorizer.ComponentKind] = SpanCategorizer.FromConfig,
     };
 
     /// <summary>Registers a head kind.</summary>

@@ -5,7 +5,7 @@
     <RootNamespace>$(PackagePrefix)$(LibName).Models.German</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.German</PackageId>
     <Description>spaCy-class NLP for .NET: the German fast-tier model. Tagging, morphology, lemmas, dependency parse and PER/LOC/ORG/MISC entities for the Nlp verbs, trained on Universal Dependencies German-GSD (CC BY-SA 4.0) and GermEval 2014 (CC BY 4.0). No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
-    <PackageTags>$(PackageTags);english;model</PackageTags>
+    <PackageTags>$(PackageTags);german;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>

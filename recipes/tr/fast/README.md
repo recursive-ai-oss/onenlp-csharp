@@ -38,3 +38,16 @@ UD Turkish writes a copula or a suffix spelled onto its word (`vardır`, `yapark
 $R train-splitter --train tr_boun-ud-train.conllu --dev tr_boun-ud-dev.conllu --out splitter-dir --dropout 0.3 --lr 0.001 --threads 4
 $R predict --models models --parts splitter,tagging,parser --gold tr_boun-ud-test.conllu --mode raw --out pred-raw.conllu
 ```
+
+## Parser trained on the tokenizer's words and on parsed web text
+
+`train-parser --predicted-words splitter.onenlp` trains (and stops) on the words the tokenizer in that file produces, with the treebank's heads and relations projected onto them, as the parser meets text at run time. `--extra F.conllu` adds sentences that are already in the tokenizer's words. `label` parses web text with a model directory (`--reverse 1` reads the documents from the last), `tools/tr_agree.py` keeps the sentences two parsers analyse alike, and `tools/tr_overlap.py` checks them against evaluation files:
+
+```
+$R label --models m-a --parts splitter,tagging,parser --text tr.jsonl --out a.conllu --max 120000
+$R label --models m-b --parts splitter,tagging,parser --text tr.jsonl --out b.conllu --max 120000
+python3 tools/tr_agree.py a.conllu b.conllu agreed.conllu 0.8 40000
+$R train-parser --train tr_boun-ud-train.conllu --dev tr_boun-ud-dev.conllu --out parser-dir --batch-words 700 --lr 0.003 --dropout 0.45 --predicted-words splitter.onenlp --extra agreed.conllu
+```
+
+`tools/tr_parser_variant.sh` and `tools/tr_dev_eval.sh` train and score a variant on the development file; `tools/tr_raw_diag.py` splits the raw-text loss by what went wrong in each sentence.

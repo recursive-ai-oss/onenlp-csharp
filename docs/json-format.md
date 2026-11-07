@@ -23,6 +23,8 @@ Normative and language-neutral. A document is a JSON object in the shape spaCy d
 
 The writer emits `tag`, `pos`, `morph`, `lemma` and `dep` for every token when any token has the value, `head` when any token has a dependency or a head other than itself, and omits an annotation nobody set. A token that is its own head is a root. The reader treats a missing or empty annotation as not set and a missing `head` as the token itself.
 
+**Categories and span groups.** `cats` is an object from label to score (0 to 1, in the order the component wrote them), written when a classifier has set categories. `spans` is an object from group name to a list of `{start, end, label}` with code point offsets as for `ents`; a span may overlap or nest in another of its group, and keeps `conf` when not 1. spaCy's extra span fields (`kb_id`, `token_start`, `token_end`) are skipped on reading. A document without them writes neither field.
+
 **Our additions.** Token `norm` (the normalized form), token `conf` (the confidence of the token's tag; written when not 1, read as 1 when missing), token `sb` (the sentence boundary: 1 starts a sentence, 2 is inside one; a token with no `sb` has an unset boundary) and entity `conf`. When no token has `sb` and `sents` is present (a document from spaCy), the first token of each sentence is a start and every other token is inside.
 
 ## Offsets
@@ -31,7 +33,7 @@ The writer emits `tag`, `pos`, `morph`, `lemma` and `dep` for every token when a
 
 ## Not carried
 
-JSON text cannot hold an unpaired surrogate, so writing a document whose text or a label has one throws `InvalidOperationException`; use the binary form. A token boundary inside a surrogate pair has no code point offset and throws the same way. `spans`, `cats`, `user_data` and unknown fields are skipped on reading, because a `Doc` does not store them.
+JSON text cannot hold an unpaired surrogate, so writing a document whose text or a label has one throws `InvalidOperationException`; use the binary form. A token boundary inside a surrogate pair has no code point offset and throws the same way. `user_data` and unknown fields are skipped on reading, because a `Doc` does not store them.
 
 ## Reading limits
 

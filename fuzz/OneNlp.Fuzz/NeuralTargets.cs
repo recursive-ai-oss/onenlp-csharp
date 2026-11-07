@@ -163,6 +163,9 @@ internal static class NeuralTargets
         File.WriteAllBytes(Path.Combine(dir, "seed-pipeline"), TinyPipelineBytes());
         File.WriteAllBytes(Path.Combine(dir, "seed-segmenter"), TinySegmenterBytes());
         File.WriteAllBytes(Path.Combine(dir, "seed-splitter"), TinySplitterBytes());
+        File.WriteAllBytes(Path.Combine(dir, "seed-textcat"), TinyTextcatBytes(multiLabel: false));
+        File.WriteAllBytes(Path.Combine(dir, "seed-textcat-multilabel"), TinyTextcatBytes(multiLabel: true));
+        File.WriteAllBytes(Path.Combine(dir, "seed-spancat"), TinySpancatBytes());
     }
 
     internal static void SeedPipelineConfig(string dir)
@@ -176,6 +179,11 @@ internal static class NeuralTargets
         byte[] splitter = TinySplitterBytes();
         ulong splitterConfigLength = BinaryPrimitives.ReadUInt64LittleEndian(splitter.AsSpan(16));
         File.WriteAllBytes(Path.Combine(dir, "seed-splitter-config"), splitter.AsSpan(HeaderSize, (int)splitterConfigLength).ToArray());
+        foreach ((string name, byte[] bytes) in new[] { ("textcat", TinyTextcatBytes(multiLabel: false)), ("textcat-multilabel", TinyTextcatBytes(multiLabel: true)), ("spancat", TinySpancatBytes()) })
+        {
+            ulong length = BinaryPrimitives.ReadUInt64LittleEndian(bytes.AsSpan(16));
+            File.WriteAllBytes(Path.Combine(dir, "seed-" + name + "-config"), bytes.AsSpan(HeaderSize, (int)length).ToArray());
+        }
     }
 
     private static void RunPipeline(byte[] file)
@@ -226,6 +234,41 @@ internal static class NeuralTargets
             .Add(new Tagger(encoder) { OwnsEncoder = true })
             .Add(new Morphologizer(encoder))
             .Add(new EditTreeLemmatizer(encoder));
+        _ = pipeline.Train(examples, new TrainOptions { Epochs = 1, BatchWords = 40, DevFraction = 0, Seed = 1 });
+        using var stream = new MemoryStream();
+        PipelineFile.Save(pipeline, stream);
+        return stream.ToArray();
+    }
+
+    // A pipeline with a text classifier head (the "textcat" head kind), multi-class or multi-label.
+    private static byte[] TinyTextcatBytes(bool multiLabel)
+    {
+        const string data = """
+            {"text":"the cat sat on the mat","cats":{"ANIMAL":1,"FOOD":0}}
+            {"text":"we ate bread and cheese","cats":{"ANIMAL":0,"FOOD":1}}
+            {"text":"a dog chased the cat","cats":{"ANIMAL":1,"FOOD":0}}
+            {"text":"fresh bread with cheese","cats":{"ANIMAL":0,"FOOD":1}}
+            """;
+        List<Example> examples = [.. JsonlReader.Read(new StringReader(data))];
+        var encoder = new FastEncoder(width: 8, depth: 1, normRows: 16, prefixRows: 8, suffixRows: 16, shapeRows: 8, seed: 1);
+        using Pipeline pipeline = Pipeline.Blank(Language.English).Add(new TextClassifier(encoder, multiLabel, hiddenSize: 4) { OwnsEncoder = true });
+        _ = pipeline.Train(examples, new TrainOptions { Epochs = 1, BatchWords = 40, DevFraction = 0, Seed = 1 });
+        using var stream = new MemoryStream();
+        PipelineFile.Save(pipeline, stream);
+        return stream.ToArray();
+    }
+
+    // A pipeline with a span categorizer head (the "spancat" head kind).
+    private static byte[] TinySpancatBytes()
+    {
+        const string data = """
+            {"text":"Grand Piano and Widget","spans":{"sc":[[0,11,"PRODUCT"],[6,11,"PART"],[16,22,"PART"]]}}
+            {"text":"a Widget in the room","spans":{"sc":[[2,8,"PART"]]}}
+            {"text":"nothing here at all","spans":{"sc":[]}}
+            """;
+        List<Example> examples = [.. JsonlReader.Read(new StringReader(data))];
+        var encoder = new FastEncoder(width: 8, depth: 1, normRows: 16, prefixRows: 8, suffixRows: 16, shapeRows: 8, seed: 1);
+        using Pipeline pipeline = Pipeline.Blank(Language.English).Add(new SpanCategorizer(encoder, "sc", [1, 2], hiddenSize: 4) { OwnsEncoder = true });
         _ = pipeline.Train(examples, new TrainOptions { Epochs = 1, BatchWords = 40, DevFraction = 0, Seed = 1 });
         using var stream = new MemoryStream();
         PipelineFile.Save(pipeline, stream);

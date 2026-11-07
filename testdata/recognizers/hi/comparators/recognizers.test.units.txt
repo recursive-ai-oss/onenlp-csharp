@@ -1,0 +1,25 @@
+('age', 'Day', None) 10 दिन का
+('age', 'Month', None) महीने
+('age', 'Week', None) 3 सप्ताह के
+('age', 'Year', None) साल
+('currency', 'Centime', None) 75 सेंटीम
+('currency', 'Dollar', None) 150 डॉलर
+('currency', 'Euro', 'EUR') €2.50
+('currency', 'Indian rupee', 'INR') ₹20
+('currency', 'Rupee', None) rs
+('currency', 'Samoan tālā', 'WST') ताल
+('currency', 'United States dollar', 'USD') 100 usd
+('dimension', 'Centimeter', None) 75 सेंटीमीटर
+('dimension', 'Gram', None) 500 ग्राम
+('dimension', 'Kilometer per hour', None) 90 किमी/घं
+('dimension', 'Kilometer', None) 12 किलोमीटर
+('dimension', 'Liter', None) 1.5 लीटर
+('dimension', 'Megabyte', None) 250 mb
+('dimension', 'Meter', None) 6 मीटर
+('dimension', 'Mile', None) 3 मील
+('dimension', 'Milliliter', None) 250 मिलीलीटर
+('dimension', 'Square meter', None) 120 वर्ग मीटर
+('dimension', 'Volume unit', None) गिल
+('temperature', 'C', None) 15 डिग्री सेल्सियस
+('temperature', 'Degree', None) 200 °
+('temperature', 'K', None) 300 केल्विन

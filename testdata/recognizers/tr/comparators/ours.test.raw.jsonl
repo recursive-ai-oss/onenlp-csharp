@@ -1,0 +1,327 @@
+{"id":"00e62ce579e2","results":[{"start":7,"end":30,"cpStart":7,"cpEnd":30,"text":"her Pazartesi saat 9:00","label":"SET","confidence":1,"kind":"Set","value":"XXXX-WXX-1T09:00","grain":"minute","approx":false}]}
+{"id":"01bc2404bc0a","results":[{"start":11,"end":23,"cpStart":11,"cpEnd":23,"text":"gelecek Cuma","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-27","grain":"day","approx":false}]}
+{"id":"02089b220896","results":[{"start":12,"end":20,"cpStart":12,"cpEnd":20,"text":"d\u00F6rd\u00FCnc\u00FC","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"4"}]}
+{"id":"02812b9b24fc","results":[{"start":6,"end":16,"cpStart":6,"cpEnd":16,"text":"5 g\u00FCn \u00F6nce","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-13","grain":"day","approx":false}]}
+{"id":"02bbb935356a","results":[{"start":5,"end":14,"cpStart":5,"cpEnd":14,"text":"10 g\u00FCnl\u00FCk","label":"QUANTITY","confidence":1,"kind":"Measure","value":"10","unit":"day","dimension":"age"}]}
+{"id":"04945cb35851","results":[{"start":7,"end":19,"cpStart":7,"cpEnd":19,"text":"198.51.100.7","label":"IP_ADDRESS","confidence":1,"kind":"IpAddress","normalized":"198.51.100.7"}]}
+{"id":"05c38deec126","results":[{"start":16,"end":32,"cpStart":16,"cpEnd":32,"text":"@acik_kaynak_fan","label":"MENTION","confidence":1,"kind":"Mention","normalized":"acik_kaynak_fan"}]}
+{"id":"06bdf6e46f8b","results":[{"start":6,"end":14,"cpStart":6,"cpEnd":14,"text":"500 gram","label":"QUANTITY","confidence":1,"kind":"Measure","value":"500","unit":"gram","dimension":"mass"}]}
+{"id":"0721e64f4cdd","results":[{"start":5,"end":17,"cpStart":5,"cpEnd":17,"text":"Babalar G\u00FCn\u00FC","label":"DATE","confidence":1,"kind":"Date","value":"2026-06-21","grain":"day","approx":false}]}
+{"id":"0747d761a659","results":[{"start":7,"end":43,"cpStart":7,"cpEnd":43,"text":"f47ac10b-58cc-4372-a567-0e02b2c3d479","label":"GUID","confidence":1,"kind":"Uuid","normalized":"f47ac10b-58cc-4372-a567-0e02b2c3d479"}]}
+{"id":"07a13b1e8135","results":[]}
+{"id":"083a8ebbb155","results":[{"start":21,"end":26,"cpStart":21,"cpEnd":26,"text":"3 g\u00FCn","label":"DURATION","confidence":1,"kind":"Duration","value":"259200","approx":false,"durationUnit":"Day","count":"3"}]}
+{"id":"0896bfdce798","results":[{"start":5,"end":12,"cpStart":5,"cpEnd":12,"text":"saat 15","label":"TIME","confidence":1,"kind":"Time","value":"T15:00","grain":"hour","approx":false}]}
+{"id":"089d657d1ba8","results":[{"start":9,"end":17,"cpStart":9,"cpEnd":17,"text":"bu ak\u015Fam","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-18T18:00/2026-03-19T00:00","grain":"hour","approx":true}]}
+{"id":"09bab99c58cb","results":[]}
+{"id":"09feeedd0e71","results":[{"start":0,"end":12,"cpStart":0,"cpEnd":12,"text":"Y\u0131lba\u015F\u0131 2028","label":"DATE","confidence":1,"kind":"Date","value":"2028-01-01","grain":"day","approx":false}]}
+{"id":"0a11a373f1fc","results":[]}
+{"id":"0a4ec3bbf5b2","results":[{"start":10,"end":18,"cpStart":10,"cpEnd":18,"text":"bu hafta","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-03-16/2026-03-23","grain":"week","approx":false}]}
+{"id":"0a8596ed8062","results":[{"start":8,"end":15,"cpStart":8,"cpEnd":15,"text":"1000000","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"1000000"}]}
+{"id":"0acb63934d04","results":[{"start":0,"end":8,"cpStart":0,"cpEnd":8,"text":"Per\u015Fembe","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-19","grain":"day","approx":false}]}
+{"id":"0b2d940baa52","results":[{"start":0,"end":11,"cpStart":0,"cpEnd":11,"text":"7 ya\u015F\u0131ndaki","label":"QUANTITY","confidence":1,"kind":"Measure","value":"7","unit":"year","dimension":"age"},{"start":18,"end":23,"cpStart":18,"cpEnd":23,"text":"bug\u00FCn","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-18","grain":"day","approx":false}]}
+{"id":"0b3c4f1350cb","results":[{"start":0,"end":13,"cpStart":0,"cpEnd":13,"text":"15 Nisan 1990","label":"DATE","confidence":1,"kind":"Date","value":"1990-04-15","grain":"day","approx":false}]}
+{"id":"0b7ae9482d87","results":[{"start":9,"end":45,"cpStart":9,"cpEnd":45,"text":"886313e1-3b8a-5372-9b90-0c9aee199e5d","label":"GUID","confidence":1,"kind":"Uuid","normalized":"886313e1-3b8a-5372-9b90-0c9aee199e5d"}]}
+{"id":"0b8b1ed99d5d","results":[{"start":10,"end":26,"cpStart":10,"cpEnd":26,"text":"2026-04-01 14:00","label":"DATETIME","confidence":1,"kind":"DateTime","value":"2026-04-01T14:00","grain":"minute","approx":false}]}
+{"id":"0c2e87970430","results":[{"start":7,"end":17,"cpStart":7,"cpEnd":17,"text":"@destek_tr","label":"MENTION","confidence":1,"kind":"Mention","normalized":"destek_tr"}]}
+{"id":"0cde754888e2","results":[{"start":9,"end":19,"cpStart":9,"cpEnd":19,"text":"2026-05-04","label":"DATE","confidence":1,"kind":"Date","value":"2026-05-04","grain":"day","approx":false}]}
+{"id":"11907c74234d","results":[{"start":8,"end":22,"cpStart":8,"cpEnd":22,"text":"saat 12:00 UTC","label":"TIME","confidence":1,"kind":"Time","value":"T12:00Z","grain":"minute","approx":false}]}
+{"id":"139435699ee2","results":[{"start":15,"end":19,"cpStart":15,"cpEnd":19,"text":"%100","label":"PERCENT","confidence":1,"kind":"Percent","value":"100","unit":"percent","dimension":"percent"}]}
+{"id":"13eedd32bdd9","results":[{"start":0,"end":6,"cpStart":0,"cpEnd":6,"text":"1\u0027inci","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"1"}]}
+{"id":"16831ce852e3","results":[{"start":8,"end":12,"cpStart":8,"cpEnd":12,"text":"1969","label":"DATE","confidence":0.8,"kind":"DateRange","value":"1969-01-01/1970-01-01","grain":"year","approx":false}]}
+{"id":"16ca4895d5b2","results":[{"start":10,"end":20,"cpStart":10,"cpEnd":20,"text":"3 haftal\u0131k","label":"QUANTITY","confidence":1,"kind":"Measure","value":"3","unit":"week","dimension":"age"}]}
+{"id":"18758485eb1e","results":[{"start":19,"end":34,"cpStart":19,"cpEnd":34,"text":"\u00F6\u011Fleden sonra 3","label":"TIME","confidence":1,"kind":"Time","value":"T15:00","grain":"hour","approx":false}]}
+{"id":"18d9e85487b3","results":[{"start":0,"end":9,"cpStart":0,"cpEnd":9,"text":"D\u00FCn sabah","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-17T06:00/2026-03-17T12:00","grain":"hour","approx":true}]}
+{"id":"1d640ba84d35","results":[{"start":7,"end":16,"cpStart":7,"cpEnd":16,"text":"@mehmet_k","label":"MENTION","confidence":1,"kind":"Mention","normalized":"mehmet_k"}]}
+{"id":"1dc3ce49208a","results":[{"start":10,"end":19,"cpStart":10,"cpEnd":19,"text":"#haberler","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"haberler"},{"start":23,"end":30,"cpStart":23,"cpEnd":30,"text":"#dotnet","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"dotnet"}]}
+{"id":"1df949046a63","results":[{"start":16,"end":24,"cpStart":16,"cpEnd":24,"text":"iki saat","label":"DURATION","confidence":1,"kind":"Duration","value":"7200","approx":false,"durationUnit":"Hour","count":"2"}]}
+{"id":"1f90727230f8","results":[{"start":5,"end":18,"cpStart":5,"cpEnd":18,"text":"her Pazartesi","label":"SET","confidence":1,"kind":"Set","value":"XXXX-WXX-1","grain":"day","approx":false}]}
+{"id":"2097d4111b7d","results":[{"start":20,"end":30,"cpStart":20,"cpEnd":30,"text":"1 y\u0131l 6 ay","label":"DURATION","confidence":1,"kind":"Duration","value":"P1Y6M","approx":false,"durationUnit":"Month","count":"18"}]}
+{"id":"2117f1066118","results":[{"start":0,"end":5,"cpStart":0,"cpEnd":5,"text":"Ayl\u0131k","label":"SET","confidence":1,"kind":"Set","value":"P1M","grain":"month","approx":false}]}
+{"id":"21eab9bd3772","results":[{"start":10,"end":26,"cpStart":10,"cpEnd":26,"text":"(0212) 345 67 89","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"02123456789"}]}
+{"id":"23453b18bc30","results":[]}
+{"id":"23707d9e90f0","results":[{"start":6,"end":11,"cpStart":6,"cpEnd":11,"text":"3 mil","label":"QUANTITY","confidence":1,"kind":"Measure","value":"3","unit":"mile","dimension":"length"}]}
+{"id":"258b56f987a9","results":[{"start":7,"end":15,"cpStart":7,"cpEnd":15,"text":"4.500,75","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"4500.75"}]}
+{"id":"2607a5cbdf13","results":[{"start":7,"end":21,"cpStart":7,"cpEnd":21,"text":"2021 bahar\u0131nda","label":"DATE","confidence":1,"kind":"DateRange","value":"2021-03-01/2021-06-01","grain":"season","approx":true}]}
+{"id":"26dcff988839","results":[{"start":10,"end":18,"cpStart":10,"cpEnd":18,"text":"75 kuru\u015F","label":"MONEY","confidence":0.7,"kind":"Money","value":"0.75","currency":"TRY"}]}
+{"id":"2946dee3d19c","results":[{"start":10,"end":23,"cpStart":10,"cpEnd":23,"text":"9 Temmuz 2026","label":"DATE","confidence":1,"kind":"Date","value":"2026-07-09","grain":"day","approx":false}]}
+{"id":"2b3d47f59ab6","results":[{"start":26,"end":43,"cpStart":26,"cpEnd":43,"text":"\u002B90 212 345 67 89","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"\u002B902123456789"}]}
+{"id":"2cc09de6dce8","results":[{"start":7,"end":20,"cpStart":7,"cpEnd":20,"text":"3 milyon avro","label":"MONEY","confidence":0.95,"kind":"Money","value":"3000000","currency":"EUR"}]}
+{"id":"2cd37422d12c","results":[{"start":0,"end":15,"cpStart":0,"cpEnd":15,"text":"bilgi@ornek.net","label":"EMAIL","confidence":1,"kind":"Email","normalized":"bilgi@ornek.net"}]}
+{"id":"2d12880201f5","results":[{"start":0,"end":33,"cpStart":0,"cpEnd":33,"text":"Ulusal Egemenlik ve \u00C7ocuk Bayram\u0131","label":"DATE","confidence":1,"kind":"Date","value":"2026-04-23","grain":"day","approx":false}]}
+{"id":"2d45fe312465","results":[{"start":6,"end":19,"cpStart":6,"cpEnd":19,"text":"120 metrekare","label":"QUANTITY","confidence":1,"kind":"Measure","value":"120","unit":"square meter","dimension":"area"}]}
+{"id":"2dd3cab6f01f","results":[{"start":5,"end":14,"cpStart":5,"cpEnd":14,"text":"250.000 \u20BA","label":"MONEY","confidence":1,"kind":"Money","value":"250000","currency":"TRY"}]}
+{"id":"2ed24594c5f1","results":[{"start":0,"end":20,"cpStart":0,"cpEnd":20,"text":"Ramazan Bayram\u0131 2027","label":"DATE","confidence":1,"kind":"Date","value":"2027-03-09","grain":"day","approx":false}]}
+{"id":"30a8189591ed","results":[{"start":0,"end":24,"cpStart":0,"cpEnd":24,"text":"fe80::1ff:fe23:4567:890a","label":"IP_ADDRESS","confidence":1,"kind":"IpAddress","normalized":"fe80::1ff:fe23:4567:890a"}]}
+{"id":"32752e71c6d7","results":[{"start":5,"end":21,"cpStart":5,"cpEnd":21,"text":"#foto\u011Fraf_cumas\u0131","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"foto\u011Fraf_cumas\u0131"}]}
+{"id":"32b24807ac08","results":[{"start":6,"end":15,"cpStart":6,"cpEnd":15,"text":"Mart 2026","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-03-01/2026-04-01","grain":"month","approx":false}]}
+{"id":"32d1cac98abd","results":[{"start":8,"end":14,"cpStart":8,"cpEnd":14,"text":"3\u0027\u00FCnc\u00FC","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"3"}]}
+{"id":"33dbd4478968","results":[{"start":9,"end":16,"cpStart":9,"cpEnd":16,"text":"alt\u0131 ay","label":"DURATION","confidence":1,"kind":"Duration","value":"P6M","approx":false,"durationUnit":"Month","count":"6"}]}
+{"id":"348942a606f5","results":[{"start":8,"end":17,"cpStart":8,"cpEnd":17,"text":"2 ya\u015F\u0131nda","label":"QUANTITY","confidence":1,"kind":"Measure","value":"2","unit":"year","dimension":"age"}]}
+{"id":"35ad12ad0156","results":[{"start":6,"end":17,"cpStart":6,"cpEnd":17,"text":"gelecek y\u0131l","label":"DATE","confidence":1,"kind":"DateRange","value":"2027-01-01/2028-01-01","grain":"year","approx":false}]}
+{"id":"37c77837c232","results":[{"start":6,"end":42,"cpStart":6,"cpEnd":42,"text":"0f8fad5b-d9cb-469f-a165-70867728950e","label":"GUID","confidence":1,"kind":"Uuid","normalized":"0f8fad5b-d9cb-469f-a165-70867728950e"}]}
+{"id":"38679f98209b","results":[{"start":4,"end":11,"cpStart":4,"cpEnd":11,"text":"saat 23","label":"TIME","confidence":1,"kind":"Time","value":"T23:00","grain":"hour","approx":false}]}
+{"id":"389f4d39e961","results":[{"start":5,"end":27,"cpStart":5,"cpEnd":27,"text":"1 Haziran - 15 Haziran","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-06-01/2026-06-16","grain":"day","approx":false}]}
+{"id":"38e74e275332","results":[{"start":6,"end":30,"cpStart":6,"cpEnd":30,"text":"20:00 ile 22:00 aras\u0131nda","label":"TIME","confidence":1,"kind":"TimeRange","value":"T20:00/T22:00","grain":"minute","approx":false}]}
+{"id":"39983f37247a","results":[{"start":4,"end":13,"cpStart":4,"cpEnd":13,"text":"22 derece","label":"QUANTITY","confidence":0.6,"kind":"Measure","value":"22","unit":"degree","dimension":"temperature"}]}
+{"id":"39de9fd05ce9","results":[]}
+{"id":"3a9feb89cceb","results":[{"start":0,"end":17,"cpStart":0,"cpEnd":17,"text":"Gelecek Pazartesi","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-23","grain":"day","approx":false}]}
+{"id":"3ad2bee3d9a3","results":[{"start":12,"end":22,"cpStart":12,"cpEnd":22,"text":"gelecek ay","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-04-01/2026-05-01","grain":"month","approx":false}]}
+{"id":"3bc85cc131ed","results":[{"start":7,"end":14,"cpStart":7,"cpEnd":14,"text":"her g\u00FCn","label":"SET","confidence":1,"kind":"Set","value":"P1D","grain":"day","approx":false}]}
+{"id":"3bd10ff67ba9","results":[{"start":0,"end":13,"cpStart":0,"cpEnd":13,"text":"#\u0130stanbul2026","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"istanbul2026"}]}
+{"id":"3be151928943","results":[{"start":9,"end":20,"cpStart":9,"cpEnd":20,"text":"2 g\u00FCn sonra","label":"DATE","confidence":1,"kind":"Date","value":"2028-03-01","grain":"day","approx":false}]}
+{"id":"3bf3d57fcd9f","results":[{"start":5,"end":15,"cpStart":5,"cpEnd":15,"text":"90 km/saat","label":"QUANTITY","confidence":1,"kind":"Measure","value":"90","unit":"kilometer per hour","dimension":"speed"}]}
+{"id":"3c9f04409ae4","results":[{"start":13,"end":27,"cpStart":13,"cpEnd":27,"text":"0850 123 45 67","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"08501234567"}]}
+{"id":"3e7cabcfa319","results":[{"start":8,"end":20,"cpStart":8,"cpEnd":20,"text":"y\u00FCz yirmi \u00FC\u00E7","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"123"}]}
+{"id":"3e9510e6419f","results":[{"start":5,"end":35,"cpStart":5,"cpEnd":35,"text":"http://git.ornek.net/proje.git","label":"URL","confidence":1,"kind":"Url","normalized":"http://git.ornek.net/proje.git"}]}
+{"id":"3f0f41465cdb","results":[{"start":24,"end":27,"cpStart":24,"cpEnd":27,"text":"%12","label":"PERCENT","confidence":1,"kind":"Percent","value":"12","unit":"percent","dimension":"percent"}]}
+{"id":"401df30e50fc","results":[{"start":5,"end":11,"cpStart":5,"cpEnd":11,"text":"bu y\u0131l","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-01-01/2027-01-01","grain":"year","approx":false}]}
+{"id":"402ebd4f9ad2","results":[{"start":6,"end":15,"cpStart":6,"cpEnd":15,"text":"d\u00FCn ak\u015Fam","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-17T18:00/2026-03-18T00:00","grain":"hour","approx":true}]}
+{"id":"40b2b5b05643","results":[{"start":8,"end":13,"cpStart":8,"cpEnd":13,"text":"25 \u00B0C","label":"QUANTITY","confidence":1,"kind":"Measure","value":"25","unit":"celsius","dimension":"temperature"}]}
+{"id":"420c8add06c3","results":[{"start":15,"end":26,"cpStart":15,"cpEnd":26,"text":"38,5 derece","label":"QUANTITY","confidence":0.6,"kind":"Measure","value":"38.5","unit":"degree","dimension":"temperature"}]}
+{"id":"43b8f25fe0cc","results":[]}
+{"id":"441bfe6c53f3","results":[{"start":12,"end":21,"cpStart":12,"cpEnd":21,"text":"@zeynep_a","label":"MENTION","confidence":1,"kind":"Mention","normalized":"zeynep_a"},{"start":25,"end":31,"cpStart":25,"cpEnd":31,"text":"@kodcu","label":"MENTION","confidence":1,"kind":"Mention","normalized":"kodcu"}]}
+{"id":"451e54126b4a","results":[{"start":10,"end":20,"cpStart":10,"cpEnd":20,"text":"saat 18.45","label":"TIME","confidence":1,"kind":"Time","value":"T18:45","grain":"minute","approx":false}]}
+{"id":"464c0aa4d2c5","results":[{"start":7,"end":45,"cpStart":7,"cpEnd":45,"text":"{6ba7b810-9dad-11d1-80b4-00c04fd430c8}","label":"GUID","confidence":1,"kind":"Uuid","normalized":"6ba7b810-9dad-11d1-80b4-00c04fd430c8"}]}
+{"id":"4725f6f1bfcd","results":[{"start":11,"end":13,"cpStart":11,"cpEnd":13,"text":"-7","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"-7"}]}
+{"id":"472ef1e98d60","results":[{"start":9,"end":36,"cpStart":9,"cpEnd":36,"text":"yanit-yok@bildirim.ornek.io","label":"EMAIL","confidence":1,"kind":"Email","normalized":"yanit-yok@bildirim.ornek.io"}]}
+{"id":"48bc35389092","results":[{"start":5,"end":14,"cpStart":5,"cpEnd":14,"text":"30 saniye","label":"DURATION","confidence":1,"kind":"Duration","value":"30","approx":false,"durationUnit":"Second","count":"30"}]}
+{"id":"4956f909957d","results":[{"start":5,"end":13,"cpStart":5,"cpEnd":13,"text":"her Cuma","label":"SET","confidence":1,"kind":"Set","value":"XXXX-WXX-5","grain":"day","approx":false}]}
+{"id":"4a25bc1f2e4c","results":[{"start":0,"end":11,"cpStart":0,"cpEnd":11,"text":"3 g\u00FCn sonra","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-21","grain":"day","approx":false}]}
+{"id":"4e30ef5da562","results":[{"start":10,"end":22,"cpStart":10,"cpEnd":22,"text":"90 ya\u015F\u0131ndaki","label":"QUANTITY","confidence":1,"kind":"Measure","value":"90","unit":"year","dimension":"age"}]}
+{"id":"4e4fc7c03515","results":[{"start":9,"end":27,"cpStart":9,"cpEnd":27,"text":"#musteri_gorusleri","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"musteri_gorusleri"}]}
+{"id":"4f18d84a4f35","results":[{"start":19,"end":40,"cpStart":19,"cpEnd":40,"text":"iletisim@ornek.edu.tr","label":"EMAIL","confidence":1,"kind":"Email","normalized":"iletisim@ornek.edu.tr"}]}
+{"id":"4fa7cfa4a97f","results":[{"start":6,"end":19,"cpStart":6,"cpEnd":19,"text":"09.00 - 17.00","label":"TIME","confidence":1,"kind":"TimeRange","value":"T09:00/T17:00","grain":"minute","approx":false}]}
+{"id":"513b72160045","results":[{"start":7,"end":18,"cpStart":7,"cpEnd":18,"text":"09:00-17:00","label":"TIME","confidence":1,"kind":"TimeRange","value":"T09:00/T17:00","grain":"minute","approx":false}]}
+{"id":"517439d4a40d","results":[{"start":10,"end":16,"cpStart":10,"cpEnd":16,"text":"her ay","label":"SET","confidence":1,"kind":"Set","value":"P1M","grain":"month","approx":false}]}
+{"id":"51c7bd5fd9b2","results":[{"start":22,"end":47,"cpStart":22,"cpEnd":47,"text":"www.ornek.com.tr/iletisim","label":"URL","confidence":1,"kind":"Url","normalized":"www.ornek.com.tr/iletisim"}]}
+{"id":"525bca4fb0ba","results":[{"start":4,"end":11,"cpStart":4,"cpEnd":11,"text":"6 metre","label":"QUANTITY","confidence":1,"kind":"Measure","value":"6","unit":"meter","dimension":"length"}]}
+{"id":"5302b8a4c000","results":[{"start":21,"end":41,"cpStart":21,"cpEnd":41,"text":"100 santigrat derece","label":"QUANTITY","confidence":1,"kind":"Measure","value":"100","unit":"celsius","dimension":"temperature"}]}
+{"id":"53f15e037e56","results":[{"start":25,"end":35,"cpStart":25,"cpEnd":35,"text":"#Izmir2026","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"izmir2026"}]}
+{"id":"54c248b566c7","results":[{"start":6,"end":10,"cpStart":6,"cpEnd":10,"text":"k\u0131rk","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"40"}]}
+{"id":"55a40172ce74","results":[{"start":14,"end":28,"cpStart":14,"cpEnd":28,"text":"0216-345-67-89","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"02163456789"}]}
+{"id":"5715d7c66f27","results":[{"start":8,"end":13,"cpStart":8,"cpEnd":13,"text":"yar\u0131n","label":"DATE","confidence":1,"kind":"Date","value":"2028-02-29","grain":"day","approx":false}]}
+{"id":"5783c3577241","results":[{"start":10,"end":23,"cpStart":10,"cpEnd":23,"text":"May\u0131s ba\u015F\u0131nda","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-05-01/2026-05-11","grain":"month","approx":true}]}
+{"id":"57b84b6b990d","results":[{"start":22,"end":47,"cpStart":22,"cpEnd":47,"text":"ahmet.yilmaz@ornek.com.tr","label":"EMAIL","confidence":1,"kind":"Email","normalized":"ahmet.yilmaz@ornek.com.tr"}]}
+{"id":"5873f07dd326","results":[{"start":5,"end":11,"cpStart":5,"cpEnd":11,"text":"ikinci","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"2"}]}
+{"id":"5950776ddc75","results":[{"start":6,"end":16,"cpStart":6,"cpEnd":16,"text":"15.04.2026","label":"DATE","confidence":1,"kind":"Date","value":"2026-04-15","grain":"day","approx":false}]}
+{"id":"599a658d5099","results":[{"start":15,"end":27,"cpStart":15,"cpEnd":27,"text":"y\u00FCzde on iki","label":"PERCENT","confidence":1,"kind":"Percent","value":"12","unit":"percent","dimension":"percent"}]}
+{"id":"5a13ba5635b2","results":[{"start":6,"end":18,"cpStart":6,"cpEnd":18,"text":"3 \u015Eubat 2027","label":"DATE","confidence":1,"kind":"Date","value":"2027-02-03","grain":"day","approx":false}]}
+{"id":"5a2f71fb01ce","results":[{"start":6,"end":15,"cpStart":6,"cpEnd":15,"text":"5 ya\u015F\u0131nda","label":"QUANTITY","confidence":1,"kind":"Measure","value":"5","unit":"year","dimension":"age"}]}
+{"id":"5ae66b9509ec","results":[{"start":13,"end":30,"cpStart":13,"cpEnd":30,"text":"\u002B90 532 123 45 67","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"\u002B905321234567"}]}
+{"id":"5b88912e6869","results":[{"start":11,"end":22,"cpStart":11,"cpEnd":22,"text":"1 Ocak 2027","label":"DATE","confidence":1,"kind":"Date","value":"2027-01-01","grain":"day","approx":false}]}
+{"id":"5cc6eeb347d4","results":[{"start":9,"end":16,"cpStart":9,"cpEnd":16,"text":"sabah 8","label":"TIME","confidence":1,"kind":"Time","value":"T08:00","grain":"hour","approx":false}]}
+{"id":"5cf8876a18cb","results":[{"start":17,"end":21,"cpStart":17,"cpEnd":21,"text":"5 km","label":"QUANTITY","confidence":1,"kind":"Measure","value":"5","unit":"kilometer","dimension":"length"}]}
+{"id":"5d4bc2da99d7","results":[{"start":10,"end":26,"cpStart":10,"cpEnd":26,"text":"2 saat 30 dakika","label":"DURATION","confidence":1,"kind":"Duration","value":"9000","approx":false,"durationUnit":"Minute","count":"150"}]}
+{"id":"5d85f43e1ffb","results":[{"start":19,"end":36,"cpStart":19,"cpEnd":36,"text":"\u002B90 850 222 33 44","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"\u002B908502223344"}]}
+{"id":"60260e5da957","results":[{"start":21,"end":53,"cpStart":21,"cpEnd":53,"text":"https://ornek.com/a/b/c.html#son","label":"URL","confidence":1,"kind":"Url","normalized":"https://ornek.com/a/b/c.html#son"}]}
+{"id":"60867997cf1e","results":[{"start":0,"end":11,"cpStart":0,"cpEnd":11,"text":"Yar\u0131n sabah","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-19T06:00/2026-03-19T12:00","grain":"hour","approx":true}]}
+{"id":"608edee469c8","results":[{"start":5,"end":21,"cpStart":5,"cpEnd":21,"text":"yar\u0131n saat 15:00","label":"DATETIME","confidence":1,"kind":"DateTime","value":"2026-03-19T15:00","grain":"minute","approx":false}]}
+{"id":"60c86ebb8130","results":[{"start":8,"end":21,"cpStart":8,"cpEnd":21,"text":"www.ornek.com","label":"URL","confidence":1,"kind":"Url","normalized":"www.ornek.com"}]}
+{"id":"60ea7c82275a","results":[{"start":8,"end":17,"cpStart":8,"cpEnd":17,"text":"ge\u00E7en k\u0131\u015F","label":"DATE","confidence":1,"kind":"DateRange","value":"2025-12-01/2026-03-01","grain":"season","approx":true}]}
+{"id":"61c6e9e7b240","results":[{"start":5,"end":14,"cpStart":5,"cpEnd":14,"text":"her hafta","label":"SET","confidence":1,"kind":"Set","value":"P1W","grain":"week","approx":false},{"start":15,"end":21,"cpStart":15,"cpEnd":21,"text":"\u00FC\u00E7\u00FCnc\u00FC","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"3"}]}
+{"id":"62a52e178348","results":[{"start":9,"end":13,"cpStart":9,"cpEnd":13,"text":"Cuma","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-20","grain":"day","approx":false}]}
+{"id":"64533a3bab39","results":[]}
+{"id":"656fcf0a706a","results":[{"start":0,"end":6,"cpStart":0,"cpEnd":6,"text":"Y\u0131ll\u0131k","label":"SET","confidence":1,"kind":"Set","value":"P1Y","grain":"year","approx":false}]}
+{"id":"65d17e6c77e2","results":[{"start":13,"end":25,"cpStart":13,"cpEnd":25,"text":"12 kilometre","label":"QUANTITY","confidence":1,"kind":"Measure","value":"12","unit":"kilometer","dimension":"length"}]}
+{"id":"6628ca381b21","results":[{"start":12,"end":35,"cpStart":12,"cpEnd":35,"text":"a.b_c-d@alt.ornek.co.uk","label":"EMAIL","confidence":1,"kind":"Email","normalized":"a.b_c-d@alt.ornek.co.uk"}]}
+{"id":"6733360095b3","results":[{"start":7,"end":17,"cpStart":7,"cpEnd":17,"text":"12/09/2026","label":"DATE","confidence":1,"kind":"Date","value":"2026-09-12","grain":"day","approx":false}]}
+{"id":"673e36a13688","results":[{"start":8,"end":12,"cpStart":8,"cpEnd":12,"text":"2031","label":"DATE","confidence":0.8,"kind":"DateRange","value":"2031-01-01/2032-01-01","grain":"year","approx":false}]}
+{"id":"6749ded9a1ce","results":[{"start":7,"end":30,"cpStart":7,"cpEnd":30,"text":"ayse.demir@ornek.com.tr","label":"EMAIL","confidence":1,"kind":"Email","normalized":"ayse.demir@ornek.com.tr"}]}
+{"id":"69010403cae0","results":[{"start":28,"end":35,"cpStart":28,"cpEnd":35,"text":"@ali_75","label":"MENTION","confidence":1,"kind":"Mention","normalized":"ali_75"}]}
+{"id":"6922642ed6e2","results":[{"start":6,"end":12,"cpStart":6,"cpEnd":12,"text":"\u20AC12,40","label":"MONEY","confidence":1,"kind":"Money","value":"12.4","currency":"EUR"}]}
+{"id":"692c1d287e55","results":[{"start":7,"end":16,"cpStart":7,"cpEnd":16,"text":"Pazartesi","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-23","grain":"day","approx":false},{"start":22,"end":23,"cpStart":22,"cpEnd":23,"text":"9","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"9"}]}
+{"id":"69d937c2537a","results":[{"start":31,"end":40,"cpStart":31,"cpEnd":40,"text":"127.0.0.1","label":"IP_ADDRESS","confidence":1,"kind":"IpAddress","normalized":"127.0.0.1"}]}
+{"id":"6a8ec2d8cf0f","results":[]}
+{"id":"6b636b825136","results":[{"start":12,"end":24,"cpStart":12,"cpEnd":24,"text":"20 Mart 2026","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-20","grain":"day","approx":false}]}
+{"id":"6b6856fa6883","results":[{"start":5,"end":16,"cpStart":5,"cpEnd":16,"text":"08:00-15:00","label":"TIME","confidence":1,"kind":"TimeRange","value":"T08:00/T15:00","grain":"minute","approx":false}]}
+{"id":"6ba2e99a4816","results":[{"start":8,"end":25,"cpStart":8,"cpEnd":25,"text":"\u00FC\u00E7 y\u00FCz yirmi d\u00F6rt","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"324"}]}
+{"id":"6c3d7663456f","results":[{"start":7,"end":14,"cpStart":7,"cpEnd":14,"text":"75 lira","label":"MONEY","confidence":0.9,"kind":"Money","value":"75","currency":"TRY"}]}
+{"id":"6c7ab7aca92e","results":[{"start":11,"end":20,"cpStart":11,"cpEnd":20,"text":"45 dakika","label":"DURATION","confidence":1,"kind":"Duration","value":"2700","approx":false,"durationUnit":"Minute","count":"45"}]}
+{"id":"6d0db3e3869c","results":[{"start":18,"end":26,"cpStart":18,"cpEnd":26,"text":"10.0.0.1","label":"IP_ADDRESS","confidence":1,"kind":"IpAddress","normalized":"10.0.0.1"}]}
+{"id":"6d100eee2582","results":[{"start":9,"end":28,"cpStart":9,"cpEnd":28,"text":"yar\u0131n \u00F6\u011Fleden sonra","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-19T12:00/2026-03-19T18:00","grain":"hour","approx":true}]}
+{"id":"6e852a4d4f4b","results":[{"start":13,"end":18,"cpStart":13,"cpEnd":18,"text":"%48,3","label":"PERCENT","confidence":1,"kind":"Percent","value":"48.3","unit":"percent","dimension":"percent"}]}
+{"id":"6f8fed9dde9b","results":[{"start":12,"end":20,"cpStart":12,"cpEnd":20,"text":"y\u00FCzde 50","label":"PERCENT","confidence":1,"kind":"Percent","value":"50","unit":"percent","dimension":"percent"}]}
+{"id":"714637b89f6f","results":[{"start":8,"end":14,"cpStart":8,"cpEnd":14,"text":"250 ml","label":"QUANTITY","confidence":1,"kind":"Measure","value":"250","unit":"milliliter","dimension":"volume"}]}
+{"id":"71ae1300f7fa","results":[{"start":5,"end":16,"cpStart":5,"cpEnd":16,"text":"evvelsi g\u00FCn","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-16","grain":"day","approx":false}]}
+{"id":"71d203f85c21","results":[{"start":7,"end":16,"cpStart":7,"cpEnd":16,"text":"1,5 litre","label":"QUANTITY","confidence":1,"kind":"Measure","value":"1.5","unit":"liter","dimension":"volume"}]}
+{"id":"72309109f16b","results":[]}
+{"id":"72786a719175","results":[{"start":10,"end":18,"cpStart":10,"cpEnd":18,"text":"800 euro","label":"MONEY","confidence":0.95,"kind":"Money","value":"800","currency":"EUR"}]}
+{"id":"73bb52a21d4e","results":[{"start":0,"end":7,"cpStart":0,"cpEnd":7,"text":"Bininci","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"1000"}]}
+{"id":"74702fe3f87b","results":[{"start":5,"end":14,"cpStart":5,"cpEnd":14,"text":"4-8 May\u0131s","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-05-04/2026-05-09","grain":"day","approx":false}]}
+{"id":"76638fa32279","results":[{"start":15,"end":44,"cpStart":15,"cpEnd":44,"text":"ftp://dosyalar.ornek.org/pub/","label":"URL","confidence":1,"kind":"Url","normalized":"ftp://dosyalar.ornek.org/pub/"}]}
+{"id":"76a01b3dc16a","results":[{"start":7,"end":9,"cpStart":7,"cpEnd":9,"text":"42","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"42"}]}
+{"id":"77d9181fccea","results":[{"start":7,"end":35,"cpStart":7,"cpEnd":35,"text":"6 Nisan\u0027dan 10 Nisan\u0027a kadar","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-04-06/2026-04-11","grain":"day","approx":false}]}
+{"id":"784a7007287b","results":[{"start":19,"end":31,"cpStart":19,"cpEnd":31,"text":"203.0.113.45","label":"IP_ADDRESS","confidence":1,"kind":"IpAddress","normalized":"203.0.113.45"}]}
+{"id":"791f5cad9747","results":[{"start":11,"end":16,"cpStart":11,"cpEnd":16,"text":"%0,75","label":"PERCENT","confidence":1,"kind":"Percent","value":"0.75","unit":"percent","dimension":"percent"}]}
+{"id":"79d33f459cc7","results":[]}
+{"id":"7a0a88b9636c","results":[{"start":12,"end":16,"cpStart":12,"cpEnd":16,"text":"4 \u00B0C","label":"QUANTITY","confidence":1,"kind":"Measure","value":"4","unit":"celsius","dimension":"temperature"}]}
+{"id":"7b1595827e9b","results":[]}
+{"id":"7d6fe11b6949","results":[{"start":0,"end":15,"cpStart":0,"cpEnd":15,"text":"Ramazan Bayram\u0131","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-20","grain":"day","approx":false}]}
+{"id":"7d908613690a","results":[{"start":4,"end":8,"cpStart":4,"cpEnd":8,"text":"5 TL","label":"MONEY","confidence":1,"kind":"Money","value":"5","currency":"TRY"}]}
+{"id":"7e3ea6eb6afb","results":[{"start":0,"end":10,"cpStart":0,"cpEnd":10,"text":"Ge\u00E7en Sal\u0131","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-17","grain":"day","approx":false}]}
+{"id":"7ed949883242","results":[{"start":5,"end":18,"cpStart":5,"cpEnd":18,"text":"gelecek hafta","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-03-23/2026-03-30","grain":"week","approx":false}]}
+{"id":"7f53619ebecc","results":[{"start":7,"end":20,"cpStart":7,"cpEnd":20,"text":"30 Eyl\u00FCl 2026","label":"DATE","confidence":1,"kind":"Date","value":"2026-09-30","grain":"day","approx":false}]}
+{"id":"7f6b8aa56b8a","results":[{"start":5,"end":12,"cpStart":5,"cpEnd":12,"text":"5 hafta","label":"DURATION","confidence":1,"kind":"Duration","value":"3024000","approx":false,"durationUnit":"Week","count":"5"}]}
+{"id":"7f779b434df3","results":[{"start":17,"end":31,"cpStart":17,"cpEnd":31,"text":"0212 345 67 89","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"02123456789"}]}
+{"id":"7f919af6901d","results":[{"start":10,"end":23,"cpStart":10,"cpEnd":23,"text":"#kodlama_gunu","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"kodlama_gunu"}]}
+{"id":"814a33209048","results":[{"start":5,"end":16,"cpStart":5,"cpEnd":16,"text":"ge\u00E7en hafta","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-03-09/2026-03-16","grain":"week","approx":false}]}
+{"id":"81e2921b903e","results":[]}
+{"id":"82e23e0890d0","results":[{"start":0,"end":16,"cpStart":0,"cpEnd":16,"text":"\u00D6\u011Fretmenler G\u00FCn\u00FC","label":"DATE","confidence":1,"kind":"Date","value":"2026-11-24","grain":"day","approx":false}]}
+{"id":"85116e05588f","results":[{"start":5,"end":18,"cpStart":5,"cpEnd":18,"text":"2 hafta sonra","label":"DATE","confidence":1,"kind":"Date","value":"2026-04-01","grain":"day","approx":false}]}
+{"id":"855d43c0bca0","results":[{"start":0,"end":8,"cpStart":0,"cpEnd":8,"text":"Haftal\u0131k","label":"SET","confidence":1,"kind":"Set","value":"P1W","grain":"week","approx":false},{"start":15,"end":31,"cpStart":15,"cpEnd":31,"text":"Pazartesi sabah\u0131","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-23T06:00/2026-03-23T12:00","grain":"hour","approx":true}]}
+{"id":"8645c7275b93","results":[{"start":7,"end":18,"cpStart":7,"cpEnd":18,"text":"yar\u0131n \u00F6\u011Flen","label":"DATETIME","confidence":1,"kind":"DateTime","value":"2026-03-19T12:00","grain":"hour","approx":false}]}
+{"id":"87816176f5ce","results":[{"start":5,"end":21,"cpStart":5,"cpEnd":21,"text":"bu \u00F6\u011Fleden sonra","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-18T12:00/2026-03-18T18:00","grain":"hour","approx":true}]}
+{"id":"87e062877e96","results":[{"start":22,"end":69,"cpStart":22,"cpEnd":69,"text":"https://docs.ornek.org/kilavuz/baslangic?dil=tr","label":"URL","confidence":1,"kind":"Url","normalized":"https://docs.ornek.org/kilavuz/baslangic?dil=tr"}]}
+{"id":"888bf729dd3d","results":[{"start":20,"end":52,"cpStart":20,"cpEnd":52,"text":"https://www.ornek.com.tr/urunler","label":"URL","confidence":1,"kind":"Url","normalized":"https://www.ornek.com.tr/urunler"}]}
+{"id":"88e73f820d13","results":[{"start":6,"end":11,"cpStart":6,"cpEnd":11,"text":"bu ay","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-03-01/2026-04-01","grain":"month","approx":false}]}
+{"id":"89c7427cf3fa","results":[{"start":9,"end":21,"cpStart":9,"cpEnd":21,"text":"Anneler G\u00FCn\u00FC","label":"DATE","confidence":1,"kind":"Date","value":"2026-05-10","grain":"day","approx":false}]}
+{"id":"8a578ee66d78","results":[{"start":30,"end":41,"cpStart":30,"cpEnd":41,"text":"2001:db8::1","label":"IP_ADDRESS","confidence":1,"kind":"IpAddress","normalized":"2001:db8::1"}]}
+{"id":"8cd688887d36","results":[{"start":8,"end":14,"cpStart":8,"cpEnd":14,"text":"10 y\u0131l","label":"DURATION","confidence":1,"kind":"Duration","value":"P10Y","approx":false,"durationUnit":"Year","count":"10"}]}
+{"id":"8ef1384a8cb7","results":[{"start":13,"end":34,"cpStart":13,"cpEnd":34,"text":"2020\u0027den 2024\u0027e kadar","label":"DATE","confidence":1,"kind":"DateRange","value":"2020-01-01/2025-01-01","grain":"year","approx":false}]}
+{"id":"8f10dd0d5ec2","results":[{"start":6,"end":42,"cpStart":6,"cpEnd":42,"text":"9b2c1e04-7d3a-4f5b-8c6d-1a2b3c4d5e6f","label":"GUID","confidence":1,"kind":"Uuid","normalized":"9b2c1e04-7d3a-4f5b-8c6d-1a2b3c4d5e6f"}]}
+{"id":"8f21fdeb27c1","results":[{"start":8,"end":18,"cpStart":8,"cpEnd":18,"text":"saat 15:30","label":"TIME","confidence":1,"kind":"Time","value":"T15:30","grain":"minute","approx":false}]}
+{"id":"9165a6c6d3ea","results":[{"start":6,"end":16,"cpStart":6,"cpEnd":16,"text":"gelecek ay","label":"DATE","confidence":1,"kind":"DateRange","value":"2027-01-01/2027-02-01","grain":"month","approx":false}]}
+{"id":"922b62b54344","results":[{"start":9,"end":18,"cpStart":9,"cpEnd":18,"text":"#sonbahar","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"sonbahar"}]}
+{"id":"94d407dd2dd2","results":[{"start":8,"end":32,"cpStart":8,"cpEnd":32,"text":"14:00 ile 16:00 aras\u0131nda","label":"TIME","confidence":1,"kind":"TimeRange","value":"T14:00/T16:00","grain":"minute","approx":false}]}
+{"id":"96afce466d1a","results":[]}
+{"id":"979a38e265d0","results":[{"start":9,"end":19,"cpStart":9,"cpEnd":19,"text":"saat 10:00","label":"TIME","confidence":1,"kind":"Time","value":"T10:00","grain":"minute","approx":false},{"start":24,"end":29,"cpStart":24,"cpEnd":29,"text":"11:30","label":"TIME","confidence":1,"kind":"Time","value":"T11:30","grain":"minute","approx":false}]}
+{"id":"981bd1ab7e79","results":[{"start":0,"end":2,"cpStart":0,"cpEnd":2,"text":"On","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"10"},{"start":3,"end":10,"cpStart":3,"cpEnd":10,"text":"be\u015Finci","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"5"}]}
+{"id":"985537fcb4c8","results":[{"start":4,"end":11,"cpStart":4,"cpEnd":11,"text":"ak\u015Fam 5","label":"TIME","confidence":1,"kind":"Time","value":"T17:00","grain":"hour","approx":false}]}
+{"id":"9955d81c7498","results":[{"start":0,"end":7,"cpStart":0,"cpEnd":7,"text":"21\u0027inci","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"21"}]}
+{"id":"9981aa90d9e5","results":[{"start":7,"end":13,"cpStart":7,"cpEnd":13,"text":"bu yaz","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-06-01/2026-09-01","grain":"season","approx":true}]}
+{"id":"9a50295b99d9","results":[{"start":6,"end":10,"cpStart":6,"cpEnd":10,"text":"2 kg","label":"QUANTITY","confidence":1,"kind":"Measure","value":"2","unit":"kilogram","dimension":"mass"}]}
+{"id":"9acbe977b7b1","results":[]}
+{"id":"9c164db226d9","results":[{"start":18,"end":23,"cpStart":18,"cpEnd":23,"text":"-5 \u00B0C","label":"QUANTITY","confidence":1,"kind":"Measure","value":"-5","unit":"celsius","dimension":"temperature"}]}
+{"id":"9d5897be5b6c","results":[{"start":6,"end":11,"cpStart":6,"cpEnd":11,"text":"\u00F6\u011Flen","label":"TIME","confidence":1,"kind":"Time","value":"T12:00","grain":"hour","approx":false}]}
+{"id":"9e51db8d9ff2","results":[{"start":13,"end":28,"cpStart":13,"cpEnd":28,"text":"Sevgililer G\u00FCn\u00FC","label":"DATE","confidence":1,"kind":"Date","value":"2027-02-14","grain":"day","approx":false}]}
+{"id":"9f0b19dc74fa","results":[{"start":15,"end":29,"cpStart":15,"cpEnd":29,"text":"0312 123 45 67","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"03121234567"}]}
+{"id":"9f3d69833641","results":[{"start":8,"end":14,"cpStart":8,"cpEnd":14,"text":"5\u0027inci","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"5"}]}
+{"id":"9f76c2d693ff","results":[{"start":6,"end":13,"cpStart":6,"cpEnd":13,"text":"y\u00FCzde 8","label":"PERCENT","confidence":1,"kind":"Percent","value":"8","unit":"percent","dimension":"percent"}]}
+{"id":"a0027df838df","results":[{"start":0,"end":14,"cpStart":0,"cpEnd":14,"text":"Kurban Bayram\u0131","label":"DATE","confidence":1,"kind":"Date","value":"2026-05-27","grain":"day","approx":false}]}
+{"id":"a2907b8d7afb","results":[{"start":14,"end":19,"cpStart":14,"cpEnd":19,"text":"0,001","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"0.001"}]}
+{"id":"a2cc95a985d9","results":[{"start":6,"end":13,"cpStart":6,"cpEnd":13,"text":"her y\u0131l","label":"SET","confidence":1,"kind":"Set","value":"P1Y","grain":"year","approx":false}]}
+{"id":"a412f0459ae3","results":[{"start":0,"end":5,"cpStart":0,"cpEnd":5,"text":"Yar\u0131n","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-19","grain":"day","approx":false}]}
+{"id":"a49012ea0a60","results":[]}
+{"id":"a51fe73a7b79","results":[{"start":0,"end":8,"cpStart":0,"cpEnd":8,"text":"18 ayl\u0131k","label":"QUANTITY","confidence":1,"kind":"Measure","value":"18","unit":"month","dimension":"age"}]}
+{"id":"a64b5df16eaf","results":[{"start":8,"end":19,"cpStart":8,"cpEnd":19,"text":"y\u00FCzde yirmi","label":"PERCENT","confidence":1,"kind":"Percent","value":"20","unit":"percent","dimension":"percent"}]}
+{"id":"a6882f942aaf","results":[{"start":0,"end":18,"cpStart":0,"cpEnd":18,"text":"Cumhuriyet Bayram\u0131","label":"DATE","confidence":1,"kind":"Date","value":"2026-10-29","grain":"day","approx":false}]}
+{"id":"a768a76eccfb","results":[{"start":7,"end":12,"cpStart":7,"cpEnd":12,"text":"2\u0027nci","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"2"}]}
+{"id":"aa2aa2024846","results":[{"start":7,"end":19,"cpStart":7,"cpEnd":19,"text":"yirmi \u00FC\u00E7\u00FCnc\u00FC","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"23"}]}
+{"id":"aa4dd614f767","results":[{"start":5,"end":15,"cpStart":5,"cpEnd":15,"text":"12 ya\u015F\u0131nda","label":"QUANTITY","confidence":1,"kind":"Measure","value":"12","unit":"year","dimension":"age"}]}
+{"id":"aac5432f220f","results":[{"start":8,"end":19,"cpStart":8,"cpEnd":19,"text":"#Ankara2026","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"ankara2026"}]}
+{"id":"aadeff9fdc82","results":[{"start":0,"end":9,"cpStart":0,"cpEnd":9,"text":"Dokuzuncu","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"9"},{"start":17,"end":20,"cpStart":17,"cpEnd":20,"text":"d\u00FCn","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-17","grain":"day","approx":false}]}
+{"id":"ab0355875e80","results":[{"start":5,"end":27,"cpStart":5,"cpEnd":27,"text":"saat 9\u0027dan 17\u0027ye kadar","label":"TIME","confidence":1,"kind":"TimeRange","value":"T09:00/T17:00","grain":"hour","approx":false}]}
+{"id":"abcc6260c73b","results":[{"start":21,"end":26,"cpStart":21,"cpEnd":26,"text":"72 \u00B0F","label":"QUANTITY","confidence":1,"kind":"Measure","value":"72","unit":"fahrenheit","dimension":"temperature"}]}
+{"id":"abdfc17afa5f","results":[{"start":15,"end":16,"cpStart":15,"cpEnd":16,"text":"8","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"8"},{"start":21,"end":23,"cpStart":21,"cpEnd":23,"text":"12","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"12"}]}
+{"id":"acdb89c5284a","results":[{"start":9,"end":24,"cpStart":9,"cpEnd":24,"text":"Cuma saat 10.30","label":"DATETIME","confidence":1,"kind":"DateTime","value":"2026-03-20T10:30","grain":"minute","approx":false}]}
+{"id":"ad6d3f3087fd","results":[{"start":9,"end":23,"cpStart":9,"cpEnd":23,"text":"2022 ortas\u0131nda","label":"DATE","confidence":1,"kind":"DateRange","value":"2022-05-01/2022-09-01","grain":"year","approx":true}]}
+{"id":"ad8b485ac839","results":[{"start":0,"end":5,"cpStart":0,"cpEnd":5,"text":"Bug\u00FCn","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-18","grain":"day","approx":false},{"start":13,"end":20,"cpStart":13,"cpEnd":20,"text":"y\u00FCz\u00FCnc\u00FC","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"100"}]}
+{"id":"ae6a679a858e","results":[{"start":17,"end":26,"cpStart":17,"cpEnd":26,"text":"10.000 TL","label":"MONEY","confidence":1,"kind":"Money","value":"10000","currency":"TRY"}]}
+{"id":"ae7502aac6a3","results":[{"start":7,"end":18,"cpStart":7,"cpEnd":18,"text":"gece yar\u0131s\u0131","label":"TIME","confidence":1,"kind":"Time","value":"T00:00","grain":"hour","approx":false}]}
+{"id":"af3c0d4fb3c8","results":[{"start":6,"end":9,"cpStart":6,"cpEnd":9,"text":"iki","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"2"}]}
+{"id":"b0938d2a51fc","results":[{"start":9,"end":13,"cpStart":9,"cpEnd":13,"text":"%3,5","label":"PERCENT","confidence":1,"kind":"Percent","value":"3.5","unit":"percent","dimension":"percent"}]}
+{"id":"b17e456a6999","results":[{"start":9,"end":30,"cpStart":9,"cpEnd":30,"text":"ornek.com.tr/fiyatlar","label":"URL","confidence":1,"kind":"Url","normalized":"ornek.com.tr/fiyatlar"}]}
+{"id":"b262f5f1024a","results":[{"start":8,"end":27,"cpStart":8,"cpEnd":27,"text":"15 Nisan saat 18:30","label":"DATETIME","confidence":1,"kind":"DateTime","value":"2026-04-15T18:30","grain":"minute","approx":false}]}
+{"id":"b34a7e6828f6","results":[{"start":17,"end":25,"cpStart":17,"cpEnd":25,"text":"#yaz2026","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"yaz2026"}]}
+{"id":"b3a02def32ce","results":[{"start":5,"end":38,"cpStart":5,"cpEnd":38,"text":"https://magaza.ornek.com.tr/sepet","label":"URL","confidence":1,"kind":"Url","normalized":"https://magaza.ornek.com.tr/sepet"}]}
+{"id":"b49335f403c4","results":[{"start":5,"end":18,"cpStart":5,"cpEnd":18,"text":"75 santimetre","label":"QUANTITY","confidence":1,"kind":"Measure","value":"75","unit":"centimeter","dimension":"length"}]}
+{"id":"b51ae24305c5","results":[{"start":6,"end":11,"cpStart":6,"cpEnd":11,"text":"bug\u00FCn","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-18","grain":"day","approx":false}]}
+{"id":"b69efa7c0431","results":[{"start":13,"end":27,"cpStart":13,"cpEnd":27,"text":"0533-123-45-67","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"05331234567"}]}
+{"id":"b7b75419984e","results":[{"start":11,"end":18,"cpStart":11,"cpEnd":18,"text":"6 ayl\u0131k","label":"QUANTITY","confidence":1,"kind":"Measure","value":"6","unit":"month","dimension":"age"}]}
+{"id":"b9f1c72943ef","results":[{"start":7,"end":19,"cpStart":7,"cpEnd":19,"text":"2021 ba\u015F\u0131nda","label":"DATE","confidence":1,"kind":"DateRange","value":"2021-01-01/2021-05-01","grain":"year","approx":true}]}
+{"id":"bb79c4455d3e","results":[{"start":0,"end":4,"cpStart":0,"cpEnd":4,"text":"Noel","label":"DATE","confidence":1,"kind":"Date","value":"2026-12-25","grain":"day","approx":false}]}
+{"id":"bc3432464f96","results":[{"start":6,"end":23,"cpStart":6,"cpEnd":23,"text":"2025 sonbahar\u0131nda","label":"DATE","confidence":1,"kind":"DateRange","value":"2025-09-01/2025-12-01","grain":"season","approx":true}]}
+{"id":"bc603af1708b","results":[{"start":0,"end":6,"cpStart":0,"cpEnd":6,"text":"Bu y\u0131l","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-01-01/2027-01-01","grain":"year","approx":false},{"start":14,"end":23,"cpStart":14,"cpEnd":23,"text":"2.500.000","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"2500000"}]}
+{"id":"bf56db00a558","results":[{"start":15,"end":19,"cpStart":15,"cpEnd":19,"text":"3,14","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"3.14"}]}
+{"id":"bf8cf9280553","results":[{"start":19,"end":29,"cpStart":19,"cpEnd":29,"text":"7,9 milyar","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"7900000000"}]}
+{"id":"c07987791c51","results":[{"start":0,"end":7,"cpStart":0,"cpEnd":7,"text":"Y\u0131lba\u015F\u0131","label":"DATE","confidence":1,"kind":"Date","value":"2027-01-01","grain":"day","approx":false}]}
+{"id":"c0f0078bd10b","results":[{"start":17,"end":53,"cpStart":17,"cpEnd":53,"text":"3f2504e0-4f89-11d3-9a0c-0305e82c3301","label":"GUID","confidence":1,"kind":"Uuid","normalized":"3f2504e0-4f89-11d3-9a0c-0305e82c3301"}]}
+{"id":"c1eece7b54ed","results":[{"start":10,"end":20,"cpStart":10,"cpEnd":20,"text":"@nlp_ekibi","label":"MENTION","confidence":1,"kind":"Mention","normalized":"nlp_ekibi"}]}
+{"id":"c1ef101b46ef","results":[{"start":6,"end":9,"cpStart":6,"cpEnd":9,"text":"\u20BA45","label":"MONEY","confidence":1,"kind":"Money","value":"45","currency":"TRY"}]}
+{"id":"c2876bc18170","results":[{"start":5,"end":10,"cpStart":5,"cpEnd":10,"text":"yar\u0131n","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-19","grain":"day","approx":false},{"start":11,"end":20,"cpStart":11,"cpEnd":20,"text":"18 derece","label":"QUANTITY","confidence":0.6,"kind":"Measure","value":"18","unit":"degree","dimension":"temperature"}]}
+{"id":"c42ebb1cada4","results":[{"start":0,"end":36,"cpStart":0,"cpEnd":36,"text":"123e4567-e89b-12d3-a456-426614174000","label":"GUID","confidence":1,"kind":"Uuid","normalized":"123e4567-e89b-12d3-a456-426614174000"}]}
+{"id":"c44328d63bc5","results":[{"start":11,"end":26,"cpStart":11,"cpEnd":26,"text":"20 Haziran 2026","label":"DATE","confidence":1,"kind":"Date","value":"2026-06-20","grain":"day","approx":false}]}
+{"id":"c5c10a90eac1","results":[{"start":7,"end":22,"cpStart":7,"cpEnd":22,"text":"iki bin be\u015F y\u00FCz","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"2500"}]}
+{"id":"c5d655f4dff4","results":[{"start":14,"end":28,"cpStart":14,"cpEnd":28,"text":"d\u00FCn saat 22:15","label":"DATETIME","confidence":1,"kind":"DateTime","value":"2026-03-17T22:15","grain":"minute","approx":false}]}
+{"id":"c6e569cd6ad5","results":[{"start":7,"end":30,"cpStart":7,"cpEnd":30,"text":"20 Mart 2026 saat 09:00","label":"DATETIME","confidence":1,"kind":"DateTime","value":"2026-03-20T09:00","grain":"minute","approx":false}]}
+{"id":"c79a6e1f079f","results":[{"start":9,"end":12,"cpStart":9,"cpEnd":12,"text":"d\u00FCn","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-17","grain":"day","approx":false}]}
+{"id":"c8a125d7a8cf","results":[{"start":0,"end":36,"cpStart":0,"cpEnd":36,"text":"550e8400-e29b-41d4-a716-446655440000","label":"GUID","confidence":1,"kind":"Uuid","normalized":"550e8400-e29b-41d4-a716-446655440000"}]}
+{"id":"c8ba38376b62","results":[{"start":8,"end":20,"cpStart":8,"cpEnd":20,"text":"Pazar sabah\u0131","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-22T06:00/2026-03-22T12:00","grain":"hour","approx":true}]}
+{"id":"c9db65611bf1","results":[{"start":7,"end":19,"cpStart":7,"cpEnd":19,"text":"192.168.0.12","label":"IP_ADDRESS","confidence":1,"kind":"IpAddress","normalized":"192.168.0.12"}]}
+{"id":"cab566d633d5","results":[{"start":18,"end":21,"cpStart":18,"cpEnd":21,"text":"bin","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"1000"}]}
+{"id":"cac5fc75cbb9","results":[{"start":7,"end":10,"cpStart":7,"cpEnd":10,"text":"%25","label":"PERCENT","confidence":1,"kind":"Percent","value":"25","unit":"percent","dimension":"percent"}]}
+{"id":"cb17044f668c","results":[{"start":3,"end":16,"cpStart":3,"cpEnd":16,"text":"2,5 milyon TL","label":"MONEY","confidence":1,"kind":"Money","value":"2500000","currency":"TRY"}]}
+{"id":"cb695fe79480","results":[{"start":6,"end":27,"cpStart":6,"cpEnd":27,"text":"ad.soyad@ornek.gov.tr","label":"EMAIL","confidence":1,"kind":"Email","normalized":"ad.soyad@ornek.gov.tr"}]}
+{"id":"cbf848af84ef","results":[{"start":8,"end":22,"cpStart":8,"cpEnd":22,"text":"31 Aral\u0131k 2026","label":"DATE","confidence":1,"kind":"Date","value":"2026-12-31","grain":"day","approx":false}]}
+{"id":"cc0924ce90d8","results":[{"start":8,"end":13,"cpStart":8,"cpEnd":13,"text":"1.250","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"1250"}]}
+{"id":"cc22af4db833","results":[{"start":15,"end":26,"cpStart":15,"cpEnd":26,"text":"23 kilogram","label":"QUANTITY","confidence":1,"kind":"Measure","value":"23","unit":"kilogram","dimension":"mass"}]}
+{"id":"cc2e284593d6","results":[{"start":0,"end":8,"cpStart":0,"cpEnd":8,"text":"Yeni y\u0131l","label":"DATE","confidence":1,"kind":"Date","value":"2027-01-01","grain":"day","approx":false},{"start":17,"end":28,"cpStart":17,"cpEnd":28,"text":"yar\u0131n ak\u015Fam","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2027-01-01T18:00/2027-01-02T00:00","grain":"hour","approx":true}]}
+{"id":"ce038fc2a610","results":[{"start":7,"end":14,"cpStart":7,"cpEnd":14,"text":"100 USD","label":"MONEY","confidence":1,"kind":"Money","value":"100","currency":"USD"}]}
+{"id":"ce59025d6900","results":[{"start":5,"end":16,"cpStart":5,"cpEnd":16,"text":"12:00-13:30","label":"TIME","confidence":1,"kind":"TimeRange","value":"T12:00/T13:30","grain":"minute","approx":false}]}
+{"id":"ce6129322284","results":[{"start":13,"end":18,"cpStart":13,"cpEnd":18,"text":"20 TL","label":"MONEY","confidence":1,"kind":"Money","value":"20","currency":"TRY"}]}
+{"id":"cf71b6f27527","results":[{"start":0,"end":13,"cpStart":0,"cpEnd":13,"text":"Zafer Bayram\u0131","label":"DATE","confidence":1,"kind":"Date","value":"2026-08-30","grain":"day","approx":false}]}
+{"id":"cfff6879f042","results":[{"start":9,"end":15,"cpStart":9,"cpEnd":15,"text":"seksen","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"80"}]}
+{"id":"d0f12454ddc5","results":[{"start":9,"end":18,"cpStart":9,"cpEnd":18,"text":"ge\u00E7en y\u0131l","label":"DATE","confidence":1,"kind":"DateRange","value":"2025-01-01/2026-01-01","grain":"year","approx":false}]}
+{"id":"d133bb5f3697","results":[{"start":5,"end":17,"cpStart":5,"cpEnd":17,"text":"2023 sonunda","label":"DATE","confidence":1,"kind":"DateRange","value":"2023-09-01/2024-01-01","grain":"year","approx":true}]}
+{"id":"d188cb933381","results":[{"start":6,"end":11,"cpStart":6,"cpEnd":11,"text":"bug\u00FCn","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-18","grain":"day","approx":false},{"start":12,"end":31,"cpStart":12,"cpEnd":31,"text":"15 santigrat derece","label":"QUANTITY","confidence":1,"kind":"Measure","value":"15","unit":"celsius","dimension":"temperature"}]}
+{"id":"d1c758d4f6a8","results":[{"start":6,"end":15,"cpStart":6,"cpEnd":15,"text":"yirmi be\u015F","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"25"}]}
+{"id":"d21f8a68aa59","results":[{"start":9,"end":45,"cpStart":9,"cpEnd":45,"text":"6BA7B811-9DAD-11D1-80B4-00C04FD430C8","label":"GUID","confidence":1,"kind":"Uuid","normalized":"6ba7b811-9dad-11d1-80b4-00c04fd430c8"}]}
+{"id":"d28afb67f7a2","results":[]}
+{"id":"d301f7dfaf95","results":[{"start":0,"end":5,"cpStart":0,"cpEnd":5,"text":"Bu ay","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-03-01/2026-04-01","grain":"month","approx":false},{"start":16,"end":20,"cpStart":16,"cpEnd":20,"text":"%1,2","label":"PERCENT","confidence":1,"kind":"Percent","value":"1.2","unit":"percent","dimension":"percent"}]}
+{"id":"d3c05db6a850","results":[{"start":19,"end":28,"cpStart":19,"cpEnd":28,"text":"@jane_doe","label":"MENTION","confidence":1,"kind":"Mention","normalized":"jane_doe"},{"start":32,"end":39,"cpStart":32,"cpEnd":39,"text":"@dotnet","label":"MENTION","confidence":1,"kind":"Mention","normalized":"dotnet"}]}
+{"id":"d42667eacf98","results":[{"start":17,"end":31,"cpStart":17,"cpEnd":31,"text":"ekip@ornek.com","label":"EMAIL","confidence":1,"kind":"Email","normalized":"ekip@ornek.com"}]}
+{"id":"d47faeedee61","results":[{"start":9,"end":19,"cpStart":9,"cpEnd":19,"text":"iki milyon","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"2000000"}]}
+{"id":"d4b8596292c5","results":[{"start":7,"end":17,"cpStart":7,"cpEnd":17,"text":"85 ya\u015F\u0131nda","label":"QUANTITY","confidence":1,"kind":"Measure","value":"85","unit":"year","dimension":"age"}]}
+{"id":"d4cf8e5ce638","results":[{"start":10,"end":20,"cpStart":10,"cpEnd":20,"text":"bir d\u00FCzine","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"12"}]}
+{"id":"d50eb039ba4d","results":[{"start":0,"end":12,"cpStart":0,"cpEnd":12,"text":"40 ya\u015F\u0131ndaki","label":"QUANTITY","confidence":1,"kind":"Measure","value":"40","unit":"year","dimension":"age"}]}
+{"id":"d57c661940e9","results":[{"start":8,"end":19,"cpStart":8,"cpEnd":19,"text":"18:00-20:00","label":"TIME","confidence":1,"kind":"TimeRange","value":"T18:00/T20:00","grain":"minute","approx":false}]}
+{"id":"d676fcca5be1","results":[{"start":5,"end":14,"cpStart":5,"cpEnd":14,"text":"90 dakika","label":"DURATION","confidence":1,"kind":"Duration","value":"5400","approx":false,"durationUnit":"Minute","count":"90"}]}
+{"id":"d80de384bdda","results":[{"start":7,"end":17,"cpStart":7,"cpEnd":17,"text":"12.345.678","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"12345678"}]}
+{"id":"d9ad0176a091","results":[{"start":5,"end":21,"cpStart":5,"cpEnd":21,"text":"Cumartesi ak\u015Fam\u0131","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-21T18:00/2026-03-22T00:00","grain":"hour","approx":true}]}
+{"id":"dc0a5476329b","results":[{"start":18,"end":26,"cpStart":18,"cpEnd":26,"text":"bu hafta","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-03-16/2026-03-23","grain":"week","approx":false}]}
+{"id":"dc7e0bfce353","results":[{"start":17,"end":25,"cpStart":17,"cpEnd":25,"text":"otuz bin","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"30000"}]}
+{"id":"de95eb900fa5","results":[{"start":7,"end":30,"cpStart":7,"cpEnd":30,"text":"25 Mart 2026 saat 14:00","label":"DATETIME","confidence":1,"kind":"DateTime","value":"2026-03-25T14:00","grain":"minute","approx":false}]}
+{"id":"df6ecf028256","results":[{"start":7,"end":12,"cpStart":7,"cpEnd":12,"text":"09:00","label":"TIME","confidence":1,"kind":"Time","value":"T09:00","grain":"minute","approx":false}]}
+{"id":"e01817ce5a4b","results":[{"start":6,"end":16,"cpStart":6,"cpEnd":16,"text":"14 A\u011Fustos","label":"DATE","confidence":1,"kind":"Date","value":"2026-08-14","grain":"day","approx":false}]}
+{"id":"e0cd12418dfa","results":[{"start":6,"end":11,"cpStart":6,"cpEnd":11,"text":"40 kW","label":"QUANTITY","confidence":1,"kind":"Measure","value":"40","unit":"kilowatt","dimension":"power"}]}
+{"id":"e10208bf7b18","results":[{"start":23,"end":30,"cpStart":23,"cpEnd":30,"text":"@elif_s","label":"MENTION","confidence":1,"kind":"Mention","normalized":"elif_s"}]}
+{"id":"e12498079a5f","results":[{"start":5,"end":11,"cpStart":5,"cpEnd":11,"text":"180 cm","label":"QUANTITY","confidence":1,"kind":"Measure","value":"180","unit":"centimeter","dimension":"length"}]}
+{"id":"e152e4186d62","results":[{"start":14,"end":21,"cpStart":14,"cpEnd":21,"text":"#OneNLP","label":"HASHTAG","confidence":1,"kind":"Hashtag","normalized":"onenlp"}]}
+{"id":"e22b94bb3166","results":[{"start":9,"end":21,"cpStart":9,"cpEnd":21,"text":"Haziran 2027","label":"DATE","confidence":1,"kind":"DateRange","value":"2027-06-01/2027-07-01","grain":"month","approx":false}]}
+{"id":"e39eab926c74","results":[{"start":5,"end":12,"cpStart":5,"cpEnd":12,"text":"iki g\u00FCn","label":"DURATION","confidence":1,"kind":"Duration","value":"172800","approx":false,"durationUnit":"Day","count":"2"}]}
+{"id":"e3f97871ceec","results":[{"start":14,"end":25,"cpStart":14,"cpEnd":25,"text":"1.234,56 TL","label":"MONEY","confidence":1,"kind":"Money","value":"1234.56","currency":"TRY"}]}
+{"id":"e4364daf8c86","results":[{"start":8,"end":21,"cpStart":8,"cpEnd":21,"text":"08:30 - 12:00","label":"TIME","confidence":1,"kind":"TimeRange","value":"T08:30/T12:00","grain":"minute","approx":false}]}
+{"id":"e43a7df6e70f","results":[{"start":8,"end":26,"cpStart":8,"cpEnd":26,"text":"her g\u00FCn saat 12:00","label":"SET","confidence":1,"kind":"Set","value":"T12:00","grain":"minute","approx":false}]}
+{"id":"e4d5f612bf50","results":[{"start":7,"end":13,"cpStart":7,"cpEnd":13,"text":"200 \u00B0C","label":"QUANTITY","confidence":1,"kind":"Measure","value":"200","unit":"celsius","dimension":"temperature"}]}
+{"id":"e4e66674d95a","results":[{"start":11,"end":24,"cpStart":11,"cpEnd":24,"text":"gelecek hafta","label":"DATE","confidence":1,"kind":"DateRange","value":"2026-03-23/2026-03-30","grain":"week","approx":false}]}
+{"id":"e50dde8f76f2","results":[{"start":13,"end":26,"cpStart":13,"cpEnd":26,"text":"saat 10:15:30","label":"TIME","confidence":1,"kind":"Time","value":"T10:15:30","grain":"second","approx":false}]}
+{"id":"e58f51885818","results":[{"start":20,"end":32,"cpStart":20,"cpEnd":32,"text":"@recursiveai","label":"MENTION","confidence":1,"kind":"Mention","normalized":"recursiveai"}]}
+{"id":"e5ab2f1645e9","results":[{"start":0,"end":12,"cpStart":0,"cpEnd":12,"text":"ik@ornek.com","label":"EMAIL","confidence":1,"kind":"Email","normalized":"ik@ornek.com"},{"start":16,"end":31,"cpStart":16,"cpEnd":31,"text":"satis@ornek.com","label":"EMAIL","confidence":1,"kind":"Email","normalized":"satis@ornek.com"}]}
+{"id":"e5c1592e6336","results":[{"start":4,"end":10,"cpStart":4,"cpEnd":10,"text":"8\u0027inci","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"8"}]}
+{"id":"e60e2c999417","results":[{"start":14,"end":20,"cpStart":14,"cpEnd":20,"text":"-12 \u00B0C","label":"QUANTITY","confidence":1,"kind":"Measure","value":"-12","unit":"celsius","dimension":"temperature"}]}
+{"id":"e82b62fe6710","results":[{"start":0,"end":8,"cpStart":0,"cpEnd":8,"text":"\u00D6b\u00FCr g\u00FCn","label":"DATE","confidence":1,"kind":"Date","value":"2026-03-20","grain":"day","approx":false}]}
+{"id":"e89267e7af5a","results":[{"start":9,"end":16,"cpStart":9,"cpEnd":16,"text":"5 May\u0131s","label":"DATE","confidence":1,"kind":"Date","value":"2026-05-05","grain":"day","approx":false}]}
+{"id":"e9406117f763","results":[{"start":8,"end":37,"cpStart":8,"cpEnd":37,"text":"destek\u002Bfatura@posta.ornek.org","label":"EMAIL","confidence":1,"kind":"Email","normalized":"destek\u002Bfatura@posta.ornek.org"}]}
+{"id":"e9bb3185811f","results":[{"start":5,"end":24,"cpStart":5,"cpEnd":24,"text":"Per\u015Fembe saat 14:00","label":"DATETIME","confidence":1,"kind":"DateTime","value":"2026-03-19T14:00","grain":"minute","approx":false}]}
+{"id":"eb2dfdc2338a","results":[{"start":0,"end":28,"cpStart":0,"cpEnd":28,"text":"2001:db8:85a3::8a2e:370:7334","label":"IP_ADDRESS","confidence":1,"kind":"IpAddress","normalized":"2001:db8:85a3::8a2e:370:7334"}]}
+{"id":"ebcbd33b40db","results":[{"start":17,"end":24,"cpStart":17,"cpEnd":24,"text":"8.8.8.8","label":"IP_ADDRESS","confidence":1,"kind":"IpAddress","normalized":"8.8.8.8"}]}
+{"id":"ec73f60ae8e3","results":[{"start":11,"end":19,"cpStart":11,"cpEnd":19,"text":"y\u00FCzde 90","label":"PERCENT","confidence":1,"kind":"Percent","value":"90","unit":"percent","dimension":"percent"}]}
+{"id":"ecc64718f8d5","results":[{"start":8,"end":22,"cpStart":8,"cpEnd":22,"text":"saat 15:00 CET","label":"TIME","confidence":1,"kind":"Time","value":"T15:00\u002B01:00","grain":"minute","approx":false}]}
+{"id":"ee31dba4ff49","results":[{"start":8,"end":12,"cpStart":8,"cpEnd":12,"text":"$499","label":"MONEY","confidence":0.9,"kind":"Money","value":"499","currency":"USD"}]}
+{"id":"ef4f683685e8","results":[{"start":15,"end":24,"cpStart":15,"cpEnd":24,"text":"150 dolar","label":"MONEY","confidence":0.9,"kind":"Money","value":"150","currency":"USD"}]}
+{"id":"efda2252db89","results":[{"start":6,"end":42,"cpStart":6,"cpEnd":42,"text":"1b4e28ba-2fa1-11d2-883f-0016d3cca427","label":"GUID","confidence":1,"kind":"Uuid","normalized":"1b4e28ba-2fa1-11d2-883f-0016d3cca427"}]}
+{"id":"f0e8e74f176d","results":[{"start":9,"end":20,"cpStart":9,"cpEnd":20,"text":"doksan yedi","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"97"}]}
+{"id":"f1af3c0e55ad","results":[{"start":9,"end":19,"cpStart":9,"cpEnd":19,"text":"saat 15:00","label":"TIME","confidence":1,"kind":"Time","value":"T15:00","grain":"minute","approx":false}]}
+{"id":"f22e2767df99","results":[{"start":6,"end":22,"cpStart":6,"cpEnd":22,"text":"bug\u00FCn saat 17:00","label":"DATETIME","confidence":1,"kind":"DateTime","value":"2026-03-18T17:00","grain":"minute","approx":false}]}
+{"id":"f3e943fcfc83","results":[{"start":6,"end":16,"cpStart":6,"cpEnd":16,"text":"300 kelvin","label":"QUANTITY","confidence":1,"kind":"Measure","value":"300","unit":"kelvin","dimension":"temperature"}]}
+{"id":"f3fbdb43edbc","results":[{"start":8,"end":14,"cpStart":8,"cpEnd":14,"text":"\u00FC\u00E7\u00FCnc\u00FC","label":"ORDINAL","confidence":1,"kind":"Ordinal","value":"3"}]}
+{"id":"f4dad18627f0","results":[{"start":12,"end":18,"cpStart":12,"cpEnd":18,"text":"2,50 \u20AC","label":"MONEY","confidence":1,"kind":"Money","value":"2.5","currency":"EUR"}]}
+{"id":"f4e89e1767f0","results":[{"start":11,"end":22,"cpStart":11,"cpEnd":22,"text":"yar\u0131n ak\u015Fam","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-19T18:00/2026-03-20T00:00","grain":"hour","approx":true}]}
+{"id":"f72fb62622fe","results":[{"start":11,"end":46,"cpStart":11,"cpEnd":46,"text":"https://blog.ornek.com.tr/2026/mart","label":"URL","confidence":1,"kind":"Url","normalized":"https://blog.ornek.com.tr/2026/mart"}]}
+{"id":"f756fd1202d7","results":[{"start":6,"end":12,"cpStart":6,"cpEnd":12,"text":"250 MB","label":"QUANTITY","confidence":1,"kind":"Measure","value":"250","unit":"megabyte","dimension":"information"}]}
+{"id":"f7a65d3bdfea","results":[{"start":8,"end":16,"cpStart":8,"cpEnd":16,"text":"bu sabah","label":"DATETIME","confidence":1,"kind":"DateTimeRange","value":"2026-03-18T06:00/2026-03-18T12:00","grain":"hour","approx":true}]}
+{"id":"f961f3803eb3","results":[{"start":16,"end":28,"cpStart":16,"cpEnd":28,"text":"172.16.254.3","label":"IP_ADDRESS","confidence":1,"kind":"IpAddress","normalized":"172.16.254.3"}]}
+{"id":"f9b0ed434d90","results":[{"start":12,"end":26,"cpStart":12,"cpEnd":26,"text":"0532 123 45 67","label":"PHONE_LIKE","confidence":0.7,"kind":"PhoneLike","normalized":"05321234567"}]}
+{"id":"fa4281ed1453","results":[{"start":13,"end":22,"cpStart":13,"cpEnd":22,"text":"saat 7.05","label":"TIME","confidence":1,"kind":"Time","value":"T07:05","grain":"minute","approx":false}]}
+{"id":"fd05552f6b73","results":[{"start":0,"end":7,"cpStart":0,"cpEnd":7,"text":"On yedi","label":"CARDINAL","confidence":1,"kind":"Cardinal","value":"17"}]}
+{"id":"fdbcd14e036e","results":[{"start":0,"end":22,"cpStart":0,"cpEnd":22,"text":"Emek ve Dayan\u0131\u015Fma G\u00FCn\u00FC","label":"DATE","confidence":1,"kind":"Date","value":"2026-05-01","grain":"day","approx":false}]}

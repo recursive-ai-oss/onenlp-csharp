@@ -47,6 +47,10 @@ The section must end exactly there.
 
 ## Single document (`ONDC`)
 
+**Categories (section 6).** Present only when categories have been set. `varint count`, then per category in the order written: the label's table index (not 0) and a float score. Labels are distinct.
+
+**Span groups (section 7).** Present only when a document has a span group. `varint groups`, then per group: the name's table index (not 0), `varint count`, and per span in the order kept: the first token, the length in tokens (at least 1), the label's table index (not 0) and a float confidence. Spans of a group may overlap. Sections 6 and 7 were added to version 1 after the first release: a reader that predates them skips them by length, so every older reader still reads the rest of the document.
+
 Header, string table section, then sections 2–4, then the optional trailer.
 
 ## Bin (`ONDB`)

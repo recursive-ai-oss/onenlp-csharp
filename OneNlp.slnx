@@ -21,6 +21,9 @@
     <Project Path="tests/OneNlp.Tests/OneNlp.Tests.csproj" />
     <Project Path="tests/OneNlp.AotSmoke/OneNlp.AotSmoke.csproj" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/OneNlp.Samples/OneNlp.Samples.csproj" />
+  </Folder>
   <Folder Name="/bench/">
     <Project Path="bench/OneNlp.Bench/OneNlp.Bench.csproj" />
     <Project Path="bench/OneNlp.Bench.Tokenizers/OneNlp.Bench.Tokenizers.csproj" />
@@ -41,6 +44,9 @@
     <Project Path="recipes/accurate/probe/AccurateProbe.csproj" />
     <Project Path="recipes/openner/OpenNer.csproj" />
     <Project Path="recipes/en/ner/OneNlp.Recipes.EnNer.csproj" />
+    <Project Path="recipes/en/textcat/OneNlp.Recipes.EnTextcat.csproj" />
+    <Project Path="recipes/en/textcat-multilabel/OneNlp.Recipes.EnTextcatMultilabel.csproj" />
+    <Project Path="recipes/en/spancat/OneNlp.Recipes.EnSpancat.csproj" />
     <Project Path="recipes/fr/fast-tagging/FrenchFastTagging.csproj" />
     <Project Path="recipes/fr/parser/FrParser.csproj" />
     <Project Path="recipes/fr/ner/FrNer.csproj" />

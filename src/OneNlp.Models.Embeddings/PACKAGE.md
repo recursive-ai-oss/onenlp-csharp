@@ -14,6 +14,7 @@ float cosine = a.Zip(b, (x, y) => x * y).Sum();   // vectors have unit length
 
 The model is BAAI `bge-small-en-v1.5` (MIT), exported to ONNX from the authors' published weights and run on OneModel; nothing is trained here. Vectors match sentence-transformers to float tolerance (`docs/embeddings.md` in the source repository has the parity and MTEB results). `PROVENANCE.md` states the licence and the authors' training data.
 
+- Measured results against spaCy and others: <https://github.com/recursive-ai-oss/onenlp-csharp/blob/main/docs/results-table.md>
 - Source and documentation: <https://github.com/recursive-ai-oss/onenlp-csharp>
 
 Copyright (c) Recursive AI, LLC.

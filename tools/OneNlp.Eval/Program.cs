@@ -18,7 +18,7 @@ internal sealed record ResultRow(
     bool? WithinNoise,
     ConfidenceInterval? Difference);
 
-internal static class Program
+internal static partial class Program
 {
     private const string Usage = """
         OneNlp.Eval: scores predictions and writes results rows.
@@ -27,6 +27,11 @@ internal static class Program
                [--component NAME] [--language CODE] [--dataset NAME] [--metrics LAS,UPOS,...]
                [--resamples 1000] [--seed N] [--json OUT.json] [--markdown OUT.md]
           span --gold G.iob2 --pred P.iob2 [same options; metrics: micro-F1, macro-F1, precision, recall]
+          cats --gold G.jsonl --pred P.jsonl --mode single|multi [--ref-pred R.jsonl] [same options]
+               text classification: accuracy and macro-F1 (single), micro-F1, macro-F1 and macro ROC-AUC (multi), bootstrapped over documents.
+               gold lines hold "cats", predictions {"cats": {label: score}}, in the same order.
+          spangroup --gold G.jsonl --pred P.jsonl [--group sc] [--ref-pred R.jsonl] [same options]
+               span categorization: exact (start, end, label) F1, precision and recall over documents. Predictions {"spans": [[start, end, label, score]]}.
           segment --raw RAW.txt --out OUT.conllu [--language en] [--mwt]
                tokenizes and splits sentences with the default pipeline and writes CoNLL-U with only ID and FORM filled, for
                scoring with 'ud --metrics Tokens,Sentences,Words'. Every token is a word; --mwt also writes the pieces of a split
@@ -67,6 +72,10 @@ internal static class Program
                     return RunUd(options);
                 case "span":
                     return RunSpan(options);
+                case "cats":
+                    return RunCats(options);
+                case "spangroup":
+                    return RunSpanGroup(options);
                 case "segment":
                     return Segment.Run(options);
                 case "recognizers":
@@ -158,12 +167,12 @@ internal static class Program
         return sum;
     }
 
-    private static ResultRow MakeRow(
+    private static ResultRow MakeRow<T>(
         Dictionary<string, List<string>> o,
         string metric,
-        IReadOnlyList<MetricCounts> ours,
-        IReadOnlyList<MetricCounts>? reference,
-        Statistic<MetricCounts> statistic)
+        IReadOnlyList<T> ours,
+        IReadOnlyList<T>? reference,
+        Statistic<T> statistic)
     {
         int resamples = int.Parse(One(o, "resamples", "1000"), CultureInfo.InvariantCulture);
         ulong seed = ulong.Parse(One(o, "seed", Bootstrap.DefaultSeed.ToString(CultureInfo.InvariantCulture)), CultureInfo.InvariantCulture);

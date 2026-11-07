@@ -8,6 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Documentation for the first release: a rewritten README and package readmes, `docs/results-table.md` (every quality row with its reference and interval), side-by-side "reads like" samples (`docs/reads-like.md`), migration pages for Catalyst, Microsoft.Recognizers.Text, Lingua and Microsoft.ML.Tokenizers, guides for training, the fast tier and classification, and `samples/OneNlp.Samples`, which builds and runs every sample the docs show.
+- Recognizer comparison files for Turkish and Hindi test sets, and refreshed English ones that include date/time.
+
 - Sentence embeddings: `IEmbedder`, `SentenceEmbedder` (sentence-transformers-format ONNX models, CLS/mean/max pooling, normalization, batching, opt-in int8), `Nlp.Embed`/`Nlp.EmbedMany`, `EmbedderPackages`, `Tokenizer.IsSpecialToken`, and the `RecursiveAI.OneNlp.Models.Embeddings` package (bge-small-en-v1.5, MIT). Parity and MTEB results: `docs/embeddings.md`.
 - French: `SegmentationData.French` (elision, inversion clitics, `du`/`au`/`aux`/`des` as multiword-token pieces, digit groups) with `TryMatchMultiword`, the recipes in `recipes/fr` and the `RecursiveAI.OneNlp.Models.French` package.
 - Dutch: `SegmentationData.Dutch` (apostrophe words and short forms, abbreviations, dash amounts), the recipe in `recipes/nl/fast` and the `RecursiveAI.OneNlp.Models.Dutch` package (tagging, morphology, lemmas, parser, entities on UD Dutch-Alpino and WikiNER Dutch).
@@ -22,3 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `RuleWordTokenizer` and the `Nlp.Analyze` static.
 - `IEncoder`, the first shape of the encoder seam, in `RecursiveAI.OneNlp.Neural`.
 - `Doc.ToJson`/`Doc.FromJson` in the shape spaCy documents for `Doc.to_json` (offsets in code points, extra fields for norm, confidences and sentence boundaries), and a compact, versioned, checksummed binary form (`Doc.ToBytes`/`Doc.FromBytes`), plus `DocBin` and a streaming `DocBinReader` that share one string table. Readers reject malformed, truncated and oversized input with `InvalidDataException`. Formats are specified in `docs/json-format.md` and `docs/binary-format.md`.
+
+### Fixed
+
+- `bench/OneNlp.Bench` runs out of process under BenchmarkDotNet (the assembly name now matches the project file); `tools/oracles/bench_recognizers_lang.sh` builds its own tools, uses small inputs where the comparator is slow (Turkish, Hindi) and times out each run.

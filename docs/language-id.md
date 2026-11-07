@@ -8,7 +8,7 @@
 - `Confidences(text)` returns every candidate with a probability; the values sum to 1. Only languages that use the text's script are candidates.
 - `Restrict(languages)` returns a detector that never answers outside the set. A text whose script none of the allowed languages use is `Unknown`.
 - `DetectSpans(text, switchPenalty = 9)` returns runs of one language that tile the text from index 0 to its length. See "Mixed text".
-- The happy path is `Nlp.DetectLanguage(text)`. `Nlp.Analyze`, `Nlp.Tokens` and `Nlp.Sentences` detect the language first and use its segmentation data (English exceptions for English, plain UAX #29 otherwise).
+- The happy path is `Nlp.DetectLanguage(text)`. `Nlp.Analyze`, `Nlp.Tokens` and `Nlp.Sentences` detect the language first and use its segmentation data (the language's own exceptions and multiword-token rules where it has them, plain UAX #29 otherwise).
 - A detector is immutable and thread-safe.
 
 ## Where the weights come from
