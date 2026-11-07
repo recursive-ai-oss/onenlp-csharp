@@ -91,7 +91,7 @@ public static class ModelPackages
         ArgumentNullException.ThrowIfNull(create);
         lock (OpenGate)
         {
-            _openEntities ??= new Entry(packageId, create);
+            _openEntities ??= new Entry(Tier.Accurate, packageId, create, 0);
             if (!string.Equals(_openEntities.PackageId, packageId, StringComparison.Ordinal))
             {
                 throw new InvalidOperationException($"The package '{_openEntities.PackageId}' is already registered for open-type entities; '{packageId}' cannot be registered as well.");

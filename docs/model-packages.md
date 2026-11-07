@@ -78,3 +78,14 @@ src/OneNlp.Models.English/
 ## Writing another model package
 
 Same shape: a project referencing `RecursiveAI.OneNlp.Neural`, a manifest with hashes, a loader that builds a `Pipeline` from its resources, a `Register` that calls `ModelPackages.Register(language, packageId, factory)`, and the contentFiles registration. The package for language X names itself `RecursiveAI.OneNlp.Models.<EnglishNameOfX>`.
+
+## Pipeline.Create, Add&lt;T&gt;() and tiers
+
+`Pipeline.Create(language, tier)` makes a pipeline from the model package referenced for the language, with the package's tokenizer and no components. `.Add<T>()` then takes the package's trained component of type `T` (`Tagger`, `Morphologizer`, `Lemmatizer`, `DependencyParser`, `EntityRecognizer`, ...) and appends it; `.Add(component)` appends one you built (an `EntityRuler`). Components run in the order added. Components never added are released when the pipeline is disposed. The `Tagger` of the fast-tier packages sets fine-grained tags (`Token.Tag`); add the `Morphologizer` for `Pos` and morphology, which noun chunks need together with the parser.
+
+- `Tier.Fast`: the language's fast-tier package, else `RecursiveAI.OneNlp.Models.Multilingual`.
+- `Tier.Accurate`: `RecursiveAI.OneNlp.Models.Multilingual.Large` if referenced, else `RecursiveAI.OneNlp.Models.Multilingual`; never the fast model.
+- With nothing referenced the call throws `InvalidOperationException` naming the package to add. Nothing is downloaded and nothing is found by reflection: packages register from a module initializer.
+- Each `Create` reads the weights into a new copy owned by the pipeline; the `Nlp` verbs keep their own shared one.
+- `Doc.NounChunks` returns the base noun phrases of a parsed document as spans; it throws for a document without a parse.
+- `pipeline.Train(examples, epochs: 10)` needs only `using RecursiveAI.OneNlp;`.
