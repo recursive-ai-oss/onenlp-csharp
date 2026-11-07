@@ -296,6 +296,11 @@ internal static class Program
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"completed={result.Completed} steps={result.Steps} epochs={result.Epochs} evaluations={result.Evaluations} best_dev={result.BestScore:F3} best_step={result.BestStep}"));
         Console.WriteLine($"weights_sha256={result.WeightsSha256}");
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"chunk_wall_s={Wall.Elapsed.TotalSeconds:F1} threads={TensorCompute.Threads}"));
+        if (result.Completed && Opt(args, "export", string.Empty) is { Length: > 0 } exportDir)
+        {
+            Export(encoder, pipeline, langs, exportDir);
+        }
+
         if (result.Completed && Opt(args, "predict-split", string.Empty) is { Length: > 0 } split)
         {
             // Predictions for tools/OneNlp.Eval with the best dev weights: gold tokens and sentences (gold mode), raw text with the language's
@@ -334,6 +339,82 @@ internal static class Program
         }
 
         return 0;
+    }
+
+    // The best-dev weights as the model package ships them: the encoder's layers (the token table is frozen and comes from the ONNX file, see
+    // tools/accurate/split_token_table.py), the encoder's settings and shape, and for each language a pipeline file that holds its heads only,
+    // bound to the shared encoder.
+    private static void Export(TrainableTransformerEncoder encoder, Pipeline trained, string[] langs, string dir)
+    {
+        Directory.CreateDirectory(Path.Combine(dir, "heads"));
+        Checkpoint.Save(Path.Combine(dir, "encoder-layers.ckpt"), encoder.Weights!);
+        using (var stream = new MemoryStream())
+        {
+            using (var w = new Utf8JsonWriter(stream))
+            {
+                w.WriteStartObject();
+                w.WriteStartObject("shape");
+                w.WriteNumber("vocabularySize", 256000);
+                w.WriteNumber("width", encoder.Width);
+                w.WriteNumber("layers", 22);
+                w.WriteNumber("feedForwardWidth", 1152);
+                w.WriteEndObject();
+                w.WriteStartObject("settings");
+                using var all = new MemoryStream();
+                using (var inner = new Utf8JsonWriter(all))
+                {
+                    inner.WriteStartObject();
+                    encoder.WriteSettings(inner);
+                    inner.WriteEndObject();
+                }
+
+                using JsonDocument written = JsonDocument.Parse(all.ToArray());
+                foreach (JsonProperty prop in written.RootElement.EnumerateObject())
+                {
+                    // The file names of the training machine mean nothing in the package.
+                    if (prop.Name is not ("model" or "tokenizer" or "modelSha256"))
+                    {
+                        prop.WriteTo(w);
+                    }
+                }
+
+                w.WriteEndObject();
+                w.WriteEndObject();
+            }
+
+            File.WriteAllBytes(Path.Combine(dir, "encoder.json"), stream.ToArray());
+        }
+
+        var shared = new SharedEncoder(encoder, "multilingual-large");
+        foreach (string lang in langs)
+        {
+            Language language = Language.FromCode(lang);
+            using Pipeline package = new(UaxWordTokenizer.For(language), language);
+            package.Add(new MultiwordFormsComponent(language));
+            foreach (ScopedHead scoped in trained.Components.OfType<ScopedHead>().Where(h => h.Name.EndsWith("-" + lang, StringComparison.Ordinal)))
+            {
+                ITrainableComponent from = scoped.Inner;
+                using var config = new MemoryStream();
+                using (var w = new Utf8JsonWriter(config))
+                {
+                    w.WriteStartObject();
+                    from.WriteConfig(w);
+                    w.WriteEndObject();
+                }
+
+                using JsonDocument configJson = JsonDocument.Parse(config.ToArray());
+                ITrainableComponent copy = HeadRegistry.Create(from.Kind, from.Name, shared, configJson.RootElement);
+                using var weights = new MemoryStream();
+                Checkpoint.Save(weights, from.Weights);
+                weights.Position = 0;
+                Checkpoint.Load(weights, copy.Weights);
+                package.Add(copy);
+            }
+
+            string file = Path.Combine(dir, "heads", lang + ".onenlp");
+            PipelineFile.Save(package, file);
+            Console.WriteLine($"exported {file} {new FileInfo(file).Length} bytes");
+        }
     }
 
     // Entity types to the family scheme. WikiNER and UNER already use PER, ORG, LOC (and MISC); GermEval's OTH is MISC and its derived and
@@ -541,7 +622,8 @@ internal static class Program
 
         foreach (ConllUSentence s in ConllUReader.Read(gold).Take(predictLimit > 0 ? predictLimit : int.MaxValue))
         {
-            chunk.Add(s.Doc.Text);
+            // The text line of the file is the raw text; Doc.Text spells the words of a one-character multiword token (Portuguese à = a a).
+            chunk.Add(s.GetComment("text") ?? s.Doc.Text);
             if (chunk.Count == 10)
             {
                 Flush();
