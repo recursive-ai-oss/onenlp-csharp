@@ -151,9 +151,9 @@ public class SentenceEmbedderTests
             return;
         }
 
-        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => Nlp.Embed("x"));
+        ModelNotAvailableException ex = Assert.Throws<ModelNotAvailableException>(() => Nlp.Embed("x"));
         Assert.Contains("RecursiveAI.OneNlp.Models.Embeddings", ex.Message);
-        Assert.Throws<InvalidOperationException>(() => Nlp.EmbedMany(["x"]));
+        Assert.Throws<ModelNotAvailableException>(() => Nlp.EmbedMany(["x"]));
     }
 
     [Fact]

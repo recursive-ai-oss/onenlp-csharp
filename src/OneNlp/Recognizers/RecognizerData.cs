@@ -7,11 +7,23 @@ namespace RecursiveAI.OneNlp.Recognizers;
 public sealed class RecognizerRulesException : FormatException
 {
     /// <summary>Creates the exception.</summary>
-    /// <param name="message">What is wrong, with the line number when there is one.</param>
+    /// <param name="message">What is wrong.</param>
     public RecognizerRulesException(string message)
         : base(message)
     {
     }
+
+    /// <summary>Creates the exception for a line of a rule file.</summary>
+    /// <param name="message">What is wrong, without the line number, which <see cref="LineNumber"/> carries; the message repeats it for readers of logs.</param>
+    /// <param name="lineNumber">The line of the rule data, counted from 1 like <c>DataFormatException.LineNumber</c>.</param>
+    public RecognizerRulesException(string message, int lineNumber)
+        : base($"Line {lineNumber}: {message}")
+    {
+        LineNumber = lineNumber;
+    }
+
+    /// <summary>The line of the rule data where the error is, counted from 1; <see langword="null"/> when the error is not tied to a line.</summary>
+    public int? LineNumber { get; }
 }
 
 internal enum CardinalKind
@@ -294,12 +306,12 @@ internal sealed class RecognizerData
             lineNo++;
             if (lineNo > MaxLines)
             {
-                throw new RecognizerRulesException($"Rule data has more than {MaxLines} lines.");
+                throw new RecognizerRulesException($"Rule data has more than {MaxLines} lines.", lineNo);
             }
 
             if (eol - pos > MaxLineChars)
             {
-                throw new RecognizerRulesException($"Line {lineNo} is longer than {MaxLineChars} characters.");
+                throw new RecognizerRulesException($"The line is longer than {MaxLineChars} characters.", lineNo);
             }
 
             string line = text.Substring(pos, eol - pos).Trim();
@@ -342,7 +354,7 @@ internal sealed class RecognizerData
             }
             catch (RecognizerRulesException e)
             {
-                throw new RecognizerRulesException($"Line {lineNo}: {e.Message}");
+                throw new RecognizerRulesException(e.Message, lineNo);
             }
         }
     }

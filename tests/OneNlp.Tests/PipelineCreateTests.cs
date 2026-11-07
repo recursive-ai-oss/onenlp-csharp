@@ -33,7 +33,7 @@ public class PipelineCreateTests
     {
         var language = Language.FromCode("is");
         var marker = new Marker("marker");
-        ModelPackages.Register(language, "Test.Models.Icelandic", Package(language, marker));
+        ModelPackages.RegisterQuietly(language, "Test.Models.Icelandic", Package(language, marker));
         using Pipeline pipeline = Pipeline.Create(language, Tier.Fast);
         Assert.Empty(pipeline.Components);
         pipeline.Add<Other>().Add<Marker>();
@@ -45,7 +45,7 @@ public class PipelineCreateTests
     public void AddOfAMissingOrTakenComponentNamesWhatIsLeft()
     {
         var language = Language.FromCode("fo");
-        ModelPackages.Register(language, "Test.Models.Faroese", Package(language, new Marker("marker")));
+        ModelPackages.RegisterQuietly(language, "Test.Models.Faroese", Package(language, new Marker("marker")));
         using Pipeline pipeline = Pipeline.Create(language);
         pipeline.Add<Marker>();
         InvalidOperationException again = Assert.Throws<InvalidOperationException>(() => pipeline.Add<Marker>());
@@ -60,7 +60,7 @@ public class PipelineCreateTests
     {
         var language = Language.FromCode("mt");
         var marker = new Marker("marker");
-        ModelPackages.Register(language, "Test.Models.Maltese", Package(language, marker));
+        ModelPackages.RegisterQuietly(language, "Test.Models.Maltese", Package(language, marker));
         Pipeline.Create(language).Dispose();
         Assert.True(marker.Disposed);
     }
@@ -69,7 +69,7 @@ public class PipelineCreateTests
     public void CreateLoadsANewCopyEachTimeAndNeverTheSharedPipeline()
     {
         var language = Language.FromCode("lb");
-        ModelPackages.Register(language, "Test.Models.Luxembourgish", Package(language, new Marker("marker")));
+        ModelPackages.RegisterQuietly(language, "Test.Models.Luxembourgish", Package(language, new Marker("marker")));
         using Pipeline a = Pipeline.Create(language);
         using Pipeline b = Pipeline.Create(language);
         Assert.NotSame(a, b);
@@ -80,8 +80,8 @@ public class PipelineCreateTests
     public void AccurateTierPrefersTheHigherPriorityAndFastFallsBackToIt()
     {
         var language = Language.FromCode("sq");
-        ModelPackages.Register(language, Tier.Accurate, "Test.Multilingual", Package(language, new Marker("m1")));
-        ModelPackages.Register(language, Tier.Accurate, "Test.Multilingual.Large", Package(language, new Marker("m2")), priority: 1);
+        ModelPackages.RegisterQuietly(language, Tier.Accurate, "Test.Multilingual", Package(language, new Marker("m1")));
+        ModelPackages.RegisterQuietly(language, Tier.Accurate, "Test.Multilingual.Large", Package(language, new Marker("m2")), priority: 1);
         using Pipeline accurate = Pipeline.Create(language, Tier.Accurate);
         Assert.Equal("m2", accurate.Add<Marker>().Components.OfType<Marker>().Single().Name);
         using Pipeline fast = Pipeline.Create(language, Tier.Fast);
@@ -93,10 +93,10 @@ public class PipelineCreateTests
     public void AccurateTierNeverFallsBackToTheFastModelAndTheErrorNamesThePackage()
     {
         var language = Language.FromCode("eu");
-        ModelPackages.Register(language, "Test.Models.Basque", Package(language, new Marker("marker")));
-        InvalidOperationException e = Assert.Throws<InvalidOperationException>(() => Pipeline.Create(language, Tier.Accurate));
+        ModelPackages.RegisterQuietly(language, "Test.Models.Basque", Package(language, new Marker("marker")));
+        ModelNotAvailableException e = Assert.Throws<ModelNotAvailableException>(() => Pipeline.Create(language, Tier.Accurate));
         Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", e.Message, StringComparison.Ordinal);
-        InvalidOperationException none = Assert.Throws<InvalidOperationException>(() => Pipeline.Create(Language.FromCode("yo"), Tier.Fast));
+        ModelNotAvailableException none = Assert.Throws<ModelNotAvailableException>(() => Pipeline.Create(Language.FromCode("yo"), Tier.Fast));
         Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", none.Message, StringComparison.Ordinal);
     }
 }

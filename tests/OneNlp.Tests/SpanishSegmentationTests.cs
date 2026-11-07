@@ -84,7 +84,7 @@ public class SpanishSegmentationTests
     [Fact]
     public void MissingSpanishModelNamesTheSpanishPackage()
     {
-        InvalidOperationException e = Assert.Throws<InvalidOperationException>(() => ModelPackages.Get(Language.Spanish));
+        ModelNotAvailableException e = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.Spanish));
         Assert.Contains("RecursiveAI.OneNlp.Models.Spanish", e.Message, StringComparison.Ordinal);
         Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", e.Message, StringComparison.Ordinal);
     }

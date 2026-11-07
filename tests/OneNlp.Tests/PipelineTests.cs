@@ -199,7 +199,7 @@ public class RegistryTests
         InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => ComponentRegistry.Create("tagger"));
         Assert.Contains("'tagger'", ex.Message, StringComparison.Ordinal);
         Assert.Contains("norm", ex.Message, StringComparison.Ordinal);
-        Assert.Contains("RecursiveAI.OneNlp.Neural", ex.Message, StringComparison.Ordinal);
+        Assert.Contains("Pipeline.Create", ex.Message, StringComparison.Ordinal);
     }
 
     [Fact]

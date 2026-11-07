@@ -45,7 +45,9 @@ public abstract class Tokenizer
     /// <summary>Loads a tokenizer from a file, choosing the format from the file name.</summary>
     /// <param name="path">
     /// <c>tokenizer.json</c> or another <c>.json</c> (Hugging Face), <c>.model</c> (SentencePiece), <c>vocab.txt</c> or another <c>.txt</c>
-    /// (WordPiece vocabulary), or <c>.tiktoken</c> (Tiktoken ranks).
+    /// (WordPiece vocabulary), or <c>.tiktoken</c> (Tiktoken ranks). A <c>vocab.txt</c> does not say whether the model lower-cases, so the casing is
+    /// guessed from the vocabulary (see <see cref="WordPieceVocabularyOptions"/>); use <see cref="FromWordPieceVocabulary(string, WordPieceVocabularyOptions)"/>
+    /// to state it, or load the model's <c>tokenizer.json</c>, which does.
     /// </param>
     /// <exception cref="NotSupportedException">The extension is not one of these, or the format has no loader yet.</exception>
     /// <exception cref="IOException">The file cannot be read.</exception>
@@ -83,6 +85,31 @@ public abstract class Tokenizer
             TokenizerFormat.Tiktoken => Loaders.TiktokenRanksFile.Load(stream),
             _ => throw new ArgumentOutOfRangeException(nameof(format), format, "Unknown tokenizer format."),
         };
+    }
+
+    /// <summary>Loads a WordPiece tokenizer from a BERT-style <c>vocab.txt</c> with the casing stated instead of guessed.</summary>
+    /// <param name="path">The vocabulary file: one token per line, the line number is the ID.</param>
+    /// <param name="options">The normalization the model was trained with.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="options"/> is <see langword="null"/>.</exception>
+    /// <exception cref="IOException">The file cannot be read.</exception>
+    /// <exception cref="InvalidDataException">The content is not a valid vocabulary.</exception>
+    public static Tokenizer FromWordPieceVocabulary(string path, WordPieceVocabularyOptions options)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(path);
+        using FileStream stream = File.OpenRead(path);
+        return FromWordPieceVocabulary(stream, options);
+    }
+
+    /// <summary>Loads a WordPiece tokenizer from a BERT-style <c>vocab.txt</c> stream with the casing stated instead of guessed.</summary>
+    /// <param name="stream">A readable stream at the start of the file's content. It is read to the end and not closed.</param>
+    /// <param name="options">The normalization the model was trained with.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> or <paramref name="options"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidDataException">The content is not a valid vocabulary.</exception>
+    public static Tokenizer FromWordPieceVocabulary(Stream stream, WordPieceVocabularyOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(options);
+        return Loaders.WordPieceVocabularyFile.Load(stream, options.LowerCase, options.StripAccents);
     }
 
     /// <summary>Encodes a text, applying <see cref="Truncation"/> and <see cref="Padding"/>.</summary>
@@ -148,6 +175,13 @@ public abstract class Tokenizer
     /// <returns><see cref="OperationStatus.Done"/>, or <see cref="OperationStatus.DestinationTooSmall"/> when <paramref name="ids"/> cannot hold every token.</returns>
     public virtual OperationStatus EncodeToIds(ReadOnlySpan<char> text, Span<int> ids, out int written, out int consumed, bool addSpecialTokens = true) =>
         CopyIds(EncodeCore(text, addSpecialTokens, null), text.Length, ids, out written, out consumed);
+
+    /// <summary>Encodes a text to its token IDs in a new array. Ignores <see cref="Truncation"/> and <see cref="Padding"/>, like the buffer form.</summary>
+    /// <param name="text">The text.</param>
+    /// <param name="addSpecialTokens">Whether the post-processor adds its special tokens (for example <c>[CLS]</c> and <c>[SEP]</c>). The default is <see langword="true"/>, so a short text has two more IDs than the same call with <see langword="false"/>.</param>
+    /// <returns>Every ID of the text; nothing is cut off, whatever the length.</returns>
+    public int[] EncodeToIds(ReadOnlySpan<char> text, bool addSpecialTokens = true) =>
+        EncodeCore(text, addSpecialTokens, null).Ids;
 
     /// <summary>Encodes UTF-8 text into a caller's buffer like <see cref="EncodeToIds(ReadOnlySpan{char}, Span{int}, out int, out int, bool)"/>, with <paramref name="consumed"/> counted in bytes.</summary>
     /// <param name="utf8">The text as UTF-8.</param>
