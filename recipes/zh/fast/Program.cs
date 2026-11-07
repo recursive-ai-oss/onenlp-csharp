@@ -12,6 +12,7 @@ namespace RecursiveAI.OneNlp.Recipes.Chinese;
 //   train-parser    --train F.conllu --dev F.conllu --out DIR [options]   biaffine dependency parser with sentence starts, on gold words
 //   ner-convert IN.iob2 OUT.jsonl                                         UNER Chinese-GSDSIMP to JSON Lines
 //   ner-train TRAIN.jsonl DEV.jsonl OUT-DIR [options]                     entity recognizer
+//   ner-threshold MODEL OUT T                                       save MODEL with entities below confidence T dropped
 //   ner-eval MODEL EVAL.jsonl OUT-DIR [--ref ref.tsv] [--raw SEGMENTER]   entity F1 with bootstrap intervals, paired against a reference
 //   predict --models DIR [--parts segmenter,tagging,parser,ner] --gold F.conllu --mode raw|gold --out P.conllu
 //                                                                         CoNLL-U predictions of the pipeline of the parts found in DIR
@@ -45,6 +46,7 @@ internal static partial class Program
                 "ner-convert" when args.Length >= 3 => NerConvert(args[1], args[2]),
                 "ner-train" when args.Length >= 4 => NerTrain(args),
                 "ner-eval" when args.Length >= 4 => NerEval(args),
+                "ner-threshold" when args.Length >= 4 => NerThreshold(args),
                 "predict" => Predict(args),
                 "segment" => Segment(args),
                 "speed" => Speed(args),

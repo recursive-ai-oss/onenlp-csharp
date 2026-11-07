@@ -100,14 +100,14 @@ Source for each language: its section in [results.md](results.md) and the recipe
 | Spanish | gold | LAS | 87.00 [86.50, 87.51] | 85.95 [85.44, 86.44] | ahead |
 | Spanish | raw | UPOS | 97.86 [97.71, 98.01] | 94.81 [94.56, 95.02] | ahead |
 | Spanish | raw | LAS | 86.70 [86.15, 87.23] | 81.82 [81.25, 82.37] | ahead |
-| Spanish | gold, WikiNER test | Entities micro F1 | 82.88 [82.12, 83.64] | 83.35 [82.63, 84.08] | within noise (PER type: see misses) |
+| Spanish | gold, WikiNER test | Entities micro F1 | 84.81 [84.08, 85.54] | 83.35 [82.63, 84.08] | ahead (paired +1.46 [0.84, 2.14]; PER 91.57 vs 90.45, ahead) |
 | Portuguese | gold | UPOS | 95.89 [95.62, 96.14] | 95.92 [95.66, 96.22] | within noise |
 | Portuguese | gold | UFeats | 94.51 [94.17, 94.80] | 94.11 [93.82, 94.42] | within noise |
 | Portuguese | gold | Lemmas | 97.30 [97.10, 97.51] | 96.90 [96.70, 97.11] | within noise |
 | Portuguese | gold | LAS | 82.74 [82.07, 83.35] | 81.96 [81.30, 82.61] | within noise |
 | Portuguese | raw | UPOS | 95.35 [95.05, 95.64] | 84.15 [83.59, 84.73] | ahead |
 | Portuguese | raw | LAS | 82.09 [81.38, 82.76] | 65.85 [64.88, 66.65] | ahead |
-| Portuguese | gold, UNER Bosque test | Entities micro F1 | 73.13 [70.58, 75.60] | 75.27 [72.73, 77.60] | within noise (precision: see misses) |
+| Portuguese | gold, UNER Bosque test | Entities micro F1 | 73.48 [70.95, 75.86] | 75.27 [72.73, 77.60] | within noise (precision 75.46 vs 76.96, paired -1.50 [-3.76, 0.83]) |
 | Italian | gold | UPOS | 94.44 [93.92, 94.96] | 94.10 [93.58, 94.60] | within noise |
 | Italian | gold | UFeats | 89.52 [88.85, 90.16] | 87.42 [86.67, 88.14] | ahead |
 | Italian | gold | Lemmas | 95.18 [94.73, 95.63] | 93.13 [92.58, 93.64] | ahead |
@@ -137,7 +137,7 @@ Source for each language: its section in [results.md](results.md) and the recipe
 | Chinese | raw | Words | 89.62 [88.87, 90.42] | 39.43 [38.60, 40.23] | ahead (spaCy's default Chinese tokenizer cuts single characters) |
 | Chinese | raw | UPOS | 81.90 [80.99, 82.86] | 34.92 [34.11, 35.68] | ahead |
 | Chinese | raw | LAS | 57.88 [56.21, 59.63] | 8.59 [7.94, 9.28] | ahead |
-| Chinese | gold, UNER GSDSIMP test | Entities micro F1 | 62.80 [58.46, 67.23] | 61.86 [57.66, 66.12] | within noise (precision: see misses) |
+| Chinese | gold, UNER GSDSIMP test | Entities micro F1 | 63.79 [59.39, 68.27] | 61.86 [57.66, 66.12] | within noise (precision 69.28 vs 67.08, recall 59.11 vs 57.40, all within noise) |
 
 **Hindi.** No Hindi fast-tier model is listed: there is no allowed training data for it (the Hindi treebank with the most data and the available Hindi NER sets are non-commercial or sourced from non-commercial text; `ud-licences.md`). Hindi has recognizers (above) and language identification today; its fast tier comes later, trained on labels from our own models.
 
@@ -194,9 +194,6 @@ No accurate-tier model package is released yet, so these rows are information an
 ## Misses and caveats
 
 - **English raw MLAS** 65.61 against spaCy's 69.05: outside the interval; information, not one of the gated rows.
-- **Spanish entities, PER type** (WikiNER test): -1.96 [-2.83, -1.13] against spaCy; micro F1 is within noise and ORG is ahead (`recipes/es/fast/PROVENANCE.md`).
-- **Portuguese entities, precision:** -4.27 [-6.58, -1.59] outside the interval, while micro F1 is within noise (`recipes/pt/fast/PROVENANCE.md`).
-- **Chinese entities, precision:** 62.44 against 67.08 (-4.64 [-8.52, -0.50]); micro F1, recall (63.17 against 57.40) and every type are within noise or ahead.
 - **Span categorizer:** at spaCy's threshold of 0.5 precision was 70.33 against 75.38 (paired -5.05 [-8.63, -1.42]); the shipped default threshold is 0.8, chosen on the development split (`recipes/en/spancat/README.md`).
 - **Embeddings:** the five cells below the model cards, shared with sentence-transformers (above).
 - **Language ID:** the languages named under the table are below Lingua on short text.

@@ -58,6 +58,7 @@ public sealed class EntityRecognizer : TrainableHead
     private string[] _labels = [];
     private Dictionary<string, int> _labelIds = new(StringComparer.Ordinal);
     private NerModule? _module;
+    private float _minConfidence;
 
     /// <summary>Creates an uninitialized recognizer.</summary>
     /// <param name="encoder">The encoder the recognizer reads.</param>
@@ -85,6 +86,25 @@ public sealed class EntityRecognizer : TrainableHead
         Context = context;
         Hidden = hidden;
         MaxSpanLength = maxSpanLength;
+    }
+
+    /// <summary>
+    /// Entities whose confidence is below this value are dropped after decoding, trading recall for precision. From 0 to 1;
+    /// default 0 keeps every decoded entity and leaves existing models' output unchanged. It is saved with the model when above 0.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">The value is outside 0 to 1 or not a number.</exception>
+    public float MinConfidence
+    {
+        get => _minConfidence;
+        set
+        {
+            if (!(value >= 0f && value <= 1f))
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "MinConfidence must be from 0 to 1.");
+            }
+
+            _minConfidence = value;
+        }
     }
 
     /// <summary>How scores become entities.</summary>
@@ -394,6 +414,10 @@ public sealed class EntityRecognizer : TrainableHead
         writer.WriteNumber("context", Context);
         writer.WriteNumber("hidden", Hidden);
         writer.WriteNumber("max_span_length", MaxSpanLength);
+        if (_minConfidence > 0f)
+        {
+            writer.WriteNumber("min_confidence", _minConfidence);
+        }
         writer.WriteStartArray("labels");
         foreach (string label in _labels)
         {
@@ -436,6 +460,16 @@ public sealed class EntityRecognizer : TrainableHead
             JsonSettings.Int(config, "max_span_length", 1, MaxSpan),
             name)
         { OwnsEncoder = true };
+        if (config.TryGetProperty("min_confidence", out JsonElement minConfidence))
+        {
+            if (minConfidence.ValueKind != JsonValueKind.Number || !minConfidence.TryGetSingle(out float threshold) || !(threshold >= 0f && threshold <= 1f))
+            {
+                throw new InvalidDataException("A ner head's 'min_confidence' must be a number from 0 to 1.");
+            }
+
+            head.MinConfidence = threshold;
+        }
+
         head.Build(labels, new Generator(0));
         return head;
     }
@@ -482,9 +516,17 @@ public sealed class EntityRecognizer : TrainableHead
         return blocked;
     }
 
-    private static void SetEntities(Doc doc, List<SpanSpec> found, bool[] blocked)
+    private void SetEntities(Doc doc, List<SpanSpec> found, bool[] blocked)
     {
-        var all = new List<SpanSpec>(found);
+        var all = new List<SpanSpec>(found.Count);
+        foreach (SpanSpec f in found)
+        {
+            if (f.Confidence >= _minConfidence)
+            {
+                all.Add(f);
+            }
+        }
+
         if (blocked.Contains(true))
         {
             foreach (Span e in doc.Ents)
