@@ -387,4 +387,106 @@ public class TrainableTransformerTests
             TransformerEncoder.ModelDirectory = null;
         }
     }
+
+    [Fact]
+    public void ASharedEncoderKeepsTheEncoderOutOfTheSavedHeadsAndReloadsThroughTheRegistry()
+    {
+        List<Example> train = Toy(120, 1);
+        List<Example> test = Toy(30, 2);
+        using TrainableTransformerEncoder encoder = Modern();
+        using Pipeline trained = Pipeline.Blank().Add(new Tagger(encoder, TokenColumn.Pos));
+        trained.Train(train, new TrainOptions { Epochs = 30, BatchWords = 200, LearningRate = 0.01f, Dropout = 0f, Seed = 5, DevFraction = 0.1 });
+        double accuracy = Accuracy(trained, test);
+        Assert.True(accuracy > 0.95, $"UPOS {accuracy}");
+
+        // The heads alone, bound to a shared encoder: what the accurate-tier package ships for each language.
+        var shared = new SharedEncoder(encoder, "test-shared-encoder");
+        var from = (Tagger)trained.Components.First(c => c is Tagger);
+        using var config = new MemoryStream();
+        using (var w = new Utf8JsonWriter(config))
+        {
+            w.WriteStartObject();
+            from.WriteConfig(w);
+            w.WriteEndObject();
+        }
+
+        using JsonDocument configJson = JsonDocument.Parse(config.ToArray());
+        ITrainableComponent copy = HeadRegistry.Create(from.Kind, "tagger", shared, configJson.RootElement);
+        using var weights = new MemoryStream();
+        Checkpoint.Save(weights, from.Weights);
+        weights.Position = 0;
+        Checkpoint.Load(weights, copy.Weights);
+        using Pipeline heads = Pipeline.Blank().Add(copy);
+
+        using var file = new MemoryStream();
+        PipelineFile.Save(heads, file);
+        Assert.True(file.Length < 100_000, $"the heads file holds {file.Length} bytes: the encoder's weights must not be in it");
+
+        // Without the registration the file cannot be loaded, and says why.
+        file.Position = 0;
+        InvalidDataException missing = Assert.Throws<InvalidDataException>(() => PipelineFile.Load(file));
+        Assert.Contains("test-shared-encoder", missing.Message, StringComparison.Ordinal);
+
+        SharedEncoder.Register("test-shared-encoder", encoder);
+        try
+        {
+            file.Position = 0;
+            using Pipeline loaded = PipelineFile.Load(file);
+            Assert.Equal(accuracy, Accuracy(loaded, test));
+            Assert.Throws<InvalidOperationException>(() => SharedEncoder.Register("test-shared-encoder", encoder));
+        }
+        finally
+        {
+            Assert.True(SharedEncoder.Unregister("test-shared-encoder"));
+        }
+    }
+
+    [Fact]
+    public void ExpandedWordFormsLetThePiecesOfAMultiwordTokenHaveVectorsOfTheirOwn()
+    {
+        // One written word "thecat" stands for the two words "the" and "cat" (as French "du" is "de" + "le"). With the option the encoder reads
+        // "the cat", so the result equals that of the text written with a space.
+        var strings = new StringStore();
+        Doc Written()
+        {
+            var d = new Doc(strings, "thecat", [new TokenBoundary(0, 3), new TokenBoundary(3, 3)]);
+            d.SetAnnotation(TokenColumn.Norm, 0, "the");
+            d.SetAnnotation(TokenColumn.Norm, 1, "cat");
+            return d;
+        }
+
+        var words = new Doc(strings, "the cat", [new TokenBoundary(0, 3), new TokenBoundary(4, 3)]);
+        using TrainableTransformerEncoder plain = Modern(ModernOptions());
+        using TrainableTransformerEncoder expanding = Modern(new TrainableTransformerOptions
+        {
+            Heads = 2, GlobalEvery = 2, LocalWindow = 8, GlobalRopeTheta = 160000f, LocalRopeTheta = 10000f, MaxLength = 64, ExpandWordForms = true,
+        });
+        plain.Weights!.Eval();
+        expanding.Weights!.Eval();
+        using var noGrad = GradMode.NoGrad();
+        float[] expected = [.. expanding.Encode([words]).Vectors.Data<float>()];
+        float[] viaNorms = [.. expanding.Encode([Written()]).Vectors.Data<float>()];
+        Assert.Equal(expected, viaNorms);
+        float[] asWritten = [.. plain.Encode([Written()]).Vectors.Data<float>()];
+        int width = expanding.Width;
+        Assert.NotEqual(asWritten, viaNorms); // read as written, the encoder sees different text
+        Assert.NotEqual(viaNorms.AsSpan(0, width).ToArray(), viaNorms.AsSpan(width, width).ToArray());
+
+        // Without any norm the option changes nothing.
+        float[] plainText = [.. plain.Encode([words]).Vectors.Data<float>()];
+        float[] expandedText = [.. expanding.Encode([words]).Vectors.Data<float>()];
+        Assert.Equal(plainText, expandedText);
+
+        // The setting is saved with the encoder and read back.
+        using var ms = new MemoryStream();
+        using (var w = new Utf8JsonWriter(ms))
+        {
+            w.WriteStartObject();
+            expanding.WriteSettings(w);
+            w.WriteEndObject();
+        }
+
+        using JsonDocument settings = JsonDocument.Parse(ms.ToArray());
+        Assert.True(settings.RootElement.GetProperty("expandForms").GetBoolean());
+    }
 }

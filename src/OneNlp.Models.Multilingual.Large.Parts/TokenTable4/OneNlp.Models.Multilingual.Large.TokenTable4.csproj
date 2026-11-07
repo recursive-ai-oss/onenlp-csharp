@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PartName>TokenTable4</PartName>
+    <PartDescription>token table 4 of 4 (rows fourth of the frozen mmBERT-base embedding table)</PartDescription>
+  </PropertyGroup>
+
+  <Import Project="../Part.props" />
+
+</Project>

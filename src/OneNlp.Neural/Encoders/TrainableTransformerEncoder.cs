@@ -97,7 +97,7 @@ public sealed class TrainableTransformerOptions
 /// frozen embedding table is read from the model again on load. This class is not safe for concurrent calls.
 /// </para>
 /// </remarks>
-public sealed partial class TrainableTransformerEncoder : IEncoder
+public sealed partial class TrainableTransformerEncoder : IEncoder, IWordFormEncoder
 {
     /// <summary>The kind name a saved pipeline uses for this encoder.</summary>
     public const string EncoderKind = "transformer-trainable";
@@ -368,6 +368,9 @@ public sealed partial class TrainableTransformerEncoder : IEncoder
     }
 
     /// <inheritdoc/>
+    bool IWordFormEncoder.ReadsWordForms => _options.ExpandWordForms;
+
+    /// <inheritdoc/>
     /// <exception cref="NotSupportedException">The embedding table is trainable: the pipeline file cannot hold it.</exception>
     public void WriteSettings(Utf8JsonWriter writer)
     {
@@ -483,26 +486,42 @@ public sealed partial class TrainableTransformerEncoder : IEncoder
         ModernBertModule? module = null;
         try
         {
-            Span<byte> bytes = System.Runtime.InteropServices.MemoryMarshal.AsBytes(table.MutableData<float>());
-            int filled = 0;
+            // The pieces are little-endian float32; each value is decoded explicitly so the result does not depend on the machine's byte order.
+            // Bounds: at most `total` values are written; a read fills a 1 MiB buffer, and a piece with more bytes than the table has left is rejected.
+            Span<float> values = table.MutableData<float>();
+            long total = values.Length;
+            long filled = 0;
+            byte[] buffer = new byte[1 << 20];
+            int carry = 0;
             foreach (Stream part in tableParts)
             {
-                // Bounds: a read never runs past the end of the table; a piece that has more left over is rejected below.
                 int n;
-                while (filled < bytes.Length && (n = part.Read(bytes[filled..])) > 0)
+                while (filled < total * 4 && (n = part.Read(buffer, carry, (int)Math.Min(buffer.Length - carry, total * 4 - filled - carry))) > 0)
                 {
-                    filled += n;
-                }
+                    int have = carry + n;
+                    int whole = have / 4;
+                    for (int i = 0; i < whole; i++)
+                    {
+                        values[(int)(filled / 4) + i] = System.Buffers.Binary.BinaryPrimitives.ReadSingleLittleEndian(buffer.AsSpan(i * 4, 4));
+                    }
 
-                if (part.ReadByte() >= 0)
-                {
-                    throw new InvalidDataException("The token table pieces hold more than vocabularySize * width * 4 bytes.");
+                    filled += whole * 4L;
+                    carry = have - whole * 4;
+                    Buffer.BlockCopy(buffer, whole * 4, buffer, 0, carry);
                 }
             }
 
-            if (filled != bytes.Length)
+            if (carry != 0 || filled != total * 4)
             {
-                throw new InvalidDataException($"The token table pieces hold {filled} bytes where {bytes.Length} are needed.");
+                throw new InvalidDataException($"The token table pieces hold {filled + carry} bytes where {total * 4} are needed.");
+            }
+
+            foreach (Stream part in tableParts)
+            {
+                if (part.CanSeek ? part.Position < part.Length : part.ReadByte() >= 0)
+                {
+                    throw new InvalidDataException("The token table pieces hold more than vocabularySize * width * 4 bytes.");
+                }
             }
 
             module = new ModernBertModule(config, o.Seed, table);

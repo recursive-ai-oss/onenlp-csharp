@@ -17,7 +17,7 @@ namespace RecursiveAI.OneNlp.Neural.Encoders;
 /// </para>
 /// <para>Calls to the shared encoder take turns when several pipelines use it from different threads, because the real encoder is not thread-safe.</para>
 /// </remarks>
-public sealed class SharedEncoder : IEncoder
+public sealed class SharedEncoder : IEncoder, IWordFormEncoder
 {
     /// <summary>The kind name a saved pipeline uses for this encoder: <c>shared</c>.</summary>
     public const string EncoderKind = "shared";
@@ -43,6 +43,9 @@ public sealed class SharedEncoder : IEncoder
         _inner = inner;
         Name = name;
     }
+
+    /// <inheritdoc/>
+    bool IWordFormEncoder.ReadsWordForms => _inner is IWordFormEncoder { ReadsWordForms: true };
 
     /// <summary>The name pipelines record.</summary>
     public string Name { get; }

@@ -19,6 +19,13 @@
     <Project Path="src/OneNlp.Models.Multilingual.Parts/Encoder/OneNlp.Models.Multilingual.Encoder.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Parts/FrozenEncoder/OneNlp.Models.Multilingual.FrozenEncoder.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Parts/Segmenters/OneNlp.Models.Multilingual.Segmenters.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large/OneNlp.Models.Multilingual.Large.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Encoder1/OneNlp.Models.Multilingual.Large.Encoder1.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Encoder2/OneNlp.Models.Multilingual.Large.Encoder2.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable1/OneNlp.Models.Multilingual.Large.TokenTable1.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable2/OneNlp.Models.Multilingual.Large.TokenTable2.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable3/OneNlp.Models.Multilingual.Large.TokenTable3.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable4/OneNlp.Models.Multilingual.Large.TokenTable4.csproj" />
     <Project Path="src/OneNlp.Models.Chinese/OneNlp.Models.Chinese.csproj" />
   </Folder>
   <Folder Name="/tests/">
@@ -47,6 +54,7 @@
     <Project Path="recipes/en/fast-tagging/EnglishFastTagging.csproj" />
     <Project Path="recipes/accurate/en-tagging/AccurateEnglishTagging.csproj" />
     <Project Path="recipes/accurate/student-multilingual/OneNlp.Recipes.AccurateStudent.csproj" />
+    <Project Path="recipes/accurate/multilingual/OneNlp.Recipes.Accurate.csproj" />
     <Project Path="recipes/accurate/probe/AccurateProbe.csproj" />
     <Project Path="recipes/openner/OpenNer.csproj" />
     <Project Path="recipes/en/ner/OneNlp.Recipes.EnNer.csproj" />
