@@ -26,6 +26,10 @@ Packages depend on other Recursive AI libraries (`RecursiveAI.OneFont`, `Recursi
 
 The distilled multilingual encoder (`recipes/accurate/student-v1/PROVENANCE.md`) was trained to reproduce the hidden states of **mmBERT-base** (Marone et al. 2025; MIT licence, JHU CLSP) on text from **FineWeb-2** and **FineWeb** (Hugging Face; ODC-By 1.0, subject to the Common Crawl terms of use) and **Wikipedia** (the Wikipedia contributors; CC BY-SA 3.0 and GFDL). Its token table is initialised from mmBERT's, and it uses mmBERT's tokenizer. The training data includes share-alike text.
 
+## Open-type entity recognizer (`recipes/openner`)
+
+The open-type entity head (`recipes/openner/PROVENANCE.md`) was trained on **Few-NERD** (Ding et al. 2021; CC BY-SA 4.0, text from Wikipedia, CC BY-SA), on **Universal NER** English-EWT (Mayhew et al. 2024; CC BY-SA 4.0) and on entity labels written by **Qwen2.5-7B-Instruct-AWQ** (Alibaba Cloud; Apache-2.0, run once to label passages; its weights are not redistributed) for passages of **FineWeb** (Hugging Face; ODC-By 1.0, subject to the Common Crawl terms of use) and **English Wikipedia** (CC BY-SA 3.0 and GFDL). The training data includes share-alike text. **CrossNER** (Liu et al. 2021; MIT licence, text from Wikipedia) is used only to measure the model and is not part of any package.
+
 ## Test data (not packed)
 
 `tests/testdata/unicode/WordBreakTest.txt` and `SentenceBreakTest.txt` are the Unicode 17.0.0 UAX #29 conformance files, © 2025 Unicode, Inc., redistributed under the Unicode License v3 (https://www.unicode.org/license.txt). They are used only by the test project and are not part of any package.
