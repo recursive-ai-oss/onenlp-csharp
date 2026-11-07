@@ -4,6 +4,7 @@ using System.Text.Json;
 using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
+using RecursiveAI.OneNlp.Neural.Embeddings;
 using RecursiveAI.OneNlp.Neural.Encoders;
 
 namespace RecursiveAI.OneNlp.Fuzz;
@@ -37,6 +38,70 @@ internal static class NeuralTargets
         {
             _ = tree.Apply(form);
         }
+    }
+
+    /// <summary>The lemma lexicon table inside a saved lemmatizer: what reads must write back to a table that reads to the same entries.</summary>
+    internal static void LemmaLexiconJson(ReadOnlySpan<byte> data)
+    {
+        JsonDocument document;
+        try
+        {
+            document = JsonDocument.Parse(data.ToArray(), new JsonDocumentOptions { MaxDepth = 8 });
+        }
+        catch (JsonException)
+        {
+            return;
+        }
+
+        using (document)
+        {
+            LemmaLexicon lexicon;
+            try
+            {
+                lexicon = LemmaLexicon.Read(document.RootElement);
+            }
+            catch (InvalidDataException)
+            {
+                return;
+            }
+
+            using var stream = new MemoryStream();
+            using (var writer = new Utf8JsonWriter(stream))
+            {
+                lexicon.Write(writer);
+            }
+
+            using JsonDocument again = JsonDocument.Parse(stream.ToArray());
+            LemmaLexicon second = LemmaLexicon.Read(again.RootElement);
+            Require(second.Count == lexicon.Count, "lexicon round trip count");
+            _ = lexicon.TryGet("walking", "VERB", out _);
+        }
+    }
+
+    /// <summary>The three sentence-embedder configuration files, joined by NUL bytes (modules, pooling, sentence-BERT): only <see cref="InvalidDataException"/> and <see cref="NotSupportedException"/> may escape.</summary>
+    internal static void EmbeddingConfigFiles(ReadOnlySpan<byte> data)
+    {
+        string[] parts = Encoding.UTF8.GetString(data).Split('\0');
+        string? Part(int i) => i < parts.Length && parts[i].Length > 0 ? parts[i] : null;
+        try
+        {
+            EmbeddingConfig config = EmbeddingConfig.Parse(Part(0), Part(1), Part(2));
+            Require(config.MaxSequenceLength is >= 2 and <= EmbeddingConfig.MaxSequenceLengthLimit, "embedding config length range");
+        }
+        catch (Exception e) when (e is InvalidDataException or NotSupportedException)
+        {
+        }
+    }
+
+    internal static void SeedEmbeddingConfig(string directory)
+    {
+        File.WriteAllText(Path.Combine(directory, "seed-bge"), "[{\"idx\":0,\"name\":\"0\",\"path\":\"\",\"type\":\"sentence_transformers.models.Transformer\"},{\"idx\":1,\"name\":\"1\",\"path\":\"1_Pooling\",\"type\":\"sentence_transformers.models.Pooling\"}]\0{\"word_embedding_dimension\":384,\"pooling_mode_cls_token\":true,\"pooling_mode_mean_tokens\":false}\0{\"max_seq_length\":512}");
+    }
+
+    internal static void SeedLemmaLexicon(string directory)
+    {
+        File.WriteAllText(Path.Combine(directory, "seed-lexicon"), "[\"walking\",\"VERB\",\"walk\",\"mice\",\"NOUN\",\"mouse\"]");
+        File.WriteAllText(Path.Combine(directory, "seed-empty"), "[]");
     }
 
     /// <summary>The fast encoder's settings object: what builds must report settings that build the same shape.</summary>

@@ -12,6 +12,8 @@ base="${ONENLP_FUZZ_WORK:?set ONENLP_FUZZ_WORK}"
 for t in "$@"; do
   (
     export ONENLP_FUZZ_WORK="$base/$t"
+    # Side-by-side builds must not share an output folder.
+    export ONENLP_ARTIFACTS="${ONENLP_ARTIFACTS:-$base/artifacts}/$t"
     mkdir -p "$ONENLP_FUZZ_WORK/extra"
     for d in "$root/fuzz/seeds/$t" "$root/fuzz/corpus/$t"; do
       [[ -d "$d" ]] && cp "$d"/* "$ONENLP_FUZZ_WORK/extra/"
