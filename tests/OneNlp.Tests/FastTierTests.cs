@@ -220,6 +220,52 @@ public class FastTierTests
     }
 
     [Fact]
+    public void ALemmaLexiconOverridesTheTreesAndSurvivesSaveAndLoad()
+    {
+        List<Example> train = Toy(200, 1);
+        using Pipeline pipeline = NewPipeline();
+        pipeline.Train(train, new TrainOptions { Epochs = 6, BatchWords = 200, LearningRate = 0.01f, Dropout = 0f, Seed = 5, DevFraction = 0.1 });
+        var lemmatizer = (EditTreeLemmatizer)pipeline.Components[2];
+
+        // Every "walking" in the toy data has the lemma "walk"; a table built from references that say "stride" for it must win over the trees.
+        List<Example> odd = Toy(30, 4);
+        foreach (Example e in odd)
+        {
+            Doc d = e.Reference;
+            int[] lemmas = new int[d.Length];
+            for (int t = 0; t < d.Length; t++)
+            {
+                lemmas[t] = d.Strings.Add(d[t].Text.StartsWith("walk", StringComparison.OrdinalIgnoreCase) ? "stride" : d[t].Lemma);
+            }
+
+            d.SetColumn(TokenColumn.Lemma, lemmas);
+        }
+
+        LemmaLexicon table = LemmaLexicon.Build(odd.Select(e => e.Reference), minCount: 1, minShare: 0.9);
+        Assert.True(table.TryGet("walking", "VERB", out string lemma));
+        Assert.Equal("stride", lemma);
+        Assert.False(table.TryGet("walking", "NOUN", out _));
+        lemmatizer.Lexicon = table;
+
+        Doc doc = pipeline.Process("walking talking");
+        Assert.Equal("stride", doc[0].Lemma);
+        Assert.Equal("talk", doc[1].Lemma);
+
+        string path = Path.Combine(Path.GetTempPath(), "onenlp-lexicon-" + Guid.NewGuid().ToString("N") + ".onenlp");
+        try
+        {
+            PipelineFile.Save(pipeline, path);
+            using Pipeline loaded = PipelineFile.Load(path);
+            Assert.Equal(table.Count, ((EditTreeLemmatizer)loaded.Components[2]).Lexicon!.Count);
+            Assert.Equal("stride", loaded.Process("walking talking")[0].Lemma);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void SharedInferenceBatchIsReusedOnlyForTheSameDocuments()
     {
         using var encoder = new FastEncoder(width: 16, depth: 1, normRows: 64, prefixRows: 16, suffixRows: 32, shapeRows: 16, seed: 9, relu: true, neighbourRows: 32, bigramRows: 32);

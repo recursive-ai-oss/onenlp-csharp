@@ -75,6 +75,13 @@ public sealed class TrainOptions
     /// <summary>Continue from <c>last.ckpt</c> in <see cref="CheckpointDirectory"/> when it exists. Default true.</summary>
     public bool Resume { get; init; } = true;
 
+    /// <summary>
+    /// A <c>last.ckpt</c> of an earlier run with the same pipeline structure to start from: weights, optimizer moments and the optimizer's
+    /// step count are loaded, while this run counts its own steps from 0 (so <see cref="MaxSteps"/> is the number of new steps). Used only
+    /// when <see cref="CheckpointDirectory"/> holds no <c>last.ckpt</c> yet; a later resume continues this run. Default <see langword="null"/>.
+    /// </summary>
+    public string? InitializeFrom { get; init; }
+
     /// <summary>Receives a report after every step. The library writes nothing to the console.</summary>
     public IProgress<TrainProgress>? Progress { get; init; }
 }

@@ -158,6 +158,13 @@ public static class PipelineTraining
                 }
             }
 
+            if (_o.InitializeFrom is not null && _step == 0 && _batch == 0 && !(_o.CheckpointDirectory is not null && File.Exists(Path.Combine(_o.CheckpointDirectory, LastName))))
+            {
+                // A fresh run that starts from the weights and optimizer moments of an earlier run: the step counter of the run restarts at 0
+                // while the optimizer keeps its own count, so a schedule given by the caller sees steps continuing from the earlier run.
+                Checkpoint.Load(_o.InitializeFrom, _state, _optimizer);
+            }
+
             while (!_done)
             {
                 if (_epoch >= _o.Epochs || (_o.MaxSteps > 0 && _step >= _o.MaxSteps))
@@ -171,6 +178,12 @@ public static class PipelineTraining
                 {
                     if (_ct.IsCancellationRequested)
                     {
+                        // Between two steps the state is consistent: keep everything done so far.
+                        if (_o.CheckpointDirectory is not null && _step > 0)
+                        {
+                            SaveLast();
+                        }
+
                         return Result(completed: false);
                     }
 

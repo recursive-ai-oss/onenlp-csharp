@@ -1,5 +1,3 @@
-using System.Text.Json;
-using RecursiveAI.OneModel.Training;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Encoders;
 
@@ -30,7 +28,7 @@ public static class MultilingualLargeModel
     /// <summary>The name under which the shared encoder is registered for the saved pipelines.</summary>
     internal const string SharedName = "multilingual-large";
 
-    private static readonly Lazy<TrainableTransformerEncoder> Encoder = new(BuildEncoder, LazyThreadSafetyMode.ExecutionAndPublication);
+    private static readonly Lazy<TransformerEncoder> Encoder = new(BuildEncoder, LazyThreadSafetyMode.ExecutionAndPublication);
 
     /// <summary>The languages this package has heads for (ISO 639-1 codes).</summary>
     public static IReadOnlyList<string> Languages { get; } = ["en", "de", "fr", "es", "pt", "it", "nl", "tr", "zh"];
@@ -70,66 +68,109 @@ public static class MultilingualLargeModel
         typeof(MultilingualLargeModel).Assembly.GetManifestResourceStream("weights/" + name)
         ?? throw new InvalidOperationException($"This build of {PackageId} carries no weights ('{name}'); use the packed package.");
 
-    private static TrainableTransformerEncoder BuildEncoder()
+    // The fine-tuned encoder is served from its ONNX graph on OneModel's inference runtime (about three times faster than the trainable
+    // modules the encoder was fine-tuned in; docs/accurate-tier.md). The graph file is cut into six consecutive pieces to fit the size limit of
+    // the package feed; they are read as one stream. The stream is seekable, so the runtime sizes its buffer once and nothing is copied twice.
+    private static TransformerEncoder BuildEncoder()
     {
-        using Stream encoderJson = Resource("encoder.json");
-        using JsonDocument description = JsonDocument.Parse(encoderJson);
-        JsonElement shape = description.RootElement.GetProperty("shape");
-
-        byte[] layers = ReadAll([Encoder1.Part.Open(), Encoder2.Part.Open()]);
-        using var layerStream = new MemoryStream(layers, writable: false);
         using Stream tokenizer = Resource("tokenizer.json");
-        Stream[] table = [TokenTable1.Part.Open(), TokenTable2.Part.Open(), TokenTable3.Part.Open(), TokenTable4.Part.Open()];
-        try
-        {
-            TrainableTransformerEncoder encoder = TrainableTransformerEncoder.FromParts(
-                description.RootElement.GetProperty("settings"),
-                shape.GetProperty("vocabularySize").GetInt32(),
-                shape.GetProperty("width").GetInt32(),
-                shape.GetProperty("layers").GetInt32(),
-                shape.GetProperty("feedForwardWidth").GetInt32(),
-                tokenizer,
-                table,
-                layerStream);
-            SharedEncoder.Register(SharedName, encoder);
-            return encoder;
-        }
-        finally
-        {
-            foreach (Stream s in table)
-            {
-                s.Dispose();
-            }
-        }
+        using var graph = new ConcatenatedStream([Encoder1.Part.Open(), Encoder2.Part.Open(), TokenTable1.Part.Open(), TokenTable2.Part.Open(), TokenTable3.Part.Open(), TokenTable4.Part.Open()]);
+        TransformerEncoder encoder = TransformerEncoder.FromStreams(graph, tokenizer, SubwordPooling.Mean, expandWordForms: true);
+        SharedEncoder.Register(SharedName, encoder);
+        return encoder;
     }
 
-    // The halves of one file, joined. Bounds: the two parts are each under 250 MB, so the array is under 500 MB.
-    private static byte[] ReadAll(Stream[] parts)
+    // Read-only, seekable view of consecutive streams as one. Bounds: every part is seekable with a known length (embedded resources are).
+    private sealed class ConcatenatedStream : Stream
     {
-        try
+        private readonly Stream[] _parts;
+        private readonly long[] _starts;
+        private long _position;
+
+        public ConcatenatedStream(Stream[] parts)
         {
-            long total = 0;
-            foreach (Stream s in parts)
+            _parts = parts;
+            _starts = new long[parts.Length + 1];
+            for (int i = 0; i < parts.Length; i++)
             {
-                total += s.Length;
+                _starts[i + 1] = _starts[i] + parts[i].Length;
             }
-
-            byte[] all = new byte[checked((int)total)];
-            int at = 0;
-            foreach (Stream s in parts)
-            {
-                s.ReadExactly(all, at, (int)s.Length);
-                at += (int)s.Length;
-            }
-
-            return all;
         }
-        finally
+
+        public override bool CanRead => true;
+
+        public override bool CanSeek => true;
+
+        public override bool CanWrite => false;
+
+        public override long Length => _starts[^1];
+
+        public override long Position
         {
-            foreach (Stream s in parts)
+            get => _position;
+            set => _position = value >= 0 ? value : throw new ArgumentOutOfRangeException(nameof(value));
+        }
+
+        public override int Read(byte[] buffer, int offset, int count) => Read(buffer.AsSpan(offset, count));
+
+        public override int Read(Span<byte> buffer)
+        {
+            int total = 0;
+            while (!buffer.IsEmpty && _position < Length)
             {
-                s.Dispose();
+                int part = Array.BinarySearch(_starts, _position);
+                part = part >= 0 ? part : ~part - 1;
+                if (part >= _parts.Length)
+                {
+                    break;
+                }
+
+                _parts[part].Position = _position - _starts[part];
+                int want = (int)Math.Min(buffer.Length, _starts[part + 1] - _position);
+                int got = _parts[part].Read(buffer[..want]);
+                if (got == 0)
+                {
+                    break;
+                }
+
+                _position += got;
+                total += got;
+                buffer = buffer[got..];
             }
+
+            return total;
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            _position = origin switch
+            {
+                SeekOrigin.Begin => offset,
+                SeekOrigin.Current => _position + offset,
+                _ => Length + offset,
+            };
+            return _position;
+        }
+
+        public override void Flush()
+        {
+        }
+
+        public override void SetLength(long value) => throw new NotSupportedException();
+
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                foreach (Stream s in _parts)
+                {
+                    s.Dispose();
+                }
+            }
+
+            base.Dispose(disposing);
         }
     }
 }
