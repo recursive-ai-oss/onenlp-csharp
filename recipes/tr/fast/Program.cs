@@ -49,6 +49,7 @@ internal static partial class Program
                 "predict" => Predict(args),
                 "segment" => Segment(args),
                 "speed" => Speed(args),
+                "label" => Label(args),
                 _ => 2,
             };
         }

@@ -1,0 +1,27 @@
+('age', 'Day', None) 10 günlük
+('age', 'Month', None) ay
+('age', 'Week', None) haftalık
+('age', 'Year', None) 85 yaşında
+('currency', 'Bosnia and Herzegovina convertible mark', 'BAM') 5 km
+('currency', 'Dollar', None) 150 dolar
+('currency', 'Euro', 'EUR') 2,50 €
+('currency', 'Kuruş', None) 75 kuruş
+('currency', 'Turkish lira', 'TRY') 1.234,56 tl
+('currency', 'Türk lirası', None) ₺45
+('currency', 'United States dollar', 'USD') 100 usd
+('currency', 'Yemeni rial', 'YER') seksen yer
+('dimension', 'Ar', None) 8a
+('dimension', 'Centimeter', None) 180 cm
+('dimension', 'Gram', None) 500 gram
+('dimension', 'Kilogram', None) 23 kilogram
+('dimension', 'Kilometer', None) 12 kilometre
+('dimension', 'Liter', None) 1,5 litre
+('dimension', 'Megabyte', None) 250 mb
+('dimension', 'Meter', None) 6 metre
+('dimension', 'Mile', None) 3 mil
+('dimension', 'Milliliter', None) 250 ml
+('dimension', 'Square meter', None) 120 metrekare
+('temperature', 'C', None) -12 °c
+('temperature', 'Degree', None) 18 derece
+('temperature', 'F', None) 883f
+('temperature', 'K', None) 300 kelvin

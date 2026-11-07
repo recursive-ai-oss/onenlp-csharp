@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName)</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName)</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName)</PackageId>
-    <Description>spaCy-class NLP for .NET: the model-free core. Doc, Span and Token with character offsets into the original text, a component pipeline, and tokenizer contracts, with no native code, NativeAOT and trim clean. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the model-free core. Doc, Span and Token with character offsets into the original text; tokenizers that match Hugging Face tokenizers byte for byte; sentence segmentation; Matcher and EntityRuler; recognizers for numbers, units, currency, dates and times in ten languages; language identification for 75 languages. No native code, NativeAOT and trim clean. Unaffiliated with other projects named OneNLP.</Description>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
