@@ -1,7 +1,7 @@
 <Project>
   <!-- The files of weights this package packs: name, size, sha256. A pack fails when a file is missing or differs. Weights are never committed. -->
   <ItemGroup>
-    <MultilingualWeight Include="zh.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="tr.onenlp" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="zh.onenlp" Size="43476326" Sha256="6520915c3d6cfa6d238012e52cdae03641154b8d9fc81e31ee8e1ffcd934b3cb" />
+    <MultilingualWeight Include="tr.onenlp" Size="3453592" Sha256="2a4d8d9a7076c4c5ef0b9135593edcaa3e405c1d4af2dddae36fca31f48e00a2" />
   </ItemGroup>
 </Project>

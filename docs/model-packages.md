@@ -10,7 +10,9 @@ A model package carries trained weights for one language (or one task) and makes
 | `RecursiveAI.OneNlp.Models.French`, `.German`, `.Spanish`, `.Portuguese`, `.Dutch`, `.Italian`, `.Turkish`, `.Chinese` | the fast tier of that language | `FrenchModel`, `GermanModel`, `SpanishModel`, `PortugueseModel`, `DutchModel`, `ItalianModel`, `TurkishModel`, `ChineseModel` | the same verbs, for text of that language |
 | `RecursiveAI.OneNlp.Models.Embeddings` | English sentence embeddings (bge-small-en-v1.5) | `EmbeddingsModel` | `Nlp.Embed`, `Nlp.EmbedMany` |
 | `RecursiveAI.OneNlp.Models.Embeddings.Multilingual` | multilingual sentence embeddings (multilingual-e5-small); its three `...Shard1..3` packages hold the weights and come with it | `MultilingualEmbeddingsModel` | `Nlp.Embed`, `Nlp.EmbedMany` (wins over the English embedder when both are referenced) |
-| `RecursiveAI.OneNlp.Models.Multilingual`, `.Multilingual.Large` | the accurate tier | in progress, not released | |
+| `RecursiveAI.OneNlp.Models.Multilingual` | the distilled accurate tier for English, German, French, Spanish, Portuguese, Italian, Dutch, Turkish and Chinese, and open-type entities (`Nlp.Entities(text, types)`); its parts `.Encoder`, `.FrozenEncoder` and `.Segmenters` come with it (`distilled-tier.md`) | `MultilingualModel` | `Nlp.Analyze`, `Nlp.Entities`, `Nlp.Lemmas` where no fast-tier package is referenced |
+| `RecursiveAI.OneNlp.Models.Multilingual.FrozenEncoder` | the frozen distilled encoder alone, for your own heads | `FrozenStudentEncoder.Create()` | an `IEncoder` |
+| `RecursiveAI.OneNlp.Models.Multilingual.Large` | the base-size accurate tier (`accurate-tier.md`) | `MultilingualLargeModel` | as above, preferred over `.Multilingual` when both are referenced |
 
 There is no Hindi fast-tier package yet (the reason is the training data: `ud-licences.md`). Hindi text is identified, tokenized, split into sentences and run through the Hindi recognizers.
 

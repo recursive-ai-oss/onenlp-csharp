@@ -1,16 +1,16 @@
 <Project>
   <!-- The weights this package packs: name, size and sha256. A pack fails when a file is missing or differs. Weights are never committed. -->
   <ItemGroup>
-    <MultilingualWeight Include="heads/en.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="heads/de.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="heads/fr.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="heads/es.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="heads/pt.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="heads/it.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="heads/nl.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="heads/tr.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="heads/zh.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="open-entities.onenlp" Size="0" Sha256="PENDING" />
-    <MultilingualWeight Include="tokenizer.json" Size="0" Sha256="PENDING" />
+    <MultilingualWeight Include="heads/en.onenlp" Size="20396489" Sha256="4171eb102c0ce704cb05cb01ab0992d1d7b4c4523c53578d3fa925378d6ae5ae" />
+    <MultilingualWeight Include="heads/de.onenlp" Size="19697041" Sha256="7b2e74b4aab1a85ca1c5c5cb67276eaceea975631c5343cde96c8bc11bf03b10" />
+    <MultilingualWeight Include="heads/fr.onenlp" Size="22117803" Sha256="773691be1a1fbc1b0e547b388a603ce156f87dfcc13805b616b4448015867c4a" />
+    <MultilingualWeight Include="heads/es.onenlp" Size="18291796" Sha256="ea93e1068942b1743f8f9be41fce1e5b1a436e91b14d81a66288f6ac5a0c9b67" />
+    <MultilingualWeight Include="heads/pt.onenlp" Size="17743694" Sha256="d3355b19477329212c5040fa423d7d5e7ccc36e81a86980ef1b2345de49eb415" />
+    <MultilingualWeight Include="heads/it.onenlp" Size="17177866" Sha256="18094fd7c838153209d27364e46f0cf3fe6e5e0e7e6bd8257448ae31999f04f4" />
+    <MultilingualWeight Include="heads/nl.onenlp" Size="19221813" Sha256="ab81af09f6ad5096ff5ee6c3a65a2d321332be1268dbfd3ec61de23f642d8e53" />
+    <MultilingualWeight Include="heads/tr.onenlp" Size="27154575" Sha256="d01e84c3be1ec0980deb827d4506916a2e4e734c401844a76cca93e9b63e1421" />
+    <MultilingualWeight Include="heads/zh.onenlp" Size="16690068" Sha256="ddc4195820735762815f5179782164cdb852532113a027ac423cb2e8a9b3c39e" />
+    <MultilingualWeight Include="open-entities.onenlp" Size="2385609" Sha256="25d7cd3f8f3cc67b73aaca5d49db00dc88dc1758ffb34f43658aeb2fefff1d68" />
+    <MultilingualWeight Include="tokenizer.json" Size="17525329" Sha256="197d4cc5406ee12cc50c8b5511f2393cc32d9db321545979ce041c1199178356" />
   </ItemGroup>
 </Project>

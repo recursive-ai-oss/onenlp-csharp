@@ -15,7 +15,7 @@ for name in "${!GOLD[@]}"; do
   dir=${GOLD[$name]}
   gold="$DATA/eval/ud/$dir/$name.conllu"
   lang=${name%%_*}
-  if [[ "$NOXPOS" == *" $name "* ]]; then M=UPOS,UFeats,Lemmas,UAS,LAS; else M=UPOS,XPOS,UFeats,AllTags,Lemmas,UAS,LAS; fi
+  if [[ "$NOXPOS" == *" $name "* ]]; then M=UPOS,UFeats,Lemmas,UAS,LAS,CLAS,MLAS; else M=UPOS,XPOS,UFeats,AllTags,Lemmas,UAS,LAS,CLAS,MLAS; fi
   if [ -f "$RUN/pred-$name.conllu" ]; then
     dotnet "$EVAL" ud --gold "$gold" --pred "$RUN/pred-$name.conllu" --metrics "$M" --component accurate-student-gold --language "$lang" --dataset "$name" \
       --resamples 1000 --seed 20261106 --json "$OUT/$name.gold.json" --markdown "$OUT/$name.gold.md" > /dev/null
