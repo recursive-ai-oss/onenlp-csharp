@@ -36,7 +36,7 @@ namespace RecursiveAI.OneNlp.Neural.Components;
 /// <b>Existing entities</b> of the document are kept as they are and the head predicts around them, as <see cref="EntityRecognizer"/> does.
 /// </para>
 /// </remarks>
-public sealed class OpenEntityRecognizer : TrainableHead
+public sealed class OpenEntityRecognizer : TrainableHead, IOpenEntityRecognizer
 {
     /// <summary>The kind name used by <see cref="HeadRegistry"/>: <c>open-ner</c>.</summary>
     public const string ComponentKind = "open-ner";
