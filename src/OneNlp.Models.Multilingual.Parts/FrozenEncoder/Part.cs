@@ -12,4 +12,14 @@ public static class Part
     public static Stream Open() =>
         typeof(Part).Assembly.GetManifestResourceStream("weights/" + FileName)
         ?? throw new InvalidOperationException("This build of FrozenEncoder carries no weights; use the packed package.");
+
+    /// <summary>The name of the tokenizer file this part carries (the model's <c>tokenizer.json</c>).</summary>
+    public const string TokenizerFileName = "tokenizer.json";
+
+    /// <summary>Opens the tokenizer file for reading.</summary>
+    /// <returns>A readable, seekable stream over the embedded bytes. The caller disposes it.</returns>
+    /// <exception cref="InvalidOperationException">The package was built without its weights.</exception>
+    public static Stream OpenTokenizer() =>
+        typeof(Part).Assembly.GetManifestResourceStream("weights/" + TokenizerFileName)
+        ?? throw new InvalidOperationException("This build of FrozenEncoder carries no weights; use the packed package.");
 }

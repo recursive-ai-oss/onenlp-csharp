@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <PartName>Encoder</PartName>
+    <ProbeFile>student-multilingual.onnx</ProbeFile>
     <PartDescription>the fine-tuned encoder (all six layers and the factorised token table, as one ONNX file)</PartDescription>
   </PropertyGroup>
 

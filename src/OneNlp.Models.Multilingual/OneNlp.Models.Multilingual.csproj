@@ -6,11 +6,17 @@
     <PackageId>$(PackagePrefix)$(LibName).Models.Multilingual</PackageId>
     <Description>spaCy-class NLP for .NET: the distilled accurate-tier model (a six-layer student of mmBERT-base, fine-tuned) for English, German, French, Spanish, Portuguese, Italian, Dutch, Turkish and Chinese, plus an open-type entity recognizer. Tags, morphology, lemmas, dependency parse and entities for the Nlp verbs; the Nlp verbs use it for these languages when no fast-tier package is referenced. About 500 MB, split over several packages. No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);multilingual;model</PackageTags>
-    <IsPackable>true</IsPackable>
+    <IsPackable>false</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <MultilingualWeightsDir Condition="'$(MultilingualWeightsDir)' == ''">$(ONENLP_MULTILINGUAL_WEIGHTS)</MultilingualWeightsDir>
+  </PropertyGroup>
+
+  <!-- Packed only when the weights directory holds this package's own files; a pack of the whole solution skips it until they exist. -->
+  <PropertyGroup Condition="'$(MultilingualWeightsDir)' != '' And Exists('$(MultilingualWeightsDir)/open-entities.onenlp')">
+    <HasPackageWeights>true</HasPackageWeights>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <Import Project="weights.manifest.props" />
@@ -40,7 +46,7 @@
 
   <!-- With a weights directory (property MultilingualWeightsDir or environment variable ONENLP_MULTILINGUAL_WEIGHTS): check every file against the manifest
        and embed it. Without one the project still builds (for development), but cannot be packed. -->
-  <Target Name="EmbedMultilingualWeights" BeforeTargets="AssignTargetPaths" Condition="'$(MultilingualWeightsDir)' != ''">
+  <Target Name="EmbedMultilingualWeights" BeforeTargets="AssignTargetPaths" Condition="'$(HasPackageWeights)' == 'true'">
     <ItemGroup>
       <_Weight Include="@(MultilingualWeight)" Path="$([MSBuild]::EnsureTrailingSlash('$(MultilingualWeightsDir)'))%(Identity)" WeightName="%(Identity)" />
     </ItemGroup>
@@ -55,7 +61,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="RequireMultilingualWeightsToPack" BeforeTargets="GenerateNuspec" Condition="'$(MultilingualWeightsDir)' == ''">
+  <Target Name="RequireMultilingualWeightsToPack" BeforeTargets="GenerateNuspec" Condition="'$(HasPackageWeights)' != 'true' And '$(IsPackable)' == 'true'">
     <Error Text="Packing needs the weights: set the environment variable ONENLP_MULTILINGUAL_WEIGHTS (or the property MultilingualWeightsDir) to the directory that holds the files listed in weights.manifest.props, and the same for the parts." />
   </Target>
 
