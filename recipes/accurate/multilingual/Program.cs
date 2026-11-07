@@ -84,6 +84,17 @@ internal static class Program
                 return VerifyExport(args);
             }
 
+            if (args.Length > 0 && args[0] == "predict-package")
+            {
+                if (Opt(args, "threads", string.Empty).Length > 0)
+                {
+                    TensorCompute.Threads = Num(args, "threads", 8);
+                }
+
+                LoadSegmenter(args);
+                return PredictPackage(args);
+            }
+
             if (args.Length == 0 || args[0] != "train")
             {
                 Console.Error.WriteLine("usage: train ... (see the comment at the top of Program.cs)");
@@ -400,39 +411,8 @@ internal static class Program
 
         if (result.Completed && Opt(args, "predict-split", string.Empty) is { Length: > 0 } split)
         {
-            // Predictions for tools/OneNlp.Eval with the best dev weights: gold tokens and sentences (gold mode), raw text with the language's
-            // tokenizer (--raw 1; the parser sets the sentences), and entities on the entity corpus's tokens.
-            bool raw = Num(args, "raw", 0) == 1;
-            foreach (string lang in langs.Where(l => predictLangs.Length == 0 || predictLangs.Contains(l)))
-            {
-                (string dir, string prefix) = Treebanks[lang];
-                string sub = split == "test" ? "eval" : "train";
-                string root = Path.Combine(data, sub, "ud", dir);
-                if (!Directory.Exists(root))
-                {
-                    root = Path.Combine(data, sub, dir);
-                }
-
-                string[] names = split == "test" && lang == "it" ? ["it_parlamint-ud-test", "it_markit-ud-test"] : [$"{prefix}-{split}"];
-                ITrainableComponent[] mine = [.. pipeline.Components.OfType<ScopedHead>().Where(h => h.Name.EndsWith("-" + lang, StringComparison.Ordinal)).Select(h => h.Inner)];
-                ITrainableComponent[] ud = [.. mine.Where(h => h.Kind != "ner")];
-                foreach (string name in names)
-                {
-                    string gold = Path.Combine(root, name + ".conllu");
-                    Predict(encoder, ud, gold, stores[lang], Path.Combine(outDir, $"pred-{name}.conllu"));
-                    if (raw)
-                    {
-                        var tokenizer = new Pipeline(TokenizerFor(Language.FromCode(lang)), Language.FromCode(lang));
-                        PredictRaw(encoder, ud, tokenizer, SegmentationData.For(Language.FromCode(lang)), gold, Path.Combine(outDir, $"pred-raw-{name}.conllu"));
-                    }
-                }
-
-                if (NerSets.TryGetValue(lang, out var ns) && nerStores.TryGetValue(lang, out StringStore? nerStore))
-                {
-                    string nerRoot = split == "test" ? Path.Combine(data, "eval", ns.EvalDir) : Path.Combine(data, "train", ns.Dir);
-                    PredictNer(encoder, [.. mine.Where(h => h.Kind == "ner")], Path.Combine(nerRoot, $"{ns.Prefix}-{split}.iob2"), lang, nerStore, outDir, split);
-                }
-            }
+            PredictSplit(encoder, lang => [.. pipeline.Components.OfType<ScopedHead>().Where(h => h.Name.EndsWith("-" + lang, StringComparison.Ordinal)).Select(h => h.Inner)],
+                data, split, Num(args, "raw", 0) == 1, [.. langs.Where(l => predictLangs.Length == 0 || predictLangs.Contains(l))], outDir, stores, nerStores);
         }
 
         return 0;
@@ -514,6 +494,77 @@ internal static class Program
             PipelineFile.Save(package, file);
             Console.WriteLine($"exported {file} {new FileInfo(file).Length} bytes");
         }
+    }
+
+    // Predictions for tools/OneNlp.Eval: gold tokens and sentences (gold mode), raw text with the language's tokenizer (raw; the parser sets the
+    // sentences), and entities on the entity corpus's tokens. headsOf gives the heads of a language, from the training run or from a package.
+    private static void PredictSplit(IEncoder encoder, Func<string, ITrainableComponent[]> headsOf, string data, string split, bool raw, string[] langs, string outDir,
+        Dictionary<string, StringStore> stores, Dictionary<string, StringStore> nerStores)
+    {
+        foreach (string lang in langs)
+        {
+            (string dir, string prefix) = Treebanks[lang];
+            string sub = split == "test" ? "eval" : "train";
+            string root = Path.Combine(data, sub, "ud", dir);
+            if (!Directory.Exists(root))
+            {
+                root = Path.Combine(data, sub, dir);
+            }
+
+            string[] names = split == "test" && lang == "it" ? ["it_parlamint-ud-test", "it_markit-ud-test"] : [$"{prefix}-{split}"];
+            ITrainableComponent[] mine = headsOf(lang);
+            ITrainableComponent[] ud = [.. mine.Where(h => h.Kind != "ner")];
+            foreach (string name in names)
+            {
+                string gold = Path.Combine(root, name + ".conllu");
+                Predict(encoder, ud, gold, stores[lang], Path.Combine(outDir, $"pred-{name}.conllu"));
+                if (raw)
+                {
+                    var tokenizer = new Pipeline(TokenizerFor(Language.FromCode(lang)), Language.FromCode(lang));
+                    PredictRaw(encoder, ud, tokenizer, SegmentationData.For(Language.FromCode(lang)), gold, Path.Combine(outDir, $"pred-raw-{name}.conllu"));
+                }
+            }
+
+            if (NerSets.TryGetValue(lang, out var ns) && nerStores.TryGetValue(lang, out StringStore? nerStore))
+            {
+                string nerRoot = split == "test" ? Path.Combine(data, "eval", ns.EvalDir) : Path.Combine(data, "train", ns.Dir);
+                PredictNer(encoder, [.. mine.Where(h => h.Kind == "ner")], Path.Combine(nerRoot, $"{ns.Prefix}-{split}.iob2"), lang, nerStore, outDir, split);
+            }
+        }
+    }
+
+    // predict-package --export DIR --data DATA --split test|dev --out DIR [--raw 1] [--langs de,tr] [--zh-segmenter FILE] [--threads N]: the packaged model
+    // (encoder from its ONNX graph, heads from the per-language files with their lemma tables) predicts a split, so that the rows reported are those
+    // of the model users get.
+    private static int PredictPackage(string[] args)
+    {
+        string dir = Required(args, "export");
+        string outDir = Required(args, "out");
+        Directory.CreateDirectory(outDir);
+        predictLimit = Num(args, "predict-limit", 0);
+        nerTestLimit = Num(args, "ner-test", 3000);
+        string[] langs = Opt(args, "langs", "en,de,fr,es,pt,it,nl,tr,zh").Split(',');
+        using FileStream graph = File.OpenRead(Path.Combine(dir, "encoder.onnx"));
+        using Stream tokenizerJson = File.OpenRead(Path.Combine(dir, "tokenizer.json"));
+        using TransformerEncoder encoder = TransformerEncoder.FromStreams(graph, tokenizerJson, SubwordPooling.Mean, expandWordForms: true);
+        SharedEncoder.Register("multilingual-large", encoder);
+        var packages = new Dictionary<string, Pipeline>();
+        var stores = new Dictionary<string, StringStore>();
+        var nerStores = new Dictionary<string, StringStore>();
+        foreach (string lang in langs)
+        {
+            packages[lang] = PipelineFile.Load(Path.Combine(dir, "heads", lang + ".onenlp"));
+            stores[lang] = new StringStore();
+            nerStores[lang] = new StringStore();
+        }
+
+        PredictSplit(encoder, lang => [.. packages[lang].Components.OfType<ITrainableComponent>()], Required(args, "data"), Opt(args, "split", "test"), Num(args, "raw", 0) == 1, langs, outDir, stores, nerStores);
+        foreach (Pipeline p in packages.Values)
+        {
+            p.Dispose();
+        }
+
+        return 0;
     }
 
     // verify-export --export DIR --lang pt --data DATA [--predict-limit 100]: the packaged model, rebuilt from its files the way the package does
