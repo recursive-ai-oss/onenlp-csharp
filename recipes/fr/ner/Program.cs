@@ -20,7 +20,7 @@ namespace RecursiveAI.OneNlp.Recipes.FrNer;
 //   eval <model> <eval.jsonl> <out-dir> [--ref ref.tsv] [--raw]
 //   speed <model> <eval.jsonl> [threads]
 //
-// train options: --decoding tagging|spans  --epochs N  --seed N  --context N  --hidden N  --width N  --depth N  --norm-rows N  --prefix-rows N  --suffix-rows N  --shape-rows N  --prefix N  --suffix N  --cased-rows N  --embed-width N  --plain  --hashes N  --lr F  --batch-words N
+// train options: --decoding tagging|spans  --epochs N  --seed N  --context N  --hidden N  --width N  --depth N  --norm-rows N  --prefix-rows N  --suffix-rows N  --shape-rows N  --prefix N  --suffix N  --cased-rows N  --embed-width N  --plain  --hashes N  --relu 1  --recurrent N  --recurrent-size N  --lr F  --batch-words N
 //                --patience N  --threads N  --checkpoint-every N  --dropout F
 internal static class Program
 {
@@ -182,9 +182,9 @@ internal static class Program
 
         NerDecoding decoding = Opt(args, "decoding", "tagging") == "spans" ? NerDecoding.Spans : NerDecoding.Tagging;
         // The fast-tier encoder configuration of the English recipes, unless an encoder option is given (for trying other shapes).
-        string[] encoderOptions = ["width", "depth", "norm-rows", "prefix-rows", "suffix-rows", "shape-rows", "prefix", "suffix", "cased-rows", "embed-width", "plain", "hashes"];
+        string[] encoderOptions = ["width", "depth", "norm-rows", "prefix-rows", "suffix-rows", "shape-rows", "prefix", "suffix", "cased-rows", "embed-width", "plain", "hashes", "relu", "recurrent", "recurrent-size"];
         FastEncoder encoder = encoderOptions.Any(o => args.Contains("--" + o))
-            ? new FastEncoder(Num(args, "width", 96), Num(args, "depth", 4), normRows: Num(args, "norm-rows", 20000), prefixRows: Num(args, "prefix-rows", 2000), suffixRows: Num(args, "suffix-rows", 5000), shapeRows: Num(args, "shape-rows", 2500), seed: seed, prefixLength: Num(args, "prefix", FastEncoder.PrefixLength), suffixLength: Num(args, "suffix", FastEncoder.SuffixLength), casedRows: Num(args, "cased-rows", 0), embedWidth: Num(args, "embed-width", 0), plain: args.Contains("--plain"), hashes: Num(args, "hashes", FastEncoder.HashesPerToken))
+            ? new FastEncoder(Num(args, "width", 96), Num(args, "depth", 4), normRows: Num(args, "norm-rows", 20000), prefixRows: Num(args, "prefix-rows", 2000), suffixRows: Num(args, "suffix-rows", 5000), shapeRows: Num(args, "shape-rows", 2500), seed: seed, prefixLength: Num(args, "prefix", FastEncoder.PrefixLength), suffixLength: Num(args, "suffix", FastEncoder.SuffixLength), casedRows: Num(args, "cased-rows", 0), embedWidth: Num(args, "embed-width", 0), plain: args.Contains("--plain"), hashes: Num(args, "hashes", FastEncoder.HashesPerToken), relu: Num(args, "relu", 0) == 1, recurrentLayers: Num(args, "recurrent", 0), recurrentSize: Num(args, "recurrent-size", 0))
             : FastEncoder.English(seed);
         using Pipeline pipeline = Pipeline.Blank(Language.French)
             .Add(new EntityRecognizer(encoder, decoding, Num(args, "context", 0), Num(args, "hidden", 256)) { OwnsEncoder = true });

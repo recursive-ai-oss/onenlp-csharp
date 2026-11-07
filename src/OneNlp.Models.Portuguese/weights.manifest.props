@@ -6,7 +6,7 @@
                   Recipe="recipes/pt/fast" Data="UD Portuguese-Bosque r2.18 (CC BY-SA 4.0)" Contents="sentencizer, morphologizer, lemmatizer" />
     <PortugueseWeight Include="parser.onenlp" Size="46033533" Sha256="277a4526586eb4233f552373923f2bccadb3495afc70956924ba8ca4a08566d4"
                   Recipe="recipes/pt/fast" Data="UD Portuguese-Bosque r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />
-    <PortugueseWeight Include="ner.onenlp" Size="35677812" Sha256="79829139344a306f8683542708916e20b74e7d122c8031af2ec990229848af9f"
+    <PortugueseWeight Include="ner.onenlp" Size="35678318" Sha256="3d81efdbb1017159ba8076153188d33bb0c0953da46c2a93510a41f752a96ef1"
                   Recipe="recipes/pt/fast" Data="Universal NER Portuguese-Bosque (CC BY-SA 4.0)" Contents="entity recognizer (PER, LOC, ORG)" />
   </ItemGroup>
 </Project>
