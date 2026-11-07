@@ -3,6 +3,7 @@
 #
 #   score-sources.sh <accurate-weights-dir> <work-dir>
 #
+# LANGS lists the source languages; EXTRA_HEADS is a directory of head sets from train-related.sh (NAME.onenlp).
 # Needs the repository built in Release. The development sentences rank the source languages; Hindi-PUD is never used for choosing.
 set -euo pipefail
 WEIGHTS=${1:?weights directory of the accurate tier}
@@ -12,7 +13,7 @@ GOLD=$ROOT/testdata/hi/selfdev.conllu
 mkdir -p "$WORK"
 RECIPE="dotnet run -c Release --no-build --project $ROOT/recipes/hi/fast --"
 EVAL="dotnet run -c Release --no-build --project $ROOT/tools/OneNlp.Eval --"
-$RECIPE label --weights "$WEIGHTS" --conllu "$GOLD" --out "$WORK/selfdev.jsonl.gz" --langs "${LANGS:-en,de,fr,es,pt,it,nl,tr,zh}" --threads "${THREADS:-4}"
+$RECIPE label --weights "$WEIGHTS" --conllu "$GOLD" --out "$WORK/selfdev.jsonl.gz" --langs "${LANGS:-en,de,fr,es,pt,it,nl,tr,zh}" ${EXTRA_HEADS:+--extra-heads $EXTRA_HEADS} --threads "${THREADS:-4}"
 $RECIPE ensemble --in "$WORK/selfdev.jsonl.gz" --out "$WORK/selfdev-ens" --per-source --pos-agree 0 --uas-agree 0 ${ENSEMBLE_ARGS:-} > /dev/null
 for P in "$WORK"/selfdev-ens/src-*.conllu; do
   printf '%s ' "$(basename "$P" .conllu)"

@@ -17,4 +17,4 @@ mkdir -p "$OUT"
 F=$(printf '%s/chunk-%04d.jsonl.gz' "$OUT" "$K")
 if [ -s "$F" ]; then echo "chunk $K already done"; exit 0; fi
 dotnet run -c Release --no-build --project "$ROOT/recipes/hi/fast" -- label --weights "$WEIGHTS" --text "$TEXT" --pud "$PUD" \
-  --out "$F" --first-doc $((K * N)) --docs "$N" --langs "${LANGS:-en,de,fr,es,pt,it,nl,tr,zh}" --threads "${THREADS:-8}"
+  --out "$F" --first-doc $((K * N)) --docs "$N" --langs "${LANGS:-en,de,fr,es,pt,it,nl,tr,zh}" ${EXTRA_HEADS:+--extra-heads $EXTRA_HEADS} --threads "${THREADS:-8}"

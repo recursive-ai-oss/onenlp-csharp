@@ -44,6 +44,8 @@ internal static partial class Program
                 "train-parser" => TrainParser(args),
                 "label" => Label(args),
                 "ensemble" => Ensemble(args),
+                "train-related" => TrainRelated(args),
+                "lemma-probe" => LemmaProbe(args),
                 "ner-convert" when args.Length >= 3 => NerConvert(args[1], args[2]),
                 "ner-train" when args.Length >= 4 => NerTrain(args),
                 "ner-eval" when args.Length >= 4 => NerEval(args),

@@ -239,7 +239,9 @@ internal static partial class Program
         var sources = new List<Source>();
         foreach (string lang in langs)
         {
-            sources.Add(new Source(lang, PipelineFile.Load(HeadsFile(weights, lang))));
+            // --extra-heads DIR: head sets trained afterwards on the same encoder (Related.cs), found as DIR/<lang>.onenlp.
+            string extra = Path.Combine(Opt(args, "extra-heads", "."), lang + ".onenlp");
+            sources.Add(new Source(lang, PipelineFile.Load(Opt(args, "extra-heads", string.Empty).Length > 0 && File.Exists(extra) ? extra : HeadsFile(weights, lang))));
         }
 
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"loaded encoder and {sources.Count} head sets in {clock.Elapsed.TotalSeconds:F1} s, threads={TensorCompute.Threads}"));
@@ -250,6 +252,8 @@ internal static partial class Program
         int droppedOverlap = 0;
         int droppedDuplicate = 0;
         int droppedShape = 0;
+        int droppedAdultDocs = 0;
+        int droppedAdultSentences = 0;
         var seen = new HashSet<string>(StringComparer.Ordinal);
         var batch = new List<(int Doc, Doc Tokens)>();
 
@@ -312,7 +316,14 @@ internal static partial class Program
                 continue;
             }
 
-            foreach (string paragraph in rec.RootElement.GetProperty("t").GetString()!.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            string docText = rec.RootElement.GetProperty("t").GetString()!;
+            if (AdultFilter.Document(docText))
+            {
+                droppedAdultDocs++;
+                continue;
+            }
+
+            foreach (string paragraph in docText.Split('\n', StringSplitOptions.RemoveEmptyEntries))
             {
                 Doc paragraphDoc = segmenter.Process(paragraph);
                 foreach (Span sentence in paragraphDoc.Sentences)
@@ -321,6 +332,12 @@ internal static partial class Program
                     if (!UsableSentence(d, 5, 50))
                     {
                         droppedShape++;
+                        continue;
+                    }
+
+                    if (AdultFilter.Sentence(d.Text))
+                    {
+                        droppedAdultSentences++;
                         continue;
                     }
 
@@ -349,7 +366,7 @@ internal static partial class Program
         gz.Dispose();
         file.Dispose();
         File.Move(output + ".part", output, overwrite: true);
-        Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"done sentences={sentences} tokens={tokens} docs_to={docIndex} dropped_shape={droppedShape} dropped_eval_overlap={droppedOverlap} dropped_duplicate={droppedDuplicate} wall_s={clock.Elapsed.TotalSeconds:F1} threads={TensorCompute.Threads}"));
+        Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"done sentences={sentences} tokens={tokens} docs_to={docIndex} dropped_shape={droppedShape} dropped_adult_docs={droppedAdultDocs} dropped_adult_sentences={droppedAdultSentences} dropped_eval_overlap={droppedOverlap} dropped_duplicate={droppedDuplicate} wall_s={clock.Elapsed.TotalSeconds:F1} threads={TensorCompute.Threads}"));
         foreach (Source s in sources)
         {
             s.Pipeline.Dispose();

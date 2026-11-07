@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Writes testdata/hi/selfdev.conllu: 17 Hindi web sentences that we annotated by hand (UPOS, head, relation) in the UD Hindi style.
+"""Writes testdata/hi/selfdev.conllu: Hindi sentences that we annotated by hand (17 from web text, the rest written by us) (UPOS, head, relation) in the UD Hindi style.
 
 The sentences are from the FineWeb-2 Hindi sample (ODC-By 1.0) used for labelling, picked by position in a pilot slice, not by
 difficulty. The set is small on purpose: it ranks the source languages of the labeller and nothing else (Hindi-PUD is evaluation only).
@@ -26,7 +26,11 @@ S = [
 "इन/DET/2/det लोगों/NOUN/4/nmod का/ADP/2/case व्यवहार/NOUN/7/obl से/ADP/4/case खास/ADJ/7/amod लेना/NOUN/11/nsubj -/PUNCT/9/punct देना/NOUN/7/conj नहीं/PART/11/advmod होता/VERB/0/root ।/PUNCT/11/punct",
 "एक/NUM/2/nummod बार/NOUN/12/obl फिर/ADV/12/advmod से/ADP/3/case बंगाली/ADJ/6/amod बाला/NOUN/8/nmod का/ADP/6/case जादू/NOUN/12/nsubj बॉक्स/NOUN/10/compound ऑफिस/NOUN/12/obl पर/ADP/10/case चल/VERB/0/root गया/AUX/12/aux ।/PUNCT/12/punct",
 ]
-NOSPACE_BEFORE = {".", "।", ",", "”"}
+# Sentences we wrote ourselves, one per line in the same form (selfdev_own.txt next to this script).
+import os
+OWN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "selfdev_own.txt")
+S += [l.strip() for l in open(OWN, encoding="utf-8") if l.strip()]
+NOSPACE_BEFORE = {".", "।", ",", "”", "?"}
 out = []
 for n, line in enumerate(S, 1):
     toks = [t.rsplit("/", 3) for t in line.split(" ")]
@@ -34,6 +38,11 @@ for n, line in enumerate(S, 1):
     for t in toks:
         h = int(t[2]); assert 0 <= h <= len(toks), line
     assert sum(1 for t in toks if t[2] == "0") == 1, line
+    for i in range(len(toks)):  # every token reaches the root without a cycle
+        j, steps = i + 1, 0
+        while j != 0:
+            j = int(toks[j - 1][2]); steps += 1
+            assert steps <= len(toks), ("cycle", line)
     text = ""
     rows = []
     for i, (f, u, h, r) in enumerate(toks):

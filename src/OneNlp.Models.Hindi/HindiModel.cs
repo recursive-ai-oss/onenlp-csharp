@@ -6,7 +6,7 @@ namespace RecursiveAI.OneNlp.Models.Hindi;
 /// <summary>
 /// The Hindi fast-tier model: one pipeline that tokenizes, splits sentences, tags (UPOS and morphology), parses dependencies and finds named
 /// entities (PER, LOC, ORG), from weights packed inside this assembly. It has no lemmatizer and no XPOS tagger: there is no allowed Hindi
-/// treebank to learn them from, so <c>Token.Lemma</c> and <c>Token.Tag</c> stay empty.
+/// treebank to learn them from, so <c>Token.Lemma</c> is the token's own text and <c>Token.Tag</c> stays empty.
 /// </summary>
 /// <remarks>
 /// The weights were trained on Hindi web text that the accurate tier labelled by transfer from other languages (<c>PROVENANCE.md</c>), so
@@ -64,6 +64,7 @@ public static class HindiModel
                 }
             }
 
+            combined.Add(new FormLemmas());
             return combined;
         }
         catch

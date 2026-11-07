@@ -187,6 +187,9 @@ internal static partial class Program
         var tokens = new List<TokenBoundary>();
         var heads = new List<int>();
         var deps = new List<int>();
+        var pos = new List<int>();
+        var morph = new List<int>();
+        var lemma = new List<int>();
         var marks = new List<SentenceBoundary>();
         foreach (ConllUSentence s in sentences)
         {
@@ -204,6 +207,9 @@ internal static partial class Program
                 tokens.Add(new TokenBoundary(charOffset + d.GetStarts()[t], d.GetLengths()[t]));
                 heads.Add(tokenOffset + d.GetHeads()[t]);
                 deps.Add(d.GetColumn(TokenColumn.Dep)[t]);
+                pos.Add(d.GetColumn(TokenColumn.Pos)[t]);
+                morph.Add(d.GetColumn(TokenColumn.Morph)[t]);
+                lemma.Add(d.GetColumn(TokenColumn.Lemma)[t]);
                 marks.Add(t == 0 ? SentenceBoundary.Start : SentenceBoundary.Inside);
             }
         }
@@ -211,6 +217,9 @@ internal static partial class Program
         var doc = new Doc(strings, text.ToString(), tokens.ToArray());
         doc.SetHeads(heads.ToArray());
         doc.SetColumn(TokenColumn.Dep, deps.ToArray());
+        doc.SetColumn(TokenColumn.Pos, pos.ToArray());
+        doc.SetColumn(TokenColumn.Morph, morph.ToArray());
+        doc.SetColumn(TokenColumn.Lemma, lemma.ToArray());
         doc.SetSentenceBoundaries(marks.ToArray());
         return doc;
     }

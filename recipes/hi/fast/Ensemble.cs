@@ -153,6 +153,33 @@ internal static partial class Program
         string[] types = ["PER", "ORG", "LOC"];
         int contestedSentences = 0;
 
+        // Adult-content filter (AdultFilter.cs): the documents of the text file that the filter flags, and the sentences with a weaker term.
+        var adultDocs = new HashSet<int>();
+        bool adultFilter = Opt(args, "text", string.Empty) is { Length: > 0 };
+        int adultRemoved = 0;
+        int adultDocsFlagged = 0;
+        int docsRead = 0;
+        if (adultFilter)
+        {
+            int di = -1;
+            foreach (string line in File.ReadLines(Opt(args, "text", string.Empty)))
+            {
+                di++;
+                using JsonDocument rec = JsonDocument.Parse(line);
+                if (rec.RootElement.GetProperty("s").GetString() == Opt(args, "source", "fw"))
+                {
+                    docsRead++;
+                    if (AdultFilter.Document(rec.RootElement.GetProperty("t").GetString()!))
+                    {
+                        adultDocs.Add(di);
+                        adultDocsFlagged++;
+                    }
+                }
+            }
+        }
+
+        string[] nerUse = Opt(args, "ner-use", string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
+
         foreach (string path in Required(args, "in").Split(','))
         {
             foreach (Labelled s in ReadLabelled(path))
@@ -160,6 +187,12 @@ internal static partial class Program
                 if (total >= maxSentences)
                 {
                     break;
+                }
+
+                if (adultFilter && (adultDocs.Contains(s.Doc) || AdultFilter.Sentence(s.Text)))
+                {
+                    adultRemoved++;
+                    continue;
                 }
 
                 // Chunks are labelled by separate processes, so the same sentence can come from two of them. (Scoring runs keep every sentence.)
@@ -323,12 +356,15 @@ internal static partial class Program
                 }
 
                 // Entities.
+                // --ner-use: the sources that vote on entities (the related-language treebanks have no entity data, so they cannot).
+                SourceLabels[] voters = nerUse.Length == 0 ? src : [.. nerUse.Select(l => s.Sources[l])];
+                int mn = voters.Length;
                 var spans = new Dictionary<(int, int, string), int>();
-                var perSourceSpans = new HashSet<(int, int, string)>[m];
-                for (int a = 0; a < m; a++)
+                var perSourceSpans = new HashSet<(int, int, string)>[mn];
+                for (int a = 0; a < mn; a++)
                 {
                     perSourceSpans[a] = [];
-                    foreach (LabeledSpan e in SpanScorer.ExtractIob2(src[a].Ner))
+                    foreach (LabeledSpan e in SpanScorer.ExtractIob2(voters[a].Ner))
                     {
                         if (e.Label is "PER" or "ORG" or "LOC")
                         {
@@ -338,24 +374,27 @@ internal static partial class Program
                         }
                     }
 
-                    nerCount[a] += perSourceSpans[a].Count;
+                    if (nerUse.Length == 0)
+                    {
+                        nerCount[a] += perSourceSpans[a].Count;
+                    }
                 }
 
-                for (int a = 0; a < m; a++)
+                for (int a = 0; a < mn && nerUse.Length == 0; a++)
                 {
-                    for (int b = 0; b < m; b++)
+                    for (int b = 0; b < mn; b++)
                     {
                         nerBoth[a, b] += perSourceSpans[a].Count(x => perSourceSpans[b].Contains(x));
                     }
                 }
 
-                bool contested = spans.Any(kv => kv.Value >= 2 && kv.Value * 2 < m);
+                bool contested = spans.Any(kv => kv.Value >= 2 && kv.Value * 2 < mn);
                 if (contested)
                 {
                     contestedSentences++;
                 }
 
-                var accepted = spans.Where(kv => kv.Value * 2 >= m).Select(kv => kv.Key).OrderBy(k => k.Item1).ToList();
+                var accepted = spans.Where(kv => kv.Value * 2 >= mn).Select(kv => kv.Key).OrderBy(k => k.Item1).ToList();
                 // Overlapping accepted spans cannot both be written; the longer wins, the sentence stays only if none overlap.
                 bool overlapping = false;
                 for (int i = 1; i < accepted.Count; i++)
@@ -439,6 +478,11 @@ internal static partial class Program
 
         var sb = new StringBuilder();
         sb.AppendLine(string.Create(CultureInfo.InvariantCulture, $"sentences={total} duplicates_removed={duplicates} tokens={tokens} sources={string.Join(',', names ?? [])}"));
+        if (adultFilter)
+        {
+            sb.AppendLine(string.Create(CultureInfo.InvariantCulture, $"adult filter: documents flagged={adultDocsFlagged} of {docsRead} ({100.0 * adultDocsFlagged / Math.Max(1, docsRead):F2}%); labelled sentences removed={adultRemoved} of {total + adultRemoved} ({100.0 * adultRemoved / Math.Max(1, total + adultRemoved):F2}%)"));
+        }
+
         sb.AppendLine(string.Create(CultureInfo.InvariantCulture, $"ud kept={keptUd} ({100.0 * keptUd / Math.Max(1, total):F1}%) train={trainUdCount} dev={devUdCount} tokens={keptTokens} mean_pos_share={posShareSum / Math.Max(1, keptTokens):F3} mean_medoid_uas={uasSum / Math.Max(1, keptTokens):F3}"));
         sb.AppendLine(string.Create(CultureInfo.InvariantCulture, $"ner kept={keptNer} ({100.0 * keptNer / Math.Max(1, total):F1}%) train={trainNerCount} dev={devNerCount} contested_sentences={contestedSentences} entities PER={entityKept[0]} ORG={entityKept[1]} LOC={entityKept[2]}"));
         if (names is not null)

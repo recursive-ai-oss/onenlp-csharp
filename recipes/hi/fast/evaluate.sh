@@ -6,6 +6,9 @@
 #   evaluate.sh spacy <models-dir> <weights-dir> <out-dir> <spacy-prediction-dir> <hi_pud-ud-test.conllu>   (after final: same out-dir)
 #                                                            the evaluation treebank, once, for the final model
 #
+# The labeller is set by LABEL_LANGS (sources to run), EXTRA_HEADS (directory of related-language head sets), LABEL_USE (sources for UPOS and
+# the tree) and NER_USE (sources that vote on entities); without them it is the nine source languages as first used.
+#
 # models-dir holds tagging.onenlp, parser.onenlp and ner.onenlp; weights-dir holds the accurate tier's exported files. Needs the repository
 # built in Release (recipes/hi/fast and tools/OneNlp.Eval).
 set -euo pipefail
@@ -18,8 +21,8 @@ mkdir -p "$OUT"
 
 # Labels a CoNLL-U file's tokens with the source heads and writes the ensemble (and each source) as CoNLL-U files, unfiltered.
 labeller() { # in.conllu out-dir
-  $R label --conllu "$1" --weights "$WEIGHTS" --out "$2.jsonl.gz" --threads "$THREADS" > /dev/null
-  $R ensemble --in "$2.jsonl.gz" --out "$2" --per-source --ner-all --pos-agree 0 --uas-agree 0 --dev-mod 1 > /dev/null
+  $R label --conllu "$1" --weights "$WEIGHTS" --out "$2.jsonl.gz" --langs "${LABEL_LANGS:-en,de,fr,es,pt,it,nl,tr,zh}" ${EXTRA_HEADS:+--extra-heads $EXTRA_HEADS} --threads "$THREADS" > /dev/null
+  $R ensemble --in "$2.jsonl.gz" --out "$2" --per-source --ner-all --pos-agree 0 --uas-agree 0 --dev-mod 1 ${LABEL_USE:+--use $LABEL_USE} ${NER_USE:+--ner-use $NER_USE} > /dev/null
 }
 
 score() { # name gold pred [ref-pred]

@@ -257,3 +257,975 @@
 13	गया	_	AUX	_	_	12	aux	_	SpaceAfter=No
 14	।	_	PUNCT	_	_	12	punct	_	_
 
+# sent_id = hi-selfdev-18
+# text = मेरी बहन दिल्ली में रहती है।
+1	मेरी	_	PRON	_	_	2	nmod	_	_
+2	बहन	_	NOUN	_	_	5	nsubj	_	_
+3	दिल्ली	_	PROPN	_	_	5	obl	_	_
+4	में	_	ADP	_	_	3	case	_	_
+5	रहती	_	VERB	_	_	0	root	_	_
+6	है	_	AUX	_	_	5	aux	_	SpaceAfter=No
+7	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-19
+# text = बच्चे स्कूल से घर लौट आए।
+1	बच्चे	_	NOUN	_	_	5	nsubj	_	_
+2	स्कूल	_	NOUN	_	_	5	obl	_	_
+3	से	_	ADP	_	_	2	case	_	_
+4	घर	_	NOUN	_	_	5	obl	_	_
+5	लौट	_	VERB	_	_	0	root	_	_
+6	आए	_	AUX	_	_	5	aux	_	SpaceAfter=No
+7	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-20
+# text = किसान ने खेत में गेहूँ की फसल बोई थी।
+1	किसान	_	NOUN	_	_	8	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	खेत	_	NOUN	_	_	8	obl	_	_
+4	में	_	ADP	_	_	3	case	_	_
+5	गेहूँ	_	NOUN	_	_	7	nmod	_	_
+6	की	_	ADP	_	_	5	case	_	_
+7	फसल	_	NOUN	_	_	8	obj	_	_
+8	बोई	_	VERB	_	_	0	root	_	_
+9	थी	_	AUX	_	_	8	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-21
+# text = यह किताब बहुत दिलचस्प है।
+1	यह	_	DET	_	_	2	det	_	_
+2	किताब	_	NOUN	_	_	4	nsubj	_	_
+3	बहुत	_	ADV	_	_	4	advmod	_	_
+4	दिलचस्प	_	ADJ	_	_	0	root	_	_
+5	है	_	AUX	_	_	4	cop	_	SpaceAfter=No
+6	।	_	PUNCT	_	_	4	punct	_	_
+
+# sent_id = hi-selfdev-22
+# text = वह रोज सुबह जल्दी उठता है और टहलने जाता है।
+1	वह	_	PRON	_	_	5	nsubj	_	_
+2	रोज	_	ADV	_	_	5	advmod	_	_
+3	सुबह	_	NOUN	_	_	5	obl:tmod	_	_
+4	जल्दी	_	ADV	_	_	5	advmod	_	_
+5	उठता	_	VERB	_	_	0	root	_	_
+6	है	_	AUX	_	_	5	aux	_	_
+7	और	_	CCONJ	_	_	9	cc	_	_
+8	टहलने	_	VERB	_	_	9	advcl	_	_
+9	जाता	_	VERB	_	_	5	conj	_	_
+10	है	_	AUX	_	_	9	aux	_	SpaceAfter=No
+11	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-23
+# text = सरकार ने किसानों के लिए नई योजना शुरू की।
+1	सरकार	_	NOUN	_	_	9	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	किसानों	_	NOUN	_	_	9	obl	_	_
+4	के	_	ADP	_	_	3	case	_	_
+5	लिए	_	ADP	_	_	3	case	_	_
+6	नई	_	ADJ	_	_	7	amod	_	_
+7	योजना	_	NOUN	_	_	9	obj	_	_
+8	शुरू	_	ADJ	_	_	9	xcomp	_	_
+9	की	_	VERB	_	_	0	root	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	9	punct	_	_
+
+# sent_id = hi-selfdev-24
+# text = बारिश के कारण कई सड़कें बंद हो गईं।
+1	बारिश	_	NOUN	_	_	3	nmod	_	_
+2	के	_	ADP	_	_	1	case	_	_
+3	कारण	_	NOUN	_	_	7	obl	_	_
+4	कई	_	DET	_	_	5	det	_	_
+5	सड़कें	_	NOUN	_	_	7	nsubj	_	_
+6	बंद	_	ADJ	_	_	7	xcomp	_	_
+7	हो	_	VERB	_	_	0	root	_	_
+8	गईं	_	AUX	_	_	7	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-25
+# text = मुझे यह खबर सुनकर बहुत खुशी हुई।
+1	मुझे	_	PRON	_	_	7	obl	_	_
+2	यह	_	DET	_	_	3	det	_	_
+3	खबर	_	NOUN	_	_	4	obj	_	_
+4	सुनकर	_	VERB	_	_	7	advcl	_	_
+5	बहुत	_	ADV	_	_	6	advmod	_	_
+6	खुशी	_	NOUN	_	_	7	nsubj	_	_
+7	हुई	_	VERB	_	_	0	root	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-26
+# text = शिक्षक ने छात्रों से कहा कि कल परीक्षा होगी।
+1	शिक्षक	_	NOUN	_	_	5	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	छात्रों	_	NOUN	_	_	5	obl	_	_
+4	से	_	ADP	_	_	3	case	_	_
+5	कहा	_	VERB	_	_	0	root	_	_
+6	कि	_	SCONJ	_	_	9	mark	_	_
+7	कल	_	NOUN	_	_	9	obl:tmod	_	_
+8	परीक्षा	_	NOUN	_	_	9	nsubj	_	_
+9	होगी	_	VERB	_	_	5	ccomp	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-27
+# text = हम सब मिलकर इस समस्या का हल निकालेंगे।
+1	हम	_	PRON	_	_	8	nsubj	_	_
+2	सब	_	PRON	_	_	1	nmod	_	_
+3	मिलकर	_	VERB	_	_	8	advcl	_	_
+4	इस	_	DET	_	_	5	det	_	_
+5	समस्या	_	NOUN	_	_	7	nmod	_	_
+6	का	_	ADP	_	_	5	case	_	_
+7	हल	_	NOUN	_	_	8	obj	_	_
+8	निकालेंगे	_	VERB	_	_	0	root	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-28
+# text = यह रास्ता सीधा बाजार तक जाता है।
+1	यह	_	DET	_	_	2	det	_	_
+2	रास्ता	_	NOUN	_	_	6	nsubj	_	_
+3	सीधा	_	ADV	_	_	6	advmod	_	_
+4	बाजार	_	NOUN	_	_	6	obl	_	_
+5	तक	_	ADP	_	_	4	case	_	_
+6	जाता	_	VERB	_	_	0	root	_	_
+7	है	_	AUX	_	_	6	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-29
+# text = कल रात तेज हवा चल रही थी।
+1	कल	_	NOUN	_	_	2	nmod	_	_
+2	रात	_	NOUN	_	_	5	obl:tmod	_	_
+3	तेज	_	ADJ	_	_	4	amod	_	_
+4	हवा	_	NOUN	_	_	5	nsubj	_	_
+5	चल	_	VERB	_	_	0	root	_	_
+6	रही	_	AUX	_	_	5	aux	_	_
+7	थी	_	AUX	_	_	5	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-30
+# text = उसने मुझे एक सुंदर तोहफा दिया।
+1	उसने	_	PRON	_	_	6	nsubj	_	_
+2	मुझे	_	PRON	_	_	6	obl	_	_
+3	एक	_	NUM	_	_	5	nummod	_	_
+4	सुंदर	_	ADJ	_	_	5	amod	_	_
+5	तोहफा	_	NOUN	_	_	6	obj	_	_
+6	दिया	_	VERB	_	_	0	root	_	SpaceAfter=No
+7	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-31
+# text = आप कल हमारे घर कब आ सकते हैं?
+1	आप	_	PRON	_	_	6	nsubj	_	_
+2	कल	_	NOUN	_	_	6	obl:tmod	_	_
+3	हमारे	_	PRON	_	_	4	nmod	_	_
+4	घर	_	NOUN	_	_	6	obl	_	_
+5	कब	_	ADV	_	_	6	advmod	_	_
+6	आ	_	VERB	_	_	0	root	_	_
+7	सकते	_	AUX	_	_	6	aux	_	_
+8	हैं	_	AUX	_	_	6	aux	_	SpaceAfter=No
+9	?	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-32
+# text = यह मशीन बिजली से चलती है।
+1	यह	_	DET	_	_	2	det	_	_
+2	मशीन	_	NOUN	_	_	5	nsubj	_	_
+3	बिजली	_	NOUN	_	_	5	obl	_	_
+4	से	_	ADP	_	_	3	case	_	_
+5	चलती	_	VERB	_	_	0	root	_	_
+6	है	_	AUX	_	_	5	aux	_	SpaceAfter=No
+7	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-33
+# text = गाँव के लोग हर साल मेला लगाते हैं।
+1	गाँव	_	NOUN	_	_	3	nmod	_	_
+2	के	_	ADP	_	_	1	case	_	_
+3	लोग	_	NOUN	_	_	7	nsubj	_	_
+4	हर	_	DET	_	_	5	det	_	_
+5	साल	_	NOUN	_	_	7	obl:tmod	_	_
+6	मेला	_	NOUN	_	_	7	obj	_	_
+7	लगाते	_	VERB	_	_	0	root	_	_
+8	हैं	_	AUX	_	_	7	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-34
+# text = डॉक्टर ने मरीज को दवा लेने की सलाह दी।
+1	डॉक्टर	_	NOUN	_	_	9	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	मरीज	_	NOUN	_	_	9	obl	_	_
+4	को	_	ADP	_	_	3	case	_	_
+5	दवा	_	NOUN	_	_	6	obj	_	_
+6	लेने	_	VERB	_	_	8	acl	_	_
+7	की	_	ADP	_	_	6	case	_	_
+8	सलाह	_	NOUN	_	_	9	obj	_	_
+9	दी	_	VERB	_	_	0	root	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	9	punct	_	_
+
+# sent_id = hi-selfdev-35
+# text = वह आदमी जो कल आया था मेरा दोस्त है।
+1	वह	_	DET	_	_	2	det	_	_
+2	आदमी	_	NOUN	_	_	8	nsubj	_	_
+3	जो	_	PRON	_	_	5	nsubj	_	_
+4	कल	_	NOUN	_	_	5	obl:tmod	_	_
+5	आया	_	VERB	_	_	2	acl:relcl	_	_
+6	था	_	AUX	_	_	5	aux	_	_
+7	मेरा	_	PRON	_	_	8	nmod	_	_
+8	दोस्त	_	NOUN	_	_	0	root	_	_
+9	है	_	AUX	_	_	8	cop	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-36
+# text = पुस्तकालय सुबह नौ बजे खुलता है।
+1	पुस्तकालय	_	NOUN	_	_	5	nsubj	_	_
+2	सुबह	_	NOUN	_	_	5	obl:tmod	_	_
+3	नौ	_	NUM	_	_	4	nummod	_	_
+4	बजे	_	NOUN	_	_	5	obl:tmod	_	_
+5	खुलता	_	VERB	_	_	0	root	_	_
+6	है	_	AUX	_	_	5	aux	_	SpaceAfter=No
+7	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-37
+# text = भारत और चीन एशिया के दो बड़े देश हैं।
+1	भारत	_	PROPN	_	_	8	nsubj	_	_
+2	और	_	CCONJ	_	_	3	cc	_	_
+3	चीन	_	PROPN	_	_	1	conj	_	_
+4	एशिया	_	PROPN	_	_	8	nmod	_	_
+5	के	_	ADP	_	_	4	case	_	_
+6	दो	_	NUM	_	_	8	nummod	_	_
+7	बड़े	_	ADJ	_	_	8	amod	_	_
+8	देश	_	NOUN	_	_	0	root	_	_
+9	हैं	_	AUX	_	_	8	cop	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-38
+# text = मैं हर रविवार अपने दादाजी से मिलने जाता हूँ।
+1	मैं	_	PRON	_	_	8	nsubj	_	_
+2	हर	_	DET	_	_	3	det	_	_
+3	रविवार	_	NOUN	_	_	8	obl:tmod	_	_
+4	अपने	_	PRON	_	_	5	nmod	_	_
+5	दादाजी	_	NOUN	_	_	7	obl	_	_
+6	से	_	ADP	_	_	5	case	_	_
+7	मिलने	_	VERB	_	_	8	advcl	_	_
+8	जाता	_	VERB	_	_	0	root	_	_
+9	हूँ	_	AUX	_	_	8	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-39
+# text = इस साल गर्मी में नदी का पानी बहुत कम हो गया।
+1	इस	_	DET	_	_	2	det	_	_
+2	साल	_	NOUN	_	_	10	obl:tmod	_	_
+3	गर्मी	_	NOUN	_	_	10	obl	_	_
+4	में	_	ADP	_	_	3	case	_	_
+5	नदी	_	NOUN	_	_	7	nmod	_	_
+6	का	_	ADP	_	_	5	case	_	_
+7	पानी	_	NOUN	_	_	10	nsubj	_	_
+8	बहुत	_	ADV	_	_	9	advmod	_	_
+9	कम	_	ADJ	_	_	10	xcomp	_	_
+10	हो	_	VERB	_	_	0	root	_	_
+11	गया	_	AUX	_	_	10	aux	_	SpaceAfter=No
+12	।	_	PUNCT	_	_	10	punct	_	_
+
+# sent_id = hi-selfdev-40
+# text = वैज्ञानिकों ने एक नए ग्रह की खोज की है।
+1	वैज्ञानिकों	_	NOUN	_	_	8	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	एक	_	NUM	_	_	5	nummod	_	_
+4	नए	_	ADJ	_	_	5	amod	_	_
+5	ग्रह	_	NOUN	_	_	7	nmod	_	_
+6	की	_	ADP	_	_	5	case	_	_
+7	खोज	_	NOUN	_	_	8	obj	_	_
+8	की	_	VERB	_	_	0	root	_	_
+9	है	_	AUX	_	_	8	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-41
+# text = माँ रसोई में खाना बना रही हैं।
+1	माँ	_	NOUN	_	_	5	nsubj	_	_
+2	रसोई	_	NOUN	_	_	5	obl	_	_
+3	में	_	ADP	_	_	2	case	_	_
+4	खाना	_	NOUN	_	_	5	obj	_	_
+5	बना	_	VERB	_	_	0	root	_	_
+6	रही	_	AUX	_	_	5	aux	_	_
+7	हैं	_	AUX	_	_	5	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-42
+# text = उसे तैरना नहीं आता।
+1	उसे	_	PRON	_	_	4	obl	_	_
+2	तैरना	_	VERB	_	_	4	nsubj	_	_
+3	नहीं	_	PART	_	_	4	advmod	_	_
+4	आता	_	VERB	_	_	0	root	_	SpaceAfter=No
+5	।	_	PUNCT	_	_	4	punct	_	_
+
+# sent_id = hi-selfdev-43
+# text = तुम्हारा नाम क्या है?
+1	तुम्हारा	_	PRON	_	_	2	nmod	_	_
+2	नाम	_	NOUN	_	_	3	nsubj	_	_
+3	क्या	_	PRON	_	_	0	root	_	_
+4	है	_	AUX	_	_	3	cop	_	SpaceAfter=No
+5	?	_	PUNCT	_	_	3	punct	_	_
+
+# sent_id = hi-selfdev-44
+# text = वह कहाँ से आया है?
+1	वह	_	PRON	_	_	4	nsubj	_	_
+2	कहाँ	_	ADV	_	_	4	obl	_	_
+3	से	_	ADP	_	_	2	case	_	_
+4	आया	_	VERB	_	_	0	root	_	_
+5	है	_	AUX	_	_	4	aux	_	SpaceAfter=No
+6	?	_	PUNCT	_	_	4	punct	_	_
+
+# sent_id = hi-selfdev-45
+# text = कृपया दरवाजा बंद कर दीजिए।
+1	कृपया	_	ADV	_	_	4	advmod	_	_
+2	दरवाजा	_	NOUN	_	_	4	obj	_	_
+3	बंद	_	ADJ	_	_	4	xcomp	_	_
+4	कर	_	VERB	_	_	0	root	_	_
+5	दीजिए	_	AUX	_	_	4	aux	_	SpaceAfter=No
+6	।	_	PUNCT	_	_	4	punct	_	_
+
+# sent_id = hi-selfdev-46
+# text = पेड़ पर बैठा तोता मीठी आवाज में बोल रहा था।
+1	पेड़	_	NOUN	_	_	3	obl	_	_
+2	पर	_	ADP	_	_	1	case	_	_
+3	बैठा	_	VERB	_	_	4	acl	_	_
+4	तोता	_	NOUN	_	_	8	nsubj	_	_
+5	मीठी	_	ADJ	_	_	6	amod	_	_
+6	आवाज	_	NOUN	_	_	8	obl	_	_
+7	में	_	ADP	_	_	6	case	_	_
+8	बोल	_	VERB	_	_	0	root	_	_
+9	रहा	_	AUX	_	_	8	aux	_	_
+10	था	_	AUX	_	_	8	aux	_	SpaceAfter=No
+11	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-47
+# text = रामायण भारत का एक प्राचीन महाकाव्य है।
+1	रामायण	_	PROPN	_	_	6	nsubj	_	_
+2	भारत	_	PROPN	_	_	6	nmod	_	_
+3	का	_	ADP	_	_	2	case	_	_
+4	एक	_	NUM	_	_	6	nummod	_	_
+5	प्राचीन	_	ADJ	_	_	6	amod	_	_
+6	महाकाव्य	_	NOUN	_	_	0	root	_	_
+7	है	_	AUX	_	_	6	cop	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-48
+# text = पिछले महीने कंपनी ने सौ नए कर्मचारियों को नौकरी दी।
+1	पिछले	_	ADJ	_	_	2	amod	_	_
+2	महीने	_	NOUN	_	_	10	obl:tmod	_	_
+3	कंपनी	_	NOUN	_	_	10	nsubj	_	_
+4	ने	_	ADP	_	_	3	case	_	_
+5	सौ	_	NUM	_	_	7	nummod	_	_
+6	नए	_	ADJ	_	_	7	amod	_	_
+7	कर्मचारियों	_	NOUN	_	_	10	obl	_	_
+8	को	_	ADP	_	_	7	case	_	_
+9	नौकरी	_	NOUN	_	_	10	obj	_	_
+10	दी	_	VERB	_	_	0	root	_	SpaceAfter=No
+11	।	_	PUNCT	_	_	10	punct	_	_
+
+# sent_id = hi-selfdev-49
+# text = अगर कल बारिश हुई तो मैच नहीं होगा।
+1	अगर	_	SCONJ	_	_	4	mark	_	_
+2	कल	_	NOUN	_	_	4	obl:tmod	_	_
+3	बारिश	_	NOUN	_	_	4	nsubj	_	_
+4	हुई	_	VERB	_	_	8	advcl	_	_
+5	तो	_	PART	_	_	8	advmod	_	_
+6	मैच	_	NOUN	_	_	8	nsubj	_	_
+7	नहीं	_	PART	_	_	8	advmod	_	_
+8	होगा	_	VERB	_	_	0	root	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-50
+# text = वह थक गया था, फिर भी काम करता रहा।
+1	वह	_	PRON	_	_	2	nsubj	_	_
+2	थक	_	VERB	_	_	0	root	_	_
+3	गया	_	AUX	_	_	2	aux	_	_
+4	था	_	AUX	_	_	2	aux	_	SpaceAfter=No
+5	,	_	PUNCT	_	_	9	punct	_	_
+6	फिर	_	ADV	_	_	9	advmod	_	_
+7	भी	_	ADV	_	_	6	advmod	_	_
+8	काम	_	NOUN	_	_	9	obj	_	_
+9	करता	_	VERB	_	_	2	conj	_	_
+10	रहा	_	AUX	_	_	9	aux	_	SpaceAfter=No
+11	।	_	PUNCT	_	_	2	punct	_	_
+
+# sent_id = hi-selfdev-51
+# text = बाजार में सब्जियों के दाम बढ़ गए हैं।
+1	बाजार	_	NOUN	_	_	6	obl	_	_
+2	में	_	ADP	_	_	1	case	_	_
+3	सब्जियों	_	NOUN	_	_	5	nmod	_	_
+4	के	_	ADP	_	_	3	case	_	_
+5	दाम	_	NOUN	_	_	6	nsubj	_	_
+6	बढ़	_	VERB	_	_	0	root	_	_
+7	गए	_	AUX	_	_	6	aux	_	_
+8	हैं	_	AUX	_	_	6	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-52
+# text = हमें अपने पर्यावरण की रक्षा करनी चाहिए।
+1	हमें	_	PRON	_	_	6	obl	_	_
+2	अपने	_	PRON	_	_	3	nmod	_	_
+3	पर्यावरण	_	NOUN	_	_	5	nmod	_	_
+4	की	_	ADP	_	_	3	case	_	_
+5	रक्षा	_	NOUN	_	_	6	obj	_	_
+6	करनी	_	VERB	_	_	0	root	_	_
+7	चाहिए	_	AUX	_	_	6	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-53
+# text = रेलगाड़ी दो घंटे देर से पहुँची।
+1	रेलगाड़ी	_	NOUN	_	_	6	nsubj	_	_
+2	दो	_	NUM	_	_	3	nummod	_	_
+3	घंटे	_	NOUN	_	_	4	nmod	_	_
+4	देर	_	NOUN	_	_	6	obl	_	_
+5	से	_	ADP	_	_	4	case	_	_
+6	पहुँची	_	VERB	_	_	0	root	_	SpaceAfter=No
+7	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-54
+# text = यह गीत बचपन से मेरा पसंदीदा रहा है।
+1	यह	_	DET	_	_	2	det	_	_
+2	गीत	_	NOUN	_	_	6	nsubj	_	_
+3	बचपन	_	NOUN	_	_	6	obl	_	_
+4	से	_	ADP	_	_	3	case	_	_
+5	मेरा	_	PRON	_	_	6	nmod	_	_
+6	पसंदीदा	_	ADJ	_	_	0	root	_	_
+7	रहा	_	AUX	_	_	6	cop	_	_
+8	है	_	AUX	_	_	6	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-55
+# text = विद्यार्थियों को समय पर स्कूल पहुँचना चाहिए।
+1	विद्यार्थियों	_	NOUN	_	_	6	obl	_	_
+2	को	_	ADP	_	_	1	case	_	_
+3	समय	_	NOUN	_	_	6	obl	_	_
+4	पर	_	ADP	_	_	3	case	_	_
+5	स्कूल	_	NOUN	_	_	6	obl	_	_
+6	पहुँचना	_	VERB	_	_	0	root	_	_
+7	चाहिए	_	AUX	_	_	6	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-56
+# text = मैंने कल बाजार से आम और केले खरीदे।
+1	मैंने	_	PRON	_	_	8	nsubj	_	_
+2	कल	_	NOUN	_	_	8	obl:tmod	_	_
+3	बाजार	_	NOUN	_	_	8	obl	_	_
+4	से	_	ADP	_	_	3	case	_	_
+5	आम	_	NOUN	_	_	8	obj	_	_
+6	और	_	CCONJ	_	_	7	cc	_	_
+7	केले	_	NOUN	_	_	5	conj	_	_
+8	खरीदे	_	VERB	_	_	0	root	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-57
+# text = इस मंदिर का निर्माण सौ साल पहले हुआ था।
+1	इस	_	DET	_	_	2	det	_	_
+2	मंदिर	_	NOUN	_	_	4	nmod	_	_
+3	का	_	ADP	_	_	2	case	_	_
+4	निर्माण	_	NOUN	_	_	8	nsubj	_	_
+5	सौ	_	NUM	_	_	6	nummod	_	_
+6	साल	_	NOUN	_	_	8	obl:tmod	_	_
+7	पहले	_	ADP	_	_	6	case	_	_
+8	हुआ	_	VERB	_	_	0	root	_	_
+9	था	_	AUX	_	_	8	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-58
+# text = नदी के किनारे कई पक्षी आते हैं।
+1	नदी	_	NOUN	_	_	3	nmod	_	_
+2	के	_	ADP	_	_	1	case	_	_
+3	किनारे	_	NOUN	_	_	6	obl	_	_
+4	कई	_	DET	_	_	5	det	_	_
+5	पक्षी	_	NOUN	_	_	6	nsubj	_	_
+6	आते	_	VERB	_	_	0	root	_	_
+7	हैं	_	AUX	_	_	6	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-59
+# text = आज सुबह से लगातार पानी बरस रहा है।
+1	आज	_	ADV	_	_	6	advmod	_	_
+2	सुबह	_	NOUN	_	_	6	obl:tmod	_	_
+3	से	_	ADP	_	_	2	case	_	_
+4	लगातार	_	ADV	_	_	6	advmod	_	_
+5	पानी	_	NOUN	_	_	6	nsubj	_	_
+6	बरस	_	VERB	_	_	0	root	_	_
+7	रहा	_	AUX	_	_	6	aux	_	_
+8	है	_	AUX	_	_	6	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-60
+# text = लड़की ने गाना गाया और सब ने ताली बजाई।
+1	लड़की	_	NOUN	_	_	4	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	गाना	_	NOUN	_	_	4	obj	_	_
+4	गाया	_	VERB	_	_	0	root	_	_
+5	और	_	CCONJ	_	_	9	cc	_	_
+6	सब	_	PRON	_	_	9	nsubj	_	_
+7	ने	_	ADP	_	_	6	case	_	_
+8	ताली	_	NOUN	_	_	9	obj	_	_
+9	बजाई	_	VERB	_	_	4	conj	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	4	punct	_	_
+
+# sent_id = hi-selfdev-61
+# text = सड़क पर बहुत भीड़ थी।
+1	सड़क	_	NOUN	_	_	4	obl	_	_
+2	पर	_	ADP	_	_	1	case	_	_
+3	बहुत	_	ADJ	_	_	4	amod	_	_
+4	भीड़	_	NOUN	_	_	0	root	_	_
+5	थी	_	AUX	_	_	4	cop	_	SpaceAfter=No
+6	।	_	PUNCT	_	_	4	punct	_	_
+
+# sent_id = hi-selfdev-62
+# text = प्रधानमंत्री आज नई दिल्ली में एक सभा को संबोधित करेंगे।
+1	प्रधानमंत्री	_	NOUN	_	_	10	nsubj	_	_
+2	आज	_	ADV	_	_	10	advmod	_	_
+3	नई	_	PROPN	_	_	10	obl	_	_
+4	दिल्ली	_	PROPN	_	_	3	flat	_	_
+5	में	_	ADP	_	_	3	case	_	_
+6	एक	_	NUM	_	_	7	nummod	_	_
+7	सभा	_	NOUN	_	_	10	obj	_	_
+8	को	_	ADP	_	_	7	case	_	_
+9	संबोधित	_	ADJ	_	_	10	xcomp	_	_
+10	करेंगे	_	VERB	_	_	0	root	_	SpaceAfter=No
+11	।	_	PUNCT	_	_	10	punct	_	_
+
+# sent_id = hi-selfdev-63
+# text = बच्चों को कहानियाँ सुनना बहुत अच्छा लगता है।
+1	बच्चों	_	NOUN	_	_	7	obl	_	_
+2	को	_	ADP	_	_	1	case	_	_
+3	कहानियाँ	_	NOUN	_	_	4	obj	_	_
+4	सुनना	_	VERB	_	_	7	nsubj	_	_
+5	बहुत	_	ADV	_	_	6	advmod	_	_
+6	अच्छा	_	ADJ	_	_	7	xcomp	_	_
+7	लगता	_	VERB	_	_	0	root	_	_
+8	है	_	AUX	_	_	7	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-64
+# text = ताजमहल को देखने हर साल लाखों पर्यटक आते हैं।
+1	ताजमहल	_	PROPN	_	_	3	obj	_	_
+2	को	_	ADP	_	_	1	case	_	_
+3	देखने	_	VERB	_	_	8	advcl	_	_
+4	हर	_	DET	_	_	5	det	_	_
+5	साल	_	NOUN	_	_	8	obl:tmod	_	_
+6	लाखों	_	NUM	_	_	7	nummod	_	_
+7	पर्यटक	_	NOUN	_	_	8	nsubj	_	_
+8	आते	_	VERB	_	_	0	root	_	_
+9	हैं	_	AUX	_	_	8	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-65
+# text = वह अंग्रेजी के साथ फ्रेंच भी बोल लेता है।
+1	वह	_	PRON	_	_	7	nsubj	_	_
+2	अंग्रेजी	_	NOUN	_	_	7	obl	_	_
+3	के	_	ADP	_	_	2	case	_	_
+4	साथ	_	ADP	_	_	2	case	_	_
+5	फ्रेंच	_	PROPN	_	_	7	obj	_	_
+6	भी	_	ADV	_	_	5	advmod	_	_
+7	बोल	_	VERB	_	_	0	root	_	_
+8	लेता	_	AUX	_	_	7	aux	_	_
+9	है	_	AUX	_	_	7	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-66
+# text = हमारे शहर में नया अस्पताल खुला है।
+1	हमारे	_	PRON	_	_	2	nmod	_	_
+2	शहर	_	NOUN	_	_	6	obl	_	_
+3	में	_	ADP	_	_	2	case	_	_
+4	नया	_	ADJ	_	_	5	amod	_	_
+5	अस्पताल	_	NOUN	_	_	6	nsubj	_	_
+6	खुला	_	VERB	_	_	0	root	_	_
+7	है	_	AUX	_	_	6	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-67
+# text = उसने बिना कुछ कहे फोन रख दिया।
+1	उसने	_	PRON	_	_	6	nsubj	_	_
+2	बिना	_	ADP	_	_	4	mark	_	_
+3	कुछ	_	PRON	_	_	4	obj	_	_
+4	कहे	_	VERB	_	_	6	advcl	_	_
+5	फोन	_	NOUN	_	_	6	obj	_	_
+6	रख	_	VERB	_	_	0	root	_	_
+7	दिया	_	AUX	_	_	6	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-68
+# text = सर्दियों में यहाँ बहुत ठंड पड़ती है।
+1	सर्दियों	_	NOUN	_	_	6	obl	_	_
+2	में	_	ADP	_	_	1	case	_	_
+3	यहाँ	_	ADV	_	_	6	advmod	_	_
+4	बहुत	_	ADJ	_	_	5	amod	_	_
+5	ठंड	_	NOUN	_	_	6	nsubj	_	_
+6	पड़ती	_	VERB	_	_	0	root	_	_
+7	है	_	AUX	_	_	6	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-69
+# text = मेरे पिताजी एक बैंक में काम करते हैं।
+1	मेरे	_	PRON	_	_	2	nmod	_	_
+2	पिताजी	_	NOUN	_	_	7	nsubj	_	_
+3	एक	_	NUM	_	_	4	nummod	_	_
+4	बैंक	_	NOUN	_	_	7	obl	_	_
+5	में	_	ADP	_	_	4	case	_	_
+6	काम	_	NOUN	_	_	7	obj	_	_
+7	करते	_	VERB	_	_	0	root	_	_
+8	हैं	_	AUX	_	_	7	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-70
+# text = चुनाव आयोग ने मतदान की तारीख घोषित कर दी।
+1	चुनाव	_	NOUN	_	_	2	compound	_	_
+2	आयोग	_	NOUN	_	_	8	nsubj	_	_
+3	ने	_	ADP	_	_	2	case	_	_
+4	मतदान	_	NOUN	_	_	6	nmod	_	_
+5	की	_	ADP	_	_	4	case	_	_
+6	तारीख	_	NOUN	_	_	8	obj	_	_
+7	घोषित	_	ADJ	_	_	8	xcomp	_	_
+8	कर	_	VERB	_	_	0	root	_	_
+9	दी	_	AUX	_	_	8	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-71
+# text = इंटरनेट ने दुनिया को बहुत छोटा बना दिया है।
+1	इंटरनेट	_	NOUN	_	_	7	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	दुनिया	_	NOUN	_	_	7	obj	_	_
+4	को	_	ADP	_	_	3	case	_	_
+5	बहुत	_	ADV	_	_	6	advmod	_	_
+6	छोटा	_	ADJ	_	_	7	xcomp	_	_
+7	बना	_	VERB	_	_	0	root	_	_
+8	दिया	_	AUX	_	_	7	aux	_	_
+9	है	_	AUX	_	_	7	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-72
+# text = रात को देर तक जागना सेहत के लिए अच्छा नहीं है।
+1	रात	_	NOUN	_	_	5	obl	_	_
+2	को	_	ADP	_	_	1	case	_	_
+3	देर	_	NOUN	_	_	5	obl	_	_
+4	तक	_	ADP	_	_	3	case	_	_
+5	जागना	_	VERB	_	_	9	nsubj	_	_
+6	सेहत	_	NOUN	_	_	9	obl	_	_
+7	के	_	ADP	_	_	6	case	_	_
+8	लिए	_	ADP	_	_	6	case	_	_
+9	अच्छा	_	ADJ	_	_	0	root	_	_
+10	नहीं	_	PART	_	_	9	advmod	_	_
+11	है	_	AUX	_	_	9	cop	_	SpaceAfter=No
+12	।	_	PUNCT	_	_	9	punct	_	_
+
+# sent_id = hi-selfdev-73
+# text = वे दोनों भाई पुणे में पढ़ते हैं।
+1	वे	_	DET	_	_	3	det	_	_
+2	दोनों	_	NUM	_	_	3	nummod	_	_
+3	भाई	_	NOUN	_	_	6	nsubj	_	_
+4	पुणे	_	PROPN	_	_	6	obl	_	_
+5	में	_	ADP	_	_	4	case	_	_
+6	पढ़ते	_	VERB	_	_	0	root	_	_
+7	हैं	_	AUX	_	_	6	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-74
+# text = खिलाड़ियों ने मैदान में जमकर पसीना बहाया।
+1	खिलाड़ियों	_	NOUN	_	_	7	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	मैदान	_	NOUN	_	_	7	obl	_	_
+4	में	_	ADP	_	_	3	case	_	_
+5	जमकर	_	ADV	_	_	7	advmod	_	_
+6	पसीना	_	NOUN	_	_	7	obj	_	_
+7	बहाया	_	VERB	_	_	0	root	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-75
+# text = वर्षा का मौसम किसानों के लिए बहुत महत्वपूर्ण होता है।
+1	वर्षा	_	NOUN	_	_	3	nmod	_	_
+2	का	_	ADP	_	_	1	case	_	_
+3	मौसम	_	NOUN	_	_	8	nsubj	_	_
+4	किसानों	_	NOUN	_	_	8	obl	_	_
+5	के	_	ADP	_	_	4	case	_	_
+6	लिए	_	ADP	_	_	4	case	_	_
+7	बहुत	_	ADV	_	_	8	advmod	_	_
+8	महत्वपूर्ण	_	ADJ	_	_	0	root	_	_
+9	होता	_	AUX	_	_	8	cop	_	_
+10	है	_	AUX	_	_	8	aux	_	SpaceAfter=No
+11	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-76
+# text = उसने अपनी गलती मान ली।
+1	उसने	_	PRON	_	_	4	nsubj	_	_
+2	अपनी	_	PRON	_	_	3	nmod	_	_
+3	गलती	_	NOUN	_	_	4	obj	_	_
+4	मान	_	VERB	_	_	0	root	_	_
+5	ली	_	AUX	_	_	4	aux	_	SpaceAfter=No
+6	।	_	PUNCT	_	_	4	punct	_	_
+
+# sent_id = hi-selfdev-77
+# text = बच्चे पार्क में खेल रहे थे।
+1	बच्चे	_	NOUN	_	_	4	nsubj	_	_
+2	पार्क	_	NOUN	_	_	4	obl	_	_
+3	में	_	ADP	_	_	2	case	_	_
+4	खेल	_	VERB	_	_	0	root	_	_
+5	रहे	_	AUX	_	_	4	aux	_	_
+6	थे	_	AUX	_	_	4	aux	_	SpaceAfter=No
+7	।	_	PUNCT	_	_	4	punct	_	_
+
+# sent_id = hi-selfdev-78
+# text = मोहन ने सीता को एक पत्र लिखा।
+1	मोहन	_	PROPN	_	_	7	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	सीता	_	PROPN	_	_	7	obl	_	_
+4	को	_	ADP	_	_	3	case	_	_
+5	एक	_	NUM	_	_	6	nummod	_	_
+6	पत्र	_	NOUN	_	_	7	obj	_	_
+7	लिखा	_	VERB	_	_	0	root	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-79
+# text = हिमालय दुनिया की सबसे ऊँची पर्वत श्रृंखला है।
+1	हिमालय	_	PROPN	_	_	7	nsubj	_	_
+2	दुनिया	_	NOUN	_	_	7	nmod	_	_
+3	की	_	ADP	_	_	2	case	_	_
+4	सबसे	_	ADV	_	_	5	advmod	_	_
+5	ऊँची	_	ADJ	_	_	7	amod	_	_
+6	पर्वत	_	NOUN	_	_	7	compound	_	_
+7	श्रृंखला	_	NOUN	_	_	0	root	_	_
+8	है	_	AUX	_	_	7	cop	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-80
+# text = पुलिस ने चोर को पकड़ लिया।
+1	पुलिस	_	NOUN	_	_	5	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	चोर	_	NOUN	_	_	5	obj	_	_
+4	को	_	ADP	_	_	3	case	_	_
+5	पकड़	_	VERB	_	_	0	root	_	_
+6	लिया	_	AUX	_	_	5	aux	_	SpaceAfter=No
+7	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-81
+# text = हम शाम को पार्क में टहलने जाते हैं।
+1	हम	_	PRON	_	_	7	nsubj	_	_
+2	शाम	_	NOUN	_	_	7	obl:tmod	_	_
+3	को	_	ADP	_	_	2	case	_	_
+4	पार्क	_	NOUN	_	_	6	obl	_	_
+5	में	_	ADP	_	_	4	case	_	_
+6	टहलने	_	VERB	_	_	7	advcl	_	_
+7	जाते	_	VERB	_	_	0	root	_	_
+8	हैं	_	AUX	_	_	7	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-82
+# text = इस फिल्म की कहानी बहुत भावुक है।
+1	इस	_	DET	_	_	2	det	_	_
+2	फिल्म	_	NOUN	_	_	4	nmod	_	_
+3	की	_	ADP	_	_	2	case	_	_
+4	कहानी	_	NOUN	_	_	6	nsubj	_	_
+5	बहुत	_	ADV	_	_	6	advmod	_	_
+6	भावुक	_	ADJ	_	_	0	root	_	_
+7	है	_	AUX	_	_	6	cop	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-83
+# text = मंत्री जी ने कहा कि सभी को शिक्षा मिलनी चाहिए।
+1	मंत्री	_	NOUN	_	_	4	nsubj	_	_
+2	जी	_	NOUN	_	_	1	flat	_	_
+3	ने	_	ADP	_	_	1	case	_	_
+4	कहा	_	VERB	_	_	0	root	_	_
+5	कि	_	SCONJ	_	_	9	mark	_	_
+6	सभी	_	PRON	_	_	9	obl	_	_
+7	को	_	ADP	_	_	6	case	_	_
+8	शिक्षा	_	NOUN	_	_	9	nsubj	_	_
+9	मिलनी	_	VERB	_	_	4	ccomp	_	_
+10	चाहिए	_	AUX	_	_	9	aux	_	SpaceAfter=No
+11	।	_	PUNCT	_	_	4	punct	_	_
+
+# sent_id = hi-selfdev-84
+# text = रोज़ व्यायाम करने से शरीर स्वस्थ रहता है।
+1	रोज़	_	ADV	_	_	3	advmod	_	_
+2	व्यायाम	_	NOUN	_	_	3	obj	_	_
+3	करने	_	VERB	_	_	7	obl	_	_
+4	से	_	ADP	_	_	3	case	_	_
+5	शरीर	_	NOUN	_	_	7	nsubj	_	_
+6	स्वस्थ	_	ADJ	_	_	7	xcomp	_	_
+7	रहता	_	VERB	_	_	0	root	_	_
+8	है	_	AUX	_	_	7	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-85
+# text = पुराने शहर की गलियाँ बहुत तंग हैं।
+1	पुराने	_	ADJ	_	_	2	amod	_	_
+2	शहर	_	NOUN	_	_	4	nmod	_	_
+3	की	_	ADP	_	_	2	case	_	_
+4	गलियाँ	_	NOUN	_	_	6	nsubj	_	_
+5	बहुत	_	ADV	_	_	6	advmod	_	_
+6	तंग	_	ADJ	_	_	0	root	_	_
+7	हैं	_	AUX	_	_	6	cop	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-86
+# text = उसकी आवाज़ सुनते ही सब चुप हो गए।
+1	उसकी	_	PRON	_	_	2	nmod	_	_
+2	आवाज़	_	NOUN	_	_	3	obj	_	_
+3	सुनते	_	VERB	_	_	7	advcl	_	_
+4	ही	_	ADV	_	_	3	advmod	_	_
+5	सब	_	PRON	_	_	7	nsubj	_	_
+6	चुप	_	ADJ	_	_	7	xcomp	_	_
+7	हो	_	VERB	_	_	0	root	_	_
+8	गए	_	AUX	_	_	7	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-87
+# text = मैंने पहली बार समुद्र देखा।
+1	मैंने	_	PRON	_	_	5	nsubj	_	_
+2	पहली	_	ADJ	_	_	3	amod	_	_
+3	बार	_	NOUN	_	_	5	obl:tmod	_	_
+4	समुद्र	_	NOUN	_	_	5	obj	_	_
+5	देखा	_	VERB	_	_	0	root	_	SpaceAfter=No
+6	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-88
+# text = किताबें हमारी सबसे अच्छी दोस्त होती हैं।
+1	किताबें	_	NOUN	_	_	5	nsubj	_	_
+2	हमारी	_	PRON	_	_	5	nmod	_	_
+3	सबसे	_	ADV	_	_	4	advmod	_	_
+4	अच्छी	_	ADJ	_	_	5	amod	_	_
+5	दोस्त	_	NOUN	_	_	0	root	_	_
+6	होती	_	AUX	_	_	5	cop	_	_
+7	हैं	_	AUX	_	_	5	cop	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	5	punct	_	_
+
+# sent_id = hi-selfdev-89
+# text = वह सुबह की गाड़ी से मुंबई गया।
+1	वह	_	PRON	_	_	7	nsubj	_	_
+2	सुबह	_	NOUN	_	_	4	nmod	_	_
+3	की	_	ADP	_	_	2	case	_	_
+4	गाड़ी	_	NOUN	_	_	7	obl	_	_
+5	से	_	ADP	_	_	4	case	_	_
+6	मुंबई	_	PROPN	_	_	7	obl	_	_
+7	गया	_	VERB	_	_	0	root	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-90
+# text = सभी छात्रों को कल किताबें लानी हैं।
+1	सभी	_	DET	_	_	2	det	_	_
+2	छात्रों	_	NOUN	_	_	6	obl	_	_
+3	को	_	ADP	_	_	2	case	_	_
+4	कल	_	NOUN	_	_	6	obl:tmod	_	_
+5	किताबें	_	NOUN	_	_	6	obj	_	_
+6	लानी	_	VERB	_	_	0	root	_	_
+7	हैं	_	AUX	_	_	6	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-91
+# text = उनका घर पहाड़ की चोटी पर बना है।
+1	उनका	_	PRON	_	_	2	nmod	_	_
+2	घर	_	NOUN	_	_	7	nsubj	_	_
+3	पहाड़	_	NOUN	_	_	5	nmod	_	_
+4	की	_	ADP	_	_	3	case	_	_
+5	चोटी	_	NOUN	_	_	7	obl	_	_
+6	पर	_	ADP	_	_	5	case	_	_
+7	बना	_	VERB	_	_	0	root	_	_
+8	है	_	AUX	_	_	7	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-92
+# text = इस बार हमारी टीम जरूर जीतेगी।
+1	इस	_	DET	_	_	2	det	_	_
+2	बार	_	NOUN	_	_	6	obl:tmod	_	_
+3	हमारी	_	PRON	_	_	4	nmod	_	_
+4	टीम	_	NOUN	_	_	6	nsubj	_	_
+5	जरूर	_	ADV	_	_	6	advmod	_	_
+6	जीतेगी	_	VERB	_	_	0	root	_	SpaceAfter=No
+7	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-93
+# text = दादी हमें रोज़ नई कहानी सुनाती थीं।
+1	दादी	_	NOUN	_	_	6	nsubj	_	_
+2	हमें	_	PRON	_	_	6	obl	_	_
+3	रोज़	_	ADV	_	_	6	advmod	_	_
+4	नई	_	ADJ	_	_	5	amod	_	_
+5	कहानी	_	NOUN	_	_	6	obj	_	_
+6	सुनाती	_	VERB	_	_	0	root	_	_
+7	थीं	_	AUX	_	_	6	aux	_	SpaceAfter=No
+8	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-94
+# text = मुझे लगता है कि वह सच बोल रहा है।
+1	मुझे	_	PRON	_	_	2	obl	_	_
+2	लगता	_	VERB	_	_	0	root	_	_
+3	है	_	AUX	_	_	2	aux	_	_
+4	कि	_	SCONJ	_	_	7	mark	_	_
+5	वह	_	PRON	_	_	7	nsubj	_	_
+6	सच	_	NOUN	_	_	7	obj	_	_
+7	बोल	_	VERB	_	_	2	ccomp	_	_
+8	रहा	_	AUX	_	_	7	aux	_	_
+9	है	_	AUX	_	_	7	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	2	punct	_	_
+
+# sent_id = hi-selfdev-95
+# text = तालाब के पास एक बूढ़ा पेड़ खड़ा था।
+1	तालाब	_	NOUN	_	_	7	obl	_	_
+2	के	_	ADP	_	_	1	case	_	_
+3	पास	_	ADP	_	_	1	case	_	_
+4	एक	_	NUM	_	_	6	nummod	_	_
+5	बूढ़ा	_	ADJ	_	_	6	amod	_	_
+6	पेड़	_	NOUN	_	_	7	nsubj	_	_
+7	खड़ा	_	VERB	_	_	0	root	_	_
+8	था	_	AUX	_	_	7	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-96
+# text = कंप्यूटर ने हमारे काम को आसान बना दिया है।
+1	कंप्यूटर	_	NOUN	_	_	7	nsubj	_	_
+2	ने	_	ADP	_	_	1	case	_	_
+3	हमारे	_	PRON	_	_	4	nmod	_	_
+4	काम	_	NOUN	_	_	7	obj	_	_
+5	को	_	ADP	_	_	4	case	_	_
+6	आसान	_	ADJ	_	_	7	xcomp	_	_
+7	बना	_	VERB	_	_	0	root	_	_
+8	दिया	_	AUX	_	_	7	aux	_	_
+9	है	_	AUX	_	_	7	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	7	punct	_	_
+
+# sent_id = hi-selfdev-97
+# text = श्रीलंका और भारत के बीच कल मैच खेला जाएगा।
+1	श्रीलंका	_	PROPN	_	_	8	obl	_	_
+2	और	_	CCONJ	_	_	3	cc	_	_
+3	भारत	_	PROPN	_	_	1	conj	_	_
+4	के	_	ADP	_	_	1	case	_	_
+5	बीच	_	ADP	_	_	1	case	_	_
+6	कल	_	NOUN	_	_	8	obl:tmod	_	_
+7	मैच	_	NOUN	_	_	8	nsubj:pass	_	_
+8	खेला	_	VERB	_	_	0	root	_	_
+9	जाएगा	_	AUX	_	_	8	aux:pass	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	8	punct	_	_
+
+# sent_id = hi-selfdev-98
+# text = वह बहुत तेज दौड़ता है, इसलिए हमेशा जीतता है।
+1	वह	_	PRON	_	_	4	nsubj	_	_
+2	बहुत	_	ADV	_	_	3	advmod	_	_
+3	तेज	_	ADV	_	_	4	advmod	_	_
+4	दौड़ता	_	VERB	_	_	0	root	_	_
+5	है	_	AUX	_	_	4	aux	_	SpaceAfter=No
+6	,	_	PUNCT	_	_	9	punct	_	_
+7	इसलिए	_	ADV	_	_	9	advmod	_	_
+8	हमेशा	_	ADV	_	_	9	advmod	_	_
+9	जीतता	_	VERB	_	_	4	conj	_	_
+10	है	_	AUX	_	_	9	aux	_	SpaceAfter=No
+11	।	_	PUNCT	_	_	4	punct	_	_
+
+# sent_id = hi-selfdev-99
+# text = छोटे बच्चे अक्सर बिना सोचे बोल देते हैं।
+1	छोटे	_	ADJ	_	_	2	amod	_	_
+2	बच्चे	_	NOUN	_	_	6	nsubj	_	_
+3	अक्सर	_	ADV	_	_	6	advmod	_	_
+4	बिना	_	ADP	_	_	5	mark	_	_
+5	सोचे	_	VERB	_	_	6	advcl	_	_
+6	बोल	_	VERB	_	_	0	root	_	_
+7	देते	_	AUX	_	_	6	aux	_	_
+8	हैं	_	AUX	_	_	6	aux	_	SpaceAfter=No
+9	।	_	PUNCT	_	_	6	punct	_	_
+
+# sent_id = hi-selfdev-100
+# text = स्टेशन पर यात्रियों की लंबी कतार लगी हुई थी।
+1	स्टेशन	_	NOUN	_	_	7	obl	_	_
+2	पर	_	ADP	_	_	1	case	_	_
+3	यात्रियों	_	NOUN	_	_	6	nmod	_	_
+4	की	_	ADP	_	_	3	case	_	_
+5	लंबी	_	ADJ	_	_	6	amod	_	_
+6	कतार	_	NOUN	_	_	7	nsubj	_	_
+7	लगी	_	VERB	_	_	0	root	_	_
+8	हुई	_	AUX	_	_	7	aux	_	_
+9	थी	_	AUX	_	_	7	aux	_	SpaceAfter=No
+10	।	_	PUNCT	_	_	7	punct	_	_
+
