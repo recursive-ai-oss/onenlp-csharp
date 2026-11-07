@@ -462,7 +462,12 @@ internal static class Program
         }
 
         // The same weights as an ONNX graph for the inference runtime (the model package serves from it; see docs/accurate-tier.md).
-        Console.WriteLine("encoder.onnx sha256=" + encoder.ExportOnnx(Path.Combine(dir, "encoder.onnx")));
+        string graphFile = Path.Combine(dir, "encoder.onnx");
+        if (!File.Exists(graphFile))
+        {
+            Console.WriteLine("encoder.onnx sha256=" + encoder.ExportOnnx(graphFile));
+        }
+
         var shared = new SharedEncoder(encoder, "multilingual-large");
         foreach (string lang in langs)
         {
