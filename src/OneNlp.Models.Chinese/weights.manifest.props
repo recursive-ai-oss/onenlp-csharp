@@ -8,7 +8,7 @@
                   Recipe="recipes/zh/fast" Data="UD Chinese-GSDSimp r2.18 (CC BY-SA 4.0)" Contents="sentencizer, tagger, morphologizer, lemmatizer" />
     <ChineseWeight Include="parser.onenlp" Size="39260234" Sha256="eb5a8e1dc60ac5536dc1e22bb9b43dc704ea0cda22c5b12f5ba3b157aef88457"
                   Recipe="recipes/zh/fast" Data="UD Chinese-GSDSimp r2.18 (CC BY-SA 4.0)" Contents="biaffine dependency parser, sentence starts" />
-    <ChineseWeight Include="ner.onenlp" Size="52586086" Sha256="97ac3eb877d88cef2bea9628310259acf8c655663e47de3b509b1708c6287c5d"
+    <ChineseWeight Include="ner.onenlp" Size="52586107" Sha256="840bd9287c6c7ffe9f8b8f724480558c8272acd309961b266f2e825c323993a7"
                   Recipe="recipes/zh/fast" Data="UNER Chinese-GSDSIMP (CC BY-SA 4.0)" Contents="entity recognizer (PER, LOC, ORG)" />
   </ItemGroup>
 </Project>

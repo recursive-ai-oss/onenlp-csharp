@@ -1,0 +1,6 @@
+<Project>
+  <!-- The slice of weights this package packs: name, size, sha256. A pack fails when the file is missing or differs. Weights are never committed. -->
+  <ItemGroup>
+    <LargeWeight Include="zh.onenlp" Size="64585537" Sha256="3aa9e974b2debcc7be9187e57b41eed5329828c93a516fdbbcde01a8bd23860d" />
+  </ItemGroup>
+</Project>

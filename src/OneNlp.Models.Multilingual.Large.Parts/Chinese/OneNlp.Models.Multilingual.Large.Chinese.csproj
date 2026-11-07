@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PartName>Chinese</PartName>
+    <PartDescription>the Chinese heads and word segmenter</PartDescription>
+  </PropertyGroup>
+
+  <Import Project="../Part.props" />
+
+</Project>

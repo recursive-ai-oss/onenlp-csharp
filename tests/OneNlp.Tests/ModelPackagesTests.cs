@@ -52,8 +52,8 @@ public class ModelPackagesTests
         Assert.Contains("RecursiveAI.OneNlp.Models.English", english.Message, StringComparison.Ordinal);
         Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", english.Message, StringComparison.Ordinal);
         ModelNotAvailableException other = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.FromCode("sw")));
-        Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", other.Message, StringComparison.Ordinal);
         Assert.DoesNotContain("Models.English", other.Message, StringComparison.Ordinal);
+        Assert.Empty(other.PackageIds);
     }
 
     [Fact]

@@ -21,7 +21,7 @@ namespace RecursiveAI.OneNlp.Recipes.EnSpancat;
 //                                                          offsets, for OneNlp.Eval spangroup. Lines with "tokens" are given to the model as is.
 //
 // Data lines: {"text": "...", "tokens": [[s, e], ...], "spans": {"sc": [[s, e, "LABEL"], ...]}}. Options (defaults are the recipe):
-//   --sizes 1,2,3 --threshold 0.5 --hidden 256 --epochs 40 --seed 7 --lr 0.003 --dropout 0.2 --batch-words 1000 --patience 6 --threads N
+//   --sizes 1,2,3 --threshold 0.8 --hidden 256 --epochs 40 --seed 7 --lr 0.003 --dropout 0.2 --batch-words 1000 --patience 6 --threads N
 //   --checkpoint-every 0 --budget-seconds S
 internal static class Program
 {
@@ -184,7 +184,7 @@ internal static class Program
         ulong seed = (ulong)Num(args, "seed", 7);
         int[] sizes = [.. Opt(args, "sizes", "1,2,3").Split(',').Select(s => int.Parse(s, CultureInfo.InvariantCulture))];
         using Pipeline pipeline = Pipeline.Blank(Language.English)
-            .Add(new SpanCategorizer(FastEncoder.English(seed), Group, sizes, Num(args, "hidden", 256), Flt(args, "threshold", 0.5f)) { OwnsEncoder = true });
+            .Add(new SpanCategorizer(FastEncoder.English(seed), Group, sizes, Num(args, "hidden", 256), Flt(args, "threshold", 0.8f)) { OwnsEncoder = true });
 
         using var cts = new CancellationTokenSource();
         double budget = double.Parse(Opt(args, "budget-seconds", "0"), CultureInfo.InvariantCulture);
@@ -235,6 +235,18 @@ internal static class Program
     private static int Predict(string[] args)
     {
         using Pipeline pipeline = PipelineFile.Load(args[1]);
+        // --threshold X overrides the saved threshold, e.g. a low one to keep every score for tuning.
+        if (Flt(args, "threshold", 0f) is float threshold and > 0f)
+        {
+            foreach (IPipelineComponent component in pipeline.Components)
+            {
+                if (component is SpanCategorizer head)
+                {
+                    head.Threshold = threshold;
+                }
+            }
+        }
+
         using var writer = new StreamWriter(args[3], false, new UTF8Encoding(false)) { NewLine = "\n" };
         int n = 0;
         // The examples carry the gold tokens, so the model sees exactly the tokens the spans were written on.

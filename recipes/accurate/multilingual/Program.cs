@@ -61,6 +61,13 @@ internal static class Program
 
     private static readonly Stopwatch Wall = Stopwatch.StartNew();
 
+    // A trained Chinese word segmenter (--zh-segmenter FILE, a saved pipeline whose tokenizer is a NeuralWordSegmenter): Chinese text has no
+    // spaces, so raw-text rows and the packaged Chinese pipeline cut words with it instead of the Unicode word rules.
+    private static Pipeline? segmenterSource;
+
+    private static IWordTokenizer TokenizerFor(Language language) =>
+        language.Code == "zh" && segmenterSource is not null ? segmenterSource.Tokenizer : UaxWordTokenizer.For(language);
+
     private static int Main(string[] args)
     {
         try
@@ -72,7 +79,19 @@ internal static class Program
                     TensorCompute.Threads = Num(args, "threads", 8);
                 }
 
+                LoadSegmenter(args);
                 return VerifyExport(args);
+            }
+
+            if (args.Length > 0 && args[0] == "predict-package")
+            {
+                if (Opt(args, "threads", string.Empty).Length > 0)
+                {
+                    TensorCompute.Threads = Num(args, "threads", 8);
+                }
+
+                LoadSegmenter(args);
+                return PredictPackage(args);
             }
 
             if (args.Length == 0 || args[0] != "train")
@@ -86,12 +105,21 @@ internal static class Program
                 TensorCompute.Threads = Num(args, "threads", 8);
             }
 
+            LoadSegmenter(args);
             return Train(args);
         }
         catch (Exception e) when (e is ArgumentException or IOException or DataFormatException or InvalidDataException or FormatException or KeyNotFoundException)
         {
             Console.Error.WriteLine("error: " + e.Message);
             return 1;
+        }
+    }
+
+    private static void LoadSegmenter(string[] args)
+    {
+        if (Opt(args, "zh-segmenter", string.Empty) is { Length: > 0 } path)
+        {
+            segmenterSource = PipelineFile.Load(path);
         }
     }
 
@@ -183,6 +211,49 @@ internal static class Program
             }
         }
 
+        // The label sets of the heads (classes ordered by frequency, rare ones dropped) come from this list, the one a continued run's first
+        // run was built from, so that the tensor shapes and class order of an earlier checkpoint match whatever sampling is used after it.
+        List<Example> headInit = [.. train];
+
+        // --ner-use N: only the first N entity documents of each language are trained on (the label sets above still see all of them).
+        if (Num(args, "ner-use", 0) is > 0 and int nerUse)
+        {
+            foreach (string lang in nerLangs)
+            {
+                var keep = new HashSet<Example>(train.Where(e => ReferenceEquals(e.Predicted.Strings, nerStores[lang])).Take(nerUse));
+                train.RemoveAll(e => ReferenceEquals(e.Predicted.Strings, nerStores[lang]) && !keep.Contains(e));
+            }
+        }
+
+        // --repeat zh=1.8,tr=1.8,fr=0.2: replaces the multiplicity of each listed language's examples (UD and entities) by this many copies
+        // of its distinct examples; a fraction takes evenly spaced examples of the last copy. Which languages a continued run sees most is
+        // set here, from the development scores of the run before it.
+        foreach (string spec in Opt(args, "repeat", string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries))
+        {
+            string[] kv = spec.Split('=');
+            string lang = kv[0];
+            double times = double.Parse(kv[1], CultureInfo.InvariantCulture);
+            bool Mine(Example e) => ReferenceEquals(e.Predicted.Strings, stores[lang]);
+            var distinct = new List<Example>(train.Where(Mine).Distinct());
+            train.RemoveAll(Mine);
+            int whole = (int)Math.Floor(times);
+            for (int r = 0; r < whole; r++)
+            {
+                train.AddRange(distinct);
+            }
+
+            double fraction = times - whole;
+            for (int i = 0; i < distinct.Count; i++)
+            {
+                if (Math.Floor((i + 1) * fraction) > Math.Floor(i * fraction))
+                {
+                    train.Add(distinct[i]);
+                }
+            }
+
+            Console.WriteLine($"{lang}: UD multiplicity {times}");
+        }
+
         // The examples of the languages are interleaved by the trainer's seeded shuffle; with one language this is a plain epoch order.
         using var encoder = TrainableTransformerEncoder.LoadOnnx(
             Required(args, "onnx"),
@@ -218,6 +289,14 @@ internal static class Program
         {
             StringStore mine = nerStores[lang];
             pipeline.Add(new ScopedHead(new EntityRecognizer(encoder, NerDecoding.Tagging, 1, 256, name: "ner-" + lang), d => ReferenceEquals(d.Strings, mine)));
+        }
+
+        foreach (IPipelineComponent component in pipeline.Components)
+        {
+            if (component is ScopedHead { IsInitialized: false } head)
+            {
+                head.Initialize(headInit.Where(e => e.Predicted.Length > 0).ToList(), seed + 1);
+            }
         }
 
         var hasTag = langs.ToDictionary(l => l, l => Available("tagger", train, stores[l]));
@@ -266,6 +345,8 @@ internal static class Program
             cts.CancelAfter(TimeSpan.FromSeconds(budget));
         }
 
+        string? initFrom = Opt(args, "init", string.Empty) is { Length: > 0 } ip ? ip : null;
+        float floorFraction = Flt(args, "floor", 0.1f);
         int batchWords = Num(args, "batch-words", 400 * langs.Length);
         int logEvery = Num(args, "log-every", 5);
         var progress = new Progress(p =>
@@ -289,7 +370,9 @@ internal static class Program
                 BatchWords = batchWords,
                 LearningRate = lr,
                 WarmupSteps = warmup,
-                Schedule = new WarmupCosineLr(lr, warmup, steps, 0.1f),
+                // --init continues an earlier run: the optimizer's step count carries over, so the schedule is shifted by the steps already taken.
+                Schedule = initFrom is null ? new WarmupCosineLr(lr, warmup, steps, floorFraction) : new ShiftedLr(new WarmupCosineLr(lr, warmup, steps, floorFraction), Num(args, "init-steps", 0)),
+                InitializeFrom = initFrom,
                 Dropout = Flt(args, "dropout", 0.1f),
                 Seed = seed,
                 DevExamples = dev,
@@ -305,6 +388,21 @@ internal static class Program
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"completed={result.Completed} steps={result.Steps} epochs={result.Epochs} evaluations={result.Evaluations} best_dev={result.BestScore:F3} best_step={result.BestStep}"));
         Console.WriteLine($"weights_sha256={result.WeightsSha256}");
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"chunk_wall_s={Wall.Elapsed.TotalSeconds:F1} threads={TensorCompute.Threads}"));
+        // --lexicon tr=1:0.9,fr=2:0.8: a lemma table from each listed language's training treebank in front of its edit trees (minimum count : minimum share,
+        // chosen on development data with tools/accurate/lexicon_dev.py).
+        foreach (string spec in Opt(args, "lexicon", string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries))
+        {
+            string[] kv = spec.Split('=');
+            string[] cs = kv[1].Split(':');
+            foreach (ScopedHead scoped in pipeline.Components.OfType<ScopedHead>().Where(h => h.Name == "lemmatizer-" + kv[0]))
+            {
+                var references = train.Where(e => ReferenceEquals(e.Predicted.Strings, stores[kv[0]])).Select(e => e.Reference).Distinct().ToList();
+                var table = LemmaLexicon.Build(references, int.Parse(cs[0], CultureInfo.InvariantCulture), double.Parse(cs[1], CultureInfo.InvariantCulture));
+                ((EditTreeLemmatizer)scoped.Inner).Lexicon = table;
+                Console.WriteLine($"{kv[0]}: lemma lexicon with {table.Count} entries");
+            }
+        }
+
         if (result.Completed && Opt(args, "export", string.Empty) is { Length: > 0 } exportDir)
         {
             Export(encoder, pipeline, langs, exportDir);
@@ -312,39 +410,8 @@ internal static class Program
 
         if (result.Completed && Opt(args, "predict-split", string.Empty) is { Length: > 0 } split)
         {
-            // Predictions for tools/OneNlp.Eval with the best dev weights: gold tokens and sentences (gold mode), raw text with the language's
-            // tokenizer (--raw 1; the parser sets the sentences), and entities on the entity corpus's tokens.
-            bool raw = Num(args, "raw", 0) == 1;
-            foreach (string lang in langs.Where(l => predictLangs.Length == 0 || predictLangs.Contains(l)))
-            {
-                (string dir, string prefix) = Treebanks[lang];
-                string sub = split == "test" ? "eval" : "train";
-                string root = Path.Combine(data, sub, "ud", dir);
-                if (!Directory.Exists(root))
-                {
-                    root = Path.Combine(data, sub, dir);
-                }
-
-                string[] names = split == "test" && lang == "it" ? ["it_parlamint-ud-test", "it_markit-ud-test"] : [$"{prefix}-{split}"];
-                ITrainableComponent[] mine = [.. pipeline.Components.OfType<ScopedHead>().Where(h => h.Name.EndsWith("-" + lang, StringComparison.Ordinal)).Select(h => h.Inner)];
-                ITrainableComponent[] ud = [.. mine.Where(h => h.Kind != "ner")];
-                foreach (string name in names)
-                {
-                    string gold = Path.Combine(root, name + ".conllu");
-                    Predict(encoder, ud, gold, stores[lang], Path.Combine(outDir, $"pred-{name}.conllu"));
-                    if (raw)
-                    {
-                        var tokenizer = new Pipeline(UaxWordTokenizer.For(Language.FromCode(lang)), Language.FromCode(lang));
-                        PredictRaw(encoder, ud, tokenizer, SegmentationData.For(Language.FromCode(lang)), gold, Path.Combine(outDir, $"pred-raw-{name}.conllu"));
-                    }
-                }
-
-                if (NerSets.TryGetValue(lang, out var ns) && nerStores.TryGetValue(lang, out StringStore? nerStore))
-                {
-                    string nerRoot = split == "test" ? Path.Combine(data, "eval", ns.EvalDir) : Path.Combine(data, "train", ns.Dir);
-                    PredictNer(encoder, [.. mine.Where(h => h.Kind == "ner")], Path.Combine(nerRoot, $"{ns.Prefix}-{split}.iob2"), lang, nerStore, outDir, split);
-                }
-            }
+            PredictSplit(encoder, lang => [.. pipeline.Components.OfType<ScopedHead>().Where(h => h.Name.EndsWith("-" + lang, StringComparison.Ordinal)).Select(h => h.Inner)],
+                data, split, Num(args, "raw", 0) == 1, [.. langs.Where(l => predictLangs.Length == 0 || predictLangs.Contains(l))], outDir, stores, nerStores);
         }
 
         return 0;
@@ -394,11 +461,18 @@ internal static class Program
             File.WriteAllBytes(Path.Combine(dir, "encoder.json"), stream.ToArray());
         }
 
+        // The same weights as an ONNX graph for the inference runtime (the model package serves from it; see docs/accurate-tier.md).
+        string graphFile = Path.Combine(dir, "encoder.onnx");
+        if (!File.Exists(graphFile))
+        {
+            Console.WriteLine("encoder.onnx sha256=" + encoder.ExportOnnx(graphFile));
+        }
+
         var shared = new SharedEncoder(encoder, "multilingual-large");
         foreach (string lang in langs)
         {
             Language language = Language.FromCode(lang);
-            using Pipeline package = new(UaxWordTokenizer.For(language), language);
+            using Pipeline package = new(TokenizerFor(language), language);
             package.Add(new MultiwordFormsComponent(language));
             foreach (ScopedHead scoped in trained.Components.OfType<ScopedHead>().Where(h => h.Name.EndsWith("-" + lang, StringComparison.Ordinal)))
             {
@@ -426,6 +500,77 @@ internal static class Program
         }
     }
 
+    // Predictions for tools/OneNlp.Eval: gold tokens and sentences (gold mode), raw text with the language's tokenizer (raw; the parser sets the
+    // sentences), and entities on the entity corpus's tokens. headsOf gives the heads of a language, from the training run or from a package.
+    private static void PredictSplit(IEncoder encoder, Func<string, ITrainableComponent[]> headsOf, string data, string split, bool raw, string[] langs, string outDir,
+        Dictionary<string, StringStore> stores, Dictionary<string, StringStore> nerStores)
+    {
+        foreach (string lang in langs)
+        {
+            (string dir, string prefix) = Treebanks[lang];
+            string sub = split == "test" ? "eval" : "train";
+            string root = Path.Combine(data, sub, "ud", dir);
+            if (!Directory.Exists(root))
+            {
+                root = Path.Combine(data, sub, dir);
+            }
+
+            string[] names = split == "test" && lang == "it" ? ["it_parlamint-ud-test", "it_markit-ud-test"] : [$"{prefix}-{split}"];
+            ITrainableComponent[] mine = headsOf(lang);
+            ITrainableComponent[] ud = [.. mine.Where(h => h.Kind != "ner")];
+            foreach (string name in names)
+            {
+                string gold = Path.Combine(root, name + ".conllu");
+                Predict(encoder, ud, gold, stores[lang], Path.Combine(outDir, $"pred-{name}.conllu"));
+                if (raw)
+                {
+                    var tokenizer = new Pipeline(TokenizerFor(Language.FromCode(lang)), Language.FromCode(lang));
+                    PredictRaw(encoder, ud, tokenizer, SegmentationData.For(Language.FromCode(lang)), gold, Path.Combine(outDir, $"pred-raw-{name}.conllu"));
+                }
+            }
+
+            if (NerSets.TryGetValue(lang, out var ns) && nerStores.TryGetValue(lang, out StringStore? nerStore))
+            {
+                string nerRoot = split == "test" ? Path.Combine(data, "eval", ns.EvalDir) : Path.Combine(data, "train", ns.Dir);
+                PredictNer(encoder, [.. mine.Where(h => h.Kind == "ner")], Path.Combine(nerRoot, $"{ns.Prefix}-{split}.iob2"), lang, nerStore, outDir, split);
+            }
+        }
+    }
+
+    // predict-package --export DIR --data DATA --split test|dev --out DIR [--raw 1] [--langs de,tr] [--zh-segmenter FILE] [--threads N]: the packaged model
+    // (encoder from its ONNX graph, heads from the per-language files with their lemma tables) predicts a split, so that the rows reported are those
+    // of the model users get.
+    private static int PredictPackage(string[] args)
+    {
+        string dir = Required(args, "export");
+        string outDir = Required(args, "out");
+        Directory.CreateDirectory(outDir);
+        predictLimit = Num(args, "predict-limit", 0);
+        nerTestLimit = Num(args, "ner-test", 3000);
+        string[] langs = Opt(args, "langs", "en,de,fr,es,pt,it,nl,tr,zh").Split(',');
+        using FileStream graph = File.OpenRead(Path.Combine(dir, "encoder.onnx"));
+        using Stream tokenizerJson = File.OpenRead(Path.Combine(dir, "tokenizer.json"));
+        using TransformerEncoder encoder = TransformerEncoder.FromStreams(graph, tokenizerJson, SubwordPooling.Mean, expandWordForms: true);
+        SharedEncoder.Register("multilingual-large", encoder);
+        var packages = new Dictionary<string, Pipeline>();
+        var stores = new Dictionary<string, StringStore>();
+        var nerStores = new Dictionary<string, StringStore>();
+        foreach (string lang in langs)
+        {
+            packages[lang] = PipelineFile.Load(Path.Combine(dir, "heads", lang + ".onenlp"));
+            stores[lang] = new StringStore();
+            nerStores[lang] = new StringStore();
+        }
+
+        PredictSplit(encoder, lang => [.. packages[lang].Components.OfType<ITrainableComponent>()], Required(args, "data"), Opt(args, "split", "test"), Num(args, "raw", 0) == 1, langs, outDir, stores, nerStores);
+        foreach (Pipeline p in packages.Values)
+        {
+            p.Dispose();
+        }
+
+        return 0;
+    }
+
     // verify-export --export DIR --lang pt --data DATA [--predict-limit 100]: the packaged model, rebuilt from its files the way the package does
     // (encoder from parts, heads from the per-language file), analyses the first sentences of the test file as raw text; the output is written
     // in the format of --raw predictions so that it can be compared line by line with them.
@@ -436,28 +581,15 @@ internal static class Program
         predictLimit = Num(args, "predict-limit", 100);
         (string td, string prefix) = Treebanks[lang];
         string gold = Path.Combine(Required(args, "data"), "eval", "ud", td, lang == "it" ? "it_markit-ud-test.conllu" : $"{prefix}-test.conllu");
-        using JsonDocument description = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(dir, "encoder.json")));
-        JsonElement shape = description.RootElement.GetProperty("shape");
-        Stream[] table = [.. Directory.GetFiles(dir, "token-table-0?.bin").Order(StringComparer.Ordinal).Select(f => (Stream)File.OpenRead(f))];
-        using Stream layers = new ConcatenatedFiles([Path.Combine(dir, "encoder-layers.ckpt.part1"), Path.Combine(dir, "encoder-layers.ckpt.part2")]);
+        var load = Stopwatch.StartNew();
+        // The packaged model's way: the encoder from its ONNX graph on the inference runtime (see the model package), heads from the per-language file.
+        using FileStream graph = File.OpenRead(Path.Combine(dir, "encoder.onnx"));
         using Stream tokenizerJson = File.OpenRead(Path.Combine(dir, "tokenizer.json"));
-        using TrainableTransformerEncoder encoder = TrainableTransformerEncoder.FromParts(
-            description.RootElement.GetProperty("settings"),
-            shape.GetProperty("vocabularySize").GetInt32(),
-            shape.GetProperty("width").GetInt32(),
-            shape.GetProperty("layers").GetInt32(),
-            shape.GetProperty("feedForwardWidth").GetInt32(),
-            tokenizerJson,
-            table,
-            layers);
-        foreach (Stream t in table)
-        {
-            t.Dispose();
-        }
-
+        using TransformerEncoder encoder = TransformerEncoder.FromStreams(graph, tokenizerJson, SubwordPooling.Mean, expandWordForms: true);
         SharedEncoder.Register("multilingual-large", encoder);
         using Pipeline package = PipelineFile.Load(Path.Combine(dir, "heads", lang + ".onenlp"));
-        var tokenizer = new Pipeline(UaxWordTokenizer.For(Language.FromCode(lang)), Language.FromCode(lang));
+        Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"loaded in {load.Elapsed.TotalSeconds:F1} s, working set {Environment.WorkingSet >> 20} MiB"));
+        var tokenizer = new Pipeline(TokenizerFor(Language.FromCode(lang)), Language.FromCode(lang));
         string output = Required(args, "out");
         var clock = Stopwatch.StartNew();
         PredictRaw(encoder, [], tokenizer, SegmentationData.For(Language.FromCode(lang)), gold, output, package);
@@ -465,6 +597,12 @@ internal static class Program
         int words = File.ReadLines(output).Count(l => l.Length > 0 && l[0] != '#' && !l.AsSpan(0, Math.Min(l.Length, 8)).Contains('-'));
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture, $"analysed {words} words in {seconds:F1} s with {TensorCompute.Threads} threads: {words / seconds:F0} words/s"));
         return 0;
+    }
+
+    // A schedule read at step s - offset: the first steps of a continued run sit at the start of the new schedule.
+    private sealed class ShiftedLr(LrSchedule inner, long offset) : LrSchedule
+    {
+        public override float LrAt(long stepNumber) => inner.LrAt(Math.Max(0, stepNumber - offset));
     }
 
     // The files joined end to end, read as one stream (the layers' checkpoint is shipped in two halves).

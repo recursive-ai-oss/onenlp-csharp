@@ -56,6 +56,10 @@ public abstract class TrainableHead : ITrainableComponent, IDisposable
     public abstract void Initialize(IReadOnlyList<Example> examples, ulong seed);
 
     /// <inheritdoc/>
+    /// <inheritdoc/>
+    public virtual IReadOnlyList<string> ExtendLabels(IReadOnlyList<Example> examples, ulong seed) => [];
+
+    /// <inheritdoc/>
     public abstract Tensor Loss(EncodedBatch encoded, IReadOnlyList<Example> examples);
 
     /// <inheritdoc/>

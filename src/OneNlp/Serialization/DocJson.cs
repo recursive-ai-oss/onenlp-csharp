@@ -20,6 +20,24 @@ internal static class DocJson
     // spaCy's offsets count Unicode code points (Python string indexes); ours are UTF-16 code units. They differ only after a
     // character outside the BMP, so the mapping is built only when the text has a surrogate pair.
 
+    // ArgumentException appends " (Parameter 'name')" to its message; that names our internal argument, which means nothing to a caller reading JSON.
+    private static string PlainMessage(Exception e)
+    {
+        string message = e.Message;
+        if (e is ArgumentException { ParamName: { } name })
+        {
+            int at = message.LastIndexOf(" (Parameter '" + name + "')", StringComparison.Ordinal);
+            if (at >= 0)
+            {
+                message = message[..at];
+            }
+        }
+
+        return message;
+    }
+
+    internal static int[]? BuildCodePointIndex(string text) => CodePointIndex(text);
+
     private static int[]? CodePointIndex(string text)
     {
         int[]? map = null;
@@ -345,7 +363,7 @@ internal static class DocJson
                 throw;
             }
 
-            throw new InvalidDataException("The JSON is not a valid document: " + e.Message, e);
+            throw new InvalidDataException("The JSON is not a valid document: " + PlainMessage(e), e);
         }
     }
 
@@ -495,7 +513,7 @@ internal static class DocJson
         }
         catch (ArgumentException e)
         {
-            throw Bad("The document's cats or spans are inconsistent: " + e.Message);
+            throw Bad("The document's cats or spans are inconsistent: " + PlainMessage(e));
         }
 
         return doc;

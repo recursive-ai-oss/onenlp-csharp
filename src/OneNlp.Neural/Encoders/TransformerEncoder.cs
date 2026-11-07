@@ -45,7 +45,7 @@ public enum SubwordPooling
 /// <see cref="ModelDirectory"/>) and the model's SHA-256. This class is not safe for concurrent <see cref="Encode"/> calls.
 /// </para>
 /// </remarks>
-public sealed class TransformerEncoder : IEncoder
+public sealed class TransformerEncoder : IEncoder, IWordFormEncoder
 {
     /// <summary>The kind name a saved pipeline uses for this encoder.</summary>
     public const string EncoderKind = "transformer";
@@ -184,6 +184,9 @@ public sealed class TransformerEncoder : IEncoder
 
     /// <summary>Whether tokens that carry a <see cref="TokenColumn.Norm"/> are read as that word (the pieces of multiword tokens); see <see cref="TrainableTransformerOptions.ExpandWordForms"/>.</summary>
     public bool ExpandWordForms { get; }
+
+    /// <inheritdoc/>
+    bool IWordFormEncoder.ReadsWordForms => ExpandWordForms;
 
     /// <summary>The most windows run in one model call. Default 8; larger batches use more memory.</summary>
     public int WindowBatch { get; set; } = 8;

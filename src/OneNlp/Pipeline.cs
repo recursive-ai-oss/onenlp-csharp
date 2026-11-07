@@ -147,11 +147,23 @@ public sealed class Pipeline : IDisposable
 
     /// <summary>Adds a component created by name from the <see cref="ComponentRegistry"/>.</summary>
     /// <param name="name">The registered name.</param>
-    /// <param name="settings">Settings for the component's factory, or <see langword="null"/>.</param>
+    /// <param name="settings">Settings for the component's factory, or <see langword="null"/>. For <c>sentencizer</c>, without <c>data</c> or <c>language</c> the pipeline's own language picks the segmentation data.</param>
     /// <returns>This pipeline.</returns>
     /// <exception cref="InvalidOperationException">No component has this name.</exception>
     /// <exception cref="ArgumentException">A component with the same name is already in the pipeline.</exception>
-    public Pipeline Add(string name, IReadOnlyDictionary<string, string>? settings = null) => Add(ComponentRegistry.Create(name, settings));
+    public Pipeline Add(string name, IReadOnlyDictionary<string, string>? settings = null)
+    {
+        // A sentencizer added by name to a pipeline for a language takes that language's abbreviations (English "Mr." does not end a
+        // sentence) unless the settings name the data or the language; without this the pipeline's language is lost on the way to the factory.
+        if (name == Segmentation.SentencizerComponent.ComponentName && Language != Language.Unknown
+            && (settings is null || !(settings.ContainsKey("data") || settings.ContainsKey("language"))))
+        {
+            var merged = new Dictionary<string, string>(settings ?? new Dictionary<string, string>(), StringComparer.Ordinal) { ["language"] = Language.Code };
+            settings = merged;
+        }
+
+        return Add(ComponentRegistry.Create(name, settings));
+    }
 
     /// <summary>Tokenizes a text and runs every component on it.</summary>
     /// <param name="text">The text; may be empty. The returned document keeps this string and its offsets are into it.</param>
@@ -183,13 +195,15 @@ public sealed class Pipeline : IDisposable
     /// </summary>
     /// <param name="texts">The texts.</param>
     /// <param name="batchSize">Texts per batch, at least 1.</param>
+    /// <param name="cancellationToken">Checked before each text is read and each batch is processed; enumeration then throws <see cref="OperationCanceledException"/>. Default: never cancelled.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="batchSize"/> is less than 1.</exception>
     /// <exception cref="ArgumentOutOfRangeException">A text is longer than <see cref="MaxLength"/>; raised when that text is reached.</exception>
-    public IEnumerable<Doc> ProcessMany(IEnumerable<string> texts, int batchSize = 64)
+    /// <exception cref="OperationCanceledException">During enumeration, <paramref name="cancellationToken"/> was cancelled.</exception>
+    public IEnumerable<Doc> ProcessMany(IEnumerable<string> texts, int batchSize = 64, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(texts);
         ArgumentOutOfRangeException.ThrowIfLessThan(batchSize, 1);
-        return ProcessManyCore(texts, batchSize);
+        return ProcessManyCore(texts, batchSize, cancellationToken);
     }
 
     /// <summary>
@@ -232,11 +246,12 @@ public sealed class Pipeline : IDisposable
         return text;
     }
 
-    private IEnumerable<Doc> ProcessManyCore(IEnumerable<string> texts, int batchSize)
+    private IEnumerable<Doc> ProcessManyCore(IEnumerable<string> texts, int batchSize, CancellationToken cancellationToken)
     {
         var batch = new List<Doc>(batchSize);
         foreach (string text in texts)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             batch.Add(Tokenizer.Tokenize(CheckedItem(text ?? throw new ArgumentException("A text is null.", nameof(texts))), Strings));
             if (batch.Count == batchSize)
             {
@@ -266,6 +281,7 @@ public sealed class Pipeline : IDisposable
         var batch = new List<Doc>(batchSize);
         await foreach (string text in texts.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             batch.Add(Tokenizer.Tokenize(CheckedItem(text ?? throw new ArgumentException("A text is null.", nameof(texts))), Strings));
             if (batch.Count == batchSize)
             {

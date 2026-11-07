@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PartName>TokenTable3</PartName>
-    <PartDescription>token table 3 of 4 (rows third of the frozen mmBERT-base embedding table)</PartDescription>
+    <PartDescription>piece 5 of 6 of the fine-tuned encoder's ONNX graph</PartDescription>
   </PropertyGroup>
 
   <Import Project="../Part.props" />

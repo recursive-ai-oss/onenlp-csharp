@@ -1,6 +1,6 @@
 <Project>
   <!-- The slice of weights this package packs: name, size, sha256. A pack fails when the file is missing or differs. Weights are never committed. -->
   <ItemGroup>
-    <LargeWeight Include="encoder-layers.ckpt.part2" Size="220669920" Sha256="38b1e4e56300c303ce4a3e51df895806ab04b2cfd23e6de05265c28e449b4090" />
+    <LargeWeight Include="encoder.onnx.part2" Size="204722415" Sha256="68bed43c7820d22015dd9a4234c5db9bf0450305bf7314620ca3d78bf274a42a" />
   </ItemGroup>
 </Project>

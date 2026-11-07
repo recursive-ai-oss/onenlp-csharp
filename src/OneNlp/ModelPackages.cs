@@ -115,7 +115,7 @@ public static class ModelPackages
 
     /// <summary>Finds entities of the given types with the registered open-type recognizer.</summary>
     /// <exception cref="ModelNotAvailableException">No package is registered; the message names the package to add.</exception>
-    internal static IReadOnlyList<Span> RecognizeOpen(string text, string[] types)
+    internal static IReadOnlyList<Span> RecognizeOpen(string text, IReadOnlyList<string> types, float? threshold = null)
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(types);
@@ -126,7 +126,7 @@ public static class ModelPackages
         IOpenEntityRecognizer recognizer = pipeline.Components.OfType<IOpenEntityRecognizer>().FirstOrDefault()
             ?? throw new InvalidOperationException($"The pipeline of '{entry.PackageId}' has no open-type entity component.");
         Doc doc = pipeline.Tokenizer.Tokenize(text, pipeline.Strings);
-        recognizer.Recognize(doc, types);
+        recognizer.Recognize(doc, types, threshold);
         return doc.Ents;
     }
 
@@ -184,27 +184,58 @@ public static class ModelPackages
         ["hi"] = "RecursiveAI.OneNlp.Models.Hindi",
     };
 
-    /// <summary>The error for a language and tier without a model: it carries the packages to add, and its message names them.</summary>
+    // The languages the two accurate-tier packages have heads for (their `Languages` lists). Core cannot ask a package that is not
+    // referenced, so the table is here; a package that gains languages must be added to it.
+    private static readonly HashSet<string> AccurateLanguages = new(StringComparer.Ordinal) { "en", "de", "fr", "es", "pt", "it", "nl", "tr", "zh" };
+
+    /// <summary>
+    /// The error for a language and tier without a model. The message names only packages that would change the outcome: ones that
+    /// cover the language and are not already referenced. When there are none it says that no package covers the language, and
+    /// <see cref="ModelNotAvailableException.PackageIds"/> is empty.
+    /// </summary>
     internal static ModelNotAvailableException Missing(Language language, Tier tier)
     {
         string name = language == Language.Unknown ? "unknown" : language.Code;
+        bool accurateCovers = language == Language.Unknown || AccurateLanguages.Contains(language.Code);
+        var candidates = new List<string>();
         if (tier == Tier.Accurate)
         {
-            return new ModelNotAvailableException(
-                $"No accurate-tier model is available for language '{name}'. Add the NuGet package {LargePackageId} (or {MultilingualPackageId}); models are never downloaded.",
-                language, tier, [LargePackageId, MultilingualPackageId]);
+            if (accurateCovers)
+            {
+                candidates.Add(LargePackageId);
+                candidates.Add(MultilingualPackageId);
+            }
+        }
+        else
+        {
+            if (FastPackages.TryGetValue(language.Code, out string? fast))
+            {
+                candidates.Add(fast);
+            }
+
+            if (accurateCovers)
+            {
+                candidates.Add(MultilingualPackageId);
+            }
         }
 
-        if (FastPackages.TryGetValue(language.Code, out string? fast))
+        lock (Gate)
+        {
+            candidates.RemoveAll(id => Entries.Values.Any(list => list.Exists(e => string.Equals(e.PackageId, id, StringComparison.Ordinal))));
+        }
+
+        string kind = tier == Tier.Accurate ? "accurate-tier model" : "model";
+        if (candidates.Count == 0)
         {
             return new ModelNotAvailableException(
-                $"No model is available for language '{name}'. Add the NuGet package {fast} (fast tier), or {MultilingualPackageId}; models are never downloaded.",
-                language, tier, [fast, MultilingualPackageId]);
+                $"No {kind} covers language '{name}': the referenced packages do not include it, and no published OneNLP model package does. Models are never downloaded.",
+                language, tier, []);
         }
 
+        string options = candidates.Count == 1 ? candidates[0] : $"{candidates[0]} (or {string.Join(", ", candidates.Skip(1))})";
         return new ModelNotAvailableException(
-            $"No model is available for language '{name}'. Add the NuGet package {MultilingualPackageId}; models are never downloaded.",
-            language, tier, [MultilingualPackageId]);
+            $"No {kind} is available for language '{name}'. Add the NuGet package {options}; models are never downloaded.",
+            language, tier, candidates);
     }
 
     /// <summary>Bumped on each registration, so a cached view of the registered languages can tell when it is stale.</summary>

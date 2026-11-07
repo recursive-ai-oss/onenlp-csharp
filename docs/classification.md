@@ -17,7 +17,7 @@ Data is JSON Lines, one `{"text": "...", "cats": {"label_a": 1, "label_b": 0}}` 
 
 ## SpanCategorizer
 
-`SpanCategorizer` (kind `spancat`) has a suggester and a classifier, as spaCy documents its `spancat`. The suggester proposes every n-gram of the configured sizes (1 to 3 tokens by default). The classifier represents a span as the concatenation of the mean of its token vectors, its first token's vector and its last token's vector (boundary-plus-pooled span embeddings after Lee et al. 2017), applies a hidden ReLU layer and gives one independent sigmoid per label; a span is kept for every label whose probability reaches the threshold (0.5). Results are in `doc.Spans[key]`, each a `Span` with a label and a confidence.
+`SpanCategorizer` (kind `spancat`) has a suggester and a classifier, as spaCy documents its `spancat`. The suggester proposes every n-gram of the configured sizes (1 to 3 tokens by default). The classifier represents a span as the concatenation of the mean of its token vectors, its first token's vector and its last token's vector (boundary-plus-pooled span embeddings after Lee et al. 2017), applies a hidden ReLU layer and gives one independent sigmoid per label; a span is kept for every label whose probability reaches the threshold (default 0.8; `SpanCategorizer.Threshold` can be changed on a trained categorizer). Results are in `doc.Spans[key]`, each a `Span` with a label and a confidence.
 
 ```csharp
 Pipeline nlp = Pipeline.Blank(Language.English)
@@ -27,7 +27,7 @@ Doc doc = nlp.Process("Hamdan v. Rumsfeld was decided in Washington.");
 foreach (Span span in doc.Spans["sc"]) { /* span.Label, span.StartChar, span.EndChar, span.Confidence */ }
 ```
 
-Data: `{"text": "...", "spans": {"sc": [[start, end, "LABEL"], ...]}}`, character offsets, with `tokens` optional. The span precision of the shipped recipe is below spaCy's default at the default threshold while recall and F1 are above ([results-table.md](results-table.md)); tune the threshold on your development set.
+Data: `{"text": "...", "spans": {"sc": [[start, end, "LABEL"], ...]}}`, character offsets, with `tokens` optional. The default threshold, 0.8, was chosen on the development split of the recipe's data: at spaCy's 0.5 precision was 70.3 against spaCy's 75.4, at 0.8 it is 76.0 and recall and F1 stay above spaCy's ([results-table.md](results-table.md)). It trades precision for recall, so tune it on your own development set.
 
 ## Entities from the entity recognizer, and rules
 

@@ -41,10 +41,10 @@ public sealed class DocJsonConverter : JsonConverter<Doc>
 
 /// <summary>
 /// Writes a <see cref="Span"/> for <c>System.Text.Json</c> as <c>{"start", "end", "label", "text", "confidence"}</c>; <c>start</c> and <c>end</c> are
-/// character offsets (UTF-16 units, end exclusive) into the document's text, and <c>label</c> is left out when the span has none.
+/// character offsets in code points (end exclusive), the unit <see cref="Doc.ToJson"/> uses, and <c>label</c> is left out when the span has none.
 /// Writing only: a span belongs to a document, so read the <see cref="Doc"/> and take its spans.
 /// </summary>
-/// <remarks>Unlike <see cref="Doc.ToJson"/>, which counts code points as spaCy does, these offsets index <see cref="Doc.Text"/> directly.</remarks>
+/// <remarks>The offsets equal those of the same entity in <see cref="Doc.ToJson"/>; they differ from <see cref="Span.StartChar"/> after a character outside the Basic Multilingual Plane.</remarks>
 public sealed class SpanJsonConverter : JsonConverter<Span>
 {
     /// <inheritdoc/>
@@ -57,8 +57,8 @@ public sealed class SpanJsonConverter : JsonConverter<Span>
     {
         ArgumentNullException.ThrowIfNull(writer);
         writer.WriteStartObject();
-        writer.WriteNumber("start", value.StartChar);
-        writer.WriteNumber("end", value.EndChar);
+        writer.WriteNumber("start", value.Doc.CodePointOffset(value.StartChar));
+        writer.WriteNumber("end", value.Doc.CodePointOffset(value.EndChar));
         if (value.LabelId != 0)
         {
             writer.WriteString("label", value.Label);
@@ -72,8 +72,8 @@ public sealed class SpanJsonConverter : JsonConverter<Span>
 
 /// <summary>
 /// Writes a <see cref="Token"/> for <c>System.Text.Json</c> as <c>{"i", "start", "end", "text"}</c> plus <c>lemma</c>, <c>pos</c>, <c>tag</c>,
-/// <c>morph</c> and <c>dep</c> when they are set and <c>head</c> (the head's index); <c>start</c> and <c>end</c> are character offsets (UTF-16 units,
-/// end exclusive) into the document's text. Writing only.
+/// <c>morph</c> and <c>dep</c> when they are set and <c>head</c> (the head's index); <c>start</c> and <c>end</c> are character offsets in code points
+/// (end exclusive), the unit <see cref="Doc.ToJson"/> uses. Writing only.
 /// </summary>
 public sealed class TokenJsonConverter : JsonConverter<Token>
 {
@@ -88,8 +88,8 @@ public sealed class TokenJsonConverter : JsonConverter<Token>
         ArgumentNullException.ThrowIfNull(writer);
         writer.WriteStartObject();
         writer.WriteNumber("i", value.Index);
-        writer.WriteNumber("start", value.Idx);
-        writer.WriteNumber("end", value.EndIdx);
+        writer.WriteNumber("start", value.Doc.CodePointOffset(value.Idx));
+        writer.WriteNumber("end", value.Doc.CodePointOffset(value.EndIdx));
         writer.WriteString("text", value.TextSpan);
         Optional(writer, "lemma", value.Lemma);
         Optional(writer, "pos", value.Pos);
