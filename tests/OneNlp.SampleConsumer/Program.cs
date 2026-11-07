@@ -3,7 +3,9 @@ using System.Text;
 using RecursiveAI.OneNlp;
 using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Matching;
+#if !NO_MODELS
 using RecursiveAI.OneNlp.Neural.Components;
+#endif
 using RecursiveAI.OneNlp.Tokenizers;
 
 namespace RecursiveAI.OneNlp.SampleConsumer;
