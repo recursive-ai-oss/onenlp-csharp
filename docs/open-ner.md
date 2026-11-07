@@ -4,7 +4,7 @@ Entity types named at run time: `Nlp.Entities(text, "contract party", "governing
 
 ## Model
 
-- The encoder reads the text once. Candidate spans (up to 12 tokens, flat in the output) get a vector from the span's first, last and mean token vectors and its width; every type name is run through the same encoder and mean-pooled to one vector. A span scores a type with a dot product of the two in a shared 128-wide space, and a sigmoid turns it into a probability (Zaratiana et al. 2023, sections 3.2 to 3.4; the paper only).
+- The encoder reads the text once. Candidate spans (up to 12 tokens, flat in the output) get a vector from the span's first, last and mean token vectors and its width; every type name is run through the same encoder and mean-pooled and passed through a feed-forward layer to one vector. A span scores a type with a dot product of the two (scaled by 1/sqrt(width), plus a learned offset) in a shared 128-wide space, and a sigmoid turns it into a probability (Zaratiana et al. 2023, sections 3.2 to 3.4; the paper only).
 - Training uses binary cross-entropy per token-type cell. A type an example lists with no spans is a negative; a type it does not list teaches nothing, since one data set may label "person" and not "actor". Up to `negativeTypes` negatives are drawn per example.
 - Prediction keeps spans at or above the threshold (0.5 by default, per call with `threshold`), and where two overlap the more probable wins. The label is the type string as you gave it. Type vectors are cached, so a fixed list of types costs one encoder pass per type, once.
 - Types: 1 to 256 distinct strings of at most 200 characters, in any language the encoder reads (the shipped head is trained on English).

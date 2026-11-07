@@ -262,7 +262,7 @@ internal static class Program
         }
 
         using Pipeline trained = Pipeline.Blank(Language.English).Add(new OpenEntityRecognizer(new HashEmbeddingEncoder(32, 1024, 3), context: 1, hidden: 32, embedding: 16, maxSpanLength: 3, negativeTypes: 2) { OwnsEncoder = true });
-        TrainResult result = trained.Train(examples, new TrainOptions { Epochs = 25, BatchWords = 100, LearningRate = 0.01f, Seed = 5 });
+        TrainResult result = trained.Train(examples, new TrainOptions { Epochs = 150, BatchWords = 100, LearningRate = 0.01f, Seed = 5 });
         using var buffer = new MemoryStream();
         PipelineFile.Save(trained, buffer);
         Pipeline loaded = PipelineFile.Load(new MemoryStream(buffer.ToArray()));
