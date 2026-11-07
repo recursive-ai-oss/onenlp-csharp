@@ -30,7 +30,7 @@ Entity test sets are capped at 3,000 sentences sampled evenly, so rows are not t
 
 ### Where it stands
 
-- It beats the fast tier on UPOS in English raw text, Dutch and Turkish and on entities in English, German, Portuguese, Turkish and Chinese; it trails it on lemmas everywhere (the lemmatizer here has less capacity than the fast tier's), on parsing (LAS 4 to 14 points), on French, Spanish, Italian and Dutch entities, and on Chinese tagging and parsing (UPOS 85.56 against 90.41, LAS 54.05 against 68.76).
+- It is ahead of the fast tier on UPOS in English raw text, Dutch and Turkish and on entities in English, German, Portuguese, Turkish and Chinese; it trails it on lemmas everywhere (the lemmatizer here has less capacity than the fast tier's), on parsing (LAS 4 to 15 points), on French, Spanish, Italian and Dutch entities, and on Chinese tagging and parsing (UPOS 85.56 against 90.41, LAS 54.05 against 68.76).
 - It trails the published UDPipe 2 and Stanza numbers by a wide margin on every row: a short run of a six-layer student. The base-size tier (`accurate-tier.md`) is the model for accuracy.
 - Sentence splitting comes from the parser and is weakest in English (65.4 on EWT raw text) and Chinese.
 - Hindi has no allowed training data and is not in this package.
