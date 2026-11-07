@@ -108,8 +108,9 @@ public class EntryPointTests
         ModelNotAvailableException swahili = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.FromCode("sw")));
         Assert.Empty(swahili.PackageIds);
 
+        // Hindi has a fast-tier package and no accurate-tier one, so only that package is named.
         ModelNotAvailableException hindi = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.FromCode("hi")));
-        Assert.Empty(hindi.PackageIds);
+        Assert.Equal(["RecursiveAI.OneNlp.Models.Hindi"], hindi.PackageIds);
 
         // Code that caught InvalidOperationException keeps working.
         Assert.IsAssignableFrom<InvalidOperationException>(german);
