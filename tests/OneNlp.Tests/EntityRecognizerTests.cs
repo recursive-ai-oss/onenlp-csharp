@@ -4,7 +4,6 @@ using RecursiveAI.OneNlp.Matching;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
-using RecursiveAI.OneNlp.Neural.Training;
 using RecursiveAI.OneNlp.Scoring;
 
 namespace RecursiveAI.OneNlp.Tests;
@@ -138,7 +137,7 @@ public class EntityRecognizerTests : IDisposable
         }
 
         Doc d = loaded.Process("Grand Zorp saw Vexa near the Hux");
-        Assert.Equal(["Grand Zorp:WIDGET", "Vexa:GADGET", "Hux:GADGET"], d.Ents.Select(x => x.Text.ToString() + ":" + x.Label));
+        Assert.Equal(["Grand Zorp:WIDGET", "Vexa:GADGET", "Hux:GADGET"], d.Ents.Select(x => x.Text + ":" + x.Label));
         Assert.All(d.Ents, x => Assert.InRange(x.Confidence, 0.5f, 1f));
     }
 
@@ -178,7 +177,7 @@ public class EntityRecognizerTests : IDisposable
             ruler.AddPhrase("DATE", "today");
             Pipeline pipeline = Pipeline.Blank().Add(head).Add(ruler); // the head belongs to `model`, which disposes it
             Doc d = pipeline.Process("Vexa saw Zorp today");
-            string[] ents = [.. d.Ents.Select(x => x.Text.ToString() + ":" + x.Label)];
+            string[] ents = [.. d.Ents.Select(x => x.Text + ":" + x.Label)];
 
             // The model does not know "today" as an entity, so the rule adds it. Zorp is a model WIDGET: kept unless the rules overwrite.
             Assert.Contains("today:DATE", ents);
@@ -202,7 +201,7 @@ public class EntityRecognizerTests : IDisposable
         ruler.AddPhrase("DATE", "today");
         Pipeline pipeline = Pipeline.Blank().Add(ruler).Add(head); // the head belongs to `trained`, which disposes it
         Doc d = pipeline.Process("Vexa saw Zorp today and Grand Quan");
-        string[] ents = [.. d.Ents.Select(x => x.Text.ToString() + ":" + x.Label)];
+        string[] ents = [.. d.Ents.Select(x => x.Text + ":" + x.Label)];
 
         // The rule entities stay as the rules set them (including Zorp, which the model alone would call a WIDGET); the model fills the rest.
         Assert.Equal(["Vexa:GADGET", "Zorp:PLACE", "today:DATE", "Grand Quan:WIDGET"], ents);

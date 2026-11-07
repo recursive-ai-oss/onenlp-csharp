@@ -66,7 +66,7 @@ internal static class Segment
 
                 for (int j = i; j <= groupEnd; j++)
                 {
-                    sb.Append(j + 1).Append('\t').Append(tokens[j].Text).Append("\t_\t_\t_\t_\t")
+                    sb.Append(j + 1).Append('\t').Append(tokens[j].TextSpan).Append("\t_\t_\t_\t_\t")
                         .Append(j == 0 ? "0\troot" : "1\tdep").Append("\t_\t_\n");
                 }
 

@@ -296,7 +296,7 @@ public class EntityRulerTests
     [Fact]
     public void IndexerFormMatchesShapes()
     {
-        var ruler = new EntityRuler { ["CASE_NO"] = Pattern.Shape("Xdddd") };
+        var ruler = new EntityRuler { { "CASE_NO", Pattern.Shape("Xdddd") } };
         Doc doc = Doc("See case K1234 and Z9876.");
         ruler.Process(doc);
         Assert.Equal("CASE_NO:2-3 CASE_NO:4-5", Ents(doc));

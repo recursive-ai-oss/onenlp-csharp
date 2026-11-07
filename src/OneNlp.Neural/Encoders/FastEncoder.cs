@@ -483,7 +483,7 @@ public sealed class FastEncoder : IEncoder
             {
                 for (int t = 0; t < doc.Length; t++, row++)
                 {
-                    ReadOnlySpan<char> text = doc[t].Text;
+                    ReadOnlySpan<char> text = doc[t].TextSpan;
                     ulong norm = NormHash(text);
                     ulong suffix = SliceHash(Suffix(text), 2);
                     Put(ids, n, 0, row, norm);

@@ -85,7 +85,7 @@ public class ExampleAndJsonlTests
         List<Example> all = JsonlReader.Read(new StringReader(json)).ToList();
         Assert.Equal(2, all.Count);
         Doc doc = all[0].Reference;
-        Assert.Equal(["Ada", "Bob", "Paris"], doc.Ents.Select(e => e.Text.ToString()).ToArray());
+        Assert.Equal(["Ada", "Bob", "Paris"], doc.Ents.Select(e => e.Text).ToArray());
         Assert.Equal(["PER", "PER", "LOC"], doc.Ents.Select(e => e.Label).ToArray());
         Assert.Equal(1f, all[0].Cats!["pos"]);
         Assert.Equal(0.25f, all[0].Cats!["neg"]);
@@ -113,8 +113,8 @@ public class ExampleAndJsonlTests
         Assert.Equal(1, e.LineNumber);
         Assert.Contains("token boundaries", e.Message, StringComparison.Ordinal);
 
-        Example kept = JsonlReader.Read(new StringReader(Line), null, new JsonlOptions { Misaligned = MisalignedSpanPolicy.Skip }).Single();
-        Assert.Equal("world", kept.Reference.Ents.Single().Text.ToString());
+        Example kept = JsonlReader.Read(new StringReader(Line), strings: null, options: new JsonlOptions { Misaligned = MisalignedSpanPolicy.Skip }).Single();
+        Assert.Equal("world", kept.Reference.Ents.Single().Text);
     }
 
     [Theory]
@@ -142,6 +142,6 @@ public class ExampleAndJsonlTests
     {
         string deep = "{\"text\": \"a\", \"meta\": " + new string('[', 40) + new string(']', 40) + "}";
         Assert.Throws<DataFormatException>(() => JsonlReader.Read(new StringReader(deep)).ToList());
-        Assert.Throws<DataFormatException>(() => JsonlReader.Read(new StringReader("{\"text\": \"" + new string('a', 500) + "\"}"), null, new JsonlOptions { MaxLineLength = 100 }).ToList());
+        Assert.Throws<DataFormatException>(() => JsonlReader.Read(new StringReader("{\"text\": \"" + new string('a', 500) + "\"}"), strings: null, options: new JsonlOptions { MaxLineLength = 100 }).ToList());
     }
 }

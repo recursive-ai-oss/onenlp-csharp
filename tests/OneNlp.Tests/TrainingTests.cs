@@ -3,7 +3,6 @@ using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
-using RecursiveAI.OneNlp.Neural.Training;
 
 namespace RecursiveAI.OneNlp.Tests;
 
@@ -353,8 +352,8 @@ public class TrainingTests : IDisposable
         Doc b = loaded.Process(Text);
         Assert.Equal(a.Select(t => t.ToString()).ToArray(), b.Select(t => t.ToString()).ToArray());
         Assert.Contains("n't", a.Select(t => t.ToString()));
-        Assert.Equal(a.Sentences.Select(x => x.Text.ToString()).ToArray(), b.Sentences.Select(x => x.Text.ToString()).ToArray());
-        Assert.True(b.Sentences.Count >= 2, string.Join(" | ", b.Sentences.Select(x => x.Text.ToString())));
+        Assert.Equal(a.Sentences.Select(x => x.Text).ToArray(), b.Sentences.Select(x => x.Text).ToArray());
+        Assert.True(b.Sentences.Count >= 2, string.Join(" | ", b.Sentences.Select(x => x.Text)));
         Assert.Equal(Pipeline.Blank(Language.English).Add("sentencizer").Process(Text).Sentences.Count, b.Sentences.Count);
         Assert.Equal(["sentencizer", "tagger"], loaded.Components.Select(c => c.Name).ToArray());
 

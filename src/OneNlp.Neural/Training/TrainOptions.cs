@@ -1,7 +1,7 @@
 using RecursiveAI.OneModel.Training;
 using RecursiveAI.OneNlp.Data;
 
-namespace RecursiveAI.OneNlp.Neural.Training;
+namespace RecursiveAI.OneNlp;
 
 /// <summary>Settings for <see cref="PipelineTraining.Train(Pipeline, IReadOnlyList{Example}, TrainOptions, CancellationToken)"/>. Every property has a default that trains a small model sensibly.</summary>
 public sealed class TrainOptions
