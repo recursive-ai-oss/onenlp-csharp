@@ -38,6 +38,8 @@ internal static class Program
         ["recognizers"] = RecognizerTargets.Text,
         ["recognizer-rules"] = RecognizerTargets.Rules,
         ["edit-tree"] = NeuralTargets.EditTreeText,
+        ["lemma-lexicon"] = NeuralTargets.LemmaLexiconJson,
+        ["embedding-config"] = NeuralTargets.EmbeddingConfigFiles,
         ["fast-settings"] = NeuralTargets.FastSettings,
         ["pipeline-config"] = NeuralTargets.PipelineConfig,
         ["pipeline-file"] = NeuralTargets.PipelineFileBytes,
@@ -71,6 +73,12 @@ internal static class Program
                     break;
                 case "edit-tree":
                     NeuralTargets.SeedEditTree(args[2]);
+                    break;
+                case "lemma-lexicon":
+                    NeuralTargets.SeedLemmaLexicon(args[2]);
+                    break;
+                case "embedding-config":
+                    NeuralTargets.SeedEmbeddingConfig(args[2]);
                     break;
                 case "fast-settings":
                     NeuralTargets.SeedFastSettings(args[2]);

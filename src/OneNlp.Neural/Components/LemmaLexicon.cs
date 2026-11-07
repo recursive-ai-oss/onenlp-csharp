@@ -120,6 +120,21 @@ public sealed class LemmaLexicon
         writer.WriteEndArray();
     }
 
+    // GetString throws InvalidOperationException on a string whose bytes are not valid UTF-8; the table reports that as bad data.
+    private static bool TryGetText(JsonElement element, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out string? text)
+    {
+        try
+        {
+            text = element.GetString();
+            return text is not null;
+        }
+        catch (InvalidOperationException)
+        {
+            text = null;
+            return false;
+        }
+    }
+
     /// <summary>Reads a table written by <see cref="Write"/>.</summary>
     /// <param name="array">A JSON array of strings whose length is a multiple of three, at most 6,291,456.</param>
     /// <returns>The table.</returns>
@@ -136,7 +151,7 @@ public sealed class LemmaLexicon
         int at = 0;
         foreach (JsonElement e in array.EnumerateArray())
         {
-            if (e.ValueKind != JsonValueKind.String || e.GetString() is not { } text || text.Length > MaxLength)
+            if (e.ValueKind != JsonValueKind.String || !TryGetText(e, out string? text) || text.Length > MaxLength)
             {
                 throw new InvalidDataException("A lemma lexicon holds only strings of at most 256 characters.");
             }

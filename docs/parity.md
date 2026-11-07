@@ -144,3 +144,24 @@ null), `has_pairs`, `has_word_ids`, `has_tokens`. Then one line per corpus recor
 `{"id", "cls", "special", "plain", "trunc", "dec", "oracle_text"?}`, where each encoding holds `ids`, `tok`, `o16`, `o8` (absent
 for records with no UTF-8 form), `sm`, `ty`, `wi`, and `am` (in `trunc`); `dec` holds `skip` and `keep`; `oracle_text` is the text
 the oracle saw when it differs from the corpus record. Pair lines follow: `{"pair": id, "special", "trunc"}`.
+
+## Release run
+
+Full sweep over the golden files produced by the parity harness, for the release gate: 12 families, 47,981 corpus records each, 0 mismatches. Oracles as they report themselves: `tokenizers` 0.22.1, `tiktoken` 0.14.0.
+
+| Family | Comparisons |
+|---|---:|
+| bert-base-uncased | 3,451,629 |
+| bert-base-multilingual-cased | 3,451,661 |
+| xlm-roberta-base | 3,451,681 |
+| t5-small | 3,449,575 |
+| mmBERT-base | 3,449,935 |
+| TinyLlama | 3,449,935 |
+| gpt2 | 3,449,919 |
+| roberta-base | 3,452,041 |
+| Qwen2.5-0.5B | 3,449,919 |
+| ModernBERT-base | 3,449,935 |
+| cl100k_base | 2,395,778 |
+| o200k_base | 2,395,778 |
+
+UAX #29 (Unicode 17.0.0): `WordBreakTest.txt` 1944 lines and `SentenceBreakTest.txt` 512 lines, all pass.

@@ -44,6 +44,7 @@ case "$target" in
   recognizers) maxlen=4096 ;;
   recognizer-rules) maxlen=16384 ;;
   edit-tree) maxlen=8192 ;;
+  lemma-lexicon|embedding-config) maxlen=16384 ;;
   fast-settings) maxlen=1024 ;;
   pipeline-config) maxlen=16384 ;;
   pipeline-file) maxlen=65536 ;;
