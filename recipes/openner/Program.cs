@@ -15,7 +15,7 @@ namespace RecursiveAI.OneNlp.Recipes.OpenNer;
 //
 // Data is JSON Lines, one sentence per line: {"tokens": ["Marie", "Curie", ...], "spans": [[0, 2, "physicist"], ...]}
 // (token offsets, end exclusive, type named in plain words). A file name may be followed by ":N" to take at most N sentences.
-// Every sentence lists the types of its own file: the types that occur in the file but not in the sentence become its negatives.
+// Every sentence lists the types of its own file (or, if the row has "types": [...], those): the listed types absent from the sentence become its negatives.
 //
 //   train --onnx M.onnx --tokenizer tokenizer.json --train a.jsonl:40000,b.jsonl --dev d.jsonl:1500 --out DIR
 //         [--epochs N] [--seed N] [--threads N] [--budget-seconds S] [--checkpoint-every N] [--lr X] [--batch-words N]
@@ -259,7 +259,7 @@ internal static class Program
             int colon = part.LastIndexOf(':');
             string path = colon > 1 && int.TryParse(part[(colon + 1)..], NumberStyles.None, CultureInfo.InvariantCulture, out _) ? part[..colon] : part;
             int cap = path.Length == part.Length ? int.MaxValue : int.Parse(part[(colon + 1)..], CultureInfo.InvariantCulture);
-            var rows = new List<(string[] Tokens, List<(int, int, string)> Spans)>();
+            var rows = new List<(string[] Tokens, List<(int, int, string)> Spans, string[]? Types)>();
             var inventory = new SortedSet<string>(StringComparer.Ordinal);
             foreach (string line in File.ReadLines(path))
             {
@@ -278,7 +278,12 @@ internal static class Program
                     inventory.Add(type);
                 }
 
-                rows.Add((tokens, spans));
+                // An optional "types" list names the types this row says something about (positives and true negatives); without
+                // it every type of the file counts, which suits fully labelled sets.
+                string[]? listed = json.RootElement.TryGetProperty("types", out JsonElement ts)
+                    ? [.. ts.EnumerateArray().Select(t => t.GetString() ?? string.Empty)]
+                    : null;
+                rows.Add((tokens, spans, listed));
             }
 
             if (rows.Count > cap)
@@ -287,10 +292,10 @@ internal static class Program
                 rows = [.. rows.OrderBy(_ => random.Next()).Take(cap)];
             }
 
-            foreach ((string[] tokens, List<(int, int, string)> spans) in rows)
+            foreach ((string[] tokens, List<(int, int, string)> spans, string[]? listed) in rows)
             {
                 var groups = new Dictionary<string, IReadOnlyList<SpanSpec>>(StringComparer.Ordinal);
-                foreach (string type in inventory)
+                foreach (string type in listed ?? [.. inventory])
                 {
                     groups[type] = [.. spans.Where(s => s.Item3 == type).Select(s => new SpanSpec(s.Item1, s.Item2, type))];
                 }
