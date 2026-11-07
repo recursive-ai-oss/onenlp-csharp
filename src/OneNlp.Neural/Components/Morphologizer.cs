@@ -111,6 +111,41 @@ public sealed class Morphologizer : TrainableHead
     }
 
     /// <inheritdoc/>
+    /// <exception cref="ArgumentException">The examples hold part-of-speech and feature combinations this morphologizer's label set lacks. The label set is fixed once the morphologizer has weights.</exception>
+    public override IReadOnlyList<string> ExtendLabels(IReadOnlyList<Example> examples, ulong seed)
+    {
+        ArgumentNullException.ThrowIfNull(examples);
+        var unknown = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (Example example in examples)
+        {
+            Doc reference = example.Reference;
+            ReadOnlySpan<int> pos = reference.GetColumn(TokenColumn.Pos);
+            ReadOnlySpan<int> morph = reference.GetColumn(TokenColumn.Morph);
+            for (int t = 0; t < pos.Length; t++)
+            {
+                if (pos[t] != 0)
+                {
+                    string label = Join(reference.Strings[pos[t]], morph[t] == 0 ? string.Empty : reference.Strings[morph[t]]);
+                    if (!_labelIds.ContainsKey(label))
+                    {
+                        unknown.Add(label);
+                    }
+                }
+            }
+        }
+
+        if (unknown.Count > 0)
+        {
+            throw new ArgumentException(
+                $"The training examples hold part-of-speech and feature combinations that the component '{Name}' does not have: {string.Join(", ", unknown.Take(10))}. "
+                + "A morphologizer's label set is fixed once it has weights; train a new morphologizer, or remove these values.",
+                nameof(examples));
+        }
+
+        return [];
+    }
+
+    /// <inheritdoc/>
     public override Tensor Loss(EncodedBatch encoded, IReadOnlyList<Example> examples)
     {
         ArgumentNullException.ThrowIfNull(encoded);

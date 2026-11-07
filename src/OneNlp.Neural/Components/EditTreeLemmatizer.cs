@@ -116,6 +116,42 @@ public sealed class EditTreeLemmatizer : Lemmatizer
     }
 
     /// <inheritdoc/>
+    /// <exception cref="ArgumentException">The examples hold edit trees this lemmatizer's class set lacks, seen at least <c>minClassCount</c> times. The class set is fixed once the lemmatizer has weights.</exception>
+    public override IReadOnlyList<string> ExtendLabels(IReadOnlyList<Example> examples, ulong seed)
+    {
+        ArgumentNullException.ThrowIfNull(examples);
+        var counts = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (Example example in examples)
+        {
+            Doc reference = example.Reference;
+            ReadOnlySpan<int> lemmas = reference.GetColumn(TokenColumn.Lemma);
+            for (int t = 0; t < lemmas.Length; t++)
+            {
+                if (lemmas[t] != 0)
+                {
+                    string label = Label(reference[t].ToString(), reference.Strings[lemmas[t]]);
+                    if (!_labelIds.ContainsKey(label))
+                    {
+                        counts[label] = counts.GetValueOrDefault(label) + 1;
+                    }
+                }
+            }
+        }
+
+        // Trees below the minimum count are left out exactly as at initialization, so resuming a run does not trip on them.
+        string[] unknown = [.. counts.Where(kv => kv.Value >= _minClassCount).Select(kv => kv.Key).Order(StringComparer.Ordinal)];
+        if (unknown.Length > 0)
+        {
+            throw new ArgumentException(
+                $"The training examples hold {unknown.Length} edit trees that the component '{Name}' does not have, for example: {string.Join(", ", unknown.Take(5))}. "
+                + "A lemmatizer's classes are fixed once it has weights; train a new lemmatizer on this data.",
+                nameof(examples));
+        }
+
+        return [];
+    }
+
+    /// <inheritdoc/>
     public override Tensor Loss(EncodedBatch encoded, IReadOnlyList<Example> examples)
     {
         ArgumentNullException.ThrowIfNull(encoded);
