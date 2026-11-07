@@ -63,7 +63,12 @@ public class EntryPointTests
     [Fact]
     public void UnsureDetectionFallsBackToALanguageWithAModel()
     {
-        LanguageDetector among = LanguageDetector.Default.Restrict([Language.English]);
+        if (!LanguageDetector.TryGetDefault(out LanguageDetector? detector))
+        {
+            Assert.Skip("This build carries no language-ID model; set ONENLP_LANGID_WEIGHTS to the directory with langid.bin and rebuild.");
+        }
+
+        LanguageDetector among = detector.Restrict([Language.English]);
         bool OnlyEnglish(Language l) => l == Language.English;
 
         // The detector's unsure answers for a word and a name (observed with the shipped model) become English, the only language with a model.
