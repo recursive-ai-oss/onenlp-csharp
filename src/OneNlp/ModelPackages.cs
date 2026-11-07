@@ -77,6 +77,44 @@ public static class ModelPackages
     public static Pipeline Get(Language language) =>
         (Resolve(language, Tier.Fast) ?? throw new InvalidOperationException(MissingMessage(language))).Pipeline.Value;
 
+    private static Entry? _openEntities;
+    private static readonly Lock OpenGate = new();
+
+    /// <summary>Registers the pipeline that finds entities of types named at run time (see <see cref="Nlp.Entities(string, string[])"/>).</summary>
+    /// <param name="packageId">The NuGet package id, named in messages.</param>
+    /// <param name="create">Builds a pipeline with an <see cref="IOpenEntityRecognizer"/> component; called at most once, on first use. It must be safe to call from any thread.</param>
+    /// <exception cref="ArgumentException"><paramref name="packageId"/> is empty.</exception>
+    /// <exception cref="InvalidOperationException">A different package is already registered.</exception>
+    public static void RegisterOpenEntities(string packageId, Func<Pipeline> create)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(packageId);
+        ArgumentNullException.ThrowIfNull(create);
+        lock (OpenGate)
+        {
+            _openEntities ??= new Entry(packageId, create);
+            if (!string.Equals(_openEntities.PackageId, packageId, StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException($"The package '{_openEntities.PackageId}' is already registered for open-type entities; '{packageId}' cannot be registered as well.");
+            }
+        }
+    }
+
+    /// <summary>Finds entities of the given types with the registered open-type recognizer.</summary>
+    /// <exception cref="InvalidOperationException">No package is registered; the message names the package to add.</exception>
+    internal static IReadOnlyList<Span> RecognizeOpen(string text, string[] types)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        ArgumentNullException.ThrowIfNull(types);
+        Entry entry = _openEntities ?? throw new InvalidOperationException(
+            $"No open-type entity model is available. Add the NuGet package {MultilingualPackageId}; models are never downloaded.");
+        Pipeline pipeline = entry.Pipeline.Value;
+        IOpenEntityRecognizer recognizer = pipeline.Components.OfType<IOpenEntityRecognizer>().FirstOrDefault()
+            ?? throw new InvalidOperationException($"The pipeline of '{entry.PackageId}' has no open-type entity component.");
+        Doc doc = pipeline.Tokenizer.Tokenize(text, pipeline.Strings);
+        recognizer.Recognize(doc, types);
+        return doc.Ents;
+    }
+
     internal static bool TryGet(Language language, out Pipeline pipeline)
     {
         Entry? entry = Resolve(language, Tier.Fast);

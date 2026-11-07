@@ -105,6 +105,15 @@ public static class Nlp
     /// <exception cref="InvalidOperationException">No model package is available for the text's language; the message names the package to add.</exception>
     public static IReadOnlyList<Span> Entities(string text) => ModelPackages.Get(LanguageOf(text)).Process(text).Ents;
 
+    /// <summary>Finds entities of types you name at run time, such as <c>"contract party"</c> or <c>"governing law"</c>.</summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <param name="types">The type names: 1 to 256 distinct, non-empty strings of at most 200 characters, in any language the model reads.</param>
+    /// <returns>The entities in text order, without overlaps; each <see cref="Span.Label"/> is the type name as given, with a confidence and character offsets into <paramref name="text"/>. Empty when there are none.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> or <paramref name="types"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">No type is given, or a type is invalid.</exception>
+    /// <exception cref="InvalidOperationException">No open-type model is available; the message names the package to add.</exception>
+    public static IReadOnlyList<Span> Entities(string text, params string[] types) => ModelPackages.RecognizeOpen(text, types);
+
     /// <summary>Finds the lemma (dictionary form) of each token of a text.</summary>
     /// <param name="text">The text; may be empty.</param>
     /// <returns>One lemma per token, in token order; empty for a text without tokens.</returns>
