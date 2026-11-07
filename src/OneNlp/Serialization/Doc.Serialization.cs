@@ -4,6 +4,28 @@ namespace RecursiveAI.OneNlp;
 
 public sealed partial class Doc
 {
+    // Code point offsets for the System.Text.Json converters, built once on first use (null map: no character outside the BMP).
+    private int[]? _codePointMap;
+    private bool _codePointMapBuilt;
+
+    /// <summary>The code point offset (spaCy's unit) of a UTF-16 offset into <see cref="Text"/>.</summary>
+    internal int CodePointOffset(int unitOffset)
+    {
+        if (!_codePointMapBuilt)
+        {
+            _codePointMap = DocJson.BuildCodePointIndex(Text);
+            _codePointMapBuilt = true;
+        }
+
+        if (_codePointMap is null)
+        {
+            return unitOffset;
+        }
+
+        int cp = _codePointMap[unitOffset];
+        return cp >= 0 ? cp : throw new InvalidOperationException("A token boundary splits a surrogate pair, which has no code point offset.");
+    }
+
     /// <summary>Serializes the document as JSON in the shape spaCy documents for <c>Doc.to_json</c>, plus a few fields of our own.</summary>
     /// <returns>
     /// A JSON object with <c>text</c>, <c>ents</c> (only when entities have been set), <c>sents</c> (only when boundaries have been set)

@@ -16,10 +16,13 @@ foreach (Token t in doc)
 }
 
 // Entity types named at run time:
-foreach (Span e in Nlp.Entities("Acme Corp. signed the lease with Beta LLC.", "contract party"))
+foreach (Span e in Nlp.Entities("Acme Corp. signed the lease with Beta LLC.", "organization"))
 {
     Console.WriteLine($"{e.Label} {e}");
 }
+
+// Unusual type names score lower; lower the threshold (default 0.5) and check what comes back:
+IReadOnlyList<Span> parties = Nlp.Entities("Acme Corp. signed the lease with Beta LLC.", ["contract party"], threshold: 0.1f);
 ```
 
 Chinese words and Turkish multiword tokens come from small trained tokenizers in the package. The weights are trained on Universal Dependencies treebanks and entity corpora (several CC BY-SA), credited in `THIRD-PARTY-NOTICES.md`; `PROVENANCE.md` lists every dataset, recipe and seed. The weights are licensed `MIT OR Apache-2.0`.

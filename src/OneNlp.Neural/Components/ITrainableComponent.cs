@@ -47,6 +47,17 @@ public interface ITrainableComponent : IPipelineComponent
     /// <exception cref="ArgumentException">The examples hold no gold annotation for this head.</exception>
     void Initialize(IReadOnlyList<Example> examples, ulong seed);
 
+    /// <summary>
+    /// Called by <c>Train</c> on a head that already has weights, before training: makes the head ready for the labels of the training
+    /// examples. A head that can grow its label set (the entity recognizer) appends the labels it lacks, keeping every weight it has;
+    /// a head that cannot throws for labels it does not know rather than training on data it would silently skip. The default does nothing.
+    /// </summary>
+    /// <param name="examples">The training examples.</param>
+    /// <param name="seed">Seed of the weights created for new labels.</param>
+    /// <returns>The labels added, in output order; empty when the head was ready as it was.</returns>
+    /// <exception cref="ArgumentException">The examples hold labels the head does not have and cannot add.</exception>
+    IReadOnlyList<string> ExtendLabels(IReadOnlyList<Example> examples, ulong seed) => [];
+
     /// <summary>Computes the training loss of a batch.</summary>
     /// <param name="encoded">The encoder output for <c>examples[i].Predicted</c>, in order; it carries gradients into the encoder when the encoder is being trained.</param>
     /// <param name="examples">The batch.</param>

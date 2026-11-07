@@ -255,12 +255,28 @@ public static class Nlp
     /// <exception cref="ArgumentException">No type is given, or a type is invalid.</exception>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="text"/> is longer than <see cref="MaxLength"/>.</exception>
     /// <exception cref="ModelNotAvailableException">No open-type model is available; the message names the package to add.</exception>
-    public static IReadOnlyList<Span> Entities(string text, params string[] types) => OpenEntities(text, types);
+    public static IReadOnlyList<Span> Entities(string text, params string[] types) => OpenEntities(text, types, null);
 
-    private static IReadOnlyList<Span> OpenEntities(string text, string[] types)
+    /// <summary>
+    /// Finds entities of types you name at run time, reporting every span whose probability is at least <paramref name="threshold"/>.
+    /// The default of <see cref="Entities(string, string[])"/> is 0.5, which suits common types such as <c>"person"</c> or
+    /// <c>"organization"</c>; an unusual type name (<c>"contract party"</c>) often scores lower, so lower the threshold for it and
+    /// check the results.
+    /// </summary>
+    /// <param name="text">The text; may be empty.</param>
+    /// <param name="types">The type names: 1 to 256 distinct, non-empty strings of at most 200 characters.</param>
+    /// <param name="threshold">The probability at or above which a span is reported, above 0 and below 1.</param>
+    /// <returns>The entities in text order, without overlaps, each with a confidence of at least <paramref name="threshold"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/> or <paramref name="types"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException">No type is given, or a type is invalid.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="text"/> is longer than <see cref="MaxLength"/>, or <paramref name="threshold"/> is outside (0, 1).</exception>
+    /// <exception cref="ModelNotAvailableException">No open-type model is available; the message names the package to add.</exception>
+    public static IReadOnlyList<Span> Entities(string text, IReadOnlyList<string> types, float threshold) => OpenEntities(text, types, threshold);
+
+    private static IReadOnlyList<Span> OpenEntities(string text, IReadOnlyList<string> types, float? threshold)
     {
         CheckLength(text);
-        return ModelPackages.RecognizeOpen(text, types);
+        return ModelPackages.RecognizeOpen(text, types, threshold);
     }
 
     /// <summary>Finds the lemma (dictionary form) of each token of a text.</summary>

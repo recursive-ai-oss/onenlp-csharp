@@ -95,8 +95,13 @@ public class PipelineCreateTests
         var language = Language.FromCode("eu");
         ModelPackages.RegisterQuietly(language, "Test.Models.Basque", Package(language, new Marker("marker")));
         ModelNotAvailableException e = Assert.Throws<ModelNotAvailableException>(() => Pipeline.Create(language, Tier.Accurate));
-        Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", e.Message, StringComparison.Ordinal);
+
+        // No published package has accurate-tier heads for Basque or Yoruba, so none is named.
+        Assert.Empty(e.PackageIds);
+        Assert.Contains("'eu'", e.Message, StringComparison.Ordinal);
         ModelNotAvailableException none = Assert.Throws<ModelNotAvailableException>(() => Pipeline.Create(Language.FromCode("yo"), Tier.Fast));
-        Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", none.Message, StringComparison.Ordinal);
+        Assert.Empty(none.PackageIds);
+        ModelNotAvailableException covered = Assert.Throws<ModelNotAvailableException>(() => Pipeline.Create(Language.Turkish, Tier.Accurate));
+        Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual", covered.PackageIds);
     }
 }

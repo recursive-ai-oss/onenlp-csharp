@@ -71,6 +71,7 @@ public sealed class Example
     /// <param name="entities">Gold entities as character offsets into <paramref name="text"/> (<c>End</c> exclusive, UTF-16 units) and a label, in any order; they must not overlap. <see langword="null"/> for none.</param>
     /// <param name="cats">Gold category scores from 0 to 1, or <see langword="null"/>.</param>
     /// <exception cref="ArgumentNullException"><paramref name="nlp"/> or <paramref name="text"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">An entity starts before 0 or ends after the end of the text; the message gives the text's length.</exception>
     /// <exception cref="ArgumentException">An entity does not start and end on token boundaries of the pipeline's tokenization, is empty, has no label, or overlaps another; the message names it.</exception>
     public static Example Create(Pipeline nlp, string text, IEnumerable<(int Start, int End, string Label)>? entities = null, IReadOnlyDictionary<string, float>? cats = null)
     {
@@ -82,6 +83,11 @@ public sealed class Example
             var specs = new List<SpanSpec>();
             foreach ((int start, int end, string label) in entities)
             {
+                if (start < 0 || end > text.Length)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(entities), $"The entity {label} at characters {start}..{end} is outside the text, which has {text.Length} characters.");
+                }
+
                 if (!reference.TryGetCharSpan(start, end, out Span span, label))
                 {
                     throw new ArgumentException($"The entity {label} at characters {start}..{end} does not start and end on token boundaries of the pipeline's tokenization.", nameof(entities));
