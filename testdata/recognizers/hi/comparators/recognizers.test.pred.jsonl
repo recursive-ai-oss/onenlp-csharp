@@ -1,0 +1,335 @@
+{"id":"0207178f62c6","items":[{"start":8,"end":10,"type":"number","value":"10"},{"start":8,"end":21,"type":"date","value":"2026-11-10","grain":"day"},{"start":17,"end":21,"type":"number","value":"2026"}]}
+{"id":"02b07ef4fb90","items":[{"start":25,"end":29,"type":"daterange","value":"2001-01-01/2002-01-01","grain":"year"},{"start":25,"end":29,"type":"number","value":"2001"},{"start":25,"end":36,"type":"ip"},{"start":35,"end":36,"type":"date","value":"2026-04-01","grain":"day","candidates":2},{"start":35,"end":36,"type":"number","value":"1"}]}
+{"id":"02e5247c5fc3","items":[{"start":16,"end":32,"type":"email"}]}
+{"id":"03d3515ab856","items":[{"start":5,"end":12,"type":"datetimerange","value":"2026-03-18T08:00/2026-03-18T12:00","grain":""}]}
+{"id":"04809edc7c15","items":[{"start":8,"end":16,"type":"number","value":"4500.75"}]}
+{"id":"04b76728f89f","items":[{"start":8,"end":10,"type":"number","value":"14"},{"start":8,"end":25,"type":"timerange","value":"T14:00/T16:00","grain":"minute"},{"start":11,"end":13,"type":"number","value":"0"},{"start":17,"end":19,"type":"number","value":"16"},{"start":20,"end":22,"type":"number","value":"0"}]}
+{"id":"0522f39b3c4b","items":[{"start":7,"end":9,"type":"number","value":"12"},{"start":7,"end":12,"type":"time","value":"T12:00","grain":"minute","candidates":2},{"start":10,"end":12,"type":"number","value":"0"}]}
+{"id":"0628e29fdbbd","items":[{"start":11,"end":13,"type":"number","value":"15"},{"start":21,"end":23,"type":"number","value":"18"},{"start":24,"end":26,"type":"number","value":"30"}]}
+{"id":"06735663c216","items":[]}
+{"id":"06e609f61e0d","items":[{"start":6,"end":13,"type":"time","value":"T00:00","grain":"hour"},{"start":17,"end":19,"type":"number","value":"2"}]}
+{"id":"0741b6fdd0df","items":[{"start":12,"end":15,"type":"number","value":"11"},{"start":12,"end":25,"type":"phone"},{"start":16,"end":20,"type":"number","value":"2345"},{"start":21,"end":25,"type":"number","value":"6789"}]}
+{"id":"0746c6602ece","items":[{"start":8,"end":10,"type":"number","value":"18"},{"start":8,"end":17,"type":"time","value":"T18:45","grain":"minute"},{"start":11,"end":13,"type":"number","value":"45"}]}
+{"id":"07e2e337d2bc","items":[{"start":10,"end":13,"type":"number","value":"80"},{"start":10,"end":23,"type":"phone"},{"start":14,"end":18,"type":"number","value":"2345"},{"start":19,"end":23,"type":"number","value":"6789"},{"start":22,"end":23,"type":"date","value":"2026-04-09","grain":"day","candidates":2}]}
+{"id":"08210232671c","items":[{"start":7,"end":12,"type":"ordinal","value":"2"}]}
+{"id":"08e37b82a1c1","items":[{"start":0,"end":11,"type":"date","value":"2026-03-23","grain":"day"}]}
+{"id":"0a266cc213d9","items":[{"start":7,"end":16,"type":"daterange","value":"2025-01-01/2026-01-01","grain":"year"},{"start":13,"end":16,"type":"age","value":" year"}]}
+{"id":"0a627e638c6a","items":[{"start":11,"end":19,"type":"currency","value":"5000 INR"},{"start":15,"end":19,"type":"number","value":"5000"}]}
+{"id":"0b17c8ed7b5f","items":[{"start":3,"end":8,"type":"ordinal","value":"21"},{"start":3,"end":12,"type":"daterange","value":"2000-01-01/2100-01-01","grain":"year"}]}
+{"id":"0b97e518d413","items":[{"start":25,"end":40,"type":"phone"},{"start":26,"end":28,"type":"number","value":"91"},{"start":29,"end":34,"type":"number","value":"98765"},{"start":35,"end":40,"type":"number","value":"43210"},{"start":38,"end":40,"type":"date","value":"2026-04-10","grain":"day","candidates":2}]}
+{"id":"0c3cc2e19a66","items":[{"start":8,"end":18,"type":"daterange","value":"2027-01-01/2027-02-01","grain":"month"},{"start":13,"end":18,"type":"age","value":" month"}]}
+{"id":"0cdb29c255fe","items":[{"start":0,"end":4,"type":"date","value":"2026-03-24","grain":"day","candidates":2}]}
+{"id":"0cfef0233478","items":[{"start":7,"end":9,"type":"number","value":"12"},{"start":7,"end":10,"type":"percentage","value":"12"}]}
+{"id":"0e514d25010b","items":[{"start":8,"end":12,"type":"number","value":"12"}]}
+{"id":"11cf3f90e0d0","items":[{"start":11,"end":27,"type":"url"}]}
+{"id":"13bd6a5e4c9a","items":[{"start":6,"end":16,"type":"daterange","value":"2026-03-01/2026-04-01","grain":"month"},{"start":12,"end":16,"type":"number","value":"2026"}]}
+{"id":"1442240c8d9e","items":[{"start":16,"end":17,"type":"number","value":"9"},{"start":16,"end":28,"type":"date","value":"2026-07-09","grain":"day"},{"start":24,"end":28,"type":"number","value":"2026"}]}
+{"id":"1462ef708e7a","items":[{"start":5,"end":13,"type":"date","value":"2026-03-20","grain":"day","candidates":2}]}
+{"id":"170dd472ddaa","items":[{"start":10,"end":30,"type":"datetimerange","value":"2026-03-23T09:00/","grain":"hour","candidates":2},{"start":22,"end":23,"type":"number","value":"9"}]}
+{"id":"1771f4f9a892","items":[{"start":8,"end":11,"type":"number","value":"500"},{"start":8,"end":17,"type":"dimension","value":"500 gram"}]}
+{"id":"180dd1a355df","items":[{"start":0,"end":6,"type":"date","value":"2026-03-22","grain":"day","candidates":2}]}
+{"id":"18ad2e18debd","items":[{"start":10,"end":11,"type":"number","value":"2"},{"start":10,"end":19,"type":"date","value":"2028-03-01","grain":"day"}]}
+{"id":"1a2d3dbed2bb","items":[{"start":18,"end":26,"type":"mention"},{"start":25,"end":26,"type":"date","value":"2026-04-05","grain":"day","candidates":2}]}
+{"id":"1a5b9ec562b9","items":[{"start":0,"end":2,"type":"number","value":"90"},{"start":0,"end":10,"type":"percentage","value":"90"}]}
+{"id":"1a8b7f94d85c","items":[{"start":14,"end":17,"type":"number","value":"172"},{"start":14,"end":26,"type":"ip"},{"start":18,"end":20,"type":"number","value":"16"},{"start":21,"end":24,"type":"number","value":"254"},{"start":25,"end":26,"type":"number","value":"3"}]}
+{"id":"1bcc801bc28f","items":[{"start":7,"end":8,"type":"number","value":"2"},{"start":7,"end":21,"type":"duration","value":"9000"},{"start":14,"end":16,"type":"number","value":"30"}]}
+{"id":"1d4084d51d83","items":[{"start":10,"end":14,"type":"number","value":"1800"},{"start":10,"end":23,"type":"phone"},{"start":15,"end":18,"type":"number","value":"123"},{"start":19,"end":23,"type":"number","value":"4567"}]}
+{"id":"1daabe431141","items":[]}
+{"id":"1dacae4df50a","items":[{"start":12,"end":16,"type":"timerange","value":"T05:00/","grain":"hour","candidates":2},{"start":15,"end":16,"type":"number","value":"5"},{"start":15,"end":21,"type":"dimension","value":"5 kilometer"}]}
+{"id":"1dbe48047d8e","items":[{"start":7,"end":11,"type":"number","value":"2026"},{"start":7,"end":17,"type":"date","value":"2026-05-04","grain":"day"},{"start":12,"end":14,"type":"number","value":"5"},{"start":15,"end":17,"type":"number","value":"4"}]}
+{"id":"1ff0c13bc24a","items":[]}
+{"id":"21b70b7e6e83","items":[{"start":7,"end":8,"type":"number","value":"3"},{"start":7,"end":12,"type":"date","value":"2027-02-03","grain":"day","candidates":2},{"start":16,"end":20,"type":"daterange","value":"2027-01-01/2028-01-01","grain":"year"},{"start":16,"end":20,"type":"number","value":"2027"}]}
+{"id":"21f4d155475f","items":[{"start":10,"end":16,"type":"number","value":"15"},{"start":10,"end":19,"type":"ordinal","value":"15"}]}
+{"id":"247074e255c5","items":[{"start":20,"end":43,"type":"email"}]}
+{"id":"25582c242723","items":[]}
+{"id":"25c254b35381","items":[{"start":6,"end":10,"type":"daterange","value":"2021-01-01/2022-01-01","grain":"year"},{"start":6,"end":10,"type":"number","value":"2021"}]}
+{"id":"25fc32f4c16b","items":[{"start":4,"end":13,"type":"time","value":"T17:00","grain":"hour"},{"start":8,"end":9,"type":"number","value":"5"}]}
+{"id":"275c37c6151d","items":[{"start":0,"end":1,"type":"number","value":"3"},{"start":0,"end":9,"type":"date","value":"2026-03-21","grain":"day"}]}
+{"id":"283bfa949caf","items":[{"start":7,"end":15,"type":"set","value":"P1M","grain":"month"},{"start":10,"end":15,"type":"age","value":" month"},{"start":16,"end":19,"type":"number","value":"800"},{"start":16,"end":25,"type":"currency","value":"800 INR"}]}
+{"id":"28b6a3a1c83e","items":[{"start":5,"end":7,"type":"number","value":"45"},{"start":5,"end":13,"type":"currency","value":"45 INR"}]}
+{"id":"29302b798afc","items":[]}
+{"id":"2a0cc5c9215d","items":[{"start":5,"end":7,"type":"number","value":"15"},{"start":5,"end":14,"type":"time","value":"T15:00","grain":"minute"},{"start":8,"end":10,"type":"number","value":"0"}]}
+{"id":"2af30eefb9df","items":[{"start":11,"end":16,"type":"number","value":"0.001"}]}
+{"id":"2b7fee3084f8","items":[{"start":5,"end":20,"type":"url"}]}
+{"id":"2b92267d8af3","items":[]}
+{"id":"2cf77cb45ba0","items":[{"start":8,"end":11,"type":"number","value":"198"},{"start":8,"end":20,"type":"ip"},{"start":12,"end":14,"type":"number","value":"51"},{"start":15,"end":18,"type":"number","value":"100"},{"start":19,"end":20,"type":"date","value":"2026-04-07","grain":"day","candidates":2},{"start":19,"end":20,"type":"number","value":"7"}]}
+{"id":"2d155cdac45d","items":[{"start":7,"end":23,"type":"set","value":"T12:00","grain":"hour"},{"start":14,"end":16,"type":"number","value":"12"},{"start":17,"end":19,"type":"number","value":"0"}]}
+{"id":"2dc99bef0412","items":[{"start":6,"end":7,"type":"number","value":"5"}]}
+{"id":"2ea2ab439080","items":[{"start":6,"end":19,"type":"daterange","value":"2026-04-01/","grain":"month"},{"start":11,"end":16,"type":"age","value":" month"}]}
+{"id":"2ec1e5d17f02","items":[{"start":0,"end":4,"type":"number","value":"12"},{"start":0,"end":12,"type":"percentage","value":"12"}]}
+{"id":"2ec705674104","items":[{"start":5,"end":7,"type":"number","value":"10"},{"start":5,"end":30,"type":"timerange","value":"T10:00/T11:30","grain":"minute","candidates":2},{"start":8,"end":10,"type":"number","value":"0"},{"start":18,"end":20,"type":"number","value":"11"},{"start":21,"end":23,"type":"number","value":"30"}]}
+{"id":"2f339ca97f8c","items":[{"start":6,"end":8,"type":"number","value":"1"}]}
+{"id":"3012ce309c5b","items":[{"start":8,"end":10,"type":"date","value":"2026-03-18","grain":"day"}]}
+{"id":"307f1a2f72fe","items":[]}
+{"id":"33389abddaa8","items":[{"start":10,"end":12,"type":"number","value":"14"},{"start":10,"end":21,"type":"daterange","value":"2026-08-14/","grain":"day","candidates":2}]}
+{"id":"33e988577c80","items":[{"start":13,"end":28,"type":"phone"},{"start":14,"end":17,"type":"number","value":"11"},{"start":19,"end":23,"type":"number","value":"2345"},{"start":24,"end":28,"type":"number","value":"6789"},{"start":27,"end":28,"type":"date","value":"2026-04-09","grain":"day","candidates":2},{"start":32,"end":34,"type":"number","value":"2"}]}
+{"id":"353978258ce5","items":[{"start":8,"end":10,"type":"number","value":"30"},{"start":8,"end":16,"type":"duration","value":"30"}]}
+{"id":"355576012519","items":[{"start":7,"end":8,"type":"number","value":"2"}]}
+{"id":"3571bc2b8956","items":[{"start":0,"end":13,"type":"date","value":"2026-03-27","grain":"day"}]}
+{"id":"35b9585e10b9","items":[{"start":21,"end":23,"type":"number","value":"10"},{"start":21,"end":29,"type":"ip"},{"start":24,"end":25,"type":"number","value":"0"},{"start":26,"end":27,"type":"number","value":"0"},{"start":28,"end":29,"type":"number","value":"1"}]}
+{"id":"35c89174935b","items":[{"start":10,"end":16,"type":"number","value":"25"}]}
+{"id":"37b59cd15b1d","items":[{"start":7,"end":10,"type":"number","value":"120"},{"start":7,"end":20,"type":"dimension","value":"120 square meter"}]}
+{"id":"37f9d5e868dc","items":[{"start":6,"end":14,"type":"hashtag"}]}
+{"id":"3937ed3f5ecb","items":[{"start":6,"end":9,"type":"number","value":"192"},{"start":6,"end":18,"type":"ip"},{"start":10,"end":13,"type":"number","value":"168"},{"start":14,"end":18,"type":"number","value":"0.12"},{"start":16,"end":18,"type":"date","value":"2026-04-12","grain":"day","candidates":2}]}
+{"id":"3983ff31e469","items":[{"start":6,"end":10,"type":"number","value":"2021"},{"start":6,"end":18,"type":"daterange","value":"/","grain":"season","approx":true},{"start":23,"end":25,"type":"number","value":"2"}]}
+{"id":"39ac62bec2d4","items":[{"start":19,"end":54,"type":"url"}]}
+{"id":"3a626fce3f4c","items":[{"start":12,"end":22,"type":"number","value":"123"}]}
+{"id":"3b950ed24ca6","items":[{"start":12,"end":13,"type":"number","value":"2"},{"start":12,"end":17,"type":"duration","value":"P2Y"},{"start":12,"end":20,"type":"age","value":"2 year"}]}
+{"id":"3c44c0d32bf6","items":[{"start":6,"end":10,"type":"daterange","value":"2025-01-01/2026-01-01","grain":"year"},{"start":6,"end":10,"type":"number","value":"2025"}]}
+{"id":"3c82388c36be","items":[{"start":12,"end":16,"type":"ordinal","value":"5"}]}
+{"id":"3cde220e2e74","items":[{"start":12,"end":13,"type":"number","value":"7"},{"start":12,"end":20,"type":"time","value":"T07:05","grain":"minute","candidates":2},{"start":14,"end":16,"type":"number","value":"5"}]}
+{"id":"3d26ae3e4468","items":[]}
+{"id":"3e577fdabab4","items":[{"start":3,"end":6,"type":"age","value":" year"},{"start":7,"end":16,"type":"number","value":"2500000"}]}
+{"id":"40f150be7a68","items":[{"start":23,"end":26,"type":"number","value":"127"},{"start":23,"end":32,"type":"ip"},{"start":27,"end":28,"type":"number","value":"0"},{"start":29,"end":30,"type":"number","value":"0"},{"start":31,"end":32,"type":"number","value":"1"}]}
+{"id":"414d615a889b","items":[{"start":4,"end":10,"type":"datetimerange","value":"2026-03-18T16:00/2026-03-18T20:00","grain":""}]}
+{"id":"415b894d133f","items":[{"start":4,"end":21,"type":"datetime","value":"2026-03-19T14:00","grain":"minute","candidates":2},{"start":12,"end":14,"type":"number","value":"14"},{"start":15,"end":17,"type":"number","value":"0"}]}
+{"id":"42fa5959fa05","items":[{"start":5,"end":8,"type":"number","value":"1.25"},{"start":10,"end":19,"type":"mention"},{"start":23,"end":30,"type":"mention"}]}
+{"id":"43705e06a785","items":[{"start":9,"end":11,"type":"time","value":"T02:00","grain":"hour","candidates":2},{"start":9,"end":17,"type":"number","value":"20000000"}]}
+{"id":"43fca627483c","items":[{"start":8,"end":10,"type":"number","value":"15"},{"start":8,"end":17,"type":"time","value":"T15:30","grain":"minute"},{"start":11,"end":13,"type":"number","value":"30"}]}
+{"id":"466cef0d4152","items":[{"start":9,"end":10,"type":"number","value":"1"},{"start":9,"end":24,"type":"daterange","value":"2027-01-01/","grain":"day"},{"start":17,"end":21,"type":"number","value":"2027"}]}
+{"id":"477c3ac881d9","items":[{"start":8,"end":10,"type":"number","value":"12"},{"start":8,"end":26,"type":"timerange","value":"T12:00/T13:30","grain":"minute"},{"start":11,"end":13,"type":"number","value":"0"},{"start":14,"end":16,"type":"number","value":"13"},{"start":17,"end":19,"type":"number","value":"30"}]}
+{"id":"479d47226910","items":[{"start":7,"end":19,"type":"mention"}]}
+{"id":"47cc1e2314b5","items":[{"start":0,"end":11,"type":"date","value":"2027-10-29","grain":"day"},{"start":7,"end":11,"type":"number","value":"2027"}]}
+{"id":"4832f2f39729","items":[{"start":3,"end":9,"type":"number","value":"2500000"},{"start":3,"end":15,"type":"currency","value":"2500000 INR"}]}
+{"id":"48a4e955a788","items":[{"start":4,"end":12,"type":"datetimerange","value":"2026-03-18T12:00/2026-03-18T16:00","grain":""},{"start":7,"end":9,"type":"number","value":"2"}]}
+{"id":"48dd7cdde50c","items":[{"start":5,"end":9,"type":"number","value":"5"},{"start":5,"end":12,"type":"ordinal","value":"5"}]}
+{"id":"494346ea5b22","items":[{"start":6,"end":36,"type":"email"}]}
+{"id":"4a0a5a3ea1ad","items":[{"start":14,"end":17,"type":"number","value":"100"},{"start":14,"end":21,"type":"currency","value":"100 USD"}]}
+{"id":"4b587f20b5f8","items":[{"start":11,"end":22,"type":"hashtag"}]}
+{"id":"4cecc546dda8","items":[{"start":5,"end":9,"type":"currency","value":"500 INR"},{"start":6,"end":9,"type":"number","value":"500"}]}
+{"id":"4d8f598a5b73","items":[{"start":0,"end":2,"type":"temperature","value":" degree"},{"start":11,"end":24,"type":"daterange","value":"2005-01-01/2006-01-01","grain":"year"},{"start":11,"end":27,"type":"number","value":"2500"}]}
+{"id":"53a8cb927beb","items":[]}
+{"id":"53e3be4f03ac","items":[{"start":5,"end":14,"type":"number","value":"99"}]}
+{"id":"540154ef85cd","items":[{"start":15,"end":19,"type":"number","value":"38.5"},{"start":15,"end":26,"type":"temperature","value":"38.5 degree"}]}
+{"id":"5411aa4d0771","items":[{"start":0,"end":4,"type":"date","value":"2027-03-22","grain":"day","candidates":2}]}
+{"id":"573dc0ce327b","items":[{"start":5,"end":9,"type":"currency","value":"499 USD"},{"start":6,"end":9,"type":"number","value":"499"}]}
+{"id":"5811ac49cac0","items":[{"start":6,"end":18,"type":"daterange","value":"2026-05-01/2026-05-16","grain":"day","approx":true,"candidates":2}]}
+{"id":"58188a17b042","items":[{"start":4,"end":14,"type":"time","value":"T23:00","grain":"hour"},{"start":8,"end":10,"type":"number","value":"11"}]}
+{"id":"5ae352d4007e","items":[{"start":0,"end":5,"type":"number","value":"1000"},{"start":0,"end":8,"type":"ordinal","value":"1000"}]}
+{"id":"5af7533e9315","items":[{"start":7,"end":11,"type":"daterange","value":"2023-01-01/2024-01-01","grain":"year"},{"start":7,"end":11,"type":"number","value":"2023"}]}
+{"id":"5ce3613bd86e","items":[{"start":4,"end":12,"type":"set","value":"P1M","grain":"month"},{"start":7,"end":12,"type":"age","value":" month"}]}
+{"id":"5d2a2ff2d703","items":[{"start":10,"end":17,"type":"number","value":"1000000"},{"start":10,"end":17,"type":"phone"}]}
+{"id":"5d36277bcb32","items":[{"start":0,"end":2,"type":"date","value":"2026-03-18","grain":"day"},{"start":12,"end":14,"type":"number","value":"100"},{"start":12,"end":17,"type":"ordinal","value":"100"},{"start":18,"end":21,"type":"timerange","value":"T08:00/T18:00","grain":""}]}
+{"id":"5e15934d7d65","items":[{"start":0,"end":15,"type":"email"},{"start":19,"end":37,"type":"email"},{"start":38,"end":40,"type":"number","value":"2"}]}
+{"id":"5e4b8773ab4d","items":[{"start":7,"end":9,"type":"number","value":"15"},{"start":7,"end":20,"type":"daterange","value":"/2026-04-15","grain":"day"},{"start":10,"end":12,"type":"number","value":"4"},{"start":13,"end":17,"type":"number","value":"2026"}]}
+{"id":"5ec236e302d4","items":[{"start":7,"end":9,"type":"number","value":"23"}]}
+{"id":"61b54e422c03","items":[{"start":9,"end":16,"type":"number","value":"30000000"},{"start":9,"end":22,"type":"currency","value":"30000000 INR"}]}
+{"id":"627fba54360e","items":[{"start":6,"end":14,"type":"number","value":"250000"},{"start":6,"end":20,"type":"currency","value":"250000 INR"}]}
+{"id":"6380f8bcf92f","items":[{"start":6,"end":15,"type":"set","value":"XXXX-WXX-1","grain":"day"}]}
+{"id":"63a3020d5516","items":[{"start":17,"end":53,"type":"guid"},{"start":26,"end":27,"type":"time","value":"T04:00","grain":"hour","candidates":2},{"start":31,"end":33,"type":"time","value":"T11:00","grain":"hour","candidates":2},{"start":36,"end":37,"type":"time","value":"T09:00","grain":"hour","candidates":2}]}
+{"id":"63e889b1d4ec","items":[{"start":6,"end":7,"type":"number","value":"4"},{"start":6,"end":12,"type":"daterange","value":"2026-05-04/2026-05-08","grain":"day","candidates":2},{"start":8,"end":9,"type":"number","value":"8"}]}
+{"id":"647eb8655775","items":[{"start":3,"end":5,"type":"number","value":"2"},{"start":3,"end":22,"type":"time","value":"T15:30","grain":"minute"},{"start":15,"end":18,"type":"number","value":"3"}]}
+{"id":"65d7ce24c1ab","items":[{"start":7,"end":15,"type":"daterange","value":"2027-01-01/2028-01-01","grain":"year"},{"start":12,"end":15,"type":"age","value":" year"}]}
+{"id":"66c337a1abe5","items":[{"start":7,"end":18,"type":"datetimerange","value":"2026-03-22T08:00/2026-03-22T12:00","grain":"","candidates":2}]}
+{"id":"6736ab2e9e45","items":[{"start":6,"end":14,"type":"number","value":"8863130"},{"start":6,"end":42,"type":"guid"},{"start":15,"end":16,"type":"time","value":"T03:00","grain":"hour","candidates":2},{"start":19,"end":24,"type":"number","value":"-5372"},{"start":30,"end":31,"type":"time","value":"T00:00","grain":"hour"}]}
+{"id":"67793d206105","items":[{"start":4,"end":6,"type":"number","value":"75"}]}
+{"id":"67fc16305bed","items":[{"start":0,"end":2,"type":"temperature","value":" degree"},{"start":8,"end":16,"type":"datetimerange","value":"2026-03-19T12:00/2026-03-19T16:00","grain":""},{"start":11,"end":13,"type":"number","value":"2"}]}
+{"id":"688d699fda82","items":[{"start":6,"end":8,"type":"date","value":"2028-02-29","grain":"day"}]}
+{"id":"69d168202785","items":[{"start":7,"end":33,"type":"timerange","value":"T09:00/T17:00","grain":"hour"},{"start":12,"end":13,"type":"number","value":"9"},{"start":25,"end":26,"type":"number","value":"5"}]}
+{"id":"6c55106c7a5d","items":[]}
+{"id":"6d9856fa537e","items":[{"start":8,"end":10,"type":"number","value":"2"},{"start":22,"end":24,"type":"number","value":"1"}]}
+{"id":"6ed4b2db9235","items":[]}
+{"id":"6efd35611e9b","items":[]}
+{"id":"702a7c3a91ef","items":[{"start":13,"end":39,"type":"email"}]}
+{"id":"711c7c4d732d","items":[{"start":0,"end":2,"type":"number","value":"15"},{"start":0,"end":8,"type":"date","value":"2026-08-15","grain":"day","candidates":2},{"start":9,"end":13,"type":"number","value":"2026"}]}
+{"id":"729072ac32ce","items":[{"start":22,"end":33,"type":"hashtag"}]}
+{"id":"72a42c60c875","items":[{"start":16,"end":27,"type":"hashtag"}]}
+{"id":"72b413354478","items":[{"start":0,"end":3,"type":"currency","value":" WST"},{"start":14,"end":23,"type":"number","value":"30000"}]}
+{"id":"7330b9f42815","items":[{"start":13,"end":41,"type":"url"}]}
+{"id":"750bdb95bdfa","items":[{"start":10,"end":22,"type":"datetime","value":"2026-03-18T17:00","grain":"hour"},{"start":17,"end":18,"type":"number","value":"5"}]}
+{"id":"750d4002c8ff","items":[{"start":4,"end":7,"type":"currency","value":" WST"}]}
+{"id":"7521f296853c","items":[{"start":0,"end":4,"type":"ordinal","value":"1"},{"start":10,"end":12,"type":"number","value":"1"}]}
+{"id":"75de8055f08d","items":[{"start":10,"end":12,"type":"number","value":"15"},{"start":10,"end":24,"type":"date","value":"1990-04-15","grain":"day"},{"start":20,"end":24,"type":"number","value":"1990"}]}
+{"id":"761e150b70e7","items":[{"start":12,"end":14,"type":"number","value":"85"},{"start":12,"end":18,"type":"duration","value":"P85Y"},{"start":12,"end":21,"type":"age","value":"85 year"}]}
+{"id":"7624ca7d808c","items":[{"start":14,"end":20,"type":"number","value":"98765"},{"start":14,"end":26,"type":"phone"},{"start":21,"end":26,"type":"number","value":"43210"},{"start":24,"end":26,"type":"date","value":"2026-04-10","grain":"day","candidates":2}]}
+{"id":"764244e97212","items":[{"start":8,"end":46,"type":"guid"},{"start":18,"end":19,"type":"time","value":"T09:00","grain":"hour","candidates":2},{"start":23,"end":25,"type":"time","value":"T11:00","grain":"hour","candidates":2},{"start":33,"end":35,"type":"time","value":"T00:00","grain":"hour"}]}
+{"id":"76544ca15273","items":[{"start":6,"end":8,"type":"number","value":"90"},{"start":6,"end":16,"type":"dimension","value":"90 kilometer per hour"}]}
+{"id":"777c6b023e27","items":[]}
+{"id":"77a27ff4e335","items":[{"start":5,"end":17,"type":"datetimerange","value":"2026-03-20T20:00/2026-03-20T23:59:59","grain":"","candidates":2}]}
+{"id":"7b98b479e9ff","items":[{"start":14,"end":15,"type":"number","value":"8"},{"start":14,"end":21,"type":"ip"},{"start":16,"end":17,"type":"number","value":"8"},{"start":18,"end":19,"type":"number","value":"8"},{"start":20,"end":21,"type":"number","value":"8"}]}
+{"id":"7d46ecfcef5f","items":[{"start":0,"end":1,"type":"number","value":"5"},{"start":0,"end":5,"type":"duration","value":"P5Y"},{"start":0,"end":8,"type":"age","value":"5 year"}]}
+{"id":"7d49904ecf20","items":[{"start":17,"end":27,"type":"number","value":"9876543210"},{"start":17,"end":27,"type":"phone"}]}
+{"id":"7e3fb5d81fe0","items":[{"start":0,"end":2,"type":"number","value":"18"},{"start":0,"end":8,"type":"duration","value":"P18M"},{"start":0,"end":11,"type":"age","value":"18 month"},{"start":12,"end":14,"type":"number","value":"1"},{"start":12,"end":14,"type":"time","value":"T01:00","grain":"hour","candidates":2}]}
+{"id":"7eaa36c55c78","items":[{"start":9,"end":11,"type":"number","value":"2"},{"start":9,"end":16,"type":"duration","value":"7200"}]}
+{"id":"7f00c2350762","items":[{"start":18,"end":20,"type":"number","value":"90"},{"start":18,"end":25,"type":"duration","value":"P90Y"},{"start":28,"end":30,"type":"number","value":"1"}]}
+{"id":"80b534cd63bb","items":[{"start":10,"end":13,"type":"datetime","value":"2026-03-18T10:30","grain":""},{"start":14,"end":15,"type":"number","value":"6"},{"start":14,"end":21,"type":"duration","value":"P6M"},{"start":14,"end":24,"type":"age","value":"6 month"}]}
+{"id":"81128619062e","items":[{"start":13,"end":19,"type":"number","value":"10000"},{"start":13,"end":25,"type":"currency","value":"10000 INR"}]}
+{"id":"83fa6c7543d8","items":[{"start":28,"end":30,"type":"number","value":"18"},{"start":28,"end":37,"type":"temperature","value":"18 degree"}]}
+{"id":"84461db997ac","items":[{"start":12,"end":28,"type":"phone"},{"start":13,"end":15,"type":"number","value":"91"},{"start":16,"end":18,"type":"number","value":"11"},{"start":19,"end":23,"type":"number","value":"2345"},{"start":24,"end":28,"type":"number","value":"6789"},{"start":27,"end":28,"type":"date","value":"2026-04-09","grain":"day","candidates":2}]}
+{"id":"87a1476619d0","items":[{"start":0,"end":11,"type":"date","value":"2026-10-02","grain":"day","candidates":2}]}
+{"id":"87b7a0104d35","items":[{"start":8,"end":15,"type":"number","value":"300000"}]}
+{"id":"8866ef80846c","items":[{"start":11,"end":49,"type":"url"}]}
+{"id":"8d086b831481","items":[]}
+{"id":"8d5456b11cdb","items":[{"start":9,"end":12,"type":"number","value":"1.5"},{"start":9,"end":17,"type":"dimension","value":"1.5 liter"}]}
+{"id":"8dbc30642397","items":[{"start":5,"end":7,"type":"number","value":"9"},{"start":5,"end":13,"type":"timerange","value":"T09:00/","grain":"minute","candidates":2},{"start":8,"end":10,"type":"number","value":"0"}]}
+{"id":"8df8b63cf9b6","items":[{"start":4,"end":6,"type":"number","value":"10"},{"start":4,"end":10,"type":"age","value":"10 year"},{"start":4,"end":10,"type":"duration","value":"P10Y"}]}
+{"id":"8ef550012f8b","items":[]}
+{"id":"9038f58b6a57","items":[{"start":3,"end":4,"type":"number","value":"8"}]}
+{"id":"905d7a8f43b9","items":[{"start":23,"end":32,"type":"mention"},{"start":36,"end":41,"type":"date","value":"2026-03-20","grain":"day","candidates":2}]}
+{"id":"91e6ebd5e70d","items":[{"start":0,"end":3,"type":"currency","value":" INR"},{"start":4,"end":9,"type":"number","value":"1500"}]}
+{"id":"9295c203e400","items":[{"start":7,"end":9,"type":"number","value":"6"},{"start":7,"end":15,"type":"duration","value":"P6M"},{"start":7,"end":18,"type":"age","value":"6 month"}]}
+{"id":"92da2aaf9c2b","items":[{"start":10,"end":13,"type":"number","value":"150"},{"start":10,"end":18,"type":"currency","value":"150 USD"}]}
+{"id":"943f493c07d7","items":[{"start":6,"end":8,"type":"number","value":"15"},{"start":6,"end":12,"type":"time","value":"T15:00","grain":"hour"}]}
+{"id":"9514bd113a94","items":[{"start":13,"end":22,"type":"number","value":"1234567"}]}
+{"id":"955ea52c05d2","items":[{"start":9,"end":12,"type":"number","value":"20"},{"start":9,"end":20,"type":"percentage","value":"20"}]}
+{"id":"95eb3ca4e689","items":[{"start":2,"end":5,"type":"set","value":"P1D","grain":"day"},{"start":14,"end":17,"type":"number","value":"3.5"},{"start":14,"end":18,"type":"percentage","value":"3.5"}]}
+{"id":"970c12745aa8","items":[{"start":0,"end":3,"type":"timerange","value":"T20:00/T23:59:59","grain":""},{"start":14,"end":17,"type":"number","value":"-12"},{"start":14,"end":19,"type":"temperature","value":"-12 degree"},{"start":15,"end":17,"type":"time","value":"T12:00","grain":"hour","candidates":2}]}
+{"id":"975643cfe1e7","items":[]}
+{"id":"989bdb071a11","items":[{"start":17,"end":40,"type":"email"}]}
+{"id":"98ef09f72a0e","items":[{"start":8,"end":10,"type":"number","value":"25"},{"start":8,"end":31,"type":"datetime","value":"2026-03-25T14:00","grain":"minute"},{"start":17,"end":21,"type":"number","value":"2026"},{"start":22,"end":24,"type":"number","value":"14"},{"start":25,"end":27,"type":"number","value":"0"}]}
+{"id":"9a60f6f95d35","items":[{"start":0,"end":9,"type":"set","value":"P1W","grain":"week"},{"start":18,"end":24,"type":"date","value":"2026-03-23","grain":"day","candidates":2}]}
+{"id":"9a893600c121","items":[{"start":9,"end":11,"type":"number","value":"25"},{"start":9,"end":27,"type":"temperature","value":"25 celsius"}]}
+{"id":"9b19a7e4dc4d","items":[{"start":14,"end":17,"type":"number","value":"300"},{"start":14,"end":25,"type":"temperature","value":"300 kelvin"}]}
+{"id":"9bf4f876b810","items":[{"start":13,"end":17,"type":"number","value":"48.3"},{"start":13,"end":18,"type":"percentage","value":"48.3"}]}
+{"id":"9c957e358cb6","items":[{"start":5,"end":7,"type":"number","value":"2"},{"start":5,"end":17,"type":"time","value":"T12:00","grain":"hour"},{"start":11,"end":13,"type":"number","value":"12"}]}
+{"id":"9c980c9b9e54","items":[{"start":0,"end":8,"type":"number","value":""},{"start":0,"end":36,"type":"guid"},{"start":24,"end":36,"type":"number","value":"446655440000"}]}
+{"id":"9d2c78a867a0","items":[]}
+{"id":"9d9c6a489ab3","items":[{"start":4,"end":8,"type":"timerange","value":"T06:00/","grain":"hour","candidates":2},{"start":7,"end":43,"type":"guid"},{"start":16,"end":17,"type":"time","value":"T09:00","grain":"hour","candidates":2},{"start":21,"end":23,"type":"time","value":"T11:00","grain":"hour","candidates":2},{"start":31,"end":33,"type":"time","value":"T00:00","grain":"hour"}]}
+{"id":"9e1a4e547908","items":[{"start":5,"end":7,"type":"number","value":"40"}]}
+{"id":"9e4823127443","items":[{"start":14,"end":17,"type":"number","value":"4"},{"start":14,"end":17,"type":"time","value":"T04:00","grain":"hour","candidates":2},{"start":21,"end":28,"type":"hashtag"}]}
+{"id":"9f9e0187f256","items":[{"start":0,"end":7,"type":"date","value":"2026-12-25","grain":"day","candidates":2}]}
+{"id":"9fdc101cb057","items":[{"start":14,"end":15,"type":"number","value":"2"}]}
+{"id":"a060802d2ca1","items":[{"start":6,"end":8,"type":"number","value":"25"},{"start":6,"end":16,"type":"percentage","value":"25"}]}
+{"id":"a0dc70f5f2e1","items":[{"start":0,"end":20,"type":"email"}]}
+{"id":"a35cc9989c6e","items":[{"start":7,"end":8,"type":"number","value":"9"},{"start":7,"end":26,"type":"timerange","value":"T09:00/T17:00","grain":"minute"},{"start":9,"end":11,"type":"number","value":"0"},{"start":14,"end":16,"type":"number","value":"17"},{"start":17,"end":19,"type":"number","value":"0"}]}
+{"id":"a3eaed295f52","items":[{"start":7,"end":11,"type":"daterange","value":"2026-01-01/2027-01-01","grain":"year"},{"start":7,"end":11,"type":"number","value":"2026"}]}
+{"id":"a5c94b05efdc","items":[{"start":15,"end":17,"type":"number","value":"22"},{"start":15,"end":24,"type":"temperature","value":"22 degree"}]}
+{"id":"a63eb5c024c3","items":[{"start":0,"end":8,"type":"number","value":""},{"start":0,"end":36,"type":"guid"},{"start":14,"end":16,"type":"time","value":"T12:00","grain":"hour","candidates":2},{"start":24,"end":36,"type":"number","value":"426614174000"}]}
+{"id":"a6e93ed62fca","items":[{"start":7,"end":9,"type":"number","value":"1"}]}
+{"id":"a80a066d3295","items":[{"start":0,"end":7,"type":"set","value":"P1Y","grain":"year"},{"start":13,"end":18,"type":"daterange","value":"2026-08-01/2026-09-01","grain":"day","candidates":2}]}
+{"id":"a83631065198","items":[{"start":16,"end":28,"type":"daterange","value":"2026-03-21/2026-03-23","grain":"week"}]}
+{"id":"aa4e757954bd","items":[{"start":0,"end":5,"type":"date","value":"2026-03-20","grain":"day"}]}
+{"id":"ab2caea3676b","items":[]}
+{"id":"ac03658c62bf","items":[{"start":6,"end":10,"type":"number","value":"2026"},{"start":6,"end":22,"type":"datetime","value":"2026-04-01T14:00","grain":"minute"},{"start":11,"end":13,"type":"number","value":"4"},{"start":14,"end":16,"type":"number","value":"1"},{"start":17,"end":19,"type":"number","value":"14"},{"start":20,"end":22,"type":"number","value":"0"}]}
+{"id":"ac5028f1353a","items":[{"start":7,"end":11,"type":"daterange","value":"2022-01-01/2023-01-01","grain":"year"},{"start":7,"end":11,"type":"number","value":"2022"}]}
+{"id":"ac73b021cd71","items":[{"start":8,"end":10,"type":"number","value":"12"},{"start":8,"end":18,"type":"date","value":"2026-12-09","grain":"day"},{"start":11,"end":13,"type":"number","value":"9"},{"start":14,"end":18,"type":"number","value":"2026"}]}
+{"id":"ac888ed65495","items":[{"start":0,"end":7,"type":"date","value":"2026-03-19","grain":"day","candidates":2}]}
+{"id":"ad4a0a64f729","items":[{"start":6,"end":7,"type":"number","value":"5"},{"start":6,"end":16,"type":"date","value":"2026-03-13","grain":"day"},{"start":12,"end":16,"type":"ordinal","value":"1"}]}
+{"id":"af01bb8a33ee","items":[{"start":10,"end":18,"type":"mention"}]}
+{"id":"b04907b7ff37","items":[{"start":0,"end":1,"type":"number","value":"7"},{"start":0,"end":5,"type":"duration","value":"P7Y"},{"start":0,"end":8,"type":"age","value":"7 year"},{"start":15,"end":17,"type":"date","value":"2026-03-18","grain":"day"}]}
+{"id":"b26d1f258f73","items":[{"start":0,"end":24,"type":"ip"},{"start":15,"end":19,"type":"number","value":"4567"},{"start":38,"end":40,"type":"datetime","value":"2026-03-18T10:30","grain":""}]}
+{"id":"b2850e7b9ae4","items":[{"start":0,"end":2,"type":"temperature","value":" degree"},{"start":8,"end":10,"type":"number","value":"20"},{"start":8,"end":31,"type":"datetime","value":"2026-03-20T09:00","grain":"minute","candidates":2},{"start":17,"end":21,"type":"number","value":"2026"},{"start":22,"end":24,"type":"number","value":"9"},{"start":25,"end":27,"type":"number","value":"0"}]}
+{"id":"b29c6d06785b","items":[{"start":9,"end":17,"type":"mention"}]}
+{"id":"b2be5c0a1045","items":[{"start":0,"end":7,"type":"datetimerange","value":"2026-03-19T08:00/2026-03-19T12:00","grain":""}]}
+{"id":"b2df0dbe3ba9","items":[{"start":0,"end":4,"type":"date","value":"2026-03-19","grain":"day","candidates":2}]}
+{"id":"b39e1341d210","items":[{"start":4,"end":40,"type":"guid"},{"start":13,"end":14,"type":"time","value":"T02:00","grain":"hour","candidates":2},{"start":18,"end":20,"type":"time","value":"T11:00","grain":"hour","candidates":2},{"start":41,"end":43,"type":"datetime","value":"2026-03-18T10:30","grain":""}]}
+{"id":"b3d6e3eafc92","items":[]}
+{"id":"b45d68e20639","items":[{"start":18,"end":21,"type":"number","value":"100"},{"start":18,"end":37,"type":"temperature","value":"100 celsius"}]}
+{"id":"b599912a57a4","items":[{"start":6,"end":8,"type":"number","value":"50"},{"start":6,"end":13,"type":"currency","value":"50 EUR"}]}
+{"id":"b5cf20012e59","items":[{"start":0,"end":12,"type":"date","value":"2027-01-26","grain":"day","candidates":2}]}
+{"id":"b60eb4d8db91","items":[{"start":7,"end":9,"type":"number","value":"15"},{"start":7,"end":12,"type":"time","value":"T15:00","grain":"minute"},{"start":10,"end":12,"type":"number","value":"0"}]}
+{"id":"b653aabf7fd4","items":[{"start":17,"end":19,"type":"number","value":"91"},{"start":20,"end":25,"type":"number","value":"98765"},{"start":26,"end":31,"type":"number","value":"43210"},{"start":29,"end":31,"type":"date","value":"2026-04-10","grain":"day","candidates":2}]}
+{"id":"b7978b2b1218","items":[]}
+{"id":"b89dd6480c3c","items":[]}
+{"id":"b8f66c8b6c9f","items":[]}
+{"id":"b9b696756f83","items":[{"start":6,"end":42,"type":"guid"}]}
+{"id":"ba0732d9709a","items":[{"start":0,"end":13,"type":"date","value":"2026-03-17","grain":"day"}]}
+{"id":"ba13108fe254","items":[{"start":4,"end":5,"type":"number","value":"1"},{"start":4,"end":22,"type":"daterange","value":"2026-06-01/2026-06-15","grain":"day","candidates":2},{"start":13,"end":15,"type":"number","value":"15"}]}
+{"id":"bb525e31bca3","items":[{"start":6,"end":8,"type":"datetime","value":"2026-03-18T10:30","grain":""},{"start":9,"end":44,"type":"url"},{"start":34,"end":38,"type":"daterange","value":"2026-01-01/2027-01-01","grain":"year"},{"start":34,"end":38,"type":"number","value":"2026"}]}
+{"id":"bc969c717369","items":[{"start":5,"end":41,"type":"guid"},{"start":18,"end":23,"type":"number","value":"-4372"},{"start":29,"end":30,"type":"time","value":"T00:00","grain":"hour"}]}
+{"id":"bd582b261689","items":[{"start":10,"end":12,"type":"number","value":"12"},{"start":10,"end":16,"type":"duration","value":"P12Y"},{"start":10,"end":19,"type":"age","value":"12 year"}]}
+{"id":"bd82fb8303c7","items":[{"start":6,"end":33,"type":"email"}]}
+{"id":"bd85aec55f16","items":[{"start":14,"end":17,"type":"number","value":"100"},{"start":14,"end":18,"type":"percentage","value":"100"},{"start":19,"end":22,"type":"number","value":"4"}]}
+{"id":"c099224000d9","items":[{"start":9,"end":13,"type":"number","value":"0.75"},{"start":9,"end":14,"type":"percentage","value":"0.75"}]}
+{"id":"c0d255eb9061","items":[{"start":13,"end":21,"type":"number","value":"1000"}]}
+{"id":"c12642a04bbb","items":[{"start":23,"end":27,"type":"number","value":"3.14"},{"start":25,"end":30,"type":"date","value":"2027-03-14","grain":"day","candidates":2}]}
+{"id":"c1323b1b8530","items":[{"start":0,"end":8,"type":"daterange","value":"/","grain":"season","approx":true}]}
+{"id":"c13536d3a5df","items":[{"start":7,"end":9,"type":"number","value":"12"},{"start":7,"end":18,"type":"dimension","value":"12 kilometer"}]}
+{"id":"c162c446904f","items":[{"start":8,"end":26,"type":"datetime","value":"2026-03-20T10:30","grain":"minute","candidates":4},{"start":17,"end":19,"type":"number","value":"10"},{"start":20,"end":22,"type":"number","value":"30"}]}
+{"id":"c1c72a4553b4","items":[{"start":0,"end":6,"type":"date","value":"2026-11-09","grain":"day","candidates":2}]}
+{"id":"c2691405d7e4","items":[{"start":6,"end":8,"type":"number","value":"9"},{"start":6,"end":24,"type":"timerange","value":"T09:00/T17:00","grain":"minute"},{"start":9,"end":11,"type":"number","value":"0"},{"start":12,"end":14,"type":"number","value":"17"},{"start":15,"end":17,"type":"number","value":"0"}]}
+{"id":"c317877a9ce7","items":[{"start":18,"end":27,"type":"date","value":"2026-03-21","grain":"day"},{"start":22,"end":23,"type":"number","value":"3"}]}
+{"id":"c3ac29096e3b","items":[{"start":4,"end":15,"type":"number","value":"12345678"}]}
+{"id":"c410d8733b51","items":[{"start":17,"end":40,"type":"url"}]}
+{"id":"c5b5872988be","items":[{"start":0,"end":5,"type":"set","value":"P1M","grain":"month"}]}
+{"id":"c5db1d01353f","items":[{"start":6,"end":12,"type":"daterange","value":"2026-01-01/2027-01-01","grain":"year"},{"start":9,"end":15,"type":"age","value":" year"}]}
+{"id":"c62b6e3a314c","items":[{"start":8,"end":15,"type":"mention"},{"start":19,"end":25,"type":"mention"}]}
+{"id":"c89e313b5bb8","items":[{"start":19,"end":28,"type":"currency","value":"1234.56 INR"},{"start":20,"end":28,"type":"number","value":"1234.56"}]}
+{"id":"c952ba8558dd","items":[{"start":0,"end":2,"type":"number","value":"50"},{"start":0,"end":10,"type":"percentage","value":"50"}]}
+{"id":"c9e0f36f510c","items":[{"start":8,"end":20,"type":"date","value":"2026-04-08","grain":"day"},{"start":12,"end":13,"type":"number","value":"3"},{"start":12,"end":23,"type":"age","value":"3 week"},{"start":24,"end":26,"type":"number","value":"1"}]}
+{"id":"cafd0fec1d26","items":[{"start":6,"end":40,"type":"url"}]}
+{"id":"cb06bc0cd806","items":[{"start":3,"end":6,"type":"daterange","value":"2026-01-01/2027-01-01","grain":"year"},{"start":3,"end":9,"type":"age","value":" year"},{"start":17,"end":23,"type":"datetimerange","value":"2027-01-01T16:00/2027-01-01T20:00","grain":""}]}
+{"id":"cb7daff7b893","items":[{"start":7,"end":13,"type":"datetimerange","value":"2026-03-19T16:00/2026-03-19T20:00","grain":""}]}
+{"id":"cbc1aaf348bc","items":[{"start":9,"end":18,"type":"hashtag"}]}
+{"id":"cc96f410eccb","items":[{"start":5,"end":6,"type":"number","value":"6"},{"start":5,"end":11,"type":"dimension","value":"6 meter"}]}
+{"id":"ce1df5c7da9d","items":[{"start":20,"end":25,"type":"daterange","value":"/","grain":"season","approx":true},{"start":25,"end":29,"type":"daterange","value":"2026-01-01/2027-01-01","grain":"year"},{"start":25,"end":29,"type":"number","value":"2026"}]}
+{"id":"ce5b0ba21e5a","items":[{"start":5,"end":11,"type":"datetimerange","value":"2026-03-18T20:00/2026-03-18T23:59:59","grain":""}]}
+{"id":"cfbe95925be8","items":[{"start":6,"end":8,"type":"number","value":"31"},{"start":6,"end":20,"type":"date","value":"2026-12-31","grain":"day"},{"start":16,"end":20,"type":"number","value":"2026"}]}
+{"id":"d0a573219b61","items":[{"start":15,"end":27,"type":"mention"}]}
+{"id":"d111c59b2466","items":[{"start":14,"end":16,"type":"number","value":"-7"},{"start":15,"end":16,"type":"time","value":"T07:00","grain":"hour","candidates":2}]}
+{"id":"d27ed0f306b6","items":[{"start":8,"end":10,"type":"number","value":"20"},{"start":8,"end":25,"type":"timerange","value":"T20:00/T22:00","grain":"minute"},{"start":11,"end":13,"type":"number","value":"0"},{"start":17,"end":19,"type":"number","value":"22"},{"start":20,"end":22,"type":"number","value":"0"}]}
+{"id":"d32ad189ecfa","items":[{"start":0,"end":2,"type":"date","value":"2026-03-19","grain":"day"}]}
+{"id":"d340d50bdd4d","items":[{"start":5,"end":7,"type":"number","value":"9"},{"start":5,"end":10,"type":"ordinal","value":"9"}]}
+{"id":"d37c64c829e0","items":[{"start":13,"end":15,"type":"number","value":"45"},{"start":13,"end":20,"type":"duration","value":"2700"}]}
+{"id":"d40db444de9e","items":[{"start":13,"end":18,"type":"number","value":"40"}]}
+{"id":"d4122054fac9","items":[{"start":10,"end":12,"type":"number","value":"2"},{"start":10,"end":20,"type":"date","value":"2026-03-20","grain":"day"}]}
+{"id":"d452c9c7b3bc","items":[{"start":7,"end":21,"type":"daterange","value":"2026-03-28/2026-03-30","grain":"week"}]}
+{"id":"d47711743b89","items":[{"start":13,"end":16,"type":"number","value":"203"},{"start":13,"end":25,"type":"ip"},{"start":17,"end":18,"type":"number","value":"0"},{"start":19,"end":25,"type":"number","value":"113.45"},{"start":24,"end":25,"type":"date","value":"2026-04-05","grain":"day","candidates":2}]}
+{"id":"d547409aea8d","items":[{"start":3,"end":5,"type":"number","value":"18"},{"start":3,"end":21,"type":"timerange","value":"T18:00/T20:00","grain":"minute"},{"start":6,"end":8,"type":"number","value":"0"},{"start":9,"end":11,"type":"number","value":"20"},{"start":12,"end":14,"type":"number","value":"0"}]}
+{"id":"d617438a25af","items":[{"start":12,"end":15,"type":"number","value":"30"},{"start":12,"end":17,"type":"ordinal","value":"3"}]}
+{"id":"d66f43a5b3e6","items":[{"start":5,"end":6,"type":"number","value":"5"},{"start":5,"end":9,"type":"date","value":"2026-05-05","grain":"day","candidates":2}]}
+{"id":"d75fc712bbbd","items":[{"start":21,"end":23,"type":"number","value":"72"},{"start":21,"end":25,"type":"temperature","value":"72 degree"}]}
+{"id":"d82127e0a7f4","items":[{"start":8,"end":13,"type":"number","value":"1250"}]}
+{"id":"d985cad0dbc2","items":[{"start":6,"end":8,"type":"number","value":"8"},{"start":6,"end":17,"type":"timerange","value":"T08:00/T15:00","grain":"minute"},{"start":9,"end":11,"type":"number","value":"0"},{"start":12,"end":14,"type":"number","value":"15"},{"start":15,"end":17,"type":"number","value":"0"}]}
+{"id":"da4a78d43438","items":[{"start":4,"end":6,"type":"number","value":"30"},{"start":4,"end":18,"type":"date","value":"2026-09-30","grain":"day"},{"start":14,"end":18,"type":"number","value":"2026"}]}
+{"id":"dabdc2491af7","items":[]}
+{"id":"dc1b48689850","items":[{"start":17,"end":25,"type":"number","value":"97"}]}
+{"id":"dd5c40729537","items":[{"start":14,"end":21,"type":"hashtag"},{"start":15,"end":18,"type":"number","value":"1"}]}
+{"id":"de6a3ff59b4a","items":[{"start":6,"end":29,"type":"email"}]}
+{"id":"deedeee1aee5","items":[{"start":4,"end":8,"type":"number","value":"2020"},{"start":4,"end":19,"type":"daterange","value":"2020-01-01/2024-01-01","grain":"year"},{"start":12,"end":16,"type":"number","value":"2024"}]}
+{"id":"df2818826be6","items":[{"start":6,"end":9,"type":"number","value":"250"},{"start":6,"end":12,"type":"dimension","value":"250 megabyte"}]}
+{"id":"df28f9e6ba64","items":[{"start":7,"end":13,"type":"set","value":"P1Y","grain":"year"},{"start":10,"end":13,"type":"age","value":" year"}]}
+{"id":"df83003a2b3c","items":[{"start":8,"end":9,"type":"number","value":"3"},{"start":8,"end":13,"type":"dimension","value":"3 mile"}]}
+{"id":"dfb8ae9bc3c1","items":[{"start":15,"end":17,"type":"number","value":"10"},{"start":15,"end":23,"type":"time","value":"T10:15:30","grain":"second","candidates":2},{"start":18,"end":20,"type":"number","value":"15"},{"start":21,"end":23,"type":"number","value":"30"}]}
+{"id":"dfc0e74a12f9","items":[{"start":0,"end":4,"type":"daterange","value":"2001-01-01/2002-01-01","grain":"year"},{"start":0,"end":4,"type":"number","value":"2001"},{"start":0,"end":28,"type":"ip"},{"start":20,"end":23,"type":"number","value":"370"},{"start":24,"end":28,"type":"number","value":"7334"}]}
+{"id":"e105c49f2f24","items":[{"start":11,"end":14,"type":"number","value":"22"},{"start":11,"end":24,"type":"phone"},{"start":15,"end":19,"type":"number","value":"2345"},{"start":20,"end":24,"type":"number","value":"6789"},{"start":23,"end":24,"type":"date","value":"2026-04-09","grain":"day","candidates":2}]}
+{"id":"e1c886b70026","items":[]}
+{"id":"e2baa6576c12","items":[{"start":15,"end":17,"type":"number","value":"15"},{"start":15,"end":33,"type":"temperature","value":"15 celsius"}]}
+{"id":"e2e58d8537eb","items":[{"start":7,"end":8,"type":"number","value":"4"},{"start":7,"end":10,"type":"temperature","value":"4 degree"}]}
+{"id":"e3672d590d06","items":[{"start":0,"end":2,"type":"number","value":"40"},{"start":0,"end":7,"type":"duration","value":"P40Y"}]}
+{"id":"e3b3997fe353","items":[{"start":13,"end":15,"type":"number","value":"20"},{"start":13,"end":26,"type":"date","value":"2026-03-20","grain":"day"},{"start":22,"end":26,"type":"number","value":"2026"}]}
+{"id":"e502ea96f798","items":[{"start":4,"end":15,"type":"set","value":"XXXX-WXX-5","grain":"day"}]}
+{"id":"e50756053973","items":[{"start":6,"end":11,"type":"currency","value":"2.5 EUR"},{"start":7,"end":11,"type":"number","value":"2.5"}]}
+{"id":"e57d6ac781b4","items":[{"start":13,"end":17,"type":"number","value":"62.5"},{"start":13,"end":18,"type":"percentage","value":"0"}]}
+{"id":"e5813c4bf335","items":[{"start":12,"end":14,"type":"number","value":"42"}]}
+{"id":"e5b5ce3cf2f5","items":[{"start":8,"end":20,"type":"number","value":"324"}]}
+{"id":"e6bfc430dd7b","items":[{"start":5,"end":7,"type":"currency","value":" INR"},{"start":9,"end":12,"type":"number","value":"500"}]}
+{"id":"e714c90d747c","items":[{"start":7,"end":17,"type":"time","value":"T08:00","grain":"hour"},{"start":12,"end":13,"type":"number","value":"8"}]}
+{"id":"e7db6169035b","items":[{"start":15,"end":18,"type":"currency","value":"20 INR"},{"start":16,"end":18,"type":"number","value":"20"}]}
+{"id":"e837107c5ce0","items":[{"start":5,"end":11,"type":"set","value":"P1D","grain":"day"}]}
+{"id":"e87198062164","items":[{"start":7,"end":10,"type":"timerange","value":"T08:00/T18:00","grain":""}]}
+{"id":"e8bd4d34392b","items":[{"start":8,"end":9,"type":"number","value":"6"},{"start":8,"end":32,"type":"daterange","value":"2026-04-06/2026-04-10","grain":"day","candidates":2},{"start":20,"end":22,"type":"number","value":"10"}]}
+{"id":"e9763dd107fa","items":[]}
+{"id":"e9a2fa6745dc","items":[{"start":11,"end":45,"type":"email"}]}
+{"id":"ea13afb8e280","items":[{"start":4,"end":8,"type":"daterange","value":"2031-01-01/2032-01-01","grain":"year"},{"start":4,"end":8,"type":"number","value":"2031"}]}
+{"id":"ea7431f64445","items":[]}
+{"id":"eb00055d2d42","items":[{"start":15,"end":36,"type":"daterange","value":"/2026-04-01","grain":"day","candidates":2},{"start":23,"end":24,"type":"number","value":"1"},{"start":23,"end":28,"type":"age","value":"1 year"},{"start":29,"end":30,"type":"number","value":"6"},{"start":29,"end":36,"type":"age","value":"6 month"}]}
+{"id":"eb612ab39a88","items":[{"start":0,"end":3,"type":"dimension","value":" volume unit"},{"start":10,"end":13,"type":"number","value":"250"},{"start":10,"end":22,"type":"dimension","value":"250 milliliter"}]}
+{"id":"ebf8139054ec","items":[{"start":0,"end":8,"type":"daterange","value":"2026-03-01/2026-04-01","grain":"month"},{"start":3,"end":8,"type":"age","value":" month"},{"start":16,"end":19,"type":"number","value":"1.2"},{"start":16,"end":20,"type":"percentage","value":"1.2"}]}
+{"id":"ee3508627c31","items":[{"start":18,"end":47,"type":"url"}]}
+{"id":"eebabf70bc79","items":[{"start":4,"end":8,"type":"ordinal","value":"8"}]}
+{"id":"ef40ed161a2b","items":[{"start":0,"end":5,"type":"number","value":"17"}]}
+{"id":"ef46391a85c7","items":[{"start":5,"end":7,"type":"number","value":"8"},{"start":5,"end":21,"type":"timerange","value":"T08:30/T12:00","grain":"minute","candidates":2},{"start":8,"end":10,"type":"number","value":"30"},{"start":13,"end":15,"type":"number","value":"12"},{"start":16,"end":18,"type":"number","value":"0"}]}
+{"id":"ef7f913c6325","items":[{"start":10,"end":21,"type":"set","value":"2026-03-09","grain":""},{"start":20,"end":21,"type":"number","value":"9"},{"start":22,"end":24,"type":"number","value":"0"}]}
+{"id":"efecc36b2984","items":[{"start":4,"end":36,"type":"timerange","value":"/T08:00","grain":"hour"},{"start":15,"end":16,"type":"number","value":"8"},{"start":24,"end":26,"type":"number","value":"2"},{"start":30,"end":32,"type":"number","value":"12"}]}
+{"id":"f01456e954a5","items":[{"start":11,"end":18,"type":"ordinal","value":"23"},{"start":19,"end":22,"type":"age","value":" year"},{"start":19,"end":22,"type":"daterange","value":"2026-01-01/2027-01-01","grain":"year"}]}
+{"id":"f0530780a955","items":[{"start":19,"end":31,"type":"mention"}]}
+{"id":"f0789e5f2efc","items":[{"start":8,"end":13,"type":"ordinal","value":"10"},{"start":14,"end":17,"type":"age","value":" year"},{"start":14,"end":17,"type":"daterange","value":"2026-01-01/2027-01-01","grain":"year"}]}
+{"id":"f091662bb168","items":[{"start":6,"end":20,"type":"datetime","value":"2026-03-19T11:00","grain":"hour"},{"start":14,"end":16,"type":"number","value":"11"}]}
+{"id":"f2cf0bf41dc4","items":[{"start":7,"end":12,"type":"number","value":"80"}]}
+{"id":"f3987dfb79a3","items":[{"start":7,"end":11,"type":"daterange","value":"1969-01-01/1970-01-01","grain":"year"},{"start":7,"end":11,"type":"number","value":"1969"}]}
+{"id":"f44bb5740996","items":[{"start":0,"end":15,"type":"date","value":"2026-08-15","grain":"day","candidates":2}]}
+{"id":"f51c291441d3","items":[{"start":5,"end":15,"type":"datetimerange","value":"2026-03-21T16:00/2026-03-21T20:00","grain":"","candidates":2}]}
+{"id":"f52260b1e804","items":[{"start":13,"end":15,"type":"number","value":"20"},{"start":13,"end":24,"type":"date","value":"2026-06-20","grain":"day"},{"start":20,"end":24,"type":"number","value":"2026"}]}
+{"id":"f7857c3ed55d","items":[{"start":0,"end":7,"type":"timerange","value":"T20:00/T23:59:59","grain":""},{"start":13,"end":15,"type":"number","value":"-5"},{"start":13,"end":17,"type":"temperature","value":"-5 degree"},{"start":14,"end":15,"type":"time","value":"T05:00","grain":"hour","candidates":2}]}
+{"id":"f8d8e8960ecd","items":[{"start":6,"end":14,"type":"daterange","value":"2027-06-01/2027-07-01","grain":"month"},{"start":10,"end":14,"type":"number","value":"2027"}]}
+{"id":"f95caa367c6d","items":[]}
+{"id":"f9642d420e72","items":[{"start":1,"end":3,"type":"number","value":"1"},{"start":7,"end":10,"type":"number","value":"200"},{"start":7,"end":12,"type":"temperature","value":"200 degree"}]}
+{"id":"fb935f7c7697","items":[{"start":3,"end":13,"type":"date","value":"2026-03-28","grain":"day"},{"start":7,"end":9,"type":"number","value":"10"},{"start":7,"end":16,"type":"age","value":"10 day"}]}
+{"id":"fbec44084384","items":[{"start":4,"end":40,"type":"guid"},{"start":13,"end":14,"type":"time","value":"T07:00","grain":"hour","candidates":2},{"start":18,"end":19,"type":"time","value":"T04:00","grain":"hour","candidates":2},{"start":23,"end":24,"type":"time","value":"T08:00","grain":"hour","candidates":2},{"start":28,"end":29,"type":"time","value":"T01:00","grain":"hour","candidates":2}]}
+{"id":"fc3aa30004c3","items":[{"start":5,"end":7,"type":"number","value":"75"},{"start":5,"end":14,"type":"currency","value":"75 CENTIME"},{"start":5,"end":17,"type":"dimension","value":"75 centimeter"}]}
+{"id":"fc9178404aeb","items":[{"start":11,"end":14,"type":"number","value":"180"}]}
+{"id":"fd9fa1cd6052","items":[{"start":19,"end":66,"type":"url"}]}
+{"id":"febe48838880","items":[{"start":7,"end":9,"type":"number","value":"90"},{"start":7,"end":14,"type":"duration","value":"5400"}]}
+{"id":"fef8ee8b05e1","items":[{"start":6,"end":18,"type":"datetime","value":"2026-03-19T15:00","grain":"minute"},{"start":9,"end":11,"type":"number","value":"15"},{"start":12,"end":14,"type":"number","value":"0"}]}
+{"id":"ff848a75934a","items":[{"start":4,"end":12,"type":"daterange","value":"2026-03-01/2026-04-01","grain":"month"},{"start":7,"end":12,"type":"age","value":" month"}]}

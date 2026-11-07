@@ -21,6 +21,9 @@
     <Project Path="tests/OneNlp.Tests/OneNlp.Tests.csproj" />
     <Project Path="tests/OneNlp.AotSmoke/OneNlp.AotSmoke.csproj" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/OneNlp.Samples/OneNlp.Samples.csproj" />
+  </Folder>
   <Folder Name="/bench/">
     <Project Path="bench/OneNlp.Bench/OneNlp.Bench.csproj" />
     <Project Path="bench/OneNlp.Bench.Tokenizers/OneNlp.Bench.Tokenizers.csproj" />
