@@ -24,6 +24,7 @@ public static class HeadRegistry
         [Morphologizer.ComponentKind] = Morphologizer.FromConfig,
         [EditTreeLemmatizer.ComponentKind] = EditTreeLemmatizer.FromConfig,
         [EntityRecognizer.ComponentKind] = EntityRecognizer.FromConfig,
+        [OpenEntityRecognizer.ComponentKind] = OpenEntityRecognizer.FromConfig,
     };
 
     /// <summary>Registers a head kind.</summary>
