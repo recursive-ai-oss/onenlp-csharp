@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The code samples that docs/reads-like.md and the README show. Each one runs and checks its own output, so a sample that stops
+       compiling or stops working is noticed. The model packages are referenced as projects; their registration file, which a NuGet
+       reference adds to the application by itself, is compiled in here so the samples behave as an application that references the
+       packages does. Run it with dotnet run on this project, passing the argument all and a tokenizer.json path. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).Samples</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).Samples</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/OneNlp/OneNlp.csproj" />
+    <ProjectReference Include="../../src/OneNlp.Neural/OneNlp.Neural.csproj" />
+    <ProjectReference Include="../../src/OneNlp.Models.English/OneNlp.Models.English.csproj" />
+    <ProjectReference Include="../../src/OneNlp.Models.Embeddings/OneNlp.Models.Embeddings.csproj" />
+    <Compile Include="../../src/OneNlp.Models.English/contentFiles/*.cs" Link="Registration/English.cs" />
+    <Compile Include="../../src/OneNlp.Models.Embeddings/contentFiles/*.cs" Link="Registration/Embeddings.cs" />
+  </ItemGroup>
+
+</Project>

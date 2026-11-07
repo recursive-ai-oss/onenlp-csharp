@@ -16,6 +16,7 @@ The model is `intfloat/multilingual-e5-small` (MIT), exported to ONNX from the a
 
 The model expects `"query: "` / `"passage: "` prefixes: `Nlp.Embed` uses `"query: "` (right for similarity); for retrieval load `MultilingualEmbeddingsModel.Load()` and call `EmbedQuery` and `EmbedPassage`. `PROVENANCE.md` states the licence and the authors' training data.
 
+- Measured results against spaCy and others: <https://github.com/recursive-ai-oss/onenlp-csharp/blob/main/docs/results-table.md>
 - Source and documentation: <https://github.com/recursive-ai-oss/onenlp-csharp>
 
 Copyright (c) Recursive AI, LLC.

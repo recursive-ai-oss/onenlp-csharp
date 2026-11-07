@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Neural</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Neural</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Neural</PackageId>
-    <Description>spaCy-class NLP for .NET: the neural layer on OneModel. The encoder seam, trainable pipeline components, training (Train) and saved pipelines. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the neural layer on OneModel. Fast and transformer encoders, tagger, morphologizer, lemmatizer, dependency parser, entity recognizer, text classifier and span categorizer, Train for training and fine-tuning in C#, saved pipelines and sentence embeddings. Unaffiliated with other projects named OneNLP.</Description>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="../../PACKAGE.md" Pack="true" PackagePath="/" />
+    <None Include="PACKAGE.md" Pack="true" PackagePath="/" />
     <None Include="../../LICENSE-MIT" Pack="true" PackagePath="/" />
     <None Include="../../LICENSE-APACHE" Pack="true" PackagePath="/" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />

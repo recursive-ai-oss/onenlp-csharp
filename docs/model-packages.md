@@ -1,6 +1,18 @@
 # Model packages
 
-A model package carries trained weights for one language (or tier) and makes the `Nlp` verbs use them. The first is `RecursiveAI.OneNlp.Models.English` (fast tier). Nothing is ever downloaded: the weights are inside the package.
+A model package carries trained weights for one language (or one task) and makes the `Nlp` verbs use them. Nothing is ever downloaded: the weights are inside the package, embedded as resources.
+
+## The packages
+
+| Package | Language or task | Registration class | Used by |
+|---|---|---|---|
+| `RecursiveAI.OneNlp.Models.English` | English fast tier | `EnglishModel` | `Nlp.Analyze`, `Nlp.Entities`, `Nlp.Lemmas` for English text |
+| `RecursiveAI.OneNlp.Models.French`, `.German`, `.Spanish`, `.Portuguese`, `.Dutch`, `.Italian`, `.Turkish`, `.Chinese` | the fast tier of that language | `FrenchModel`, `GermanModel`, `SpanishModel`, `PortugueseModel`, `DutchModel`, `ItalianModel`, `TurkishModel`, `ChineseModel` | the same verbs, for text of that language |
+| `RecursiveAI.OneNlp.Models.Embeddings` | English sentence embeddings (bge-small-en-v1.5) | `EmbeddingsModel` | `Nlp.Embed`, `Nlp.EmbedMany` |
+| `RecursiveAI.OneNlp.Models.Embeddings.Multilingual` | multilingual sentence embeddings (multilingual-e5-small); its three `...Shard1..3` packages hold the weights and come with it | `MultilingualEmbeddingsModel` | `Nlp.Embed`, `Nlp.EmbedMany` (wins over the English embedder when both are referenced) |
+| `RecursiveAI.OneNlp.Models.Multilingual`, `.Multilingual.Large` | the accurate tier | in progress, not released | |
+
+There is no Hindi fast-tier package yet (the reason is the training data: `ud-licences.md`). Hindi text is identified, tokenized, split into sentences and run through the Hindi recognizers.
 
 ## What the user does
 
@@ -11,11 +23,17 @@ Doc doc = Nlp.Analyze(text);            // tokens, sentences, tags, morphology, 
 IReadOnlyList<Span> ents = Nlp.Entities(text);
 ```
 
-Without a package for the text's language, `Nlp.Analyze` returns tokens and sentence boundaries only, and the model verbs (`Nlp.Entities`, `Nlp.Lemmas`) throw `InvalidOperationException`:
+The language of the text is detected with the built-in language identifier, and the package registered for that language is used. A text with no letters is treated as English.
 
-> No model is available for language 'en'. Add the NuGet package RecursiveAI.OneNlp.Models.English (fast tier), or RecursiveAI.OneNlp.Models.Multilingual; models are never downloaded.
+Without a package for the text's language, `Nlp.Analyze` returns tokens and sentence boundaries only, and the model verbs (`Nlp.Entities`, `Nlp.Lemmas`) throw `InvalidOperationException`. The message names the exact package to add:
 
-Resolution order for a text: the fast-tier package of its language if referenced, otherwise the multilingual package once it exists. The language of a text is decided in one internal place (`Nlp.LanguageOf`); until language identification lands it is English.
+> No model is available for language 'de'. Add the NuGet package RecursiveAI.OneNlp.Models.German (fast tier), or RecursiveAI.OneNlp.Models.Multilingual; models are never downloaded.
+
+The same for embeddings, when no embedding package is referenced:
+
+> No embedding model is available. Add the NuGet package RecursiveAI.OneNlp.Models.Embeddings; models are never downloaded.
+
+Resolution order for a text: the fast-tier package of its language if referenced, otherwise the multilingual accurate-tier package once it is released. To use a particular package regardless of detection, load its pipeline (`EnglishModel.Load()`, ...) or any saved pipeline file (`PipelineFile.Load`) and call `Process` on it; the low level takes any file or stream, including models you trained yourself or fine-tuned from another source.
 
 ## How core reaches a pipeline that lives in a package
 
@@ -33,9 +51,9 @@ The registration runs from a module initializer, and the module initializer live
 
 ## The English pipeline
 
-One pipeline from one saved pipeline (`PipelineFile`), `english.onenlp`, assembled by `recipes/en/assemble` from three separately trained models, each with its own encoder: tagging (tagger for XPOS, morphologizer for UPOS and UFeats, edit-tree lemmatizer; `recipes/en/fast-tagging`), the dependency parser, which also predicts the sentence starts (`recipes/en/parser`), and the entity recognizer for PER, ORG and LOC (`recipes/en/ner`). The rule sentencizer saved with the tagging model is left out, because the parser sets the sentence boundaries. The assembled file predicts what each part predicted alone (the scores are in `docs/results.md`).
+One pipeline from one saved pipeline (`PipelineFile`), `english.onenlp`, assembled by `recipes/en/assemble` from three separately trained models, each with its own encoder: tagging (tagger for XPOS, morphologizer for UPOS and UFeats, edit-tree lemmatizer; `recipes/en/fast-tagging`), the dependency parser, which also predicts the sentence starts (`recipes/en/parser`), and the entity recognizer for PER, ORG and LOC (`recipes/en/ner`). The rule sentencizer saved with the tagging model is left out, because the parser sets the sentence boundaries. The assembled file predicts what each part predicted alone (the scores are in [results.md](results.md)).
 
-A single shared encoder for all heads (`recipes/en/joint`, 23.7 MB) is much faster and has weaker rows; it is documented in `docs/results.md` as an option, and a user can load it with `PipelineFile.Load` like any saved pipeline.
+A single shared encoder for all heads (`recipes/en/joint`, 23.7 MB) is much faster and has weaker rows; it is documented in [results.md](results.md) as an option, and a user can load it with `PipelineFile.Load` like any saved pipeline.
 
 The tokenizer is the UAX #29 word tokenizer with English data, shared with the string table; the pipeline owns and disposes every component.
 
