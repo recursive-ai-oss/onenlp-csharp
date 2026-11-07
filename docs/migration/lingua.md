@@ -11,7 +11,7 @@ Lingua is a language detector for short and long text; SearchPioneer.Lingua is i
 | Accuracy mode | `WithLowAccuracyMode()` | none: one model, one mode |
 | Detect | `detector.DetectLanguageOf(text)`; `Language.Unknown` when it cannot tell | `detector.Detect(text)`; `Language.Unknown` when the text has no letter of a supported script |
 | Confidence values | `ComputeLanguageConfidenceValues(text)`, sorted | `detector.Confidences(text)`; probabilities sum to 1 |
-| Mixed text | `DetectMultipleLanguagesOf(text)`: runs with a language and a start and end | `detector.DetectSpans(text, switchPenalty = 9)`: runs that tile the text from 0 to its length |
+| Mixed text | `DetectMultipleLanguagesOf(text)`: results with a language, a word count and a character `Range` | `detector.DetectSpans(text, switchPenalty = 9)`: runs that tile the text from 0 to its length |
 | Minimum relative distance | `WithMinimumRelativeDistance(d)` | not needed: restrict the languages, or read `Confidences` |
 | Language names | an enum with a member per language | `Language` is a code: `Language.English`, ...; the others by `Language.FromCode("sv")` (two-letter codes of `tools/fetch/langid/languages.tsv`) |
 | Happy path | none | `Nlp.DetectLanguage(text)` |

@@ -50,10 +50,10 @@ Our hand-labelled gold sets, one per language, written from the type definitions
 | Italian | 368 | 96.5 [94.5, 98.2] | 51.0 [48.0, 54.2] | 99.6 | ahead |
 | Dutch | 369 | 97.2 [95.0, 98.8] | 54.6 [51.7, 57.6] | 99.0 | ahead |
 | Chinese | 338 | 98.8 [97.4, 99.9] | 49.8 [46.4, 53.0] | 100.0 | ahead |
-| Turkish | 316 | not committed | not committed | | gap: test rows are scored at the release gate |
-| Hindi | 324 | not committed | not committed | | gap: test rows are scored at the release gate |
+| Turkish | 316 | 95.2 [92.9, 97.1] | 56.3 [53.1, 59.9] | 100.0 | ahead |
+| Hindi | 324 | 96.9 [95.2, 98.6] | 49.3 [45.8, 52.5] | 100.0 | ahead |
 
-No type in any language is behind Recognizers.Text (the `behind` verdict appears in none of the eight comparison files). "All types" pools types with ten to thirty items each, so per-type intervals are wide (the per-type rows are in the source files, and Duckling's, which are information, beside them). The comparator uses its own conventions for range ends and drops stated time zones; the gold uses ours, and the differences are listed in [recognizer-gold.md](recognizer-gold.md). The Chinese test file was read twice after a rule change; the published row is the first read (`recognizer-gold.md`).
+No type in any language is behind Recognizers.Text (the `behind` verdict appears in none of the ten comparison files). "All types" pools types with ten to thirty items each, so per-type intervals are wide (the per-type rows are in the source files, and Duckling's, which are information, beside them). The comparator uses its own conventions for range ends and drops stated time zones; the gold uses ours, and the differences are listed in [recognizer-gold.md](recognizer-gold.md). The Chinese test file was read twice after a rule change; the published row is the first read (`recognizer-gold.md`).
 
 Recognizer speed against Microsoft.Recognizers.Text 1.8.13 (English, alone on the machine): 54.6x on numbers, units, currency and sequences, and 43.8x with date/time, on x64 (57.6x and 50.5x on arm64); allocations, RSS and load are in `results.md`. The comparator is far slower in Turkish and Hindi (0.01 to 0.03 million characters per second); those speed rows are taken at the release gate.
 
@@ -201,5 +201,5 @@ No accurate-tier model package is released yet, so these rows are information an
 - **Embeddings:** the five cells below the model cards, shared with sentence-transformers (above).
 - **Language ID:** the languages named under the table are below Lingua on short text.
 - **Entities per type:** per-type rows are in each source file; several have intervals that overlap with a paired difference that excludes zero (for example English LOC with the single-encoder option); the packaged English model has none of those.
-- **Gaps:** no Hindi fast tier (data); Turkish and Hindi recognizer test rows to be scored at the release gate; no German, Spanish, Portuguese, Italian, Dutch, Turkish or Chinese rows against Catalyst (it has English models only); open-type NER and the accurate-tier packages are in progress and have no rows yet.
+- **Gaps:** no Hindi fast tier (data); no German, Spanish, Portuguese, Italian, Dutch, Turkish or Chinese rows against Catalyst (it has English models only); open-type NER and the accurate-tier packages are in progress and have no rows yet.
 - **Speed against Catalyst** on the tagging path is measured at the release gate; the indicative run is in `results.md` and is not repeated here.

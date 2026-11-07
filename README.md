@@ -68,7 +68,7 @@ Call-by-call maps, with no compatibility shims:
 
 - **Tokenizers** are byte-exact against Hugging Face `tokenizers` and `tiktoken` on twelve model families, and faster than Microsoft.ML.Tokenizers on every timed row.
 - **Language ID** is more accurate than Lingua on words, word pairs and sentences, and faster on every row (a few rows below it per language are listed).
-- **Recognizers** score ahead of Microsoft.Recognizers.Text on our hand-labelled sets in eight languages, and faster; Turkish and Hindi test rows are still to come.
+- **Recognizers** score ahead of Microsoft.Recognizers.Text on our hand-labelled sets in ten languages, and faster.
 - **The fast tier** is within noise of spaCy 3.8.18 trained on the same data on the gated UD and entity rows, or ahead of it; the few rows behind are listed by name.
 - **Text classification and span categorization** are ahead of spaCy's defaults on accuracy and F1; span precision is behind.
 - **Embeddings** equal sentence-transformers in the same harness; the model cards' own numbers are shown beside them, with the cells neither reproduces.

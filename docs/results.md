@@ -1,7 +1,7 @@
 # Results
 
 Measured rows. The tokenizer speed rows below are final: they were taken in one benchmark-queue group per machine, alone on the
-machine, with `bench/scripts/tokenizer-rows.sh`. Nothing else on this page is a final number yet.
+machine, with `bench/scripts/tokenizer-rows.sh`. Speed numbers elsewhere on this page are indicative until they are re-measured alone on the machine.
 
 ## Tokenizer speed against Microsoft.ML.Tokenizers
 
@@ -245,7 +245,7 @@ UD French-GSD r2.18 test and WikiNER French (wp3) test against spaCy 3.8.18 trai
 
 ## Portuguese fast tier
 
-UD Portuguese-Bosque r2.18 test and Universal NER Portuguese-Bosque test against spaCy 3.8.18 trained with its default configuration on the same data; the table, the settings and the weights are in `recipes/pt/fast/PROVENANCE.md`. Bosque has no XPOS, so there is no tagger and no XPOS or AllTags row. Raw text: every row ahead of spaCy except tokens (99.86 vs 99.87, within noise) (words 99.74 vs 88.51, UPOS 95.35 vs 84.15, LAS 82.09 vs 65.85, sentences 92.72 vs 84.48). Gold tokens: UPOS (95.89 vs 95.92), UFeats (94.51 vs 94.11), lemmas (97.30 vs 96.90), UAS (86.93 vs 86.05) and LAS (82.74 vs 81.96) within noise. The tagging heads sit on an encoder with one bidirectional LSTM layer after one window layer (`recipes/pt/fast/PROVENANCE.md`). Entities 73.13 vs 75.27 (paired difference -2.14 [-4.26, 0.39], within noise). The package is 118 MB.
+UD Portuguese-Bosque r2.18 test and Universal NER Portuguese-Bosque test against spaCy 3.8.18 trained with its default configuration on the same data; the table, the settings and the weights are in `recipes/pt/fast/PROVENANCE.md`. Bosque has no XPOS, so there is no tagger and no XPOS or AllTags row. Raw text: every row ahead of spaCy except tokens (99.86 vs 99.87, within noise) (words 99.74 vs 88.51, UPOS 95.35 vs 84.15, LAS 82.09 vs 65.85, sentences 92.72 vs 84.48). Gold tokens: UPOS (95.89 vs 95.92), UFeats (94.51 vs 94.11), lemmas (97.30 vs 96.90), UAS (86.93 vs 86.05) and LAS (82.74 vs 81.96) within noise. The tagging heads sit on an encoder with one bidirectional LSTM layer after one window layer (`recipes/pt/fast/PROVENANCE.md`). Entities 73.13 vs 75.27 (paired difference -2.14 [-4.26, 0.39], within noise).
 ## Fast-tier tagging speed in the other languages (indicative)
 
 The tagging model of each language alone (sentencizer, tagger where present, morphologizer, lemmatizer), raw test text of the language's gating treebank, one thread, one document per call, three runs of four passes; build before the faster kernels and the LSTM-free encoder prediction against the current build, in the same job, x64 worker with load 16 to 25. Predictions of the current build equal the earlier build's on every file (dumps of the tagging, parser and entity files of each language: 0 differing lines, plus the Dutch entity confidence noted under English).

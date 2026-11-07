@@ -1,0 +1,327 @@
+{"id":"00e62ce579e2","items":[{"start":7,"end":30,"type":"set","value":"XXXX-WXX-1T09:00","grain":"minute"}]}
+{"id":"01bc2404bc0a","items":[{"start":11,"end":23,"type":"date","value":"2026-03-27","grain":"day"}]}
+{"id":"02089b220896","items":[{"start":12,"end":20,"type":"ordinal","value":"4"}]}
+{"id":"02812b9b24fc","items":[{"start":6,"end":16,"type":"date","value":"2026-03-13","grain":"day"}]}
+{"id":"02bbb935356a","items":[{"start":5,"end":14,"type":"age","value":"10 day"}]}
+{"id":"04945cb35851","items":[{"start":7,"end":19,"type":"ip"}]}
+{"id":"05c38deec126","items":[{"start":16,"end":32,"type":"mention"}]}
+{"id":"06bdf6e46f8b","items":[{"start":6,"end":14,"type":"dimension","value":"500 gram"}]}
+{"id":"0721e64f4cdd","items":[{"start":5,"end":17,"type":"date","value":"2026-06-21","grain":"day"}]}
+{"id":"0747d761a659","items":[{"start":7,"end":43,"type":"guid"}]}
+{"id":"07a13b1e8135","items":[]}
+{"id":"083a8ebbb155","items":[{"start":21,"end":26,"type":"duration","value":"259200"}]}
+{"id":"0896bfdce798","items":[{"start":5,"end":12,"type":"time","value":"T15:00","grain":"hour"}]}
+{"id":"089d657d1ba8","items":[{"start":9,"end":17,"type":"datetimerange","value":"2026-03-18T18:00/2026-03-19T00:00","grain":"hour","approx":true}]}
+{"id":"09bab99c58cb","items":[]}
+{"id":"09feeedd0e71","items":[{"start":0,"end":12,"type":"date","value":"2028-01-01","grain":"day"}]}
+{"id":"0a11a373f1fc","items":[]}
+{"id":"0a4ec3bbf5b2","items":[{"start":10,"end":18,"type":"daterange","value":"2026-03-16/2026-03-23","grain":"week"}]}
+{"id":"0a8596ed8062","items":[{"start":8,"end":15,"type":"number","value":"1000000"}]}
+{"id":"0acb63934d04","items":[{"start":0,"end":8,"type":"date","value":"2026-03-19","grain":"day"}]}
+{"id":"0b2d940baa52","items":[{"start":0,"end":11,"type":"age","value":"7 year"},{"start":18,"end":23,"type":"date","value":"2026-03-18","grain":"day"}]}
+{"id":"0b3c4f1350cb","items":[{"start":0,"end":13,"type":"date","value":"1990-04-15","grain":"day"}]}
+{"id":"0b7ae9482d87","items":[{"start":9,"end":45,"type":"guid"}]}
+{"id":"0b8b1ed99d5d","items":[{"start":10,"end":26,"type":"datetime","value":"2026-04-01T14:00","grain":"minute"}]}
+{"id":"0c2e87970430","items":[{"start":7,"end":17,"type":"mention"}]}
+{"id":"0cde754888e2","items":[{"start":9,"end":19,"type":"date","value":"2026-05-04","grain":"day"}]}
+{"id":"11907c74234d","items":[{"start":8,"end":22,"type":"time","value":"T12:00Z","grain":"minute"}]}
+{"id":"139435699ee2","items":[{"start":15,"end":19,"type":"percentage","value":"100"}]}
+{"id":"13eedd32bdd9","items":[{"start":0,"end":6,"type":"ordinal","value":"1"}]}
+{"id":"16831ce852e3","items":[{"start":8,"end":12,"type":"daterange","value":"1969-01-01/1970-01-01","grain":"year"}]}
+{"id":"16ca4895d5b2","items":[{"start":10,"end":20,"type":"age","value":"3 week"}]}
+{"id":"18758485eb1e","items":[{"start":19,"end":34,"type":"time","value":"T15:00","grain":"hour"}]}
+{"id":"18d9e85487b3","items":[{"start":0,"end":9,"type":"datetimerange","value":"2026-03-17T06:00/2026-03-17T12:00","grain":"hour","approx":true}]}
+{"id":"1d640ba84d35","items":[{"start":7,"end":16,"type":"mention"}]}
+{"id":"1dc3ce49208a","items":[{"start":10,"end":19,"type":"hashtag"},{"start":23,"end":30,"type":"hashtag"}]}
+{"id":"1df949046a63","items":[{"start":16,"end":24,"type":"duration","value":"7200"}]}
+{"id":"1f90727230f8","items":[{"start":5,"end":18,"type":"set","value":"XXXX-WXX-1","grain":"day"}]}
+{"id":"2097d4111b7d","items":[{"start":20,"end":30,"type":"duration","value":"P1Y6M"}]}
+{"id":"2117f1066118","items":[{"start":0,"end":5,"type":"set","value":"P1M","grain":"month"}]}
+{"id":"21eab9bd3772","items":[{"start":10,"end":26,"type":"phone"}]}
+{"id":"23453b18bc30","items":[]}
+{"id":"23707d9e90f0","items":[{"start":6,"end":11,"type":"dimension","value":"3 mile"}]}
+{"id":"258b56f987a9","items":[{"start":7,"end":15,"type":"number","value":"4500.75"}]}
+{"id":"2607a5cbdf13","items":[{"start":7,"end":21,"type":"daterange","value":"2021-03-01/2021-06-01","grain":"season","approx":true}]}
+{"id":"26dcff988839","items":[{"start":10,"end":18,"type":"currency","value":"0.75 TRY"}]}
+{"id":"2946dee3d19c","items":[{"start":10,"end":23,"type":"date","value":"2026-07-09","grain":"day"}]}
+{"id":"2b3d47f59ab6","items":[{"start":26,"end":43,"type":"phone"}]}
+{"id":"2cc09de6dce8","items":[{"start":7,"end":20,"type":"currency","value":"3000000 EUR"}]}
+{"id":"2cd37422d12c","items":[{"start":0,"end":15,"type":"email"}]}
+{"id":"2d12880201f5","items":[{"start":0,"end":33,"type":"date","value":"2026-04-23","grain":"day"}]}
+{"id":"2d45fe312465","items":[{"start":6,"end":19,"type":"dimension","value":"120 square meter"}]}
+{"id":"2dd3cab6f01f","items":[{"start":5,"end":14,"type":"currency","value":"250000 TRY"}]}
+{"id":"2ed24594c5f1","items":[{"start":0,"end":20,"type":"date","value":"2027-03-09","grain":"day"}]}
+{"id":"30a8189591ed","items":[{"start":0,"end":24,"type":"ip"}]}
+{"id":"32752e71c6d7","items":[{"start":5,"end":21,"type":"hashtag"}]}
+{"id":"32b24807ac08","items":[{"start":6,"end":15,"type":"daterange","value":"2026-03-01/2026-04-01","grain":"month"}]}
+{"id":"32d1cac98abd","items":[{"start":8,"end":14,"type":"ordinal","value":"3"}]}
+{"id":"33dbd4478968","items":[{"start":9,"end":16,"type":"duration","value":"P6M"}]}
+{"id":"348942a606f5","items":[{"start":8,"end":17,"type":"age","value":"2 year"}]}
+{"id":"35ad12ad0156","items":[{"start":6,"end":17,"type":"daterange","value":"2027-01-01/2028-01-01","grain":"year"}]}
+{"id":"37c77837c232","items":[{"start":6,"end":42,"type":"guid"}]}
+{"id":"38679f98209b","items":[{"start":4,"end":11,"type":"time","value":"T23:00","grain":"hour"}]}
+{"id":"389f4d39e961","items":[{"start":5,"end":27,"type":"daterange","value":"2026-06-01/2026-06-16","grain":"day"}]}
+{"id":"38e74e275332","items":[{"start":6,"end":30,"type":"timerange","value":"T20:00/T22:00","grain":"minute"}]}
+{"id":"39983f37247a","items":[{"start":4,"end":13,"type":"temperature","value":"22 degree"}]}
+{"id":"39de9fd05ce9","items":[]}
+{"id":"3a9feb89cceb","items":[{"start":0,"end":17,"type":"date","value":"2026-03-23","grain":"day"}]}
+{"id":"3ad2bee3d9a3","items":[{"start":12,"end":22,"type":"daterange","value":"2026-04-01/2026-05-01","grain":"month"}]}
+{"id":"3bc85cc131ed","items":[{"start":7,"end":14,"type":"set","value":"P1D","grain":"day"}]}
+{"id":"3bd10ff67ba9","items":[{"start":0,"end":13,"type":"hashtag"}]}
+{"id":"3be151928943","items":[{"start":9,"end":20,"type":"date","value":"2028-03-01","grain":"day"}]}
+{"id":"3bf3d57fcd9f","items":[{"start":5,"end":15,"type":"dimension","value":"90 kilometer per hour"}]}
+{"id":"3c9f04409ae4","items":[{"start":13,"end":27,"type":"phone"}]}
+{"id":"3e7cabcfa319","items":[{"start":8,"end":20,"type":"number","value":"123"}]}
+{"id":"3e9510e6419f","items":[{"start":5,"end":35,"type":"url"}]}
+{"id":"3f0f41465cdb","items":[{"start":24,"end":27,"type":"percentage","value":"12"}]}
+{"id":"401df30e50fc","items":[{"start":5,"end":11,"type":"daterange","value":"2026-01-01/2027-01-01","grain":"year"}]}
+{"id":"402ebd4f9ad2","items":[{"start":6,"end":15,"type":"datetimerange","value":"2026-03-17T18:00/2026-03-18T00:00","grain":"hour","approx":true}]}
+{"id":"40b2b5b05643","items":[{"start":8,"end":13,"type":"temperature","value":"25 celsius"}]}
+{"id":"420c8add06c3","items":[{"start":15,"end":26,"type":"temperature","value":"38.5 degree"}]}
+{"id":"43b8f25fe0cc","items":[]}
+{"id":"441bfe6c53f3","items":[{"start":12,"end":21,"type":"mention"},{"start":25,"end":31,"type":"mention"}]}
+{"id":"451e54126b4a","items":[{"start":10,"end":20,"type":"time","value":"T18:45","grain":"minute"}]}
+{"id":"464c0aa4d2c5","items":[{"start":7,"end":45,"type":"guid"}]}
+{"id":"4725f6f1bfcd","items":[{"start":11,"end":13,"type":"number","value":"-7"}]}
+{"id":"472ef1e98d60","items":[{"start":9,"end":36,"type":"email"}]}
+{"id":"48bc35389092","items":[{"start":5,"end":14,"type":"duration","value":"30"}]}
+{"id":"4956f909957d","items":[{"start":5,"end":13,"type":"set","value":"XXXX-WXX-5","grain":"day"}]}
+{"id":"4a25bc1f2e4c","items":[{"start":0,"end":11,"type":"date","value":"2026-03-21","grain":"day"}]}
+{"id":"4e30ef5da562","items":[{"start":10,"end":22,"type":"age","value":"90 year"}]}
+{"id":"4e4fc7c03515","items":[{"start":9,"end":27,"type":"hashtag"}]}
+{"id":"4f18d84a4f35","items":[{"start":19,"end":40,"type":"email"}]}
+{"id":"4fa7cfa4a97f","items":[{"start":6,"end":19,"type":"timerange","value":"T09:00/T17:00","grain":"minute"}]}
+{"id":"513b72160045","items":[{"start":7,"end":18,"type":"timerange","value":"T09:00/T17:00","grain":"minute"}]}
+{"id":"517439d4a40d","items":[{"start":10,"end":16,"type":"set","value":"P1M","grain":"month"}]}
+{"id":"51c7bd5fd9b2","items":[{"start":22,"end":47,"type":"url"}]}
+{"id":"525bca4fb0ba","items":[{"start":4,"end":11,"type":"dimension","value":"6 meter"}]}
+{"id":"5302b8a4c000","items":[{"start":21,"end":41,"type":"temperature","value":"100 celsius"}]}
+{"id":"53f15e037e56","items":[{"start":25,"end":35,"type":"hashtag"}]}
+{"id":"54c248b566c7","items":[{"start":6,"end":10,"type":"number","value":"40"}]}
+{"id":"55a40172ce74","items":[{"start":14,"end":28,"type":"phone"}]}
+{"id":"5715d7c66f27","items":[{"start":8,"end":13,"type":"date","value":"2028-02-29","grain":"day"}]}
+{"id":"5783c3577241","items":[{"start":10,"end":23,"type":"daterange","value":"2026-05-01/2026-05-11","grain":"month","approx":true}]}
+{"id":"57b84b6b990d","items":[{"start":22,"end":47,"type":"email"}]}
+{"id":"5873f07dd326","items":[{"start":5,"end":11,"type":"ordinal","value":"2"}]}
+{"id":"5950776ddc75","items":[{"start":6,"end":16,"type":"date","value":"2026-04-15","grain":"day"}]}
+{"id":"599a658d5099","items":[{"start":15,"end":27,"type":"percentage","value":"12"}]}
+{"id":"5a13ba5635b2","items":[{"start":6,"end":18,"type":"date","value":"2027-02-03","grain":"day"}]}
+{"id":"5a2f71fb01ce","items":[{"start":6,"end":15,"type":"age","value":"5 year"}]}
+{"id":"5ae66b9509ec","items":[{"start":13,"end":30,"type":"phone"}]}
+{"id":"5b88912e6869","items":[{"start":11,"end":22,"type":"date","value":"2027-01-01","grain":"day"}]}
+{"id":"5cc6eeb347d4","items":[{"start":9,"end":16,"type":"time","value":"T08:00","grain":"hour"}]}
+{"id":"5cf8876a18cb","items":[{"start":17,"end":21,"type":"dimension","value":"5 kilometer"}]}
+{"id":"5d4bc2da99d7","items":[{"start":10,"end":26,"type":"duration","value":"9000"}]}
+{"id":"5d85f43e1ffb","items":[{"start":19,"end":36,"type":"phone"}]}
+{"id":"60260e5da957","items":[{"start":21,"end":53,"type":"url"}]}
+{"id":"60867997cf1e","items":[{"start":0,"end":11,"type":"datetimerange","value":"2026-03-19T06:00/2026-03-19T12:00","grain":"hour","approx":true}]}
+{"id":"608edee469c8","items":[{"start":5,"end":21,"type":"datetime","value":"2026-03-19T15:00","grain":"minute"}]}
+{"id":"60c86ebb8130","items":[{"start":8,"end":21,"type":"url"}]}
+{"id":"60ea7c82275a","items":[{"start":8,"end":17,"type":"daterange","value":"2025-12-01/2026-03-01","grain":"season","approx":true}]}
+{"id":"61c6e9e7b240","items":[{"start":5,"end":14,"type":"set","value":"P1W","grain":"week"},{"start":15,"end":21,"type":"ordinal","value":"3"}]}
+{"id":"62a52e178348","items":[{"start":9,"end":13,"type":"date","value":"2026-03-20","grain":"day"}]}
+{"id":"64533a3bab39","items":[]}
+{"id":"656fcf0a706a","items":[{"start":0,"end":6,"type":"set","value":"P1Y","grain":"year"}]}
+{"id":"65d17e6c77e2","items":[{"start":13,"end":25,"type":"dimension","value":"12 kilometer"}]}
+{"id":"6628ca381b21","items":[{"start":12,"end":35,"type":"email"}]}
+{"id":"6733360095b3","items":[{"start":7,"end":17,"type":"date","value":"2026-09-12","grain":"day"}]}
+{"id":"673e36a13688","items":[{"start":8,"end":12,"type":"daterange","value":"2031-01-01/2032-01-01","grain":"year"}]}
+{"id":"6749ded9a1ce","items":[{"start":7,"end":30,"type":"email"}]}
+{"id":"69010403cae0","items":[{"start":28,"end":35,"type":"mention"}]}
+{"id":"6922642ed6e2","items":[{"start":6,"end":12,"type":"currency","value":"12.4 EUR"}]}
+{"id":"692c1d287e55","items":[{"start":7,"end":16,"type":"date","value":"2026-03-23","grain":"day"},{"start":22,"end":23,"type":"number","value":"9"}]}
+{"id":"69d937c2537a","items":[{"start":31,"end":40,"type":"ip"}]}
+{"id":"6a8ec2d8cf0f","items":[]}
+{"id":"6b636b825136","items":[{"start":12,"end":24,"type":"date","value":"2026-03-20","grain":"day"}]}
+{"id":"6b6856fa6883","items":[{"start":5,"end":16,"type":"timerange","value":"T08:00/T15:00","grain":"minute"}]}
+{"id":"6ba2e99a4816","items":[{"start":8,"end":25,"type":"number","value":"324"}]}
+{"id":"6c3d7663456f","items":[{"start":7,"end":14,"type":"currency","value":"75 TRY"}]}
+{"id":"6c7ab7aca92e","items":[{"start":11,"end":20,"type":"duration","value":"2700"}]}
+{"id":"6d0db3e3869c","items":[{"start":18,"end":26,"type":"ip"}]}
+{"id":"6d100eee2582","items":[{"start":9,"end":28,"type":"datetimerange","value":"2026-03-19T12:00/2026-03-19T18:00","grain":"hour","approx":true}]}
+{"id":"6e852a4d4f4b","items":[{"start":13,"end":18,"type":"percentage","value":"48.3"}]}
+{"id":"6f8fed9dde9b","items":[{"start":12,"end":20,"type":"percentage","value":"50"}]}
+{"id":"714637b89f6f","items":[{"start":8,"end":14,"type":"dimension","value":"250 milliliter"}]}
+{"id":"71ae1300f7fa","items":[{"start":5,"end":16,"type":"date","value":"2026-03-16","grain":"day"}]}
+{"id":"71d203f85c21","items":[{"start":7,"end":16,"type":"dimension","value":"1.5 liter"}]}
+{"id":"72309109f16b","items":[]}
+{"id":"72786a719175","items":[{"start":10,"end":18,"type":"currency","value":"800 EUR"}]}
+{"id":"73bb52a21d4e","items":[{"start":0,"end":7,"type":"ordinal","value":"1000"}]}
+{"id":"74702fe3f87b","items":[{"start":5,"end":14,"type":"daterange","value":"2026-05-04/2026-05-09","grain":"day"}]}
+{"id":"76638fa32279","items":[{"start":15,"end":44,"type":"url"}]}
+{"id":"76a01b3dc16a","items":[{"start":7,"end":9,"type":"number","value":"42"}]}
+{"id":"77d9181fccea","items":[{"start":7,"end":35,"type":"daterange","value":"2026-04-06/2026-04-11","grain":"day"}]}
+{"id":"784a7007287b","items":[{"start":19,"end":31,"type":"ip"}]}
+{"id":"791f5cad9747","items":[{"start":11,"end":16,"type":"percentage","value":"0.75"}]}
+{"id":"79d33f459cc7","items":[]}
+{"id":"7a0a88b9636c","items":[{"start":12,"end":16,"type":"temperature","value":"4 celsius"}]}
+{"id":"7b1595827e9b","items":[]}
+{"id":"7d6fe11b6949","items":[{"start":0,"end":15,"type":"date","value":"2026-03-20","grain":"day"}]}
+{"id":"7d908613690a","items":[{"start":4,"end":8,"type":"currency","value":"5 TRY"}]}
+{"id":"7e3ea6eb6afb","items":[{"start":0,"end":10,"type":"date","value":"2026-03-17","grain":"day"}]}
+{"id":"7ed949883242","items":[{"start":5,"end":18,"type":"daterange","value":"2026-03-23/2026-03-30","grain":"week"}]}
+{"id":"7f53619ebecc","items":[{"start":7,"end":20,"type":"date","value":"2026-09-30","grain":"day"}]}
+{"id":"7f6b8aa56b8a","items":[{"start":5,"end":12,"type":"duration","value":"3024000"}]}
+{"id":"7f779b434df3","items":[{"start":17,"end":31,"type":"phone"}]}
+{"id":"7f919af6901d","items":[{"start":10,"end":23,"type":"hashtag"}]}
+{"id":"814a33209048","items":[{"start":5,"end":16,"type":"daterange","value":"2026-03-09/2026-03-16","grain":"week"}]}
+{"id":"81e2921b903e","items":[]}
+{"id":"82e23e0890d0","items":[{"start":0,"end":16,"type":"date","value":"2026-11-24","grain":"day"}]}
+{"id":"85116e05588f","items":[{"start":5,"end":18,"type":"date","value":"2026-04-01","grain":"day"}]}
+{"id":"855d43c0bca0","items":[{"start":0,"end":8,"type":"set","value":"P1W","grain":"week"},{"start":15,"end":31,"type":"datetimerange","value":"2026-03-23T06:00/2026-03-23T12:00","grain":"hour","approx":true}]}
+{"id":"8645c7275b93","items":[{"start":7,"end":18,"type":"datetime","value":"2026-03-19T12:00","grain":"hour"}]}
+{"id":"87816176f5ce","items":[{"start":5,"end":21,"type":"datetimerange","value":"2026-03-18T12:00/2026-03-18T18:00","grain":"hour","approx":true}]}
+{"id":"87e062877e96","items":[{"start":22,"end":69,"type":"url"}]}
+{"id":"888bf729dd3d","items":[{"start":20,"end":52,"type":"url"}]}
+{"id":"88e73f820d13","items":[{"start":6,"end":11,"type":"daterange","value":"2026-03-01/2026-04-01","grain":"month"}]}
+{"id":"89c7427cf3fa","items":[{"start":9,"end":21,"type":"date","value":"2026-05-10","grain":"day"}]}
+{"id":"8a578ee66d78","items":[{"start":30,"end":41,"type":"ip"}]}
+{"id":"8cd688887d36","items":[{"start":8,"end":14,"type":"duration","value":"P10Y"}]}
+{"id":"8ef1384a8cb7","items":[{"start":13,"end":34,"type":"daterange","value":"2020-01-01/2025-01-01","grain":"year"}]}
+{"id":"8f10dd0d5ec2","items":[{"start":6,"end":42,"type":"guid"}]}
+{"id":"8f21fdeb27c1","items":[{"start":8,"end":18,"type":"time","value":"T15:30","grain":"minute"}]}
+{"id":"9165a6c6d3ea","items":[{"start":6,"end":16,"type":"daterange","value":"2027-01-01/2027-02-01","grain":"month"}]}
+{"id":"922b62b54344","items":[{"start":9,"end":18,"type":"hashtag"}]}
+{"id":"94d407dd2dd2","items":[{"start":8,"end":32,"type":"timerange","value":"T14:00/T16:00","grain":"minute"}]}
+{"id":"96afce466d1a","items":[]}
+{"id":"979a38e265d0","items":[{"start":9,"end":19,"type":"time","value":"T10:00","grain":"minute"},{"start":24,"end":29,"type":"time","value":"T11:30","grain":"minute"}]}
+{"id":"981bd1ab7e79","items":[{"start":0,"end":2,"type":"number","value":"10"},{"start":3,"end":10,"type":"ordinal","value":"5"}]}
+{"id":"985537fcb4c8","items":[{"start":4,"end":11,"type":"time","value":"T17:00","grain":"hour"}]}
+{"id":"9955d81c7498","items":[{"start":0,"end":7,"type":"ordinal","value":"21"}]}
+{"id":"9981aa90d9e5","items":[{"start":7,"end":13,"type":"daterange","value":"2026-06-01/2026-09-01","grain":"season","approx":true}]}
+{"id":"9a50295b99d9","items":[{"start":6,"end":10,"type":"dimension","value":"2 kilogram"}]}
+{"id":"9acbe977b7b1","items":[]}
+{"id":"9c164db226d9","items":[{"start":18,"end":23,"type":"temperature","value":"-5 celsius"}]}
+{"id":"9d5897be5b6c","items":[{"start":6,"end":11,"type":"time","value":"T12:00","grain":"hour"}]}
+{"id":"9e51db8d9ff2","items":[{"start":13,"end":28,"type":"date","value":"2027-02-14","grain":"day"}]}
+{"id":"9f0b19dc74fa","items":[{"start":15,"end":29,"type":"phone"}]}
+{"id":"9f3d69833641","items":[{"start":8,"end":14,"type":"ordinal","value":"5"}]}
+{"id":"9f76c2d693ff","items":[{"start":6,"end":13,"type":"percentage","value":"8"}]}
+{"id":"a0027df838df","items":[{"start":0,"end":14,"type":"date","value":"2026-05-27","grain":"day"}]}
+{"id":"a2907b8d7afb","items":[{"start":14,"end":19,"type":"number","value":"0.001"}]}
+{"id":"a2cc95a985d9","items":[{"start":6,"end":13,"type":"set","value":"P1Y","grain":"year"}]}
+{"id":"a412f0459ae3","items":[{"start":0,"end":5,"type":"date","value":"2026-03-19","grain":"day"}]}
+{"id":"a49012ea0a60","items":[]}
+{"id":"a51fe73a7b79","items":[{"start":0,"end":8,"type":"age","value":"18 month"}]}
+{"id":"a64b5df16eaf","items":[{"start":8,"end":19,"type":"percentage","value":"20"}]}
+{"id":"a6882f942aaf","items":[{"start":0,"end":18,"type":"date","value":"2026-10-29","grain":"day"}]}
+{"id":"a768a76eccfb","items":[{"start":7,"end":12,"type":"ordinal","value":"2"}]}
+{"id":"aa2aa2024846","items":[{"start":7,"end":19,"type":"ordinal","value":"23"}]}
+{"id":"aa4dd614f767","items":[{"start":5,"end":15,"type":"age","value":"12 year"}]}
+{"id":"aac5432f220f","items":[{"start":8,"end":19,"type":"hashtag"}]}
+{"id":"aadeff9fdc82","items":[{"start":0,"end":9,"type":"ordinal","value":"9"},{"start":17,"end":20,"type":"date","value":"2026-03-17","grain":"day"}]}
+{"id":"ab0355875e80","items":[{"start":5,"end":27,"type":"timerange","value":"T09:00/T17:00","grain":"hour"}]}
+{"id":"abcc6260c73b","items":[{"start":21,"end":26,"type":"temperature","value":"72 fahrenheit"}]}
+{"id":"abdfc17afa5f","items":[{"start":15,"end":16,"type":"number","value":"8"},{"start":21,"end":23,"type":"number","value":"12"}]}
+{"id":"acdb89c5284a","items":[{"start":9,"end":24,"type":"datetime","value":"2026-03-20T10:30","grain":"minute"}]}
+{"id":"ad6d3f3087fd","items":[{"start":9,"end":23,"type":"daterange","value":"2022-05-01/2022-09-01","grain":"year","approx":true}]}
+{"id":"ad8b485ac839","items":[{"start":0,"end":5,"type":"date","value":"2026-03-18","grain":"day"},{"start":13,"end":20,"type":"ordinal","value":"100"}]}
+{"id":"ae6a679a858e","items":[{"start":17,"end":26,"type":"currency","value":"10000 TRY"}]}
+{"id":"ae7502aac6a3","items":[{"start":7,"end":18,"type":"time","value":"T00:00","grain":"hour"}]}
+{"id":"af3c0d4fb3c8","items":[{"start":6,"end":9,"type":"number","value":"2"}]}
+{"id":"b0938d2a51fc","items":[{"start":9,"end":13,"type":"percentage","value":"3.5"}]}
+{"id":"b17e456a6999","items":[{"start":9,"end":30,"type":"url"}]}
+{"id":"b262f5f1024a","items":[{"start":8,"end":27,"type":"datetime","value":"2026-04-15T18:30","grain":"minute"}]}
+{"id":"b34a7e6828f6","items":[{"start":17,"end":25,"type":"hashtag"}]}
+{"id":"b3a02def32ce","items":[{"start":5,"end":38,"type":"url"}]}
+{"id":"b49335f403c4","items":[{"start":5,"end":18,"type":"dimension","value":"75 centimeter"}]}
+{"id":"b51ae24305c5","items":[{"start":6,"end":11,"type":"date","value":"2026-03-18","grain":"day"}]}
+{"id":"b69efa7c0431","items":[{"start":13,"end":27,"type":"phone"}]}
+{"id":"b7b75419984e","items":[{"start":11,"end":18,"type":"age","value":"6 month"}]}
+{"id":"b9f1c72943ef","items":[{"start":7,"end":19,"type":"daterange","value":"2021-01-01/2021-05-01","grain":"year","approx":true}]}
+{"id":"bb79c4455d3e","items":[{"start":0,"end":4,"type":"date","value":"2026-12-25","grain":"day"}]}
+{"id":"bc3432464f96","items":[{"start":6,"end":23,"type":"daterange","value":"2025-09-01/2025-12-01","grain":"season","approx":true}]}
+{"id":"bc603af1708b","items":[{"start":0,"end":6,"type":"daterange","value":"2026-01-01/2027-01-01","grain":"year"},{"start":14,"end":23,"type":"number","value":"2500000"}]}
+{"id":"bf56db00a558","items":[{"start":15,"end":19,"type":"number","value":"3.14"}]}
+{"id":"bf8cf9280553","items":[{"start":19,"end":29,"type":"number","value":"7900000000"}]}
+{"id":"c07987791c51","items":[{"start":0,"end":7,"type":"date","value":"2027-01-01","grain":"day"}]}
+{"id":"c0f0078bd10b","items":[{"start":17,"end":53,"type":"guid"}]}
+{"id":"c1eece7b54ed","items":[{"start":10,"end":20,"type":"mention"}]}
+{"id":"c1ef101b46ef","items":[{"start":6,"end":9,"type":"currency","value":"45 TRY"}]}
+{"id":"c2876bc18170","items":[{"start":5,"end":10,"type":"date","value":"2026-03-19","grain":"day"},{"start":11,"end":20,"type":"temperature","value":"18 degree"}]}
+{"id":"c42ebb1cada4","items":[{"start":0,"end":36,"type":"guid"}]}
+{"id":"c44328d63bc5","items":[{"start":11,"end":26,"type":"date","value":"2026-06-20","grain":"day"}]}
+{"id":"c5c10a90eac1","items":[{"start":7,"end":22,"type":"number","value":"2500"}]}
+{"id":"c5d655f4dff4","items":[{"start":14,"end":28,"type":"datetime","value":"2026-03-17T22:15","grain":"minute"}]}
+{"id":"c6e569cd6ad5","items":[{"start":7,"end":30,"type":"datetime","value":"2026-03-20T09:00","grain":"minute"}]}
+{"id":"c79a6e1f079f","items":[{"start":9,"end":12,"type":"date","value":"2026-03-17","grain":"day"}]}
+{"id":"c8a125d7a8cf","items":[{"start":0,"end":36,"type":"guid"}]}
+{"id":"c8ba38376b62","items":[{"start":8,"end":20,"type":"datetimerange","value":"2026-03-22T06:00/2026-03-22T12:00","grain":"hour","approx":true}]}
+{"id":"c9db65611bf1","items":[{"start":7,"end":19,"type":"ip"}]}
+{"id":"cab566d633d5","items":[{"start":18,"end":21,"type":"number","value":"1000"}]}
+{"id":"cac5fc75cbb9","items":[{"start":7,"end":10,"type":"percentage","value":"25"}]}
+{"id":"cb17044f668c","items":[{"start":3,"end":16,"type":"currency","value":"2500000 TRY"}]}
+{"id":"cb695fe79480","items":[{"start":6,"end":27,"type":"email"}]}
+{"id":"cbf848af84ef","items":[{"start":8,"end":22,"type":"date","value":"2026-12-31","grain":"day"}]}
+{"id":"cc0924ce90d8","items":[{"start":8,"end":13,"type":"number","value":"1250"}]}
+{"id":"cc22af4db833","items":[{"start":15,"end":26,"type":"dimension","value":"23 kilogram"}]}
+{"id":"cc2e284593d6","items":[{"start":0,"end":8,"type":"date","value":"2027-01-01","grain":"day"},{"start":17,"end":28,"type":"datetimerange","value":"2027-01-01T18:00/2027-01-02T00:00","grain":"hour","approx":true}]}
+{"id":"ce038fc2a610","items":[{"start":7,"end":14,"type":"currency","value":"100 USD"}]}
+{"id":"ce59025d6900","items":[{"start":5,"end":16,"type":"timerange","value":"T12:00/T13:30","grain":"minute"}]}
+{"id":"ce6129322284","items":[{"start":13,"end":18,"type":"currency","value":"20 TRY"}]}
+{"id":"cf71b6f27527","items":[{"start":0,"end":13,"type":"date","value":"2026-08-30","grain":"day"}]}
+{"id":"cfff6879f042","items":[{"start":9,"end":15,"type":"number","value":"80"}]}
+{"id":"d0f12454ddc5","items":[{"start":9,"end":18,"type":"daterange","value":"2025-01-01/2026-01-01","grain":"year"}]}
+{"id":"d133bb5f3697","items":[{"start":5,"end":17,"type":"daterange","value":"2023-09-01/2024-01-01","grain":"year","approx":true}]}
+{"id":"d188cb933381","items":[{"start":6,"end":11,"type":"date","value":"2026-03-18","grain":"day"},{"start":12,"end":31,"type":"temperature","value":"15 celsius"}]}
+{"id":"d1c758d4f6a8","items":[{"start":6,"end":15,"type":"number","value":"25"}]}
+{"id":"d21f8a68aa59","items":[{"start":9,"end":45,"type":"guid"}]}
+{"id":"d28afb67f7a2","items":[]}
+{"id":"d301f7dfaf95","items":[{"start":0,"end":5,"type":"daterange","value":"2026-03-01/2026-04-01","grain":"month"},{"start":16,"end":20,"type":"percentage","value":"1.2"}]}
+{"id":"d3c05db6a850","items":[{"start":19,"end":28,"type":"mention"},{"start":32,"end":39,"type":"mention"}]}
+{"id":"d42667eacf98","items":[{"start":17,"end":31,"type":"email"}]}
+{"id":"d47faeedee61","items":[{"start":9,"end":19,"type":"number","value":"2000000"}]}
+{"id":"d4b8596292c5","items":[{"start":7,"end":17,"type":"age","value":"85 year"}]}
+{"id":"d4cf8e5ce638","items":[{"start":10,"end":20,"type":"number","value":"12"}]}
+{"id":"d50eb039ba4d","items":[{"start":0,"end":12,"type":"age","value":"40 year"}]}
+{"id":"d57c661940e9","items":[{"start":8,"end":19,"type":"timerange","value":"T18:00/T20:00","grain":"minute"}]}
+{"id":"d676fcca5be1","items":[{"start":5,"end":14,"type":"duration","value":"5400"}]}
+{"id":"d80de384bdda","items":[{"start":7,"end":17,"type":"phone"}]}
+{"id":"d9ad0176a091","items":[{"start":5,"end":21,"type":"datetimerange","value":"2026-03-21T18:00/2026-03-22T00:00","grain":"hour","approx":true}]}
+{"id":"dc0a5476329b","items":[{"start":18,"end":26,"type":"daterange","value":"2026-03-16/2026-03-23","grain":"week"}]}
+{"id":"dc7e0bfce353","items":[{"start":17,"end":25,"type":"number","value":"30000"}]}
+{"id":"de95eb900fa5","items":[{"start":7,"end":30,"type":"datetime","value":"2026-03-25T14:00","grain":"minute"}]}
+{"id":"df6ecf028256","items":[{"start":7,"end":12,"type":"time","value":"T09:00","grain":"minute"}]}
+{"id":"e01817ce5a4b","items":[{"start":6,"end":16,"type":"date","value":"2026-08-14","grain":"day"}]}
+{"id":"e0cd12418dfa","items":[{"start":6,"end":11,"type":"dimension","value":"40 kilowatt"}]}
+{"id":"e10208bf7b18","items":[{"start":23,"end":30,"type":"mention"}]}
+{"id":"e12498079a5f","items":[{"start":5,"end":11,"type":"dimension","value":"180 centimeter"}]}
+{"id":"e152e4186d62","items":[{"start":14,"end":21,"type":"hashtag"}]}
+{"id":"e22b94bb3166","items":[{"start":9,"end":21,"type":"daterange","value":"2027-06-01/2027-07-01","grain":"month"}]}
+{"id":"e39eab926c74","items":[{"start":5,"end":12,"type":"duration","value":"172800"}]}
+{"id":"e3f97871ceec","items":[{"start":14,"end":25,"type":"currency","value":"1234.56 TRY"}]}
+{"id":"e4364daf8c86","items":[{"start":8,"end":21,"type":"timerange","value":"T08:30/T12:00","grain":"minute"}]}
+{"id":"e43a7df6e70f","items":[{"start":8,"end":26,"type":"set","value":"T12:00","grain":"minute"}]}
+{"id":"e4d5f612bf50","items":[{"start":7,"end":13,"type":"temperature","value":"200 celsius"}]}
+{"id":"e4e66674d95a","items":[{"start":11,"end":24,"type":"daterange","value":"2026-03-23/2026-03-30","grain":"week"}]}
+{"id":"e50dde8f76f2","items":[{"start":13,"end":26,"type":"time","value":"T10:15:30","grain":"second"}]}
+{"id":"e58f51885818","items":[{"start":20,"end":32,"type":"mention"}]}
+{"id":"e5ab2f1645e9","items":[{"start":0,"end":12,"type":"email"},{"start":16,"end":31,"type":"email"}]}
+{"id":"e5c1592e6336","items":[{"start":4,"end":10,"type":"ordinal","value":"8"}]}
+{"id":"e60e2c999417","items":[{"start":14,"end":20,"type":"temperature","value":"-12 celsius"}]}
+{"id":"e82b62fe6710","items":[{"start":0,"end":8,"type":"date","value":"2026-03-20","grain":"day"}]}
+{"id":"e89267e7af5a","items":[{"start":9,"end":16,"type":"date","value":"2026-05-05","grain":"day"}]}
+{"id":"e9406117f763","items":[{"start":8,"end":37,"type":"email"}]}
+{"id":"e9bb3185811f","items":[{"start":5,"end":24,"type":"datetime","value":"2026-03-19T14:00","grain":"minute"}]}
+{"id":"eb2dfdc2338a","items":[{"start":0,"end":28,"type":"ip"}]}
+{"id":"ebcbd33b40db","items":[{"start":17,"end":24,"type":"ip"}]}
+{"id":"ec73f60ae8e3","items":[{"start":11,"end":19,"type":"percentage","value":"90"}]}
+{"id":"ecc64718f8d5","items":[{"start":8,"end":22,"type":"time","value":"T15:00+01:00","grain":"minute"}]}
+{"id":"ee31dba4ff49","items":[{"start":8,"end":12,"type":"currency","value":"499 USD"}]}
+{"id":"ef4f683685e8","items":[{"start":15,"end":24,"type":"currency","value":"150 USD"}]}
+{"id":"efda2252db89","items":[{"start":6,"end":42,"type":"guid"}]}
+{"id":"f0e8e74f176d","items":[{"start":9,"end":20,"type":"number","value":"97"}]}
+{"id":"f1af3c0e55ad","items":[{"start":9,"end":19,"type":"time","value":"T15:00","grain":"minute"}]}
+{"id":"f22e2767df99","items":[{"start":6,"end":22,"type":"datetime","value":"2026-03-18T17:00","grain":"minute"}]}
+{"id":"f3e943fcfc83","items":[{"start":6,"end":16,"type":"temperature","value":"300 kelvin"}]}
+{"id":"f3fbdb43edbc","items":[{"start":8,"end":14,"type":"ordinal","value":"3"}]}
+{"id":"f4dad18627f0","items":[{"start":12,"end":18,"type":"currency","value":"2.5 EUR"}]}
+{"id":"f4e89e1767f0","items":[{"start":11,"end":22,"type":"datetimerange","value":"2026-03-19T18:00/2026-03-20T00:00","grain":"hour","approx":true}]}
+{"id":"f72fb62622fe","items":[{"start":11,"end":46,"type":"url"}]}
+{"id":"f756fd1202d7","items":[{"start":6,"end":12,"type":"dimension","value":"250 megabyte"}]}
+{"id":"f7a65d3bdfea","items":[{"start":8,"end":16,"type":"datetimerange","value":"2026-03-18T06:00/2026-03-18T12:00","grain":"hour","approx":true}]}
+{"id":"f961f3803eb3","items":[{"start":16,"end":28,"type":"ip"}]}
+{"id":"f9b0ed434d90","items":[{"start":12,"end":26,"type":"phone"}]}
+{"id":"fa4281ed1453","items":[{"start":13,"end":22,"type":"time","value":"T07:05","grain":"minute"}]}
+{"id":"fd05552f6b73","items":[{"start":0,"end":7,"type":"number","value":"17"}]}
+{"id":"fdbcd14e036e","items":[{"start":0,"end":22,"type":"date","value":"2026-05-01","grain":"day"}]}
