@@ -4,8 +4,11 @@ using RecursiveAI.OneModel.Training;
 using RecursiveAI.OneNlp.Data;
 using RecursiveAI.OneNlp.Neural.Components;
 using RecursiveAI.OneNlp.Neural.Encoders;
+using RecursiveAI.OneNlp.Neural;
+using RecursiveAI.OneNlp.Neural.Training;
 
-namespace RecursiveAI.OneNlp.Neural.Training;
+// The extension lives in the namespace of Pipeline, so nlp.Train(...) needs no using beyond the one every program has.
+namespace RecursiveAI.OneNlp;
 
 /// <summary>Trains the neural components of a <see cref="Pipeline"/>.</summary>
 public static class PipelineTraining
@@ -43,6 +46,19 @@ public static class PipelineTraining
         using var trainer = new Trainer(pipeline, examples, options ?? new TrainOptions(), cancellationToken);
         return trainer.Run();
     }
+
+    /// <summary>
+    /// Trains the pipeline for a number of epochs with the default settings: shorthand for the other overload with <see cref="TrainOptions.Epochs"/> set.
+    /// </summary>
+    /// <param name="pipeline">The pipeline.</param>
+    /// <param name="examples">The training examples.</param>
+    /// <param name="epochs">The maximum number of epochs, at least 1; early stopping may end the run sooner.</param>
+    /// <param name="cancellationToken">Stops the run at a step boundary.</param>
+    /// <returns>The outcome.</returns>
+    /// <exception cref="InvalidOperationException">See the other overload.</exception>
+    /// <exception cref="ArgumentException">See the other overload; or <paramref name="epochs"/> is out of range.</exception>
+    public static TrainResult Train(this Pipeline pipeline, IReadOnlyList<Example> examples, int epochs, CancellationToken cancellationToken = default) =>
+        pipeline.Train(examples, new TrainOptions { Epochs = epochs }, cancellationToken);
 
     private sealed class Trainer : IDisposable
     {

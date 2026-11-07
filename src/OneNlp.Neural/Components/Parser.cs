@@ -33,7 +33,7 @@ namespace RecursiveAI.OneNlp.Neural.Components;
 /// A training example is used only when its predicted and reference tokens match one to one; others are left out of the loss.
 /// </para>
 /// </remarks>
-public sealed class Parser : TrainableHead
+public sealed class Parser : DependencyParser
 {
     /// <summary>The kind name used by <see cref="HeadRegistry"/>: <c>parser</c>.</summary>
     public const string ComponentKind = "parser";
