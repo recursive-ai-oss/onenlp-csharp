@@ -27,7 +27,7 @@
 - **Hand checks of the labels** (same strictness: dates and weekdays right; common nouns, titles, roles, generic phrases, nested pieces and bad boundaries wrong):
   - pilot slice, 200 passages, unfiltered: 79.1 % of 805 mentions correct (recall about 73 %); the same slice after the filter: 88.1 %;
   - fresh slice, 200 other passages (seed 20261108), filtered: 93.1 % of 613 mentions correct (42 wrong). The fresh slice was judged mostly from the mention text with 25 characters of context, so context-only errors (a team named by its city) were more likely missed than in the pilot check; the filter's gain is the likely 5 to 10 points, not the full 14.
-- **GPU time:** pilot 0.333 h and full run 1.983 h, 2.316 GPU-hours of the 8 approved (`gpu-hours.tsv`). The two-pass agreement filter was not run: precision was already above the bar and a second pass would have cost another 2 GPU-hours.
+- **GPU time:** pilot 0.333 h and full run 1.983 h, 2.316 GPU-hours in all (`gpu-hours.tsv`). A second labelling pass with an agreement filter was not run: the filtered labels already met the 80% hand-checked precision target, and a second pass would have doubled the GPU time.
 
 ## Pretrained components
 
