@@ -266,7 +266,7 @@ and `tools/OneNlp.OpenNerGate/README.md` give provenance and reproduction comman
 
 ## Accurate tier
 
-The distilled package covers nine languages; the base-size package covers 84 for syntax and 19 for entities. Current full per-language quality rows and the remaining published-reference gaps are in [accurate-tier-rows.md](accurate-tier-rows.md). No overall quality pass is claimed.
+The distilled package covers nine languages; the base-size package covers 84 for syntax and 19 for entities. The gate is the paired comparison with spaCy 3.8.18 trained on the same data: 144 rows, 117 ahead, 14 within noise, **13 behind** (listed in [accurate-tier-rows.md](accurate-tier-rows.md#paired-spacy-3818-comparison-gate)). Published research systems (Stanza, UDPipe 2, Trankit) are information: they are ahead on most rows (1,205 of 1,314 best-published comparisons, 534 of 650 against Stanza 1.5.1), typically by 3–9 LAS points. Every row is in [accurate-tier-rows.md](accurate-tier-rows.md).
 
 The following English rows are historical information, not a summary of the latest 84-language weights. Their values are unchanged. They come from [accurate-encoder.md](accurate-encoder.md), `recipes/accurate/student-v1/RESULTS.md` and, for the references, [references.md](references.md) (published numbers on other UD releases: compare the direction, not the last digit).
 

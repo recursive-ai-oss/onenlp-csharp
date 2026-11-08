@@ -71,6 +71,7 @@ Call-by-call maps, with no compatibility shims:
 - **Language ID** is more accurate than Lingua on words, word pairs and sentences, and faster on every row (a few rows below it per language are listed).
 - **Recognizers** score ahead of Microsoft.Recognizers.Text on our hand-labelled sets in ten languages, and faster.
 - **The fast tier** is within noise of spaCy 3.8.18 trained on the same data on the gated UD and entity rows, or ahead of it; the few rows behind are listed by name.
+- **The base-size accurate tier** (84 languages) is measured against spaCy 3.8.18 trained on the same data: 117 of 144 rows ahead, 14 within noise, 13 behind (listed under known gaps). Published research systems such as Stanza, UDPipe 2 and Trankit, which train a larger model per treebank, are ahead on most rows; their numbers are shown beside ours as information.
 - **Text classification and span categorization** are ahead of spaCy's defaults on accuracy and F1; span precision is within noise at the default threshold.
 - **Embeddings** equal sentence-transformers in the same harness; the model cards' own numbers are shown beside them, with the cells neither reproduces.
 
@@ -81,7 +82,7 @@ The English tagging path is compared with Catalyst at matched or better measured
 Stated plainly; each is also in [docs/results-table.md](docs/results-table.md).
 
 - **Accurate-tier coverage:** no model for Ancient Hebrew, Basque, Belarusian, Bulgarian, Chintang, Classical Armenian, Estonian, Gothic, Hungarian, Kadiweu, Khoekhoe, Maghrebi Arabic French, Manx, Mbya Guarani, Naga, Nheengatu, Occitan, Old Church Slavonic, Pomak, Ruuli, Shanghainese, South Levantine Arabic, Turkish German, Urdu or Xibe (25 languages). Their available training data is non-commercial, platform-restricted or has unresolved terms; see [the treebank licence inventory](docs/ud-licences.md). Hindi is a separate test-only UD case, with the transferred-label fast tier described above.
-- **Accurate-tier quality:** coverage is not a quality pass. Many per-language published-reference rows remain below the reference; see [the full accurate-tier rows](docs/accurate-tier-rows.md).
+- **Accurate-tier quality:** 13 of 144 rows are behind spaCy trained on the same data: Chinese UPOS, UFeats, lemmas, UAS and LAS (LAS 61.42 against 68.24); Spanish UPOS, UFeats and lemmas (by 0.2–1.0); Dutch WikiNER entities (F1 83.70 against 86.64); German raw tokenization; Turkish raw sentence boundaries. Published research systems are ahead on most rows, typically by 3–9 LAS points (1,205 of 1,314 best-published comparisons; 534 of 650 against Stanza 1.5.1). See [the full accurate-tier rows](docs/accurate-tier-rows.md).
 - **Open-type NER:** all five CrossNER zero-shot rows are 19–35 F1 points below the published GLiNER-S model, and protocol equivalence is unverified. No zero-shot quality pass is claimed.
 - **Hindi:** measured on Hindi-PUD only; gold UPOS 83.19 and LAS 52.79, raw UPOS behind the same-label spaCy baseline. No learned lemmatizer or XPOS, and entity scores are information from a small hand-labelled sample, not a treebank gate.
 - English raw-text MLAS is behind spaCy (65.30 against 69.05; an information row).

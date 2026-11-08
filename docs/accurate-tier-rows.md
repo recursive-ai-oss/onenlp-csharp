@@ -1,6 +1,8 @@
 # Base-size accurate tier: per-row results
 
-Two views of the same rows (no averaging over languages or metrics):
+**The gate** is the [paired comparison with spaCy 3.8.18 trained on the same data](#paired-spacy-3818-comparison-gate): 144 rows, 117 ahead, 14 within the paired interval, **13 behind** (listed there and in the README's known gaps).
+
+**Information:** published research systems (Stanza, UDPipe 2, Trankit) train a separate, larger model per treebank and are not a gate for this package. Three views of the same rows (no averaging over languages or metrics):
 - **Best published system per row: 1314 comparisons, 1205 misses**, 109 within the interval or ahead.
 - **Stanza 1.5.1 pretrained/charlm, no transformer: 650 comparisons, 534 misses**, 116 within the interval or ahead.
 - **All published system comparisons: 2678 comparisons, 2346 misses**, 332 within the interval or ahead.
@@ -1736,9 +1738,9 @@ Deterministic evenly spaced samples, at most 3,001 sentences per corpus. The pub
 | zh | micro-precision | 86.51 [83.49, 89.63] | 84.59 [81.42, 87.57] |
 | zh | micro-recall | 83.22 [79.76, 86.69] | 83.49 [79.86, 86.79] |
 
-## Paired spaCy 3.8.18 comparison (information)
+## Paired spaCy 3.8.18 comparison (gate)
 
-144 rows: 117 ahead, 14 within the paired interval, 13 behind. Same gold, mode and sampled entity sentences; 1,000 paired resamples, seed 20261106. This is not the published-system gate. Positive differences favor this model.
+144 rows: 117 ahead, 14 within the paired interval, 13 behind. Same gold, mode and sampled entity sentences; 1,000 paired resamples, seed 20261106. spaCy runs its documented default configuration on the same training data. A row passes when it is ahead or within the paired interval; the 13 rows behind are gaps. Positive differences favor this model.
 
 | Language / dataset | Input | Metric | Current [95% CI] | spaCy [95% CI] | Difference [95% CI] | Verdict |
 |---|---|---|---|---|---|---|
