@@ -206,7 +206,7 @@ def licences_doc(cat, langs, docs):
             if l["klass"] == "train+eval" and l["language"] not in haveuner and l["language"] not in extra_ner
             and l["language"] not in {"Chinese", "Portuguese", "English", "French", "Spanish", "Italian", "Dutch", "German", "Turkish"}]
     o.append(f"**NER gaps.** Of the {lc.get('train+eval', 0)} train+eval languages, those with no allowed NER training data at all: {', '.join(gaps)}. "
-             "The nine languages are covered in the sections above (Hindi remains a gap). The accurate tier's multilingual NER therefore trains on the languages that have allowed data and relies on cross-lingual transfer for the rest.\n")
+             "The nine languages are covered in the sections above (Hindi remains a gap). The base-size accurate tier has entity heads for the 19 languages with allowed entity training data. The other languages provide UD annotations only; a language without an entity head does not claim cross-lingual NER.\n")
     replace_region(os.path.join(docs, "ud-licences.md"), "all-treebanks", "\n".join(o))
 
 

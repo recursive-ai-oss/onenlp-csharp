@@ -36,7 +36,14 @@
     <Error Condition="!$([System.String]::Equals('%(_WeightHashed.FileHash)', '%(_WeightHashed.Sha256)', System.StringComparison.OrdinalIgnoreCase))"
            Text="Weights file '%(_WeightHashed.WeightName)' does not match the manifest: sha256 %(_WeightHashed.FileHash), expected %(_WeightHashed.Sha256). Use the weights listed in weights.manifest.props, or update the manifest and PROVENANCE.md together." />
     <ItemGroup>
-      <EmbeddedResource Include="@(_WeightHashed)" LogicalName="weights/%(_WeightHashed.WeightName)" />
+      <EmbeddedResource Include="@(_WeightHashed)" LogicalName="weights/%(_WeightHashed.WeightName)" Condition="'$(PartFiles)' != 'true'" />
+      <!-- Copied assets keep the aggregate NativeAOT resource table below its image limit. -->
+      <Content Include="@(_WeightHashed)" Condition="'$(PartFiles)' == 'true'"
+               Link="weights/multilingual-large/%(_WeightHashed.WeightName)"
+               TargetPath="weights/multilingual-large/%(_WeightHashed.WeightName)"
+               CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"
+               Pack="true" PackagePath="contentFiles/any/any/weights/multilingual-large/%(_WeightHashed.WeightName)"
+               PackageCopyToOutput="true" PackageFlatten="false" BuildAction="None" />
     </ItemGroup>
   </Target>
 

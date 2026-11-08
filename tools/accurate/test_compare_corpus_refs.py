@@ -11,12 +11,21 @@ import unittest
 
 import compare_corpus_refs as report
 import stage_large_weights as stage
+import paired_spacy as paired
 
 
 class ReferencesTests(unittest.TestCase):
     def row(self, **extra):
         return dict(treebank='UD_Finnish-FTB', input='raw', system='Stanza', system_version='1.5.1',
                     model='pretrained, charlm, no transformer', upos='91', ud_release='2.12', test_changed='changed', **extra)
+
+    def test_ner_pairing_uses_the_recipe_sample_not_a_prefix(self):
+        self.assertEqual(paired.sample_indices(5), [0, 1, 2, 3, 4])
+        self.assertEqual(paired.sample_indices(10, 3), [0, 3, 6])
+        selected = paired.sample_indices(6468)
+        self.assertEqual(3001, len(selected))
+        self.assertEqual(6467, selected[-1])
+        self.assertEqual([0, 2, 4, 6, 8], selected[:5])
 
     def test_head_parts_bound_and_order(self):
         with tempfile.TemporaryDirectory() as d:

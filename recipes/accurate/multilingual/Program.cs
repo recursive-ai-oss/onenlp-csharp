@@ -57,6 +57,7 @@ internal static class Program
 
     // For smoke runs: score and write at most this many sentences per file (0 = all).
     private static int predictLimit;
+    private static int predictOffset;
     private static int nerTestLimit;
 
     private static readonly Stopwatch Wall = Stopwatch.StartNew();
@@ -82,6 +83,13 @@ internal static class Program
             if (args.Length > 0 && args[0] == "plan")
             {
                 return PlanOnly(args);
+            }
+
+            if (args.Length > 0 && args[0] == "encoder-parity")
+            {
+                TensorCompute.Threads = Num(args, "threads", 2);
+                LoadSegmenter(args);
+                return EncoderParity(args);
             }
 
             if (args.Length > 0 && args[0] == "verify-export")
@@ -120,7 +128,7 @@ internal static class Program
             LoadSegmenter(args);
             return Train(args);
         }
-        catch (Exception e) when (e is ArgumentException or IOException or DataFormatException or InvalidDataException or FormatException or KeyNotFoundException)
+        catch (Exception e) when (e is ArgumentException or IOException or DataFormatException or InvalidDataException or FormatException or KeyNotFoundException or InvalidOperationException)
         {
             Console.Error.WriteLine("error: " + e.Message);
             return 1;
@@ -129,6 +137,8 @@ internal static class Program
 
     private static void LoadSegmenter(string[] args)
     {
+        predictOffset = Num(args, "predict-offset", 0);
+        ArgumentOutOfRangeException.ThrowIfNegative(predictOffset);
         if (Opt(args, "zh-segmenter", string.Empty) is { Length: > 0 } path)
         {
             segmenterSource = PipelineFile.Load(path);
@@ -417,6 +427,7 @@ internal static class Program
 
         // --warm-from CKPT --warm-langs en,de,...: a fresh run (no last.ckpt in --out yet) that starts from the weights of an earlier run with fewer languages.
         // Tensors are copied by name (the encoder as it is, each head through the name of its language), the optimizer starts new and warms up again.
+        bool fullyRestored = false;
         if (Opt(args, "warm-from", string.Empty) is { Length: > 0 } warmPath && !File.Exists(Path.Combine(outDir, "last.ckpt")))
         {
             string[] warmLangs = Required(args, "warm-langs").Split(',');
@@ -435,11 +446,44 @@ internal static class Program
             }
 
             WarmStartReport report = WarmStart.Apply(warmPath, target, oldNames, newNames);
+            fullyRestored = report.Missing == 0 && report.Mismatched == 0;
             Console.WriteLine($"warm start: copied={report.Copied} missing={report.Missing} mismatched={report.Mismatched} unused={report.Unused}");
             foreach (string note in report.Notes)
             {
                 Console.WriteLine("  " + note);
             }
+        }
+
+        // A selected weights-only checkpoint needs no optimizer, resume state or new last.ckpt.
+        // This keeps finalization independent of the much larger training checkpoint.
+        if (Num(args, "export-only", 0) == 1)
+        {
+            if (!fullyRestored)
+            {
+                throw new InvalidDataException("--export-only needs a --warm-from checkpoint that restores every tensor, with --warm-langs in the original language order and a fresh --out directory.");
+            }
+
+            encoder.Weights?.Eval();
+            foreach (ITrainableComponent head in pipeline.Components.OfType<ITrainableComponent>())
+            {
+                head.Weights.Eval();
+            }
+
+            Directory.CreateDirectory(outDir);
+            if (Num(args, "tune-lexicons", 0) == 1)
+            {
+                TuneLexicons(encoder, pipeline, langs, headInit, dev, stores, outDir);
+            }
+
+            Export(encoder, pipeline, langs, Required(args, "export"), Required(args, "tokenizer"));
+            if (Opt(args, "predict-split", string.Empty) is { Length: > 0 } exportSplit)
+            {
+                PredictSplit(encoder, lang => [.. pipeline.Components.OfType<ScopedHead>().Where(h => h.Name.EndsWith("-" + lang, StringComparison.Ordinal)).Select(h => h.Inner)],
+                    data, exportSplit, Num(args, "raw", 0) == 1, [.. langs.Where(l => predictLangs.Length == 0 || predictLangs.Contains(l))], outDir, stores, nerStores);
+            }
+
+            Console.WriteLine("exported selected checkpoint without training");
+            return 0;
         }
 
         var hasTag = langs.ToDictionary(l => l, l => Available("tagger", train, stores[l]));
@@ -558,7 +602,7 @@ internal static class Program
 
         if (result.Completed && Opt(args, "export", string.Empty) is { Length: > 0 } exportDir)
         {
-            Export(encoder, pipeline, langs, exportDir);
+            Export(encoder, pipeline, langs, exportDir, Required(args, "tokenizer"));
         }
 
         if (result.Completed && Opt(args, "predict-split", string.Empty) is { Length: > 0 } split)
@@ -649,9 +693,15 @@ internal static class Program
     // The best-dev weights as the model package ships them: the encoder's layers (the token table is frozen and comes from the ONNX file, see
     // tools/accurate/split_token_table.py), the encoder's settings and shape, and for each language a pipeline file that holds its heads only,
     // bound to the shared encoder.
-    private static void Export(TrainableTransformerEncoder encoder, Pipeline trained, string[] langs, string dir)
+    private static void Export(TrainableTransformerEncoder encoder, Pipeline trained, string[] langs, string dir, string tokenizerPath)
     {
         Directory.CreateDirectory(Path.Combine(dir, "heads"));
+        string tokenizerFile = Path.GetFullPath(Path.Combine(dir, "tokenizer.json"));
+        if (!string.Equals(Path.GetFullPath(tokenizerPath), tokenizerFile, StringComparison.Ordinal))
+        {
+            File.Copy(tokenizerPath, tokenizerFile, overwrite: true);
+        }
+
         Checkpoint.Save(Path.Combine(dir, "encoder-layers.ckpt"), encoder.Weights!);
         using (var stream = new MemoryStream())
         {
@@ -701,7 +751,9 @@ internal static class Program
         foreach (string lang in langs)
         {
             Language language = Language.FromCode(lang);
-            using Pipeline package = new(TokenizerFor(language), language);
+            // The segmenter source owns this tokenizer and is still needed by later
+            // dev probes. Dispose only the cloned heads, not the borrowed tokenizer.
+            Pipeline package = new(TokenizerFor(language), language);
             package.Add(new MultiwordFormsComponent(language));
             foreach (ScopedHead scoped in trained.Components.OfType<ScopedHead>().Where(h => h.Name.EndsWith("-" + lang, StringComparison.Ordinal)))
             {
@@ -725,6 +777,11 @@ internal static class Program
 
             string file = Path.Combine(dir, "heads", lang + ".onenlp");
             PipelineFile.Save(package, file);
+            foreach (ITrainableComponent head in package.Components.OfType<ITrainableComponent>())
+            {
+                (head as IDisposable)?.Dispose();
+            }
+
             Console.WriteLine($"exported {file} {new FileInfo(file).Length} bytes");
         }
     }
@@ -826,6 +883,82 @@ internal static class Program
             p.Dispose();
         }
 
+        return 0;
+    }
+
+    // Compare the same saved heads on module and graph vectors, isolating numerical
+    // encoder differences from serialization or label-order differences. Development only.
+    private static int EncoderParity(string[] args)
+    {
+        string dir = Required(args, "export");
+        string lang = Required(args, "lang");
+        CorpusSpec spec = corpus ?? throw new ArgumentException("--spec is required.");
+        string dev = spec[lang].Gating.Dev ?? throw new ArgumentException(lang + " has no dev file.");
+        string text = string.Join(' ', ConllUReader.Read(Path.Combine(Required(args, "data"), dev))
+            .Take(Num(args, "predict-limit", 4)).Select(s => s.GetComment("text") ?? s.Doc.Text));
+        using TrainableTransformerEncoder module = TrainableTransformerEncoder.LoadOnnx(Required(args, "onnx"), Path.Combine(dir, "tokenizer.json"),
+            new TrainableTransformerOptions { Pooling = SubwordPooling.Mean, FreezeEmbeddings = true, ExpandWordForms = true });
+        Checkpoint.Load(Path.Combine(dir, "encoder-layers.ckpt"), module.Weights!);
+        module.Weights!.Eval();
+        using Stream graphFile = File.OpenRead(Path.Combine(dir, "encoder.onnx"));
+        using Stream tokenizerFile = File.OpenRead(Path.Combine(dir, "tokenizer.json"));
+        using TransformerEncoder graph = TransformerEncoder.FromStreams(graphFile, tokenizerFile, SubwordPooling.Mean, expandWordForms: true);
+        SharedEncoder.Register("multilingual-large", graph);
+        using Pipeline package = PipelineFile.Load(Path.Combine(dir, "heads", lang + ".onenlp"));
+        Pipeline tokenizer = new(TokenizerFor(Language.FromCode(lang)), Language.FromCode(lang));
+        Doc first = tokenizer.Process(text);
+        Doc second = tokenizer.Process(text);
+        var forms = new MultiwordFormsComponent(Language.FromCode(lang));
+        forms.Process(first);
+        forms.Process(second);
+        using NoGradScope noGrad = GradMode.NoGrad();
+        using var scope = new ActivationScope();
+        int graphThreads = TensorCompute.Threads;
+        int moduleThreads = Num(args, "module-threads", graphThreads);
+        TensorCompute.Threads = moduleThreads;
+        EncodedBatch a = module.Encode([first]);
+        TensorCompute.Threads = graphThreads;
+        EncodedBatch b = graph.Encode([second]);
+        ReadOnlySpan<float> x = a.Vectors.Data<float>();
+        ReadOnlySpan<float> y = b.Vectors.Data<float>();
+        if (x.Length != y.Length)
+        {
+            throw new InvalidDataException("Encoder shapes differ.");
+        }
+
+        double max = 0;
+        double squared = 0;
+        for (int i = 0; i < x.Length; i++)
+        {
+            double d = (double)x[i] - y[i];
+            max = Math.Max(max, Math.Abs(d));
+            squared += d * d;
+        }
+
+        Console.WriteLine(string.Create(CultureInfo.InvariantCulture,
+            $"encoder-parity {lang}: tokens={first.Length} values={x.Length} max_abs={max:E8} rmse={Math.Sqrt(squared / Math.Max(1, x.Length)):E8}"));
+        foreach (ITrainableComponent head in package.Components.OfType<ITrainableComponent>().Where(h => h.Kind != "ner"))
+        {
+            head.Weights.Eval();
+            TensorCompute.Threads = moduleThreads;
+            head.Predict(a, [first]);
+            TensorCompute.Threads = graphThreads;
+            head.Predict(b, [second]);
+        }
+
+        int different = 0;
+        for (int i = 0; i < first.Length; i++)
+        {
+            Token p = first[i];
+            Token q = second[i];
+            if (p.Pos != q.Pos || p.Tag != q.Tag || p.Morph != q.Morph || p.Lemma != q.Lemma || p.HeadIndex != q.HeadIndex || p.Dep != q.Dep || p.IsSentStart != q.IsSentStart)
+            {
+                different++;
+                Console.WriteLine($"different token {i} {p}: pos {p.Pos}/{q.Pos}; tag {p.Tag}/{q.Tag}; morph {p.Morph}/{q.Morph}; lemma {p.Lemma}/{q.Lemma}; head {p.HeadIndex}/{q.HeadIndex}; dep {p.Dep}/{q.Dep}; sent {p.IsSentStart}/{q.IsSentStart}");
+            }
+        }
+
+        Console.WriteLine($"same serialized heads, different encoder vectors: differing words={different}");
         return 0;
     }
 
@@ -1028,7 +1161,7 @@ internal static class Program
             chunk.Clear();
         }
 
-        foreach (ConllUSentence s in ConllUReader.Read(gold).Take(predictLimit > 0 ? predictLimit : int.MaxValue))
+        foreach (ConllUSentence s in ConllUReader.Read(gold).Skip(predictOffset).Take(predictLimit > 0 ? predictLimit : int.MaxValue))
         {
             // The text line of the file is the raw text; Doc.Text spells the words of a one-character multiword token (Portuguese à = a a).
             chunk.Add(s.GetComment("text") ?? s.Doc.Text);
@@ -1118,7 +1251,7 @@ internal static class Program
 
     private static void Predict(IEncoder encoder, ITrainableComponent[] heads, string gold, StringStore store, string output)
     {
-        var sentences = ConllUReader.Read(gold, store).Take(predictLimit > 0 ? predictLimit : int.MaxValue).ToList();
+        var sentences = ConllUReader.Read(gold, store).Skip(predictOffset).Take(predictLimit > 0 ? predictLimit : int.MaxValue).ToList();
         var sb = new StringBuilder();
         const int Chunk = 32;
         for (int start = 0; start < sentences.Count; start += Chunk)

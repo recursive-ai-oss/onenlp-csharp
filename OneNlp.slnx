@@ -20,6 +20,17 @@
     <Project Path="src/OneNlp.Models.Multilingual.Parts/FrozenEncoder/OneNlp.Models.Multilingual.FrozenEncoder.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Parts/Segmenters/OneNlp.Models.Multilingual.Segmenters.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Large/OneNlp.Models.Multilingual.Large.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads1/OneNlp.Models.Multilingual.Large.Heads1.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads2/OneNlp.Models.Multilingual.Large.Heads2.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads3/OneNlp.Models.Multilingual.Large.Heads3.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads4/OneNlp.Models.Multilingual.Large.Heads4.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads5/OneNlp.Models.Multilingual.Large.Heads5.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads6/OneNlp.Models.Multilingual.Large.Heads6.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads7/OneNlp.Models.Multilingual.Large.Heads7.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads8/OneNlp.Models.Multilingual.Large.Heads8.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads9/OneNlp.Models.Multilingual.Large.Heads9.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads10/OneNlp.Models.Multilingual.Large.Heads10.csproj" />
+    <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Heads11/OneNlp.Models.Multilingual.Large.Heads11.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Encoder1/OneNlp.Models.Multilingual.Large.Encoder1.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/Encoder2/OneNlp.Models.Multilingual.Large.Encoder2.csproj" />
     <Project Path="src/OneNlp.Models.Multilingual.Large.Parts/TokenTable1/OneNlp.Models.Multilingual.Large.TokenTable1.csproj" />
