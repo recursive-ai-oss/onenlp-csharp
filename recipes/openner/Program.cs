@@ -130,9 +130,21 @@ internal static class Program
 
     private static int Eval(Dictionary<string, string> o)
     {
+#if ONENLP_PACKAGED
+        PackageVerification.Verify(Required(o, "manifest-root"));
+        using Pipeline pipeline = RecursiveAI.OneNlp.Models.Multilingual.MultilingualModel.LoadOpenEntities();
+#else
         TransformerEncoder.ModelDirectory = o.GetValueOrDefault("model-dir");
         using Pipeline pipeline = PipelineFile.Load(Required(o, "model"));
+#endif
         var head = (OpenEntityRecognizer)pipeline.Components.Single(c => c is OpenEntityRecognizer);
+#if ONENLP_PACKAGED
+        Console.WriteLine($"head_parameters={head.Weights.Parameters().Sum(p => p.Length)} default_threshold={head.Threshold}");
+        if (head.Threshold != 0.5f)
+        {
+            throw new InvalidDataException("The packaged head must use the measured default threshold 0.5.");
+        }
+#endif
         float threshold = o.TryGetValue("threshold", out string? t) ? float.Parse(t, CultureInfo.InvariantCulture) : head.Threshold;
         string[]? fixedTypes = o.TryGetValue("types", out string? ty) ? ty.Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries) : null;
         List<Example> data = ReadFiles(Required(o, "data"), new StringStore(), 1);
