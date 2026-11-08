@@ -22,6 +22,13 @@ public static partial class ModelPackages
     /// <summary>The base-size accurate-tier package.</summary>
     internal const string LargePackageId = "RecursiveAI.OneNlp.Models.Multilingual.Large";
 
+    /// <summary>Whether this release publishes the base-size accurate-tier package; errors never name a package that was not published.</summary>
+#if NO_MULTILINGUAL_LARGE
+    internal static bool LargePublished { get; }
+#else
+    internal static bool LargePublished { get; } = true;
+#endif
+
     private static readonly Lock Gate = new();
     private static readonly Dictionary<string, List<Entry>> Entries = new(StringComparer.Ordinal);
 
@@ -195,7 +202,7 @@ public static partial class ModelPackages
     internal static ModelNotAvailableException Missing(Language language, Tier tier)
     {
         string name = language == Language.Unknown ? "unknown" : language.Code;
-        bool largeCovers = language == Language.Unknown || LargeAccurateLanguages.Contains(language.Code);
+        bool largeCovers = LargePublished && (language == Language.Unknown || LargeAccurateLanguages.Contains(language.Code));
         bool multilingualCovers = language == Language.Unknown || MultilingualAccurateLanguages.Contains(language.Code);
         var candidates = new List<string>();
         if (tier == Tier.Accurate)

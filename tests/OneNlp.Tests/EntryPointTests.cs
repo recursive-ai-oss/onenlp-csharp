@@ -102,7 +102,14 @@ public class EntryPointTests
 
         ModelNotAvailableException accurate = Assert.Throws<ModelNotAvailableException>(() => Pipeline.Create(Language.German, Tier.Accurate));
         Assert.Equal(Tier.Accurate, accurate.Tier);
-        Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual.Large", accurate.PackageIds);
+        if (ModelPackages.LargePublished)
+        {
+            Assert.Contains("RecursiveAI.OneNlp.Models.Multilingual.Large", accurate.PackageIds);
+        }
+        else
+        {
+            Assert.DoesNotContain("RecursiveAI.OneNlp.Models.Multilingual.Large", accurate.PackageIds);
+        }
 
         // A language no package covers is told so, and no package is named.
         ModelNotAvailableException swahili = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(Language.FromCode("sw")));

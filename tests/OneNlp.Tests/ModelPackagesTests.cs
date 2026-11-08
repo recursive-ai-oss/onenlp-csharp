@@ -63,9 +63,11 @@ public class ModelPackagesTests
     {
         Language language = Language.FromCode(code);
         ModelNotAvailableException missing = Assert.Throws<ModelNotAvailableException>(() => Pipeline.Create(language, Tier.Accurate));
-        string[] expected = distilledCovers
-            ? ["RecursiveAI.OneNlp.Models.Multilingual.Large", "RecursiveAI.OneNlp.Models.Multilingual"]
-            : ["RecursiveAI.OneNlp.Models.Multilingual.Large"];
+        string[] expected =
+        [
+            .. ModelPackages.LargePublished ? ["RecursiveAI.OneNlp.Models.Multilingual.Large"] : Array.Empty<string>(),
+            .. distilledCovers ? ["RecursiveAI.OneNlp.Models.Multilingual"] : Array.Empty<string>(),
+        ];
         Assert.Equal(expected, missing.PackageIds);
         if (!distilledCovers)
         {

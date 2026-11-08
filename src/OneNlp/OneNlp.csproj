@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- Set from ShipMultilingualLarge in Directory.Build.props, so a release without the base-size tier never names it. -->
+    <DefineConstants Condition="'$(ShipMultilingualLarge)' != 'true'">$(DefineConstants);NO_MULTILINGUAL_LARGE</DefineConstants>
     <AssemblyName>$(PackagePrefix)$(LibName)</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName)</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName)</PackageId>
