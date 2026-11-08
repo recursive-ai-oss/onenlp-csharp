@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="../../../src/OneNlp/OneNlp.csproj" />
     <ProjectReference Include="../../../src/OneNlp.Neural/OneNlp.Neural.csproj" />
+    <ProjectReference Include="../common/OneNlp.Recipes.AccurateCommon.csproj" />
   </ItemGroup>
 
 </Project>

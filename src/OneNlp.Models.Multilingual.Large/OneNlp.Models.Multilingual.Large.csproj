@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Models.Multilingual.Large</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Models.Multilingual.Large</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.Multilingual.Large</PackageId>
-    <Description>spaCy-class NLP for .NET: the base-size accurate-tier model (fine-tuned mmBERT-base) for English, German, French, Spanish, Portuguese, Italian, Dutch, Turkish and Chinese. Tags, morphology, lemmas, dependency parse and entities for the Nlp verbs; the Nlp verbs use it for these languages when no fast-tier package is referenced. About 1.3 GB, split over several packages. No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the base-size accurate-tier model (fine-tuned mmBERT-base) for 84 languages. UD annotations and entity heads for 19 languages for the Nlp verbs; the Nlp verbs use it for these languages when no fast-tier package is referenced. About 3.5 GB, split over several packages. No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);multilingual;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
@@ -14,6 +14,7 @@
   </PropertyGroup>
 
   <Import Project="weights.manifest.props" />
+  <Import Project="HeadParts.props" />
 
   <ItemGroup>
     <!-- The registration file is shipped, not compiled here. -->
@@ -34,7 +35,21 @@
   <ItemGroup>
     <None Include="PACKAGE.md" Pack="true" PackagePath="/" />
     <None Include="PROVENANCE.md" Pack="true" PackagePath="/" />
+    <None Include="../../recipes/accurate/common/corpus.json" Pack="true" PackagePath="/corpus.json" />
+    <None Include="../../recipes/accurate/multilingual/lexicon-dev.tsv" Pack="true" PackagePath="/lexicon-dev.tsv" />
+    <None Include="../../tools/fetch/ud/MANIFEST.md" Pack="true" PackagePath="/UD-MANIFEST.md" />
+    <None Include="../../tools/fetch/ud-ner/*.md" Pack="true" PackagePath="/provenance/ner/" />
+    <None Include="../../tools/fetch/en/MANIFEST.md" Pack="true" PackagePath="/provenance/en/" />
+    <None Include="../../tools/fetch/de/MANIFEST.md" Pack="true" PackagePath="/provenance/de/" />
+    <None Include="../../tools/fetch/fr/MANIFEST.md" Pack="true" PackagePath="/provenance/fr/" />
+    <None Include="../../tools/fetch/es/MANIFEST.md" Pack="true" PackagePath="/provenance/es/" />
+    <None Include="../../tools/fetch/pt/MANIFEST.md" Pack="true" PackagePath="/provenance/pt/" />
+    <None Include="../../tools/fetch/it/MANIFEST.md" Pack="true" PackagePath="/provenance/it/" />
+    <None Include="../../tools/fetch/nl/MANIFEST.md" Pack="true" PackagePath="/provenance/nl/" />
+    <None Include="../../tools/fetch/tr/MANIFEST.md" Pack="true" PackagePath="/provenance/tr/" />
+    <None Include="../../tools/fetch/zh/MANIFEST.md" Pack="true" PackagePath="/provenance/zh/" />
     <None Include="weights.manifest.props" Pack="true" PackagePath="/" />
+    <None Include="HeadParts.props" Pack="true" PackagePath="/" />
     <None Include="../../LICENSE-MIT" Pack="true" PackagePath="/" />
     <None Include="../../LICENSE-APACHE" Pack="true" PackagePath="/" />
     <None Include="../OneNlp.Models.Multilingual.Large.Parts/THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />

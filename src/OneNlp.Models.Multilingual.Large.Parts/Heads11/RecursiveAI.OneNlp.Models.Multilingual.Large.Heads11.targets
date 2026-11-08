@@ -1,0 +1,8 @@
+<Project>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/vi.onenlp" Link="weights/multilingual-large/heads/vi.onenlp" TargetPath="weights/multilingual-large/heads/vi.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/wo.onenlp" Link="weights/multilingual-large/heads/wo.onenlp" TargetPath="weights/multilingual-large/heads/wo.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/yi.onenlp" Link="weights/multilingual-large/heads/yi.onenlp" TargetPath="weights/multilingual-large/heads/yi.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/zza.onenlp" Link="weights/multilingual-large/heads/zza.onenlp" TargetPath="weights/multilingual-large/heads/zza.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

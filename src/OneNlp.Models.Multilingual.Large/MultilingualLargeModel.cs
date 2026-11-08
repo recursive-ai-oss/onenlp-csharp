@@ -4,9 +4,9 @@ using RecursiveAI.OneNlp.Neural.Encoders;
 namespace RecursiveAI.OneNlp.Models.Multilingual.Large;
 
 /// <summary>
-/// The base-size accurate-tier model: one fine-tuned mmBERT-base encoder (Marone et al. 2025) shared by the heads of nine languages. Each
-/// language's pipeline tokenizes, tags (UPOS, morphology and, where the treebank has it, XPOS), lemmatizes, parses dependencies and sets
-/// sentence starts, and finds entities where entity data exists.
+/// The base-size accurate-tier model: one fine-tuned mmBERT-base encoder (Marone et al. 2025) shared by the heads of 84 languages. Each
+/// language's pipeline tokenizes and predicts the UD annotations for which its training treebanks provide labels (tags, morphology,
+/// lemmas, dependencies and sentence starts). Entity heads are included for the 19 languages with entity training data.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -20,7 +20,7 @@ namespace RecursiveAI.OneNlp.Models.Multilingual.Large;
 /// consecutive pieces), so that every package stays under the size limit of nuget.org. The encoder runs on OneModel's inference runtime.
 /// </para>
 /// </remarks>
-public static class MultilingualLargeModel
+public static partial class MultilingualLargeModel
 {
     /// <summary>The NuGet package id.</summary>
     public const string PackageId = "RecursiveAI.OneNlp.Models.Multilingual.Large";
@@ -29,9 +29,6 @@ public static class MultilingualLargeModel
     internal const string SharedName = "multilingual-large";
 
     private static readonly Lazy<TransformerEncoder> Encoder = new(BuildEncoder, LazyThreadSafetyMode.ExecutionAndPublication);
-
-    /// <summary>The languages this package has heads for (ISO 639-1 codes).</summary>
-    public static IReadOnlyList<string> Languages { get; } = ["en", "de", "fr", "es", "pt", "it", "nl", "tr", "zh"];
 
     /// <summary>
     /// Registers this model as the accurate-tier pipeline of its languages, with priority over the base multilingual package. Safe to call more than once; the
@@ -60,8 +57,8 @@ public static class MultilingualLargeModel
         }
 
         _ = Encoder.Value;
-        // Chinese heads carry the word segmenter and live in a part of their own, to keep the packages under the size limit.
-        using Stream heads = language == "zh" ? Chinese.Part.Open() : Resource("heads/" + language + ".onenlp");
+        // The generated dispatch reads a bounded head part; unspaced languages carry their word segmenter with the heads.
+        using Stream heads = OpenHeads(language);
         return PipelineFile.Load(heads);
     }
 

@@ -10,6 +10,13 @@ rows are information where it differs from ours (r2.18) in a way the reference n
 """
 import json, os, re, sys
 
+# The TSV catalogue and corpus spec cover every language; keep the older Markdown
+# input available for reproducing the original nine-language report.
+if len(sys.argv) > 2 and sys.argv[2].endswith('.tsv'):
+    from compare_corpus_refs import main
+    main()
+    raise SystemExit(0)
+
 score_dir, refs_path = sys.argv[1], sys.argv[2]
 COLS = ["Tokens", "Sents", "Words", "UPOS", "XPOS", "UFeats", "AllTags", "Lemmas", "UAS", "LAS"]
 SECTION = {"zh": "Chinese", "fr": "French", "es": "Spanish", "pt": "Portuguese", "de": "German", "it": "Italian", "tr": "Turkish", "nl": "Dutch", "en": "English-EWT"}

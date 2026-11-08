@@ -8,7 +8,7 @@ Albanian	train+eval	UD_Albanian-STAF	160		Albanian-TSA			UDPipe 2
 Alemannic	eval-only				Alemannic-DIVITAL;Alemannic-UZH				
 Amharic	eval-only				Amharic-ATT				
 Ancient_Greek	train+eval	UD_Ancient_Greek-PTNK	727				Ancient_Greek-PROIEL;Ancient_Greek-Perseus	UDPipe 2	
-Ancient_Hebrew	pending					Ancient_Hebrew-PTNK			
+Ancient_Hebrew	gap						Ancient_Hebrew-PTNK		
 Apurina	eval-only				Apurina-UFPA				
 Arabic	eval-only				Arabic-PUD		Arabic-NYUAD;Arabic-PADT		
 Armenian	train+eval	UD_Armenian-ArmTDP	4352	Armenian-BSUT				Stanza,Trankit,UDPipe 2	
@@ -19,7 +19,7 @@ Bambara	eval-only				Bambara-CRB
 Basque	gap						Basque-BDT		
 Bavarian	eval-only				Bavarian-MaiBaam				
 Beja	eval-only				Beja-Autogramm				
-Belarusian	pending					Belarusian-HSE			
+Belarusian	gap						Belarusian-HSE		
 Bengali	eval-only				Bengali-BRU				
 Bhojpuri	eval-only				Bhojpuri-BHTB				
 Bokota	eval-only				Bokota-ChibErgIS				
@@ -33,8 +33,8 @@ Cappadocian	eval-only				Cappadocian-AMGiC;Cappadocian-TueCL
 Catalan	train+eval	UD_Catalan-AnCora	13123					Stanza,Trankit,UDPipe 2	
 Cebuano	eval-only				Cebuano-GJA				
 Central_Kurdish	train+eval	UD_Central_Kurdish-Mukri	92						
-Chinese	train+eval	UD_Chinese-GSDSimp	3997	Chinese-GSD	Chinese-CFL;Chinese-HK;Chinese-PUD	Chinese-PatentChar	Chinese-Beginner	Stanza,Trankit,UDPipe 2	yes
-Chintang	pending					Chintang-CTNTB			
+Chinese	train+eval	UD_Chinese-GSDSimp	3997	Chinese-GSD	Chinese-CFL;Chinese-HK;Chinese-PUD		Chinese-Beginner;Chinese-PatentChar	Stanza,Trankit,UDPipe 2	yes
+Chintang	gap						Chintang-CTNTB		
 Chukchi	eval-only				Chukchi-HSE				
 Classical_Armenian	gap						Classical_Armenian-CAVaL		
 Classical_Chinese	train+eval	UD_Classical_Chinese-Kyoto	74609		Classical_Chinese-TueCL			Stanza,Trankit,UDPipe 2	
@@ -47,9 +47,9 @@ Egyptian	train+eval	UD_Egyptian-PC	1619
 English	train+eval	UD_English-EWT	12544	English-Atis;English-CHILDES;English-ESLSpok	English-CTeTex;English-LittlePrince;English-PUD;English-Pronouns		English-GENTLE;English-GUM;English-GUMReddit;English-LinES;English-ParTUT	Stanza,Trankit,UDPipe 2	yes
 Erzya	train+eval	UD_Erzya-JR	1217					Stanza,UDPipe 2	
 Esperanto	eval-only				Esperanto-Cairo;Esperanto-Prago				
-Estonian	pending					Estonian-EWT	Estonian-EDT		
+Estonian	gap						Estonian-EDT;Estonian-EWT		
 Faroese	train+eval	UD_Faroese-FarPaHC	1020		Faroese-OFT			Stanza,UDPipe 2	
-Finnish	train+eval	UD_Finnish-FTB	14981	Finnish-TDT	Finnish-PUD	Finnish-OOD		Stanza,Trankit,UDPipe 2	
+Finnish	train+eval	UD_Finnish-FTB	14981	Finnish-TDT	Finnish-PUD		Finnish-OOD	Stanza,Trankit,UDPipe 2	
 French	train+eval	UD_French-GSD	14450	French-ALTS;French-ParisStories;French-Rhapsodie;French-Sequoia	French-FQB;French-PUD;French-PoitevinDIVITAL		French-ParTUT	Stanza,Trankit,UDPipe 2	yes
 Frisian_Dutch	eval-only				Frisian_Dutch-Fame				
 Galician	train+eval	UD_Galician-TreeGal	600		Galician-PUD		Galician-CTG	Stanza,Trankit,UDPipe 2	
@@ -58,7 +58,7 @@ German	train+eval	UD_German-GSD	13813		German-PUD		German-HDT;German-LIT	Stanza,
 Gheg	eval-only				Gheg-GPS				
 Gorontalo	eval-only				Gorontalo-BungoLoLombi				
 Gothic	gap						Gothic-PROIEL		
-Greek	train+eval	UD_Greek-GUD	1071	Greek-Cretan;Greek-Messinian	Greek-Lesbian	Greek-GLCII	Greek-GDT	Stanza,UDPipe 2	
+Greek	train+eval	UD_Greek-GUD	1071	Greek-Cretan;Greek-Messinian	Greek-Lesbian		Greek-GDT;Greek-GLCII	Stanza,UDPipe 2	
 Guajajara	eval-only				Guajajara-TuDeT				
 Guarani	eval-only				Guarani-OldTuDeT				
 Gujarati	eval-only				Gujarati-GujTB				
@@ -83,14 +83,14 @@ Kangri	eval-only				Kangri-KDTB
 Karelian	eval-only				Karelian-KKPP				
 Karo	eval-only				Karo-TuDeT				
 Kazakh	train+eval	UD_Kazakh-KTB	31					Stanza,Trankit	
-Khoekhoe	pending					Khoekhoe-KDT			
+Khoekhoe	gap						Khoekhoe-KDT		
 Kiche	eval-only				Kiche-IU				
 Komi_Permyak	train+eval	UD_Komi_Permyak-UH	34						
 Komi_Zyrian	train+eval	UD_Komi_Zyrian-Lattice	20		Komi_Zyrian-IKDP				
 Korean	train+eval	UD_Korean-Kaist	23010	Korean-GSD;Korean-KSL	Korean-LittlePrince;Korean-PUD			Stanza,Trankit,UDPipe 2	
 Kyrgyz	train+eval	UD_Kyrgyz-KTMU	1308		Kyrgyz-TueCL			Stanza,UDPipe 2	
 Latgalian	eval-only				Latgalian-Cairo				
-Latin	train+eval	UD_Latin-LLCT	7289	Latin-CIRCSE		Latin-UDante	Latin-ITTB;Latin-PROIEL;Latin-Perseus	Stanza,UDPipe 2	
+Latin	train+eval	UD_Latin-LLCT	7289	Latin-CIRCSE			Latin-ITTB;Latin-PROIEL;Latin-Perseus;Latin-UDante	Stanza,UDPipe 2	
 Latvian	train+eval	UD_Latvian-LVTB	15059		Latvian-Cairo			Stanza,Trankit,UDPipe 2	
 Ligurian	train+eval	UD_Ligurian-GLT	20					Stanza	
 Lithuanian	train+eval	UD_Lithuanian-ALKSNIS	2341	Lithuanian-HSE				Stanza,Trankit,UDPipe 2	
@@ -99,18 +99,18 @@ Low_Saxon	train+eval	UD_Low_Saxon-LSDC	500					UDPipe 2
 Luxembourgish	eval-only				Luxembourgish-LuxBank				
 Macedonian	eval-only				Macedonian-MTB				
 Madi	eval-only				Madi-Jarawara				
-Maghrebi_Arabic_French	pending					Maghrebi_Arabic_French-Arabizi			
+Maghrebi_Arabic_French	gap						Maghrebi_Arabic_French-Arabizi		
 Makurap	eval-only				Makurap-TuDeT				
 Malayalam	eval-only				Malayalam-UFAL				
 Maltese	train+eval	UD_Maltese-MUDT	1123					Stanza,UDPipe 2	
-Manx	pending					Manx-Cadhan			
+Manx	gap						Manx-Cadhan		
 Marathi	train+eval	UD_Marathi-UFAL	373	Marathi-CMUPAN				Stanza,Trankit,UDPipe 2	
-Mbya_Guarani	pending					Mbya_Guarani-Thomas			
+Mbya_Guarani	gap						Mbya_Guarani-Thomas		
 Middle_Armenian	eval-only				Middle_Armenian-ArmTDP				
-Middle_French	eval-only				Middle_French-ALTM	Middle_French-PROFITEROLE			
+Middle_French	eval-only				Middle_French-ALTM		Middle_French-PROFITEROLE		
 Moksha	train+eval	UD_Moksha-JR	22						
 Munduruku	eval-only				Munduruku-TuDeT				
-Naga	pending					Naga-Suansu			
+Naga	gap						Naga-Suansu		
 Naija	train+eval	UD_Naija-NSC	7279					Stanza,UDPipe 2	
 Neapolitan	eval-only				Neapolitan-RB				
 Nenets	eval-only				Nenets-Tundra				
@@ -120,12 +120,12 @@ North_Sami	train+eval	UD_North_Sami-Giella	2257					Stanza,UDPipe 2
 Northern_Kurdish	train+eval	UD_Northern_Kurdish-Kurmanji	20					Trankit	
 Northwest_Gbaya	eval-only				Northwest_Gbaya-Autogramm				
 Norwegian	train+eval	UD_Norwegian-Bokmaal	15696	Norwegian-Nynorsk				Stanza,Trankit,UDPipe 2	
-Occitan	pending					Occitan-TTB			
+Occitan	gap						Occitan-TTB		
 Odia	eval-only				Odia-ODTB				
 Old_Church_Slavonic	gap						Old_Church_Slavonic-PROIEL		
 Old_East_Slavic	train+eval	UD_Old_East_Slavic-RNC	3778	Old_East_Slavic-Birchbark;Old_East_Slavic-Ruthenian			Old_East_Slavic-TOROT	Stanza,UDPipe 2	
 Old_English	eval-only				Old_English-Cairo				
-Old_French	eval-only				Old_French-ALTM	Old_French-PROFITEROLE			
+Old_French	eval-only				Old_French-ALTM		Old_French-PROFITEROLE		
 Old_Georgian	eval-only				Old_Georgian-GLC				
 Old_Irish	eval-only				Old_Irish-DipWBG		Old_Irish-DipSGG		
 Old_Occitan	train+eval	UD_Old_Occitan-CorAG	1092					UDPipe 2	
@@ -136,13 +136,13 @@ Paumari	eval-only				Paumari-TueCL
 Persian	train+eval	UD_Persian-Seraji	4798	Persian-PerDT				Stanza,Trankit,UDPipe 2	
 Pesh	eval-only				Pesh-ChibErgIS				
 Phrygian	eval-only				Phrygian-KUL				
-Polish	train+eval	UD_Polish-MPDT	1433		Polish-PUD	Polish-LFG	Polish-PDB	UDPipe 2	
+Polish	train+eval	UD_Polish-MPDT	1433		Polish-PUD		Polish-PDB;Polish-LFG	UDPipe 2	
 Pomak	gap						Pomak-Philotis		
 Portuguese	train+eval	UD_Portuguese-Bosque	7018	Portuguese-GSD;Portuguese-PetroGold;Portuguese-Porttinari	Portuguese-PUD		Portuguese-CINTIL;Portuguese-DANTEStocks	Stanza,Trankit,UDPipe 2	yes
 Punjabi	train+eval	UD_Punjabi-Rang	81	Punjabi-CS					
-Romanian	train+eval	UD_Romanian-RRT	8043	Romanian-SiMoNERo	Romanian-ArT;Romanian-MolDoRo	Romanian-Nonstandard	Romanian-TueCL	Stanza,Trankit,UDPipe 2	
-Russian	train+eval	UD_Russian-GSD	3850	Russian-Poetry	Russian-PUD	Russian-Taiga	Russian-SynTagRus	Stanza,Trankit,UDPipe 2	
-Ruuli	pending					Ruuli-RDT			
+Romanian	train+eval	UD_Romanian-RRT	8043	Romanian-SiMoNERo	Romanian-ArT;Romanian-MolDoRo		Romanian-TueCL;Romanian-Nonstandard	Stanza,Trankit,UDPipe 2	
+Russian	train+eval	UD_Russian-GSD	3850	Russian-Poetry	Russian-PUD		Russian-SynTagRus;Russian-Taiga	Stanza,Trankit,UDPipe 2	
+Ruuli	gap						Ruuli-RDT		
 Sanskrit	train+eval	UD_Sanskrit-Vedic	21477		Sanskrit-UFAL			Stanza,UDPipe 2	
 Scottish_Gaelic	train+eval	UD_Scottish_Gaelic-ARCOSG	3544					Stanza,Trankit,UDPipe 2	
 Serbian	train+eval	UD_Serbian-SET	3328					Stanza,Trankit,UDPipe 2	
@@ -170,7 +170,7 @@ Tswana	eval-only				Tswana-Popapolelo
 Tupinamba	eval-only				Tupinamba-TuDeT				
 Turkish	train+eval	UD_Turkish-BOUN	7803	Turkish-Atis;Turkish-FrameNet;Turkish-Kenet;Turkish-Tourism	Turkish-GB;Turkish-PUD;Turkish-TueCL		Turkish-IMST;Turkish-Penn	Stanza,UDPipe 2	yes
 Turkish_English	eval-only				Turkish_English-BUTR				
-Turkish_German	pending					Turkish_German-SAGT			
+Turkish_German	gap						Turkish_German-SAGT		
 Ukrainian	train+eval	UD_Ukrainian-ParlaMint	5611				Ukrainian-IU	UDPipe 2	
 Umbrian	eval-only				Umbrian-IKUVINA				
 Upper_Sorbian	eval-only				Upper_Sorbian-UFAL				
@@ -185,7 +185,7 @@ Western_Armenian	train+eval	UD_Western_Armenian-ArmTDP	5274					Stanza,UDPipe 2
 Western_Sierra_Puebla_Nahuatl	eval-only				Western_Sierra_Puebla_Nahuatl-MesoTree				
 Wolof	train+eval	UD_Wolof-WTB	1188					Stanza,UDPipe 2	
 Xavante	eval-only				Xavante-XDT				
-Xibe	pending					Xibe-XDT			
+Xibe	gap						Xibe-XDT		
 Yakut	eval-only				Yakut-YKTDT				
 Yiddish	train+eval	UD_Yiddish-YiTB	1877					UDPipe 2	
 Yoruba	eval-only				Yoruba-YTB				

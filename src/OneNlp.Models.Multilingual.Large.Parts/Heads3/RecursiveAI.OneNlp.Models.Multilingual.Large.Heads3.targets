@@ -1,0 +1,12 @@
+<Project>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/gd.onenlp" Link="weights/multilingual-large/heads/gd.onenlp" TargetPath="weights/multilingual-large/heads/gd.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/gl.onenlp" Link="weights/multilingual-large/heads/gl.onenlp" TargetPath="weights/multilingual-large/heads/gl.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/grc.onenlp" Link="weights/multilingual-large/heads/grc.onenlp" TargetPath="weights/multilingual-large/heads/grc.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/he.onenlp" Link="weights/multilingual-large/heads/he.onenlp" TargetPath="weights/multilingual-large/heads/he.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/hr.onenlp" Link="weights/multilingual-large/heads/hr.onenlp" TargetPath="weights/multilingual-large/heads/hr.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/ht.onenlp" Link="weights/multilingual-large/heads/ht.onenlp" TargetPath="weights/multilingual-large/heads/ht.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/hy.onenlp" Link="weights/multilingual-large/heads/hy.onenlp" TargetPath="weights/multilingual-large/heads/hy.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/hyw.onenlp" Link="weights/multilingual-large/heads/hyw.onenlp" TargetPath="weights/multilingual-large/heads/hyw.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

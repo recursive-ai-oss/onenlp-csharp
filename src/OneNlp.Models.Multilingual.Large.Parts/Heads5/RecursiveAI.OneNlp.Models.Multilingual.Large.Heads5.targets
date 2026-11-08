@@ -1,0 +1,11 @@
+<Project>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/ko.onenlp" Link="weights/multilingual-large/heads/ko.onenlp" TargetPath="weights/multilingual-large/heads/ko.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/koi.onenlp" Link="weights/multilingual-large/heads/koi.onenlp" TargetPath="weights/multilingual-large/heads/koi.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/kpv.onenlp" Link="weights/multilingual-large/heads/kpv.onenlp" TargetPath="weights/multilingual-large/heads/kpv.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/ky.onenlp" Link="weights/multilingual-large/heads/ky.onenlp" TargetPath="weights/multilingual-large/heads/ky.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/la.onenlp" Link="weights/multilingual-large/heads/la.onenlp" TargetPath="weights/multilingual-large/heads/la.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/lij.onenlp" Link="weights/multilingual-large/heads/lij.onenlp" TargetPath="weights/multilingual-large/heads/lij.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/lt.onenlp" Link="weights/multilingual-large/heads/lt.onenlp" TargetPath="weights/multilingual-large/heads/lt.onenlp" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

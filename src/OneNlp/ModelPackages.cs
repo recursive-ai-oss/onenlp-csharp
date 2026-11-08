@@ -14,9 +14,9 @@ namespace RecursiveAI.OneNlp;
 /// </para>
 /// <para>All members are thread-safe.</para>
 /// </remarks>
-public static class ModelPackages
+public static partial class ModelPackages
 {
-    /// <summary>The package that carries every language through the accurate tier. Named in the error when no model is available.</summary>
+    /// <summary>The distilled accurate-tier package. Named in the error only for languages it covers.</summary>
     internal const string MultilingualPackageId = "RecursiveAI.OneNlp.Models.Multilingual";
 
     /// <summary>The base-size accurate-tier package.</summary>
@@ -184,9 +184,8 @@ public static class ModelPackages
         ["hi"] = "RecursiveAI.OneNlp.Models.Hindi",
     };
 
-    // The languages the two accurate-tier packages have heads for (their `Languages` lists). Core cannot ask a package that is not
-    // referenced, so the table is here; a package that gains languages must be added to it.
-    private static readonly HashSet<string> AccurateLanguages = new(StringComparer.Ordinal) { "en", "de", "fr", "es", "pt", "it", "nl", "tr", "zh" };
+    // Each accurate-tier package's coverage is in ModelPackages.AccurateLanguages.g.cs, written from the training corpus
+    // description by tools/accurate/make_corpus_spec.py (--cs). Core cannot ask a package that is not referenced, so the table is here.
 
     /// <summary>
     /// The error for a language and tier without a model. The message names only packages that would change the outcome: ones that
@@ -196,13 +195,18 @@ public static class ModelPackages
     internal static ModelNotAvailableException Missing(Language language, Tier tier)
     {
         string name = language == Language.Unknown ? "unknown" : language.Code;
-        bool accurateCovers = language == Language.Unknown || AccurateLanguages.Contains(language.Code);
+        bool largeCovers = language == Language.Unknown || LargeAccurateLanguages.Contains(language.Code);
+        bool multilingualCovers = language == Language.Unknown || MultilingualAccurateLanguages.Contains(language.Code);
         var candidates = new List<string>();
         if (tier == Tier.Accurate)
         {
-            if (accurateCovers)
+            if (largeCovers)
             {
                 candidates.Add(LargePackageId);
+            }
+
+            if (multilingualCovers)
+            {
                 candidates.Add(MultilingualPackageId);
             }
         }
@@ -213,9 +217,13 @@ public static class ModelPackages
                 candidates.Add(fast);
             }
 
-            if (accurateCovers)
+            if (multilingualCovers)
             {
                 candidates.Add(MultilingualPackageId);
+            }
+            else if (largeCovers)
+            {
+                candidates.Add(LargePackageId);
             }
         }
 

@@ -56,6 +56,24 @@ public class ModelPackagesTests
         Assert.Empty(other.PackageIds);
     }
 
+    [Theory]
+    [InlineData("cs", false)]
+    [InlineData("de", true)]
+    public void AccurateCoverageNamesOnlyPackagesWithHeads(string code, bool distilledCovers)
+    {
+        Language language = Language.FromCode(code);
+        ModelNotAvailableException missing = Assert.Throws<ModelNotAvailableException>(() => Pipeline.Create(language, Tier.Accurate));
+        string[] expected = distilledCovers
+            ? ["RecursiveAI.OneNlp.Models.Multilingual.Large", "RecursiveAI.OneNlp.Models.Multilingual"]
+            : ["RecursiveAI.OneNlp.Models.Multilingual.Large"];
+        Assert.Equal(expected, missing.PackageIds);
+        if (!distilledCovers)
+        {
+            ModelNotAvailableException fallback = Assert.Throws<ModelNotAvailableException>(() => ModelPackages.Get(language));
+            Assert.Equal(expected, fallback.PackageIds);
+        }
+    }
+
     [Fact]
     public void ModelVerbsFailWithoutAPackageButAnalyzeStillTokenizes()
     {

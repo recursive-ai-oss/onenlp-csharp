@@ -50,6 +50,8 @@ Programs and scripts that support the tests, the measurements and the training r
 | `fetch/ud.sh`, `fetch/conll18_crosscheck.sh` | Fetch English-EWT and the shared-task scorer; cross-check a scorer. | Usage in each header. |
 | `fetch/langid/`, `fetch/textcat/`, per-language folders | Language-ID corpora, classification data and per-language manifests. | `fetch.py` inside each. |
 | `fetch/ud_catalog.py`, `ud_docs.py`, `ud_survey.py`, `build_references.py` | Build the treebank catalogue, licence table and published-reference table. | Usage in each header. |
+| `fetch/ud_rulings.py` | Applies the rulings on unclear treebanks to the catalogue tables in place (re-run is a no-op). | `ud_rulings.py fetch/ud` |
+| `fetch/fetch_ud_ner.py` | Fetches the entity corpora of the languages beyond the first nine (UNER sets, KPWr-NER, RONEC; raw files of alternatives) with manifests in `fetch/ud-ner/`. | `fetch_ud_ner.py <data-root> [--md-dir fetch/ud-ner] [lang ...]` |
 | `selftrain/`, `tr_overlap.py` | Check that self-labelled text contains no evaluation sentence. | `check_overlap.py`, `tr_overlap.py pseudo.conllu eval1.conllu ...` |
 | `openner/` | Fetch, label and filter the open-type entity data (an open-weight instruction model labels web text). | Scripts in order: `fetch.py`, `fetch_text.py`, `label.py`, `filter_labels.py`, `prep.py`. |
 
@@ -57,6 +59,8 @@ Programs and scripts that support the tests, the measurements and the training r
 
 | Tool | What it does | How it is run |
 |---|---|---|
+| `accurate/make_corpus_spec.py`, `lexicon_proposals.py`, `corpus_report.py` | Describe the accurate tier's multilingual corpus as data (`recipes/accurate/common/corpus.json`), propose lemma-table settings per language, and render `docs/accurate-corpus.md`. | Usage in each header; [recipes/accurate/common](../recipes/accurate/common/README.md). |
+| `accurate/train_segmenters.sh` | Trains the word segmenters of the unspaced-script languages (ja, th, vi, lzh) with the Chinese recipe, one resumable chunk each. | Environment in its header. |
 | `OneNlp.LangId/` | Trains and scores the language-ID model. [docs/language-id.md](../docs/language-id.md) | `dotnet run --project tools/OneNlp.LangId -- train\|score ...` |
 | `distill/`, `accurate/`, `OneNlp.Accurate/` | The accurate tier. PyTorch development tooling that distils the student encoder and exports encoders to ONNX; C# programs that check the exports against PyTorch and time fine-tuning steps. [docs/accurate-encoder.md](../docs/accurate-encoder.md) | `accurate/setup_venv.sh <venv-dir>`, then `distill/chunk.sh N` per resumable chunk; `OneNlp.Accurate` prints its commands. |
 | `embeddings/` | Fetch, export, shard and score the sentence-embedding models (`mteb` runs). [docs/embeddings.md](../docs/embeddings.md) | `setup_venv.sh <venv-dir>`, then the scripts in the folder. |

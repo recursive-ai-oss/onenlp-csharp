@@ -20,6 +20,7 @@ public sealed class ScopedHead : ITrainableComponent
 {
     private readonly ITrainableComponent _inner;
     private readonly Func<Doc, bool> _inScope;
+    private float _lossWeight = 1f;
 
     /// <summary>Wraps a head.</summary>
     /// <param name="inner">The head that does the work.</param>
@@ -30,6 +31,25 @@ public sealed class ScopedHead : ITrainableComponent
         ArgumentNullException.ThrowIfNull(inScope);
         _inner = inner;
         _inScope = inScope;
+    }
+
+    /// <summary>
+    /// How much this head's loss counts against the other heads' in a mixed batch (default 1). A weight above 1 asks the shared encoder to serve
+    /// this head more; the head's own gradient is scaled by the same factor. Not saved. Must be finite and not negative.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">The value is negative, infinite or not a number.</exception>
+    public float LossWeight
+    {
+        get => _lossWeight;
+        set
+        {
+            if (!float.IsFinite(value) || value < 0f)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "The loss weight must be finite and not negative.");
+            }
+
+            _lossWeight = value;
+        }
     }
 
     /// <summary>The wrapped head.</summary>
@@ -76,13 +96,18 @@ public sealed class ScopedHead : ITrainableComponent
             return Tensor.Scalar(0f);
         }
 
+        Tensor loss;
         if (picked.Count == examples.Count)
         {
-            return _inner.Loss(encoded, examples);
+            loss = _inner.Loss(encoded, examples);
+        }
+        else
+        {
+            (EncodedBatch sub, List<Example> chosen) = Select(encoded, examples, picked);
+            loss = _inner.Loss(sub, chosen);
         }
 
-        (EncodedBatch sub, List<Example> chosen) = Select(encoded, examples, picked);
-        return _inner.Loss(sub, chosen);
+        return _lossWeight == 1f ? loss : Ops.Mul(loss, Tensor.Scalar(_lossWeight));
     }
 
     /// <inheritdoc/>

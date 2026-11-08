@@ -1,17 +1,22 @@
-# RecursiveAI.OneNLP.Models.Multilingual.Large
+# RecursiveAI.OneNlp.Models.Multilingual.Large
 
-**spaCy-class NLP for .NET.** The base-size accurate-tier model for [RecursiveAI.OneNlp](https://www.nuget.org/packages/RecursiveAI.OneNlp): one fine-tuned mmBERT-base encoder shared by heads for English, German, French, Spanish, Portuguese, Italian, Dutch, Turkish and Chinese (tags, morphology, lemmas, dependency parse, entities). Add this package and the `Nlp` verbs use it for those languages whenever no fast-tier package for the language is referenced; a fast-tier package, when present, is used instead. No downloads, no native code. Unaffiliated with other projects named OneNLP.
+**spaCy-class NLP for .NET.** One fine-tuned mmBERT-base encoder with UD heads for **84 languages** and entity heads for **19**. Tags, morphology, lemmas, dependencies and sentence starts are supplied where the training treebanks have those annotations. Japanese, Classical Chinese, Thai, Vietnamese and Chinese include trained word segmentation. No downloads and no native dependencies. Unaffiliated with other projects named OneNLP.
 
-> **Early preview.** The weights are development models and will be retrained; the API will change.
+Reference this package only. Its 18 component dependencies keep every model package under 250 MB without reducing any tensor: six byte-preserving pieces of the encoder graph, the Chinese heads, and 11 additional language-head groups. Installed weights total about 3.5 GB. The shared encoder loads on first use; a language's heads load only when requested. The additional head groups are package assets copied to `weights/multilingual-large/heads/` in the build and publish directories; deploy the complete publish directory, not just the executable. The graph and original nine-language heads remain embedded. This layout supports NativeAOT without combining all weights into one resource image.
 
-The encoder is a 1.2 GB ONNX graph, so it is cut into six pieces that this package depends on (`...Large.Encoder1`, `Encoder2`, `TokenTable1` to `TokenTable4`, in that order) and one for the Chinese heads and word segmenter (`...Large.Chinese`); reference only this package. The first verb that needs the model reads the graph into memory once, and the heads of a language when that language is first used.
+The plain `Nlp` verbs prefer a referenced fast-tier model for its language, otherwise this model. Explicit accurate-tier requests prefer this base-size package over the distilled multilingual package. The distilled package covers only the original nine languages; this package covers the 84 listed by `MultilingualLargeModel.Languages`. Language detection and UD coverage are separate: provide a language explicitly for text that the language detector does not cover.
 
 ```csharp
 using RecursiveAI.OneNlp;
+using RecursiveAI.OneNlp.Neural.Components;
 
-Doc doc = Nlp.Analyze("Angela Merkel besuchte im Mai die Stadt Hamburg.");
-foreach (Span e in doc.Ents)
+using var nlp = Pipeline.Create(Language.FromCode("cs"), Tier.Accurate)
+    .Add<Morphologizer>().Add<Lemmatizer>().Add<DependencyParser>();
+Doc doc = nlp.Process("Praha je hlavní město České republiky.");
+foreach (Token token in doc)
 {
-    Console.WriteLine($"{e.Label} {e}");
+    Console.WriteLine($"{token}: {token.Pos}, {token.Lemma}, {token.Dep}");
 }
 ```
+
+These are development weights. Published-reference quality gaps, per language and metric, are reported in the repository's `docs/accurate-tier-rows.md`, not hidden behind a multilingual average. Training data, licences, hashes, recipe settings and evaluation roles are in `PROVENANCE.md`, `corpus.json`, the included manifests and `THIRD-PARTY-NOTICES.md`.

@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PartName>Heads9</PartName>
+    <PartDescription>language-specific heads</PartDescription>
+    <PartFiles>true</PartFiles>
+  </PropertyGroup>
+  <Import Project="../Part.props" />
+</Project>
