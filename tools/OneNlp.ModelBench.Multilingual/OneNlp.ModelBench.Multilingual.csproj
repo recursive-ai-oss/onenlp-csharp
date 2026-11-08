@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../src/OneNlp.Models.Multilingual/OneNlp.Models.Multilingual.csproj" />
+    <ProjectReference Include="../../src/OneNlp.Models.Multilingual.Large/OneNlp.Models.Multilingual.Large.csproj" />
   </ItemGroup>
 
 </Project>

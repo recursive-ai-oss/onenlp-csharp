@@ -30,6 +30,7 @@ public sealed class SentenceEmbedder : IEmbedder
     private const int MaxBatchSize = 4096;
 
     private readonly Session _session;
+    private Stream? _ownedModelStream;
     private readonly Tokenizer _tokenizer;
     private readonly string _outputName;
     private readonly DType _idType;
@@ -138,7 +139,7 @@ public sealed class SentenceEmbedder : IEmbedder
     }
 
     /// <summary>Loads a model from streams, for weights held in memory or embedded in an assembly.</summary>
-    /// <param name="onnx">The ONNX model; read to the end, not closed.</param>
+    /// <param name="onnx">The ONNX model; read to the end, not closed. This overload buffers the bytes, so the caller may close the stream after loading.</param>
     /// <param name="tokenizerJson">The model's <c>tokenizer.json</c>; read to the end, not closed.</param>
     /// <param name="config">Pooling, normalization and length.</param>
     /// <param name="prefix">Text put in front of every input.</param>
@@ -146,6 +147,13 @@ public sealed class SentenceEmbedder : IEmbedder
     /// <returns>An embedder the caller disposes.</returns>
     /// <exception cref="InvalidDataException">A stream is damaged or the graph is not an encoder as described for the constructor.</exception>
     public static SentenceEmbedder Load(Stream onnx, Stream tokenizerJson, EmbeddingConfig config, string prefix = "", ModelOptions? options = null)
+    {
+        // Preserve the buffered overload's lifetime contract; only the ownership overload opts into in-place resources.
+        Stream buffered = onnx is UnmanagedMemoryStream ? Stream.Synchronized(onnx) : onnx;
+        return LoadCore(buffered, tokenizerJson, config, prefix, options);
+    }
+
+    private static SentenceEmbedder LoadCore(Stream onnx, Stream tokenizerJson, EmbeddingConfig config, string prefix, ModelOptions? options)
     {
         ArgumentNullException.ThrowIfNull(onnx);
         ArgumentNullException.ThrowIfNull(tokenizerJson);
@@ -159,6 +167,40 @@ public sealed class SentenceEmbedder : IEmbedder
         catch
         {
             session.Dispose();
+            throw;
+        }
+    }
+
+    /// <summary>Loads stream-backed weights, optionally transferring ownership of the model stream to the embedder.</summary>
+    /// <param name="onnx">The ONNX model. Embedded resources load in place; their storage must remain unchanged while the embedder lives.</param>
+    /// <param name="tokenizerJson">The tokenizer JSON; read to the end and left open.</param>
+    /// <param name="config">Pooling, normalization and maximum sequence length.</param>
+    /// <param name="leaveOpen">If false, the embedder closes the model stream on disposal, or this call closes it on failure. If true, the caller keeps it open until the embedder is disposed.</param>
+    /// <param name="prefix">Text prepended to every input; default empty.</param>
+    /// <param name="options">Session options; null uses OneModel defaults.</param>
+    /// <returns>An embedder the caller disposes.</returns>
+    /// <exception cref="ArgumentNullException">A required argument is null.</exception>
+    /// <exception cref="InvalidDataException">A stream is damaged or the graph is not an encoder.</exception>
+    public static SentenceEmbedder Load(Stream onnx, Stream tokenizerJson, EmbeddingConfig config, bool leaveOpen, string prefix = "", ModelOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(onnx);
+        try
+        {
+            SentenceEmbedder embedder = LoadCore(onnx, tokenizerJson, config, prefix, options);
+            if (!leaveOpen)
+            {
+                embedder._ownedModelStream = onnx;
+            }
+
+            return embedder;
+        }
+        catch
+        {
+            if (!leaveOpen)
+            {
+                onnx.Dispose();
+            }
+
             throw;
         }
     }
@@ -285,7 +327,12 @@ public sealed class SentenceEmbedder : IEmbedder
     }
 
     /// <inheritdoc/>
-    public void Dispose() => _session.Dispose();
+    public void Dispose()
+    {
+        _session.Dispose();
+        _ownedModelStream?.Dispose();
+        _ownedModelStream = null;
+    }
 
     private int[] Tokenize(string text)
     {

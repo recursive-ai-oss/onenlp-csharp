@@ -111,7 +111,13 @@ public class TrainingTests : IDisposable
         List<Example> train = ToyExamples(60, 1);
         using Pipeline a = NewPipeline();
         using Pipeline b = NewPipeline();
-        Assert.Equal(a.Train(train, Options()).WeightsSha256, b.Train(train, Options()).WeightsSha256);
+        TrainResult first = a.Train(train, Options());
+        // Supply the previous runtime's hash for a same-machine upgrade check; fast arithmetic is not a cross-platform bitwise contract.
+        if (Environment.GetEnvironmentVariable("ONENLP_TRAINING_EXPECTED_HASH") is { } expected)
+        {
+            Assert.Equal(expected, first.WeightsSha256);
+        }
+        Assert.Equal(first.WeightsSha256, b.Train(train, Options()).WeightsSha256);
         using Pipeline c = NewPipeline();
         Assert.NotEqual(a.Train(train, Options()).WeightsSha256, c.Train(train, new TrainOptions { Epochs = 8, BatchWords = 120, LearningRate = 0.02f, Seed = 8 }).WeightsSha256);
     }
@@ -153,6 +159,35 @@ public class TrainingTests : IDisposable
         // Running again on a finished checkpoint changes nothing.
         using Pipeline third = NewPipeline();
         Assert.Equal(uninterrupted.WeightsSha256, third.Train(train, Options(killed, 4)).WeightsSha256);
+    }
+
+    [Fact]
+    public void WarmStartingLoadsTheCheckpointBeforeTheFirstStep()
+    {
+        List<Example> train = ToyExamples(40, 1);
+        string directory = Path.Combine(_dir, "warm");
+        using Pipeline source = NewPipeline();
+        TrainResult saved = source.Train(train, new TrainOptions
+        {
+            Epochs = 1,
+            BatchWords = 120,
+            Seed = 7,
+            CheckpointDirectory = directory,
+        });
+
+        using var cancelled = new CancellationTokenSource();
+        cancelled.Cancel();
+        using Pipeline target = NewPipeline();
+        TrainResult loaded = target.Train(train, new TrainOptions
+        {
+            Epochs = 1,
+            BatchWords = 120,
+            Seed = 7,
+            InitializeFrom = Path.Combine(directory, "last.ckpt"),
+        }, cancelled.Token);
+        Assert.False(loaded.Completed);
+        Assert.Equal(0, loaded.Steps);
+        Assert.Equal(saved.WeightsSha256, loaded.WeightsSha256);
     }
 
     [Fact]

@@ -19,7 +19,9 @@ cpu() {
 }
 cores() { getconf _NPROCESSORS_ONLN; }
 
-dotnet build -c Release "$REPO/bench/OneNlp.Bench.Tokenizers" -v q -clp:NoSummary
+if [ "${ONENLP_BENCH_PREBUILT:-0}" != 1 ]; then
+  dotnet build -c Release "$REPO/bench/OneNlp.Bench.Tokenizers" -m:4 -v q -clp:NoSummary
+fi
 DLL=$(find "${ONENLP_ARTIFACTS:-$REPO/artifacts}" -path '*bin/OneNlp.Bench.Tokenizers/release/RecursiveAI.OneNlp.Bench.Tokenizers.dll' | head -1)
 
 {

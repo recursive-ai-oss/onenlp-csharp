@@ -16,7 +16,7 @@ nlp.Train(examples, new TrainOptions { Epochs = 10, Seed = 7 });     // examples
 PipelineFile.Save(nlp, "model.onenlp");
 ```
 
-Models come in separate packages, one per language ([RecursiveAI.OneNlp.Models.English](https://www.nuget.org/packages/RecursiveAI.OneNlp.Models.English), `.French`, `.German`, `.Spanish`, `.Portuguese`, `.Dutch`, `.Italian`, `.Chinese`, `.Turkish`) and for embeddings (`.Embeddings`, `.Embeddings.Multilingual`).
+Models come in separate packages, one per language ([RecursiveAI.OneNlp.Models.English](https://www.nuget.org/packages/RecursiveAI.OneNlp.Models.English), `.French`, `.German`, `.Spanish`, `.Portuguese`, `.Dutch`, `.Italian`, `.Chinese`, `.Turkish`, `.Hindi`), the nine-language distilled accurate tier (`.Multilingual`), the 84-language base-size accurate tier (`.Multilingual.Large`, 19 with entities) and for embeddings (`.Embeddings`, `.Embeddings.Multilingual`).
 
 - Training and recipes: <https://github.com/recursive-ai-oss/onenlp-csharp/blob/main/docs/training.md>
 - Measured results: <https://github.com/recursive-ai-oss/onenlp-csharp/blob/main/docs/results-table.md>

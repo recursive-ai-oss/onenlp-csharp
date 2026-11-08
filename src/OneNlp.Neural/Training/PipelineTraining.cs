@@ -166,7 +166,7 @@ public static class PipelineTraining
             {
                 // A fresh run that starts from the weights and optimizer moments of an earlier run: the step counter of the run restarts at 0
                 // while the optimizer keeps its own count, so a schedule given by the caller sees steps continuing from the earlier run.
-                CheckpointFile.Load(_o.InitializeFrom, _state, _optimizer);
+                Checkpoint.Load(_o.InitializeFrom, _state, _optimizer);
             }
 
             while (!_done)
@@ -513,7 +513,7 @@ public static class PipelineTraining
 
             if (_bestOnDisk)
             {
-                CheckpointFile.Load(Path.Combine(_o.CheckpointDirectory!, BestName), _weights);
+                Checkpoint.Load(Path.Combine(_o.CheckpointDirectory!, BestName), _weights);
             }
             else if (_bestSnapshot is not null)
             {
@@ -551,7 +551,7 @@ public static class PipelineTraining
                 return;
             }
 
-            IReadOnlyDictionary<string, long> x = CheckpointFile.Load(last, _state, _optimizer);
+            IReadOnlyDictionary<string, long> x = Checkpoint.Load(last, _state, _optimizer).Extra;
             if (x["seed"] != unchecked((long)_o.Seed) || x["trainCount"] != _train.Count || x["batchWords"] != _o.BatchWords)
             {
                 throw new InvalidOperationException($"The checkpoint in '{_o.CheckpointDirectory}' was made with a different seed, batch size or training set. Delete it or use another directory.");
@@ -581,7 +581,7 @@ public static class PipelineTraining
 
         private TrainResult Result(bool completed)
         {
-            string hash = CheckpointFile.HashOf(_weights);
+            string hash = CheckpointHash.Of(_weights);
             return new TrainResult(_step, _epoch, completed, _stoppedEarly, _evals, _bestScore, _bestStep, hash);
         }
     }

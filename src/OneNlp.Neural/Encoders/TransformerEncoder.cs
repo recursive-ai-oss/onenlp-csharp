@@ -54,6 +54,7 @@ public sealed class TransformerEncoder : IEncoder, IWordFormEncoder
     private const int MaxLengthLimit = 1 << 16;
 
     private readonly Session _session;
+    private Stream? _ownedModelStream;
     private readonly Tokenizer _tokenizer;
     private readonly string _modelFile;
     private readonly string _tokenizerFile;
@@ -91,7 +92,7 @@ public sealed class TransformerEncoder : IEncoder, IWordFormEncoder
     }
 
     /// <summary>Loads an exported encoder and its tokenizer from streams, for weights embedded in an assembly. A pipeline saved with such an encoder must go through <see cref="SharedEncoder"/>.</summary>
-    /// <param name="model">The ONNX file's bytes (see the path constructor for the required inputs and output); read to the end, not closed.</param>
+    /// <param name="model">The ONNX file's bytes (see the path constructor for the required inputs and output); read to the end, not closed. This overload buffers the bytes, so the caller may close the stream after loading.</param>
     /// <param name="tokenizerJson">The model's <c>tokenizer.json</c>; read to the end, not closed.</param>
     /// <param name="pooling">How pieces become tokens.</param>
     /// <param name="maxLength">The longest sequence given to the model, special tokens included (2 to 65,536).</param>
@@ -102,7 +103,46 @@ public sealed class TransformerEncoder : IEncoder, IWordFormEncoder
     {
         ArgumentNullException.ThrowIfNull(model);
         ArgumentNullException.ThrowIfNull(tokenizerJson);
-        return new TransformerEncoder("<stream>", "<stream>", pooling, maxLength, null, options, expandWordForms, model, tokenizerJson);
+        // Preserve the buffered overload's lifetime contract. The ownership overload below opts into in-place resource loading.
+        Stream buffered = model is UnmanagedMemoryStream ? Stream.Synchronized(model) : model;
+        return new TransformerEncoder("<stream>", "<stream>", pooling, maxLength, null, options, expandWordForms, buffered, tokenizerJson);
+    }
+
+    /// <summary>Loads stream-backed weights, optionally transferring ownership of the model stream to the encoder.</summary>
+    /// <param name="model">The ONNX bytes. Embedded resource streams load in place; their storage must remain unchanged while the encoder lives.</param>
+    /// <param name="tokenizerJson">The tokenizer JSON; read to the end and left open.</param>
+    /// <param name="leaveOpen">If false, the encoder closes the model stream on disposal, or this call closes it on failure. If true, the caller must keep it open until the encoder is disposed.</param>
+    /// <param name="pooling">How pieces become tokens; default mean.</param>
+    /// <param name="maxLength">Maximum sequence length including special tokens, 2 to 65,536; default 512.</param>
+    /// <param name="expandWordForms">Whether to read multiword tokens' word forms; default false.</param>
+    /// <param name="options">Session options; null uses OneModel defaults.</param>
+    /// <returns>An encoder the caller disposes.</returns>
+    /// <exception cref="ArgumentNullException">A stream is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The maximum length is outside its bounds.</exception>
+    /// <exception cref="InvalidDataException">The model inputs, output or tokenizer are invalid.</exception>
+    public static TransformerEncoder FromStreams(Stream model, Stream tokenizerJson, bool leaveOpen, SubwordPooling pooling = SubwordPooling.Mean, int maxLength = 512, bool expandWordForms = false, ModelOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        try
+        {
+            ArgumentNullException.ThrowIfNull(tokenizerJson);
+            var encoder = new TransformerEncoder("<stream>", "<stream>", pooling, maxLength, null, options, expandWordForms, model, tokenizerJson);
+            if (!leaveOpen)
+            {
+                encoder._ownedModelStream = model;
+            }
+
+            return encoder;
+        }
+        catch
+        {
+            if (!leaveOpen)
+            {
+                model.Dispose();
+            }
+
+            throw;
+        }
     }
 
     private static string NonEmpty(string value)
@@ -126,47 +166,55 @@ public sealed class TransformerEncoder : IEncoder, IWordFormEncoder
         _tokenizer.Truncation = null;
         _session = modelStream is null ? Session.Load(modelPath, options) : Session.Load(modelStream, options);
 
-        TensorInfo? ids = null;
-        _hasMask = false;
-        foreach (TensorInfo input in _session.Inputs)
+        try
         {
-            if (input.Name == "input_ids")
+            TensorInfo? ids = null;
+            _hasMask = false;
+            foreach (TensorInfo input in _session.Inputs)
             {
-                ids = input;
+                if (input.Name == "input_ids")
+                {
+                    ids = input;
+                }
+                else if (input.Name == "attention_mask")
+                {
+                    _hasMask = true;
+                }
+                else
+                {
+                    throw new InvalidDataException($"The encoder has an input '{input.Name}'; only 'input_ids' and 'attention_mask' are supported.");
+                }
             }
-            else if (input.Name == "attention_mask")
+
+            if (ids is null || !_hasMask || (ids.DType != DType.I64 && ids.DType != DType.I32))
             {
-                _hasMask = true;
+                throw new InvalidDataException("The encoder needs integer inputs 'input_ids' and 'attention_mask'.");
             }
-            else
+
+            _idType = ids.DType;
+            if (_session.Outputs.Length < 1 || _session.Outputs[0].Rank != 3 || !_session.Outputs[0].Dims[2].IsFixed)
             {
-                throw new InvalidDataException($"The encoder has an input '{input.Name}'; only 'input_ids' and 'attention_mask' are supported.");
+                throw new InvalidDataException("The encoder's first output must have the shape [batch, sequence, width] with a fixed width.");
+            }
+
+            _outputName = _session.Outputs[0].Name;
+            long width = _session.Outputs[0].Dims[2].Value;
+            if (width < 1 || width > MaxWidth)
+            {
+                throw new InvalidDataException($"The encoder width {width} is outside 1 to {MaxWidth}.");
+            }
+
+            Width = (int)width;
+            (_prefix, _suffix) = SpecialTokenFrame(_tokenizer);
+            if (_prefix.Length + _suffix.Length >= maxLength)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxLength), "The special tokens alone fill the sequence.");
             }
         }
-
-        if (ids is null || !_hasMask || (ids.DType != DType.I64 && ids.DType != DType.I32))
+        catch
         {
-            throw new InvalidDataException("The encoder needs integer inputs 'input_ids' and 'attention_mask'.");
-        }
-
-        _idType = ids.DType;
-        if (_session.Outputs.Length < 1 || _session.Outputs[0].Rank != 3 || !_session.Outputs[0].Dims[2].IsFixed)
-        {
-            throw new InvalidDataException("The encoder's first output must have the shape [batch, sequence, width] with a fixed width.");
-        }
-
-        _outputName = _session.Outputs[0].Name;
-        long width = _session.Outputs[0].Dims[2].Value;
-        if (width < 1 || width > MaxWidth)
-        {
-            throw new InvalidDataException($"The encoder width {width} is outside 1 to {MaxWidth}.");
-        }
-
-        Width = (int)width;
-        (_prefix, _suffix) = SpecialTokenFrame(_tokenizer);
-        if (_prefix.Length + _suffix.Length >= maxLength)
-        {
-            throw new ArgumentOutOfRangeException(nameof(maxLength), "The special tokens alone fill the sequence.");
+            _session.Dispose();
+            throw;
         }
     }
 
@@ -196,7 +244,12 @@ public sealed class TransformerEncoder : IEncoder, IWordFormEncoder
     public NnModule? Weights => null;
 
     /// <inheritdoc/>
-    public void Dispose() => _session.Dispose();
+    public void Dispose()
+    {
+        _session.Dispose();
+        _ownedModelStream?.Dispose();
+        _ownedModelStream = null;
+    }
 
     /// <summary>Checks the model file against the SHA-256 given at construction.</summary>
     /// <exception cref="InvalidDataException">No hash was given, or the file's hash differs.</exception>

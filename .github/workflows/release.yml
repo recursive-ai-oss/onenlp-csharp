@@ -75,11 +75,40 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Keep build output out of the checkout
-        run: echo "ONENLP_ARTIFACTS=$RUNNER_TEMP/artifacts" >> "$GITHUB_ENV"
+      - name: Disk space for weights, build and packages
+        # A full build and pack with every model needs at least 35 GiB (docs/release.md). Remove preinstalled toolchains this job
+        # does not use, put the large outputs on the bigger volume, and stop early if it is still too small.
+        run: |
+          sudo rm -rf /usr/local/lib/android /opt/ghc /usr/local/.ghcup /usr/share/swift /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force > /dev/null 2>&1 || true
+          work=$RUNNER_TEMP/work
+          if [ -d /mnt ] && [ "$(df --output=avail -BG /mnt | tail -1 | tr -dc 0-9)" -gt "$(df --output=avail -BG "$RUNNER_TEMP" | tail -1 | tr -dc 0-9)" ]; then
+            sudo mkdir -p /mnt/work && sudo chown "$USER" /mnt/work && work=/mnt/work
+          fi
+          mkdir -p "$work"
+          df -h / "$work"
+          free=$(df --output=avail -BG "$work" | tail -1 | tr -dc 0-9)
+          [ "$free" -ge 35 ] || { echo "::error::only ${free} GiB free for the release build; 35 GiB are needed"; exit 1; }
+          { echo "WORK=$work"; echo "ONENLP_ARTIFACTS=$work/artifacts"; echo "NUGET_PACKAGES=$work/nuget"; } >> "$GITHUB_ENV"
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           global-json-file: global.json
+
+      - name: Download and verify release weights
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WEIGHTS_RELEASE: ${{ vars.ONENLP_WEIGHTS_RELEASE }}
+        run: |
+          set -euo pipefail
+          : "${WEIGHTS_RELEASE:?Set the ONENLP_WEIGHTS_RELEASE repository variable to the weights release tag}"
+          assets="$WORK/weight-assets"
+          mkdir -p "$assets"
+          # Download only the exact asset set required by this commit, never "latest".
+          while IFS= read -r asset; do
+            gh release download "$WEIGHTS_RELEASE" --repo "$GITHUB_REPOSITORY" --pattern "$asset" --dir "$assets"
+          done < <(python3 tools/gate/weight_assets.py list)
+          python3 tools/gate/weight_assets.py unpack "$assets" "$WORK/weights" --github-env "$GITHUB_ENV"
+          rm -r "$assets"
 
       - name: Restore
         run: dotnet restore OneNlp.slnx
@@ -104,23 +133,23 @@ jobs:
       - name: Pack
         # The packages, from the binaries the tests ran on. Symbols come out as a .snupkg file.
         run: |
-          dotnet pack OneNlp.slnx -c Release --no-build -o "$RUNNER_TEMP/packages"
-          ls -l "$RUNNER_TEMP/packages"
+          dotnet pack OneNlp.slnx -c Release --no-build -o "$WORK/packages"
+          ls -l "$WORK/packages"
 
       - name: Attest build provenance
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: |
-            ${{ runner.temp }}/packages/*.nupkg
-            ${{ runner.temp }}/packages/*.snupkg
+            ${{ env.WORK }}/packages/*.nupkg
+            ${{ env.WORK }}/packages/*.snupkg
 
       - name: Keep the packages for the release job
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: packages
           path: |
-            ${{ runner.temp }}/packages/*.nupkg
-            ${{ runner.temp }}/packages/*.snupkg
+            ${{ env.WORK }}/packages/*.nupkg
+            ${{ env.WORK }}/packages/*.snupkg
           if-no-files-found: error
 
       - name: Log in to nuget.org
@@ -134,9 +163,9 @@ jobs:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: |
           # --no-symbols: pushing a .nupkg would otherwise also push the .snupkg beside it, and the next line pushes it again.
-          dotnet nuget push "$RUNNER_TEMP/packages/*.nupkg" --api-key "$NUGET_API_KEY" --no-symbols \
+          dotnet nuget push "$WORK/packages/*.nupkg" --api-key "$NUGET_API_KEY" --no-symbols \
             --source https://api.nuget.org/v3/index.json --skip-duplicate
-          dotnet nuget push "$RUNNER_TEMP/packages/*.snupkg" --api-key "$NUGET_API_KEY" \
+          dotnet nuget push "$WORK/packages/*.snupkg" --api-key "$NUGET_API_KEY" \
             --source https://api.nuget.org/v3/index.json --skip-duplicate
 
   release:
