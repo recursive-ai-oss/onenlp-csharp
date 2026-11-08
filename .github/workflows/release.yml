@@ -81,6 +81,22 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Download and verify release weights
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WEIGHTS_RELEASE: ${{ vars.ONENLP_WEIGHTS_RELEASE }}
+        run: |
+          set -euo pipefail
+          : "${WEIGHTS_RELEASE:?Set the ONENLP_WEIGHTS_RELEASE repository variable to the weights release tag}"
+          assets="$RUNNER_TEMP/weight-assets"
+          mkdir -p "$assets"
+          # Download only the exact asset set required by this commit, never "latest".
+          while IFS= read -r asset; do
+            gh release download "$WEIGHTS_RELEASE" --repo "$GITHUB_REPOSITORY" --pattern "$asset" --dir "$assets"
+          done < <(python3 tools/gate/weight_assets.py list)
+          python3 tools/gate/weight_assets.py unpack "$assets" "$RUNNER_TEMP/weights" --github-env "$GITHUB_ENV"
+          rm -r "$assets"
+
       - name: Restore
         run: dotnet restore OneNlp.slnx
 

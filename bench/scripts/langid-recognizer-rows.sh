@@ -13,10 +13,14 @@ LB=$(cd "$3" && pwd)
 ROOT=$(pwd)
 ART=${ONENLP_ARTIFACTS:+$ONENLP_ARTIFACTS/$(basename "$ROOT")}
 ART=${ART:-$ROOT/artifacts}
+# A prepared build can live in a sibling checkout under the same artifact root.
+if [ "${ONENLP_BENCH_PREBUILT:-0}" = 1 ]; then ART=${ONENLP_ARTIFACTS:-$ART}; fi
 
+if [ "${ONENLP_BENCH_PREBUILT:-0}" != 1 ]; then
 for p in tools/OneNlp.LangId/OneNlp.LangId.csproj tools/OneNlp.Eval/OneNlp.Eval.csproj tools/oracles/Lingua/LinguaOracle.csproj tools/oracles/Recognizers/RecognizersOracle.csproj; do
   dotnet build "$p" -c Release -m:4 -v quiet -clp:NoSummary | tail -2
 done
+fi
 find_dll() { find "$ART" -path "*/bin/$1/release/$2" | head -1; }
 LANGID=$(find "$ART" -path '*/bin/*release*' -name 'RecursiveAI.OneNlp.LangIdTool.dll' | head -1)
 EVAL=$(find_dll OneNlp.Eval RecursiveAI.OneNlp.Eval.dll)

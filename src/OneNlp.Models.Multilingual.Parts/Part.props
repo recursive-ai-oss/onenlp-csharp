@@ -8,18 +8,17 @@
     <PackageId>$(PackagePrefix)$(LibName).Models.Multilingual.$(PartName)</PackageId>
     <Description>spaCy-class NLP for .NET: $(PartDescription) of the distilled accurate-tier model. Pulled in by RecursiveAI.OneNlp.Models.Multilingual; reference that package, not this one. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);model</PackageTags>
-    <IsPackable>false</IsPackable>
+    <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <MultilingualWeightsDir Condition="'$(MultilingualWeightsDir)' == ''">$(ONENLP_MULTILINGUAL_WEIGHTS)</MultilingualWeightsDir>
   </PropertyGroup>
 
-  <!-- A part is built with its weights and packed only when the weights directory holds its probe file (set by the part's project); without it the part
-       builds as code only and is skipped by a solution-wide pack. -->
+  <!-- A part embeds weights when its probe file exists. Code-only builds remain possible;
+       packing without those weights fails instead of silently omitting a dependency. -->
   <PropertyGroup Condition="'$(MultilingualWeightsDir)' != '' And Exists('$(MultilingualWeightsDir)/$(ProbeFile)')">
     <HasPartWeights>true</HasPartWeights>
-    <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <Import Project="$(MSBuildProjectDirectory)/weights.manifest.props" />
