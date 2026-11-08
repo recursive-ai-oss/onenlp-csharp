@@ -33,9 +33,9 @@ public static class EmbeddingsModel
     {
         System.Reflection.Assembly asm = typeof(EmbeddingsModel).Assembly;
         EmbeddingConfig config = EmbeddingConfig.Parse(Text(asm, "modules.json"), Text(asm, "pooling.json"), Text(asm, "sentence_bert_config.json"));
-        using Stream onnx = Open(asm, "bge-small-en-v1.5.onnx");
         using Stream tokenizer = Open(asm, "tokenizer.json");
-        return SentenceEmbedder.Load(onnx, tokenizer, config);
+        Stream onnx = Open(asm, "bge-small-en-v1.5.onnx");
+        return SentenceEmbedder.Load(onnx, tokenizer, config, leaveOpen: false);
     }
 
     private static Stream Open(System.Reflection.Assembly asm, string name) =>

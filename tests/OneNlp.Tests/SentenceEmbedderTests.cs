@@ -18,6 +18,46 @@ public class SentenceEmbedderTests
         return new SentenceEmbedder(session, tok, new EmbeddingConfig(mode, normalize, maxLength), padId: 0, prefix);
     }
 
+    [Fact]
+    public void TheBufferedOverloadDoesNotBorrowTheResourceStorage()
+    {
+        using Stream graph = typeof(SentenceEmbedderTests).Assembly.GetManifestResourceStream("tiny-bert.onnx")!;
+        using FileStream json = File.OpenRead(Path.Combine(Dir, "tiny-bert.tokenizer.json"));
+        using SentenceEmbedder embedder = SentenceEmbedder.Load(graph, json, new EmbeddingConfig(PoolingMode.Mean, true, 512));
+        Assert.True(graph.CanRead);
+        graph.Dispose();
+        using SentenceEmbedder reference = Make(PoolingMode.Mean, true);
+        Assert.Equal(reference.Embed("the cat sat"), embedder.Embed("the cat sat"));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void EmbeddedWeightsStayUsableUntilDisposal(bool leaveOpen)
+    {
+        using Stream graph = typeof(SentenceEmbedderTests).Assembly.GetManifestResourceStream("tiny-bert.onnx")!;
+        Assert.IsAssignableFrom<UnmanagedMemoryStream>(graph);
+        using FileStream json = File.OpenRead(Path.Combine(Dir, "tiny-bert.tokenizer.json"));
+        using SentenceEmbedder embedder = SentenceEmbedder.Load(graph, json, new EmbeddingConfig(PoolingMode.Mean, true, 512), leaveOpen);
+        using SentenceEmbedder reference = Make(PoolingMode.Mean, true);
+        Assert.Equal(reference.Embed("the cat sat"), embedder.Embed("the cat sat"));
+        embedder.Dispose();
+        Assert.Equal(leaveOpen, graph.CanRead);
+        Assert.True(json.CanRead);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void FailedLoadsHonorStreamOwnership(bool leaveOpen)
+    {
+        using Stream graph = typeof(SentenceEmbedderTests).Assembly.GetManifestResourceStream("tiny-bert.onnx")!;
+        using var json = new MemoryStream("not json"u8.ToArray());
+        Assert.ThrowsAny<Exception>(() => SentenceEmbedder.Load(graph, json, new EmbeddingConfig(PoolingMode.Mean, true, 512), leaveOpen));
+        Assert.Equal(leaveOpen, graph.CanRead);
+        Assert.True(json.CanRead);
+    }
+
     private static float[][] Hidden(int[] ids)
     {
         using Session session = Session.Load(Path.Combine(Dir, "tiny-bert.onnx"));
