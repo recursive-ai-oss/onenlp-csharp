@@ -181,6 +181,7 @@ public static partial class ModelPackages
         ["es"] = "RecursiveAI.OneNlp.Models.Spanish",
         ["it"] = "RecursiveAI.OneNlp.Models.Italian",
         ["zh"] = "RecursiveAI.OneNlp.Models.Chinese",
+        ["hi"] = "RecursiveAI.OneNlp.Models.Hindi",
     };
 
     // Each accurate-tier package's coverage is in ModelPackages.AccurateLanguages.g.cs, written from the training corpus

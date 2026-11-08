@@ -1,0 +1,12 @@
+<Project>
+  <!-- The weights this package packs: name, size, sha256 and where each came from. A pack fails when a file is missing or differs.
+       To use retrained weights, replace the rows (and PROVENANCE.md); no code changes. Weights are never committed. -->
+  <ItemGroup>
+    <HindiWeight Include="tagging.onenlp" Size="35844344" Sha256="d638169ee7098a874e1243b10e1e16b4e076c209d378ae4a45061bbc89d00163"
+                  Recipe="recipes/hi/fast" Data="Hindi FineWeb-2 text labelled by the accurate tier and Marathi, Sindhi and Punjabi heads (ODC-By 1.0 text; labeller SA lineage)" Contents="sentencizer, morphologizer (UPOS, UFeats)" />
+    <HindiWeight Include="parser.onenlp" Size="47032181" Sha256="c2f45ec9565e7ce68c358d55091f3678b59d502ed6eef4db2fa37c462a3abd76"
+                  Recipe="recipes/hi/fast" Data="Hindi FineWeb-2 text labelled by the accurate tier and Marathi, Sindhi and Punjabi heads (ODC-By 1.0 text; labeller SA lineage)" Contents="biaffine dependency parser, sentence starts" />
+    <HindiWeight Include="ner.onenlp" Size="35677809" Sha256="90e572a291a7f541ecf536ec24ba036c65b9c8bc33c8cda4335eba6ac0c9217d"
+                  Recipe="recipes/hi/fast" Data="Hindi FineWeb-2 text labelled by the accurate tier and Marathi, Sindhi and Punjabi heads (ODC-By 1.0 text; labeller SA lineage)" Contents="entity recognizer (PER, LOC, ORG)" />
+  </ItemGroup>
+</Project>

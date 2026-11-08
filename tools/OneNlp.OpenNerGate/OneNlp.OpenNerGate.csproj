@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Link the recipe's scorer so packaged and file-based evaluation use identical examples, matching and bootstrap. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>$(PackagePrefix)$(LibName).Recipes.OpenNer</RootNamespace>
+    <AssemblyName>$(PackagePrefix)$(LibName).OpenNerGate</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <DefineConstants>$(DefineConstants);ONENLP_PACKAGED</DefineConstants>
+    <OpenNerModelVersion Condition="'$(OpenNerModelVersion)' == ''">0.3.0-preview.1</OpenNerModelVersion>
+    <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ONENLP_CONSUMER_FEED)</RestoreAdditionalProjectSources>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../recipes/openner/Program.cs" Link="Program.cs" />
+    <PackageReference Include="RecursiveAI.OneNlp" VersionOverride="$(Version)" />
+    <PackageReference Include="RecursiveAI.OneNlp.Neural" VersionOverride="$(Version)" />
+    <PackageReference Include="RecursiveAI.OneNlp.Models.Multilingual" VersionOverride="$(OpenNerModelVersion)" />
+  </ItemGroup>
+</Project>

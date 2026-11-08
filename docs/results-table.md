@@ -13,11 +13,11 @@ One table of what is measured, what it is measured against, and whether it holds
 
 | Component | Metric | Ours | Reference | Verdict | Source |
 |---|---|---|---|---|---|
-| Tokenizers: WordPiece, Unigram, SentencePiece-BPE, byte-level BPE, Tiktoken (12 model families) | IDs, tokens, offsets, special-token mask, decoded text vs Hugging Face `tokenizers` 0.22.1 and `tiktoken` 0.14.0 on the multilingual parity corpus | byte-exact (a mismatch is a bug, never a tolerance) | the two libraries, run as installed packages | holds: 0 mismatches on all 12 families (bert-base-uncased, bert-base-multilingual-cased, xlm-roberta-base, t5-small, mmBERT-base, TinyLlama, gpt2, roberta-base, Qwen2.5, ModernBERT, cl100k_base, o200k_base), each over 47,981 corpus records (about 3.45 million comparisons per family); the run is repeated at the release gate | [parity.md](parity.md), `tools/parity/families.json` |
-| UAX #29 word and sentence boundaries | every line of Unicode 17.0.0 `WordBreakTest.txt` and `SentenceBreakTest.txt` through our layer with no language data | conformance tests pass | the Unicode test files | holds: WordBreakTest 1944/1944, SentenceBreakTest 512/512 | [segmentation.md](segmentation.md) |
+| Tokenizers: WordPiece, Unigram, SentencePiece-BPE, byte-level BPE, Tiktoken (12 model families) | IDs, tokens, offsets, special-token mask, decoded text vs Hugging Face `tokenizers` 0.22.1 and `tiktoken` 0.14.0 on the multilingual parity corpus | byte-exact (a mismatch is a bug, never a tolerance) | the two libraries, run as installed packages | holds: 0 mismatches on all 12 families (bert-base-uncased, bert-base-multilingual-cased, xlm-roberta-base, t5-small, mmBERT-base, TinyLlama, gpt2, roberta-base, Qwen2.5, ModernBERT, cl100k_base, o200k_base), each over 47,981 corpus records (about 3.45 million comparisons per family); release gate run on 2026-11-07 (tokenizers 0.22.1, tiktoken 0.14.0): 0 mismatches on every family; comparisons per family: bert-base-uncased 3,451,629; bert-base-multilingual-cased 3,451,661; xlm-roberta-base 3,451,681; t5-small 3,449,575; mmBERT-base 3,449,935; TinyLlama 3,449,935; gpt2 3,449,919; roberta-base 3,452,041; Qwen2.5 3,449,919; ModernBERT 3,449,935; cl100k_base 2,395,778; o200k_base 2,395,778 | [parity.md](parity.md), `tools/parity/families.json` |
+| UAX #29 word and sentence boundaries | every line of Unicode 17.0.0 `WordBreakTest.txt` and `SentenceBreakTest.txt` through our layer with no language data | conformance tests pass | the Unicode test files | holds: WordBreakTest 1944/1944, SentenceBreakTest 512/512 (release gate run, both conformance tests pass) | [segmentation.md](segmentation.md) |
 | English tokenization, raw EWT r2.18 test | Tokens F1 | 99.00 [98.80, 99.19] | spaCy 95.70 [95.14, 96.21] | ahead | [results.md](results.md) |
 
-Tokenizer speed against Microsoft.ML.Tokenizers 2.0.1: all 47 timed rows on x64 and all 47 on arm64 at 1.00x or faster; rows the comparator cannot reproduce (WordPiece medium decode and long, Unigram long) are listed with the reason, and load time is reported, not gated (`results.md`).
+Tokenizer speed against Microsoft.ML.Tokenizers 2.0.1, release gate, arm64 (Apple M2, 8 cores, .NET 10.0.403, load 2.0 to 3.3 before and during, idle after; `wq` bench class): 47 timed rows, none below 1.00x. 13 rows are not timed because the comparator's output differs from ours (WordPiece medium decode and long x3, Unigram long x3, others listed in the run's `rows.md`); they are not counted as passes. x64 rows: measured in the release run, part 2. Load time is reported, not gated, and is slower than the comparator on three rows: WordPiece from tokenizer.json 28.16 ms vs 19.17 ms (0.68x), SentencePiece-BPE TinyLlama 49.60 ms vs 11.66 ms (0.24x), cl100k_base 19.93 ms vs 19.00 ms (0.95x); ours is faster on Unigram (3.47x), gpt2 (1.02x) and o200k_base (1.31x).
 
 ## Language identification
 
@@ -36,6 +36,8 @@ The macro averages hide languages where we are below Lingua: on the main set 14 
 
 Language-ID speed (alone on the machine, x64 and arm64): at least 7.6x Lingua on every row; 10.7 ms load against 326 ms (low accuracy) and 3,850 ms (high accuracy) on x64 (`results.md`).
 
+Language-ID speed, release gate, arm64 (Apple M2, 8 cores; median microseconds per text, ours / SearchPioneer.Lingua 2.0.0 high accuracy / low accuracy): words 7.74 / 76.42 / 63.54 (9.9x and 8.2x faster), pairs 8.09 / 88.65 / 55.80 (11.0x and 6.9x), sentences 10.77 / 300.58 / 216.10 (27.9x and 20.1x). Allocation 1.4 KB per text against 75 to 126 KB; RSS 66 MB against 2,575 and 480 MB; load 9.3 ms against 4,329 and 328 ms. No row is slower. x64: measured in the release run, part 2 (earlier x64 figures above).
+
 ## Recognizers
 
 Our hand-labelled gold sets, one per language, written from the type definitions and real text (`recognizer-gold.md`), test split. Reference: Microsoft.Recognizers.Text 1.8.13 in the same culture, run as a black box. Exact-span F1, all types pooled, with the paired bootstrap 95% interval (1,000 resamples over sentences, seed 20260101). Source: `testdata/recognizers/<lang>/comparators/ours-vs-recognizers.test.md`.
@@ -49,13 +51,13 @@ Our hand-labelled gold sets, one per language, written from the type definitions
 | Portuguese | 349 | 94.4 [91.8, 96.8] | 45.3 [41.8, 48.8] | 99.6 | ahead |
 | Italian | 368 | 96.5 [94.5, 98.2] | 51.0 [48.0, 54.2] | 99.6 | ahead |
 | Dutch | 369 | 97.2 [95.0, 98.8] | 54.6 [51.7, 57.6] | 99.0 | ahead |
-| Chinese | 338 | 98.8 [97.4, 99.9] | 49.8 [46.4, 53.0] | 100.0 | ahead |
+| Chinese | 338 | 99.3 [98.2, 100.0] | 49.8 [46.4, 53.0] | 100.0 | ahead |
 | Turkish | 316 | 95.2 [92.9, 97.1] | 56.3 [53.1, 59.9] | 100.0 | ahead |
 | Hindi | 324 | 96.9 [95.2, 98.6] | 49.3 [45.8, 52.5] | 100.0 | ahead |
 
 No type in any language is behind Recognizers.Text (the `behind` verdict appears in none of the ten comparison files). "All types" pools types with ten to thirty items each, so per-type intervals are wide (the per-type rows are in the source files, and Duckling's, which are information, beside them). The comparator uses its own conventions for range ends and drops stated time zones; the gold uses ours, and the differences are listed in [recognizer-gold.md](recognizer-gold.md). The Chinese test file was read twice after a rule change; the published row is the first read (`recognizer-gold.md`).
 
-Recognizer speed against Microsoft.Recognizers.Text 1.8.13 (English, alone on the machine): 54.6x on numbers, units, currency and sequences, and 43.8x with date/time, on x64 (57.6x and 50.5x on arm64); allocations, RSS and load are in `results.md`. The comparator is far slower in Turkish and Hindi (0.01 to 0.03 million characters per second); those speed rows are taken at the release gate.
+Recognizer speed against Microsoft.Recognizers.Text 1.8.13, release gate, arm64 (English): numbers, units, currency and sequences 0.605 s against 31.874 s (52.7x faster; 402 MB allocated against 8,798 MB); with date/time 0.721 s against 27.085 s (37.6x; 616 MB against 4,879 MB); RSS 85 and 68 MB against 310 and 292 MB. x64: measured in the release run, part 2 (earlier x64 figures in `results.md`: 54.6x and 43.8x). The comparator is far slower in Turkish and Hindi (0.01 to 0.03 million characters per second); those speed rows are not part of the gate run.
 
 ## Fast tier: tagging, lemmas, parsing, entities
 
@@ -68,12 +70,12 @@ Source for each language: its section in [results.md](results.md) and the recipe
 | gold | UPOS | 94.16 [93.79, 94.54] | 94.29 [93.89, 94.66] | within noise |
 | gold | UFeats | 95.15 [94.86, 95.47] | 95.18 [94.88, 95.45] | within noise |
 | gold | Lemmas | 96.11 [95.77, 96.44] | 95.80 [95.42, 96.13] | within noise |
-| gold | LAS | 81.68 [80.82, 82.49] | 81.96 [81.03, 82.83] | within noise |
+| gold | LAS | 81.53 [80.62, 82.43] | 81.96 [81.03, 82.83] | within noise |
 | raw | UPOS | 92.90 [92.42, 93.35] | 92.45 [91.84, 93.06] | within noise |
 | raw | Lemmas | 95.03 [94.61, 95.43] | 93.69 [93.08, 94.29] | ahead |
-| raw | LAS | 77.76 [76.82, 78.70] | 78.53 [77.46, 79.55] | within noise |
-| raw | Sentences (parser) | 76.15 [74.25, 78.08] | 72.66 | within noise or ahead (source gives the interval for ours only) |
-| raw | MLAS | 65.61 [64.46, 66.72] | 69.05 [67.81, 70.21] | **behind** (information row, not gated) |
+| raw | LAS | 77.26 [76.28, 78.25] | 78.53 [77.46, 79.55] | within noise |
+| raw | Sentences (parser) | 71.08 [69.06, 72.98] | 72.66 [70.48, 74.75] | within noise |
+| raw | MLAS | 65.30 [64.12, 66.48] | 69.05 [67.81, 70.21] | **behind** (information row, not gated) |
 | gold, UNER EWT test | Entities micro F1 | 63.09 [60.01, 65.89] | 62.32 [59.42, 65.33] | within noise |
 
 ### Other languages
@@ -83,44 +85,44 @@ Source for each language: its section in [results.md](results.md) and the recipe
 | German | gold | UPOS | 94.56 [94.18, 94.94] | 94.59 [94.22, 94.95] | within noise |
 | German | gold | UFeats | 86.25 [85.60, 86.96] | 84.71 [84.03, 85.39] | ahead |
 | German | gold | Lemmas | 95.95 [95.67, 96.25] | 95.65 [95.34, 95.98] | within noise |
-| German | gold | LAS | 78.25 [77.23, 79.26] | 77.31 [76.29, 78.36] | within noise |
+| German | gold | LAS | 76.66 [75.63, 77.72] | 77.31 [76.29, 78.36] | within noise |
 | German | raw | UPOS | 94.22 [93.83, 94.61] | 90.13 [89.57, 90.67] | ahead |
-| German | raw | LAS | 76.75 [75.74, 77.76] | 70.77 [69.59, 71.95] | ahead |
+| German | raw | LAS | 74.87 [73.79, 75.92] | 70.77 [69.59, 71.95] | ahead |
 | German | gold, GermEval 2014 | Entities micro F1 | 66.28 [64.94, 67.61] | 65.77 [64.49, 67.19] | within noise |
 | French | gold | UPOS | 96.77 [96.33, 97.19] | 97.07 [96.68, 97.47] | within noise |
 | French | gold | UFeats | 96.34 [95.89, 96.81] | 96.41 [95.91, 96.88] | within noise |
 | French | gold | Lemmas | 97.51 [97.16, 97.84] | 97.49 [97.14, 97.84] | within noise |
-| French | gold | LAS | 86.69 [85.60, 87.81] | 85.98 [84.80, 87.12] | within noise |
+| French | gold | LAS | 86.96 [85.86, 87.96] | 85.98 [84.80, 87.12] | within noise |
 | French | raw | UPOS | 96.06 [95.60, 96.53] | 91.80 [91.07, 92.55] | ahead |
-| French | raw | LAS | 85.97 [84.73, 87.08] | 78.10 [76.77, 79.43] | ahead |
+| French | raw | LAS | 86.07 [84.92, 87.11] | 78.10 [76.77, 79.43] | ahead |
 | French | gold, WikiNER test | Entities micro F1 | 82.48 [81.74, 83.28] | 75.50 [74.68, 76.46] | ahead |
 | Spanish | gold | UPOS | 98.11 [97.98, 98.25] | 98.18 [98.04, 98.32] | within noise |
 | Spanish | gold | UFeats | 97.71 [97.56, 97.86] | 97.74 [97.58, 97.89] | within noise |
 | Spanish | gold | Lemmas | 98.84 [98.73, 98.95] | 98.72 [98.59, 98.83] | within noise |
-| Spanish | gold | LAS | 87.00 [86.50, 87.51] | 85.95 [85.44, 86.44] | ahead |
+| Spanish | gold | LAS | 86.41 [85.90, 86.89] | 85.95 [85.44, 86.44] | within noise |
 | Spanish | raw | UPOS | 97.86 [97.71, 98.01] | 94.81 [94.56, 95.02] | ahead |
-| Spanish | raw | LAS | 86.70 [86.15, 87.23] | 81.82 [81.25, 82.37] | ahead |
+| Spanish | raw | LAS | 86.15 [85.61, 86.64] | 81.82 [81.25, 82.37] | ahead |
 | Spanish | gold, WikiNER test | Entities micro F1 | 84.81 [84.08, 85.54] | 83.35 [82.63, 84.08] | ahead (paired +1.46 [0.84, 2.14]; PER 91.57 vs 90.45, ahead) |
 | Portuguese | gold | UPOS | 95.89 [95.62, 96.14] | 95.92 [95.66, 96.22] | within noise |
 | Portuguese | gold | UFeats | 94.51 [94.17, 94.80] | 94.11 [93.82, 94.42] | within noise |
 | Portuguese | gold | Lemmas | 97.30 [97.10, 97.51] | 96.90 [96.70, 97.11] | within noise |
-| Portuguese | gold | LAS | 82.74 [82.07, 83.35] | 81.96 [81.30, 82.61] | within noise |
+| Portuguese | gold | LAS | 81.80 [81.10, 82.49] | 81.96 [81.31, 82.61] | within noise |
 | Portuguese | raw | UPOS | 95.35 [95.05, 95.64] | 84.15 [83.59, 84.73] | ahead |
-| Portuguese | raw | LAS | 82.09 [81.38, 82.76] | 65.85 [64.88, 66.65] | ahead |
+| Portuguese | raw | LAS | 81.14 [80.44, 81.82] | 65.85 [65.02, 66.75] | ahead |
 | Portuguese | gold, UNER Bosque test | Entities micro F1 | 73.48 [70.95, 75.86] | 75.27 [72.73, 77.60] | within noise (precision 75.46 vs 76.96, paired -1.50 [-3.76, 0.83]) |
 | Italian | gold | UPOS | 94.44 [93.92, 94.96] | 94.10 [93.58, 94.60] | within noise |
 | Italian | gold | UFeats | 89.52 [88.85, 90.16] | 87.42 [86.67, 88.14] | ahead |
 | Italian | gold | Lemmas | 95.18 [94.73, 95.63] | 93.13 [92.58, 93.64] | ahead |
-| Italian | gold | LAS | 72.57 [71.24, 74.06] | 71.39 [70.26, 72.58] | within noise |
+| Italian | gold | LAS | 71.55 [70.26, 72.97] | 71.39 [70.26, 72.58] | within noise |
 | Italian | raw | UPOS | 94.01 [93.45, 94.51] | 83.53 [82.50, 84.48] | ahead |
-| Italian | raw | LAS | 72.77 [71.46, 74.16] | 58.38 [56.92, 59.86] | ahead |
+| Italian | raw | LAS | 71.55 [70.27, 72.90] | 58.38 [56.92, 59.86] | ahead |
 | Italian | gold, WikiNER test | Entities micro F1 | 86.35 [85.73, 87.01] | 83.54 [82.85, 84.26] | ahead |
 | Dutch | gold | UPOS | 93.83 [93.16, 94.49] | 94.42 [93.77, 95.04] | within noise |
 | Dutch | gold | UFeats | 92.94 [92.24, 93.53] | 93.13 [92.47, 93.72] | within noise |
 | Dutch | gold | Lemmas | 91.61 [90.99, 92.14] | 91.83 [91.21, 92.39] | within noise |
-| Dutch | gold | LAS | 80.28 [79.12, 81.51] | 79.85 [78.58, 81.16] | within noise |
+| Dutch | gold | LAS | 79.12 [77.87, 80.39] | 79.85 [78.58, 81.16] | within noise |
 | Dutch | raw | UPOS | 93.09 [92.40, 93.77] | 94.36 [93.67, 94.98] | within noise |
-| Dutch | raw | LAS | 79.48 [78.28, 80.78] | 79.57 [78.26, 80.89] | within noise |
+| Dutch | raw | LAS | 78.18 [76.87, 79.46] | 79.57 [78.26, 80.89] | within noise |
 | Dutch | gold, WikiNER test | Entities micro F1 | 87.47 [86.91, 87.98] | 86.21 [85.70, 86.78] | ahead (paired +1.26 [0.76, 1.72]) |
 | Turkish | gold | UPOS | 88.97 [88.31, 89.58] | 88.04 [87.37, 88.64] | within noise |
 | Turkish | gold | UFeats | 78.15 [77.40, 78.90] | 78.30 [77.46, 79.05] | within noise |
@@ -132,14 +134,43 @@ Source for each language: its section in [results.md](results.md) and the recipe
 | Chinese | gold (spaCy `gold_preproc`) | UPOS | 90.41 [89.70, 91.07] | 90.35 [89.70, 90.99] | within noise |
 | Chinese | gold | UFeats | 98.38 [98.13, 98.59] | 98.43 [98.19, 98.66] | within noise |
 | Chinese | gold | Lemmas | 99.87 [99.79, 99.94] | 99.91 [99.85, 99.96] | within noise |
-| Chinese | gold | LAS | 68.76 [67.12, 70.32] | 68.24 [66.47, 69.94] | within noise |
-| Chinese | gold | MLAS | 56.94 [55.08, 58.69] | 58.87 [56.85, 60.72] | within noise |
+| Chinese | gold | LAS | 67.49 [65.94, 69.14] | 68.24 [66.47, 69.94] | within noise |
+| Chinese | gold | MLAS | 55.78 [53.92, 57.68] | 58.87 [56.85, 60.72] | within noise |
 | Chinese | raw | Words | 89.62 [88.87, 90.42] | 39.43 [38.60, 40.23] | ahead (spaCy's default Chinese tokenizer cuts single characters) |
 | Chinese | raw | UPOS | 81.90 [80.99, 82.86] | 34.92 [34.11, 35.68] | ahead |
-| Chinese | raw | LAS | 57.88 [56.21, 59.63] | 8.59 [7.94, 9.28] | ahead |
+| Chinese | raw | LAS | 56.93 [55.23, 58.73] | 8.59 [7.94, 9.28] | ahead |
 | Chinese | gold, UNER GSDSIMP test | Entities micro F1 | 63.79 [59.39, 68.27] | 61.86 [57.66, 66.12] | within noise (precision 69.28 vs 67.08, recall 59.11 vs 57.40, all within noise) |
+| Chinese | raw, UNER GSDSIMP test | Entities micro F1 (character spans) | 53.71 [49.28, 58.49] | no reference | no raw spaCy row: the stored spaCy raw predictions are tokenized as single characters and do not align with the gold character spans, so the scorer gives a meaningless 13.30. Re-measured at the release gate (was 52.88, taken before the 0.6 threshold) |
 
-**Hindi.** No Hindi fast-tier model is listed: there is no allowed training data for it (the Hindi treebank with the most data and the available Hindi NER sets are non-commercial or sourced from non-commercial text; `ud-licences.md`). Hindi has recognizers (above) and language identification today; its fast tier comes later, trained on labels from our own models.
+### Hindi (self-labelled; information, not a gated comparison)
+
+There is no allowed Hindi treebank or entity corpus (`ud-licences.md`: Hindi-HDTB and the Samanantar-sourced NER sets are non-commercial), so the Hindi student learns from Hindi web text (FineWeb-2) labelled by the accurate tier: the heads of five large languages and of heads we trained on the same frozen encoder for Marathi, Sindhi and Punjabi (UD, CC BY-SA), combined by agreement, with explicit adult content filtered out of the text first (`recipes/hi/fast/README.md`). Hindi-PUD (1,000 sentences, CC BY-SA 3.0, sha256 `3562b7f4...`, test only) was read once for the final model, which is the second round of this recipe; the first round (labels from nine unrelated languages) is shown as "before". Intervals are 95% bootstrap (1,000 resamples, seed 20261107). The "labeller" is the unfiltered ensemble of the source heads on the same input, the ceiling of what the student was shown. spaCy 3.8.18 is the black-box baseline trained on the same labelled sentences with its default configuration and the pipeline `morphologizer,parser` (the labels have no XPOS or lemmas). The published Stanza, UDPipe 2 and Trankit numbers are on Hindi-HDTB with non-commercial training data and are not comparable (`references.md`, "Hindi"). **Hindi cannot be brought within noise of the published references with the training data that may be used.**
+
+| Mode | Metric | Student | Labeller | spaCy, same labels | Verdict against spaCy | Student before |
+|---|---|---|---|---|---|---|
+| gold | UPOS | 83.19 [82.65, 83.75] | 85.55 [85.05, 86.08] | 83.78 [83.24, 84.31] | within noise | 70.93 |
+| gold | UFeats | 34.28 [33.67, 34.90] | 34.63 [34.00, 35.27] | 34.29 [33.66, 34.90] | within noise | 34.01 |
+| gold | Lemmas (form) | 72.68 [72.15, 73.24] | none | none | n/a | 72.68 |
+| gold | UAS | 65.00 [64.01, 66.09] | 60.88 [59.84, 61.93] | 65.00 [64.01, 66.12] | within noise | 42.57 |
+| gold | LAS | 52.79 [51.85, 53.77] | 49.04 [48.06, 50.05] | 53.44 [52.48, 54.47] | within noise | 31.90 |
+| gold | CLAS | 45.60 [44.56, 46.69] | 44.52 [43.49, 45.56] | 46.46 [45.41, 47.57] | within noise | 29.62 |
+| gold | MLAS | 7.72 [7.30, 8.17] | 8.16 [7.74, 8.62] | 8.36 [7.91, 8.81] | within noise | 5.14 |
+| raw | Tokens | 99.38 [99.23, 99.53] | 99.38 | 99.82 [99.72, 99.89] | behind (spaCy's tokenizer) | 99.38 |
+| raw | Sentences | 89.68 [87.47, 91.82] | 98.31 [97.22, 99.25] (rule sentencizer) | 91.30 [89.07, 93.19] | within noise | 90.75 |
+| raw | UPOS | 82.41 [81.85, 82.95] | 84.99 [84.45, 85.54] | 83.65 [83.11, 84.18] | behind (1.2 points) | 70.49 |
+| raw | UFeats | 34.03 [33.43, 34.65] | 34.23 [33.61, 34.85] | 34.22 [33.60, 34.82] | within noise | 33.72 |
+| raw | UAS | 65.10 [64.09, 66.14] | 58.47 [57.47, 59.55] | 64.77 [63.77, 65.88] | within noise | 42.73 |
+| raw | LAS | 52.87 [51.93, 53.84] | 46.76 [45.81, 47.78] | 53.32 [52.35, 54.36] | within noise | 32.00 |
+| raw | CLAS | 45.54 [44.52, 46.67] | 42.60 [41.58, 43.68] | 46.40 [45.38, 47.57] | within noise | 29.80 |
+| raw | MLAS | 7.56 [7.16, 8.00] | 7.95 [7.55, 8.39] | 8.32 [7.86, 8.77] | within noise | 5.23 |
+
+The labeller's own gold-token scores rose from UPOS 72.77 and LAS 26.43 in the first round to 85.55 and 49.04. The student is 2.4 points below the labeller on UPOS and 3.8 above it on LAS (a parser trained on the medoid trees of many sources is more consistent than any one source). Against spaCy trained on the same labels it is within noise on every gold-token row and on raw UFeats, UAS, LAS, CLAS, MLAS and Sentences, and behind on raw UPOS (1.2 points; the tokenizer differs, 99.38 against 99.82). **Lemmas:** the model has no lemmatizer, and an edit-tree lemmatizer trained on Marathi was not clearly better than copying the form on 315 nouns, verbs and adjectives that we lemmatized by hand (62.5% against 61.0%), so the package fills `Token.Lemma` with the token text; the Lemmas row above is that, 72.7% on Hindi-PUD, and wrong for inflected words. Words are not scored separately from Tokens: Hindi has no multiword tokens.
+
+**Entities (information only).** There is no Hindi entity gold we may use. A spot check on 91 held-out web sentences (61 entities) that we labelled by hand (`testdata/hi/nerspot.iob2`; PER, ORG, LOC): student 70.48 [57.14, 82.05] F1 (precision 84.09, recall 60.66), labeller 77.48 [65.35, 86.27], spaCy on the same labels 70.48 [56.47, 82.05]; the first round's student scored 67.92. On held-out labelled text the student reaches 79.36 F1 against the labeller's own entities. This is not a gated row.
+
+**Hand-annotated development sentences.** 100 sentences (931 tokens, `testdata/hi/selfdev.conllu`: 17 web sentences and 83 that we wrote), gold tokens, UPOS / UAS / LAS: first-round student 80.56 [78.16, 82.80] / 70.46 / 55.85; second-round student 91.30 [89.43, 92.99] / 83.46 / 75.83; labeller (used set) 92.16 [90.64, 93.62] / 82.38 / 74.44; the nine large languages alone 83.03 / 71.64 / 59.51. These sentences ranked the source languages and the labelling model (`recipes/hi/fast/README.md`), so they are a development set, not a test.
+
+Indicative speed (x64 Ryzen 9 7950X3D, 1 thread, load 7 to 9 from other jobs): full pipeline about 4.1k to 4.6k tokens/s over 20 repetitions on the development sentences (3.5k to 4.0k in the first round at higher load; the architecture and sizes are unchanged), 6.5 kB allocated per token.
 
 ## Text classification and span categorization (English)
 
@@ -181,6 +212,58 @@ Two shipped models, scored with `mteb` 2.27.1 as a black box. "Ours minus senten
 
 The four bold cells are below the card for sentence-transformers itself, unchanged across `mteb` 1.1.1, 1.12.94 and 2.27.1; the card's numbers could not be reproduced from the published model with the released harness, whoever computes the vectors. The int8 variants are information only (0.3 to 3.8 points lower).
 
+## Open-type NER
+
+Release measurement through packed `Models.Multilingual`/`FrozenEncoder`
+**0.3.0-preview.1**, core/Neural **0.4.0-preview.1**, frozen student-v1 and default
+threshold **0.5**. The newer scratch feed had no multilingual package: this is
+not a test of a newly packed 0.4.0-preview.1 model. The embedded head, frozen
+encoder and tokenizer match the current weight manifests byte for byte. Every
+score and interval below reproduces `recipes/openner/results.md` to its reported
+precision. Strict token-span-and-type micro F1; 1,000 sentence-bootstrap
+resamples, seed 1.
+
+Published reference: Zaratiana et al., [GLiNER, arXiv:2311.08526v1](https://arxiv.org/abs/2311.08526v1),
+**Table 1, §4.1**. Model sizes and encoders (§3.2, Table 1): **GLiNER-S 50M**
+(primary, smallest), **M 90M**, **L 0.3B**, DeBERTa-v3 family
+(as reported for S/M/L, with no exact checkpoint identifiers or revisions specified). Ours is a frozen
+**6×384 student-v1, 35.5M encoder weights + 595,969 head parameters**, about
+36.1M total. The head parameter count is measured from the loaded package.
+
+| Row (test) | Sentences scored | Ours F1 [95% CI] | GLiNER-S | M (info) | L (info) | Position vs S point | Protocol verdict |
+|---|---:|---|---:|---:|---:|---|---|
+| UNER English-EWT, fixed PER/ORG/LOC | 2,077 | **67.14 [64.34, 69.97]** | — | — | — | — | Not comparable: no UNER row in paper |
+| Few-NERD, seen types | 37,637 | **49.89 [49.63, 50.15]** | — | — | — | — | Not comparable: no Few-NERD row in paper |
+| CrossNER politics, zero-shot | 651 | **41.27 [38.58, 44.09]** | 61.5 | 68.6 | 72.6 | **Behind** | Not comparable: protocol not identical/verified |
+| CrossNER science, zero-shot | 543 | **36.50 [33.09, 40.06]** | 55.6 | 58.1 | 62.6 | **Behind** | Not comparable: protocol not identical/verified |
+| CrossNER music, zero-shot | 465 | **26.01 [23.67, 28.35]** | 60.9 | 69.4 | 69.6 | **Behind** | Not comparable: protocol not identical/verified |
+| CrossNER literature, zero-shot | 416 | **30.38 [27.88, 33.05]** | 60.0 | 59.7 | 64.4 | **Behind** | Not comparable: protocol not identical/verified |
+| CrossNER AI, zero-shot | 431 | **21.10 [17.79, 24.52]** | 50.7 | 51.8 | 57.2 | **Behind** | Not comparable: protocol not identical/verified |
+
+Position is relative to our CI, since the paper has no CI: published S above our
+upper bound = behind, below our lower bound = ahead, otherwise within noise.
+It is not a paired test. **All five CrossNER rows lose numerically to S, M and L**;
+the gaps to S are politics **20.23**, science **19.10**, music **34.89**, literature
+**29.62**, AI **29.60** points. None proves the published-small-model quality target
+is met. “Not comparable” is not a passing verdict.
+
+The fixed-type black-box spaCy 3.8.18 comparison on UNER English-EWT remains
+**62.32 [59.45, 65.20]**, trained on the same UNER data with documented defaults.
+Ours is **ahead** by the point-vs-CI convention, but intervals overlap and this is
+not a new paired test or a zero-shot reference.
+
+Protocol caveats ([full audit](open-ner.md#protocol-audit)): our unchanged scorer
+uses gold tokens and skips empty/>120-token sentences and whitespace-containing
+tokens (none excluded in UNER/CrossNER; 11 of 37,648 excluded in Few-NERD);
+asks the retained file's whole type inventory using our expanded label
+names; and keeps scores **≥0.5**, whereas paper §2.3 says **>0.5**. Paper §3.4
+names the OOD benchmark and exact-match entity F1 but supplies no split hashes,
+retained sentence counts, full label-name lists or matching filters. Equivalence
+cannot be established from the paper alone. Few-NERD includes both fine and
+coarse gold labels on the same mention, with flat predictions: it is not the
+conventional fine-only benchmark. The [model/protocol notes](open-ner.md#published-comparison)
+and `tools/OneNlp.OpenNerGate/README.md` give provenance and reproduction commands.
+
 ## Accurate tier (information; the base-size model is not yet packaged)
 
 No accurate-tier model package is released yet, so these rows are information and no gate is claimed. Rows come from [accurate-encoder.md](accurate-encoder.md), `recipes/accurate/student-v1/RESULTS.md` and, for the references, [references.md](references.md) (published numbers on other UD releases: compare the direction, not the last digit).
@@ -193,10 +276,13 @@ No accurate-tier model package is released yet, so these rows are information an
 
 ## Misses and caveats
 
-- **English raw MLAS** 65.61 against spaCy's 69.05: outside the interval; information, not one of the gated rows.
+- **English raw MLAS** 65.30 against spaCy's 69.05: outside the interval; information, not one of the gated rows.
 - **Span categorizer:** at spaCy's threshold of 0.5 precision was 70.33 against 75.38 (paired -5.05 [-8.63, -1.42]); the shipped default threshold is 0.8, chosen on the development split (`recipes/en/spancat/README.md`).
 - **Embeddings:** the five cells below the model cards, shared with sentence-transformers (above).
 - **Language ID:** the languages named under the table are below Lingua on short text.
 - **Entities per type:** per-type rows are in each source file; several have intervals that overlap with a paired difference that excludes zero (for example English LOC with the single-encoder option); the packaged English model has none of those.
-- **Gaps:** no Hindi fast tier (data); no German, Spanish, Portuguese, Italian, Dutch, Turkish or Chinese rows against Catalyst (it has English models only); open-type NER and the accurate-tier packages are in progress and have no rows yet.
-- **Speed against Catalyst** on the tagging path is measured at the release gate; the indicative run is in `results.md` and is not repeated here.
+- **Gaps:** Hindi has a fast tier but only on transferred labels (see "Hindi", not a gated comparison); no German, Spanish, Portuguese, Italian, Dutch, Turkish or Chinese rows against Catalyst (it has English models only); the accurate-tier packages are in progress; open-type NER rows are above, with all five CrossNER rows numerically behind GLiNER-S and protocol equivalence unverified.
+- **Speed against Catalyst 26.10.6514** (English, 1 thread, arm64 Apple M2, release gate; median tokens/s of the last 10 of 12 passes): tagging path (Catalyst tagging 1,007,344 tokens/s, 307 B/token; ours sentences, UPOS/UFeats and lemmas 670,783, 330 B/token) is **0.666x**, above the 0.5x bar. It counts under matched or better accuracy on raw EWT test: Tokens 99.00 vs 94.47, Sentences 71.08 vs 64.57, UPOS 92.90 vs 80.70, Lemmas 95.03 vs 83.84. NER path: Catalyst with WikiNER 478,220 vs ours sentences and entities 333,620 (0.70x), not matched work (ours excludes tagging; Catalyst's NER needs it), and so indicative only; entities on UNER character spans 63.09 vs 57.77. Ours parser path 25,535 and full pipeline 22,634 tokens/s (Catalyst has no parser). RSS 311 MB against 1,401 MB. English model load time not measured in this run. x64: measured in the release run, part 2.
+- **Spanish gold LAS** is within noise at the release gate (86.41 [85.90, 86.89] vs 85.95); an earlier version of this table showed an older parser.
+- **Rows behind at the gate:** English raw MLAS (information); Hindi raw Tokens 99.38 vs 99.82 and raw UPOS 82.41 vs 83.65 (Hindi is not a gated comparison); Language ID below Lingua on short text for the languages named under that table; embeddings cells below the model cards (shared with sentence-transformers); tokenizer load time (three rows, above); es WikiNER PER per type as listed in `results.md`. All five open-type CrossNER rows are numerically behind GLiNER-S (protocol caveats above). No recognizer, fast-tier gated or tokenizer exactness row is behind.
+- **Not re-run at the gate:** Duckling and Lingua predictions were reused from pinned earlier runs; English entities have no paired spaCy file at the gate; embeddings MTEB rows stand because the package manifests are unchanged since those runs (parity re-run on the packaged files: bge max abs 4.03e-7, e5 3.20e-7, 0 id mismatches).
