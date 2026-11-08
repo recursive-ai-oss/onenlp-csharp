@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- The neural runtime and trainer use OneModel 1.2.0-preview.2. Checkpoints stream through OneModel, including files over 2 GiB; single-resource embedded encoders and embeddings load in place and keep their resource streams open for the lifetime of the model. Split-resource graphs still use the buffered concatenation path.
+- The neural runtime and trainer use OneModel 1.2.0. Checkpoints stream through OneModel, including files over 2 GiB; single-resource embedded encoders and embeddings load in place and keep their resource streams open for the lifetime of the model. Split-resource graphs still use the buffered concatenation path.
 
 ### Added
 
