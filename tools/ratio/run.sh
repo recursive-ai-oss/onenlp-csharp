@@ -3,13 +3,13 @@
 #
 #   run.sh <recipes-bin-dir> <data-root> <work-dir> [threads]
 #
-# <recipes-bin-dir> holds the Release builds (<name>/release/RecursiveAI.<name>.dll); <data-root> is ~/onenlp/data. The C# epoch time is the
+# <recipes-bin-dir> holds the Release builds (<name>/release/RecursiveAI.<name>.dll); <data-root> is the data directory the fetch scripts wrote. PYTORCH_PY names a Python with PyTorch installed. The C# epoch time is the
 # difference between the elapsed times of the first two development evaluations, which are on a 100-document development file so that scoring is
 # negligible; the PyTorch time is the second epoch. The EUR-LEX timing trains on the 5,000-document development split.
 set -euo pipefail
 BIN=$1; DATA=$2; WORK=$3; T=${4:-4}
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-PYTORCH_PY=${PYTORCH_PY:-$HOME/onenlp/venvs/u14/bin/python}
+: "${PYTORCH_PY:?set PYTORCH_PY to a Python with PyTorch installed}"
 export PATH=$HOME/dotnet10:$PATH DOTNET_ROOT=$HOME/dotnet10
 mkdir -p "$WORK"
 head -100 "$DATA/train/textcat/banking77/dev.jsonl" > "$WORK/b77-dev100.jsonl"

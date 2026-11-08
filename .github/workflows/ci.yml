@@ -1,7 +1,7 @@
 name: ci
 
 # Builds and tests on every platform we support, and publishes the NativeAOT smoke app with warnings as errors.
-# Nothing here publishes a package.
+# Nothing here packs or publishes: packages embed model weights, which only the release workflow downloads (docs/release.md).
 on:
   push:
     branches: [main, 'ci-check/**']
@@ -49,22 +49,3 @@ jobs:
         shell: bash
         run: '"$RUNNER_TEMP/smoke/RecursiveAI.OneNlp.AotSmoke"'
 
-  pack:
-    # Builds the packages as an artifact only; nothing is pushed anywhere.
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Artifacts directory
-        shell: bash
-        run: echo "ONENLP_ARTIFACTS=$RUNNER_TEMP/artifacts" >> "$GITHUB_ENV"
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        with:
-          global-json-file: global.json
-      - name: Pack
-        run: dotnet pack OneNlp.slnx -c Release -o ${{ runner.temp }}/packages
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: packages
-          path: ${{ runner.temp }}/packages/*

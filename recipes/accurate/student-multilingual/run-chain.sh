@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs run-chunk.sh through a job queue, one chunk at a time, until the recipe reports completed=True.
-#   env: as run-chunk.sh, plus  NAME (log name)  LOGS (log directory)  QUEUE (the command that runs a chunk, for example "wq run --class heavy --cores 4 --max 30m --")
+#   env: as run-chunk.sh, plus  NAME (log name)  LOGS (log directory)  QUEUE (the command that runs a chunk, for example a batch scheduler's run prefix; empty runs it directly)
 #        [MAX_CHUNKS=40]
 set -uo pipefail
 : "${NAME:?}" "${LOGS:?}"
