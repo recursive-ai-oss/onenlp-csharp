@@ -38,10 +38,10 @@ An all-embedded layout failed NativeAOT `ilc` with “Format of the executable (
 
 | Runtime | First Analyze | Peak RSS | Process elapsed |
 |---|---:|---:|---:|
-| JIT | 7,016 ms | 4,007,432 KiB | 7.50 s |
-| NativeAOT | 6,063 ms | 3,991,940 KiB | 6.74 s |
+| JIT | 3,694 ms | 4,028,732 KiB | 3.94 s |
+| NativeAOT | 2,874 ms | 3,993,404 KiB | 3.22 s |
 
-These are **shared-host indicative observations, not throughput benchmarks or a speed-gate result**. Linux x64, AMD Ryzen 9 7950X3D (16 cores/32 logical CPUs, AVX2/AVX-512 available), four logical processors exposed to the process; .NET SDK 10.0.403/runtime 10.0.14, OneModel 1.0.0, CPU only. The encompassing build/consumer job's one-minute load was 35.62 before and 33.03 after; load during the short RSS probes was not sampled. Materializing every language in the same process peaked at 8,515 MiB in the JIT smoke and 8,294 MiB in AOT; applications loading one language need not materialize all heads.
+These are **shared-host indicative observations, not throughput benchmarks or a speed-gate result**. Linux x64, AMD Ryzen 9 7950X3D (16 cores/32 logical CPUs, AVX2/AVX-512 available), four logical processors exposed to the process; .NET SDK 10.0.403/runtime 10.0.14, OneModel 1.0.0, CPU only. One-minute load before/during/after was 8.04/8.04/7.96 for JIT and 9.83/9.36/9.36 for AOT. No swapping occurred. These are fresh processes with warm filesystem caches. Materializing every language in the same process peaked at 8,304 MiB in the JIT smoke and 8,323 MiB in AOT; applications loading one language need not materialize all heads.
 
 ## Evaluation conventions and gaps
 
