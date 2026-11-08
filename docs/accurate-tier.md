@@ -69,20 +69,35 @@ These are **shared-host indicative observations, not throughput benchmarks or a 
 
 ### OneModel runtime update: memory and exactness
 
-OneModel **1.2.0-preview.2** replaces 1.0.0 in the neural package. Single-resource embedded graphs now load in place: the distilled encoders and the English sentence embedder transfer their model streams to the encoder/embedder, which keeps them open until disposal. The existing stream-loading overloads retain their buffered lifetime contract; the new `leaveOpen` overloads explicitly select the borrowed/owned in-place path. Tokenizer streams remain caller-owned. Training checkpoints use OneModel's streamed loader rather than a local checkpoint-format implementation.
+OneModel **1.2.0** replaces 1.0.0 in the neural package. Single-resource embedded graphs now load in place: the distilled encoders and the English sentence embedder transfer their model streams to the encoder/embedder, which keeps them open until disposal. The existing stream-loading overloads retain their buffered lifetime contract; the new `leaveOpen` overloads explicitly select the borrowed/owned in-place path. Tokenizer streams remain caller-owned. Training checkpoints use OneModel's streamed loader rather than a local checkpoint-format implementation.
 
-The following **indicative, non-isolated** observations compare the same committed weight manifests in fresh JIT processes. They use the source model projects, one German pipeline's `Load("de")` and `Process` on “Angela Merkel besuchte gestern die Universität in Heidelberg.” The first-process interval includes graph/head loading and the first inference, but **not language detection**; it is not the `Nlp.Analyze` workload in the preceding table. Filesystem caches were warm. RSS and elapsed time come from `/usr/bin/time -v`.
+A follow-up **controlled, interleaved indicative comparison** supersedes the earlier single-process observations, which compared different machine loads and suggested a 2.5–3× slowdown. Each version uses the same console harness over the source model projects, loading one German pipeline with `Load("de")` and calling `Process` on “Angela Merkel besuchte gestern die Universität in Heidelberg.” The first-process interval includes graph/head loading and the first inference, but **not language detection**; it is not the `Nlp.Analyze` workload in the preceding table. Both builds embed the same current weight files, verified against the same manifests, including the recovered German parser head. Filesystem caches were warm.
 
-| Model | OneModel | First process | Peak RSS | Process elapsed |
-|---|---|---:|---:|---:|
-| `.Multilingual.Large`, German | 1.0.0 | 2,325 ms | 4,001,228 KiB | 2.58 s |
-| `.Multilingual.Large`, German | 1.2.0-preview.2 | 5,895 ms | 3,966,344 KiB | 6.43 s |
-| `.Multilingual`, German | 1.0.0 | 1,049 ms | 826,412 KiB | 1.12 s |
-| `.Multilingual`, German | 1.2.0-preview.2 | 3,064 ms | 653,292 KiB | 3.29 s |
+Each cell below is the **median of three fresh processes [minimum, maximum]**. The versions alternate within each model's pair, reversing order in the second repetition. Loading is timed separately from first inference; RSS and total process elapsed time come from `/usr/bin/time -v`. Builds finish before the measurements start.
 
-The distilled model's observed peak falls by **169.1 MiB**. The base-size model shows no substantial memory saving: **its six resource pieces still require a full serialized-graph buffer**. OneModel's in-place stream API recognizes a single `UnmanagedMemoryStream`, not a concatenation of resources. The three-shard multilingual E5 embedder has the same limitation. No tensors, weights or package layout changed to work around it.
+| Model | OneModel | Load pipeline | First process | Peak RSS | Process elapsed |
+|---|---|---:|---:|---:|---:|
+| `.Multilingual.Large`, German | 1.0.0 | 2,189 [2,104, 2,520] ms | 2,401 [2,324, 2,734] ms | 4,027,688 [4,026,976, 4,035,176] KiB | 2.70 [2.62, 3.02] s |
+| `.Multilingual.Large`, German | 1.2.0 | 2,319 [2,082, 2,467] ms | 2,554 [2,293, 2,713] ms | 4,001,736 [3,995,144, 4,008,996] KiB | 2.88 [2.57, 3.01] s |
+| `.Multilingual`, German | 1.0.0 | 959 [885, 1,203] ms | 1,116 [1,037, 1,363] ms | 816,136 [813,972, 830,876] KiB | 1.21 [1.10, 1.45] s |
+| `.Multilingual`, German | 1.2.0 | 959 [767, 1,251] ms | 1,116 [915, 1,412] ms | 660,048 [658,404, 660,796] KiB | 1.18 [0.97, 1.46] s |
 
-These observations were made on 2026-11-08, Linux x64, AMD Ryzen 9 7950X3D (16 cores/32 logical CPUs; AVX2 and AVX-512 available), SDK 10.0.403/runtime 10.0.14, CPU only. Four logical processors were exposed; graph sessions used their default four intra-op threads and eager components used one. One-minute load before/during/after the base-size process was **2.21/2.21/2.36** before the update and **6.68/6.68/7.35** after; the distilled process saw **2.36/2.36/2.36** and **7.35/7.35/8.68** respectively. Other CPU jobs and disk pressure overlapped the after run. **The slower startup observations are not isolated latency comparisons, and no speed improvement is claimed.**
+The earlier 2.5–3× startup difference **does not reproduce**: median first-process ratios (1.2.0 / 1.0.0) are **1.064** for the base-size model and **1.000** for the distilled model, with overlapping ranges. Three repetitions do not establish equivalence or rule out smaller differences. Temporary load-boundary timestamps in a separate diagnostic batch found German head loading at 67–83 ms before and 61–100 ms after; the much larger variation was in encoder loading, and its direction varied between repetitions. There is no evidence here for a checkpoint-loading fix. No loading code, model bytes, public API or format was changed for this follow-up.
+
+The distilled model's median peak falls by **152.4 MiB**. The base-size model shows no substantial memory saving: **its six resource pieces still require a full serialized-graph buffer**. OneModel's in-place stream API recognizes a single `UnmanagedMemoryStream`, not a concatenation of resources. The three-shard multilingual E5 embedder has the same limitation. No tensors, weights or package layout changed to work around it.
+
+These observations were made on 2026-11-08, Linux x64, AMD Ryzen 9 7950X3D (16 cores/32 logical CPUs; AVX2 and AVX-512 available), SDK 10.0.403/runtime 10.0.14, CPU only. Four logical processors were exposed; graph sessions used their default four intra-op threads and eager components used one. The measurement job reserved four cores, **not the whole machine**: unrelated queued jobs overlapped it. The following one-minute load samples were taken before/during/after each process (during sampled every 250 ms). Interleaving matches the load much better than the old observations, but **this is not an exclusive-machine benchmark or an isolated latency claim**. An attempted fully idle window was unavailable; no startup speed improvement is claimed.
+
+| Model | Repetition | 1.0.0 load: before / during / after | 1.2.0 load: before / during / after |
+|---|---:|---|---|
+| `.Multilingual` | 1 | 8.51 / 8.51 / 8.51 | 8.51 / 8.51 / 8.51 |
+| `.Multilingual` | 2 | 8.43 / 8.43 / 8.43 | 8.47 / 8.43–8.47 / 8.43 |
+| `.Multilingual` | 3 | 8.64 / 8.64 / 8.64 | 8.64 / 8.64 / 8.64 |
+| `.Multilingual.Large` | 1 | 8.51 / 8.47–8.51 / 8.47 | 8.47 / 8.47 / 8.47 |
+| `.Multilingual.Large` | 2 | 8.43 / 8.43–8.64 / 8.64 | 8.43 / 8.43 / 8.43 |
+| `.Multilingual.Large` | 3 | 8.64 / 8.64–8.75 / 8.75 | 8.75 / 8.75–8.93 / 8.93 |
+
+The German annotation JSON, including confidences, is byte-identical across all six processes per model. SHA-256: distilled `e7bc02dfa37b9ab61feeda8cfdbf9ccc31b00f2d5da3003717655b2243d2e0e4`; base-size `34bcb371f68193c4a9f5b92c8f611cfce0058a496939fdfd5b67c0a98460d363`. A JIT consumer of the packed distilled model, with direct OneModel/OneModel.Training 1.2.0 references, gives the same distilled hash. Stream ownership, checkpoint, training/resume and embedder tests pass (51 tests, no failures or skips).
 
 Exact-output checks across these runtime versions found:
 
