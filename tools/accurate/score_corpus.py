@@ -10,6 +10,33 @@ from pathlib import Path
 import subprocess
 
 
+def annotated_metrics(path):
+    """Do not turn an entirely absent gold column into a perfect-accuracy row."""
+    present = set()
+    for line in path.read_text(encoding='utf-8').splitlines():
+        columns = line.split('\t')
+        if len(columns) >= 8 and columns[0].isdigit():
+            present.update(i for i in (2, 3, 4, 5, 6, 7) if columns[i] != '_')
+    metrics = []
+    if 3 in present:
+        metrics.append('UPOS')
+    if 4 in present:
+        metrics.append('XPOS')
+        if 3 in present:
+            metrics.append('AllTags')
+    if 5 in present:
+        metrics.append('UFeats')
+    if 2 in present:
+        metrics.append('Lemmas')
+    if 6 in present:
+        metrics.append('UAS')
+        if 7 in present:
+            metrics.append('LAS')
+            if 3 in present:
+                metrics.extend(['CLAS', 'MLAS'])
+    return metrics
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     for name in ('spec', 'data', 'predictions', 'eval_dll', 'output'):
@@ -27,18 +54,22 @@ def main():
             continue
         gold = a.data / gating['test']
         name = gold.stem
-        # A missing annotation is not a perfect score. Only report XPOS when the treebank has it.
-        xpos = any(len(c := line.split('\t')) > 4 and c[0].isdigit() and c[4] != '_'
-                   for line in gold.read_text().splitlines() if line and not line.startswith('#'))
-        metrics = ['UPOS', 'UFeats', 'Lemmas', 'UAS', 'LAS', 'CLAS', 'MLAS']
-        if xpos:
-            metrics[1:1] = ['XPOS', 'AllTags']
+        metrics = annotated_metrics(gold)
         for mode, prefix in (('gold', 'pred-'), ('raw', 'pred-raw-')):
             pred = a.predictions / (prefix + name + '.conllu')
             result = a.output / (name + '.' + mode + '.json')
-            if not pred.exists() or result.exists():
-                continue
             selected = (['Tokens', 'Sentences', 'Words'] if mode == 'raw' else []) + metrics
+            if result.exists():
+                # Existing intervals remain valid: filtering absent annotations is
+                # reporting metadata, not another model read or a new selection.
+                rows = json.loads(result.read_text())
+                retained = [r for r in rows if r['metric'] in selected]
+                if retained != rows:
+                    result.write_text(json.dumps(retained, indent=2) + '\n', encoding='utf-8')
+                    result.with_suffix('.md').unlink(missing_ok=True)
+                continue
+            if not pred.exists():
+                continue
             subprocess.run(['dotnet', str(a.eval_dll), 'ud', '--gold', str(gold), '--pred', str(pred),
                             '--metrics', ','.join(selected), '--component', 'accurate-large-' + mode,
                             '--language', code, '--dataset', name, '--resamples', '1000', '--seed', '20261106',

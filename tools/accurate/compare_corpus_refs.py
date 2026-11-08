@@ -103,7 +103,8 @@ def render(a):
     print('\nIntervals: 95% bootstrap, 1,000 resamples, seed 20261106. The published reference passes when it is no higher '
           'than our upper bound; these are not paired intervals against the reference. Gold and raw input are never crossed. '
           'A missing reference is not a pass. The reference UD version and test-split change flag accompany every comparison; '
-          'changed splits are information, not a claim of equal evaluation data. Before is the previous nine-language model, where available.\n')
+          'changed splits are information, not a claim of equal evaluation data. Entirely absent gold columns are not scored. '
+          'Before is the previous nine-language model, where available.\n')
     print('| Language / treebank | Input | Metric | Before [95% CI] | Current [95% CI] | Best published view | Stanza-only view |')
     print('|---|---|---|---|---|---|---|')
     print('\n'.join(rows))
@@ -139,15 +140,16 @@ def render_paired(directory):
     print(f"{len(rows)} rows: {counts['ahead']} ahead, {counts['within']} within the paired interval, {counts['behind']} behind. "
           'Same gold, mode and sampled entity sentences; 1,000 paired resamples, seed 20261106. '
           'This is not the published-system gate. Positive differences favor this model.\n')
-    print('| Language / dataset | Input | Metric | Current [95% CI] | spaCy | Difference [95% CI] | Verdict |')
+    print('| Language / dataset | Input | Metric | Current [95% CI] | spaCy [95% CI] | Difference [95% CI] | Verdict |')
     print('|---|---|---|---|---|---|---|')
     for path in sorted(directory.glob('*.json')):
         mode = 'entities (gold)' if path.name.startswith('ner-') else 'gold' if '.gold.' in path.name else 'raw'
         for row in json.loads(path.read_text()):
             d = row['difference']
             verdict = 'ahead' if d['low'] > 0 else 'behind' if d['high'] < 0 else 'within'
+            reference = interval(row['reference_interval']) if 'reference_interval' in row else f"{row['reference']:.2f}"
             print(f"| {row['language']}: {row['dataset']} | {mode} | {row['metric']} | {interval(row['score'])} | "
-                  f"{row['reference']:.2f} | {interval(d)} | {verdict} |")
+                  f"{reference} | {interval(d)} | {verdict} |")
 
 
 def main():

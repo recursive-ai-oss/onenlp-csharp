@@ -13,6 +13,7 @@ from unittest.mock import patch
 import compare_corpus_refs as report
 import stage_large_weights as stage
 import paired_spacy as paired
+import score_corpus as scoring
 
 
 class ReferencesTests(unittest.TestCase):
@@ -69,6 +70,16 @@ class ReferencesTests(unittest.TestCase):
             self.assertIn('"cs" => "cs.onenlp"', (generated / 'Part.cs').read_text())
             self.assertEqual(b'cs', (weights / 'heads/cs.onenlp').read_bytes())
             self.assertEqual(b'0123456789ab', b''.join((weights / f'encoder.onnx.part{i}').read_bytes() for i in range(1, 7)))
+
+    def test_absent_gold_columns_are_not_perfect_accuracy_rows(self):
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / 'gold.conllu'
+            path.write_text('1\tText\t_\tNOUN\t_\t_\t0\troot\t_\t_\n\n')
+            self.assertEqual(['UPOS', 'UAS', 'LAS', 'CLAS', 'MLAS'], scoring.annotated_metrics(path))
+            path.write_text('1\tText\ttext\tNOUN\tNN\tNumber=Sing\t0\troot\t_\t_\n\n')
+            self.assertIn('Lemmas', scoring.annotated_metrics(path))
+            self.assertIn('UFeats', scoring.annotated_metrics(path))
+            self.assertIn('AllTags', scoring.annotated_metrics(path))
 
     def test_same_treebank_mode_and_model(self):
         good = self.row()
