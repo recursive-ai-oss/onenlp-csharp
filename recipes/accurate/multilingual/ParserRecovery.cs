@@ -74,6 +74,7 @@ internal static partial class Program
                 result = train.Train(data.Train, new TrainOptions
                 {
                     Epochs = Num(args, "epochs", 8),
+                    MaxSteps = Num(args, "steps", 0),
                     BatchWords = Num(args, "batch-words", 1500),
                     LearningRate = Flt(args, "lr", 0.0002f),
                     Dropout = Flt(args, "dropout", 0.1f),

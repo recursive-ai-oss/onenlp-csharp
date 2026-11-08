@@ -2,7 +2,7 @@
 
 `RecursiveAI.OneNlp.Models.Multilingual.Large` shares one fine-tuned mmBERT-base encoder across **84 UD languages**, with entity heads for **19**. It is distinct from `.Models.Multilingual`, the distilled model covering nine languages. The full language list is `MultilingualLargeModel.Languages`; annotation availability and data gaps are in `docs/ud-licences.md`. A referenced fast-tier package is preferred by the plain `Nlp` verbs; explicit `Tier.Accurate` prefers this base-size package over the distilled one.
 
-**The published-reference quality bar is not met.** Every metric, language, input mode and confidence interval is reported in [accurate-tier-rows.md](accurate-tier-rows.md), including separate counts for the best published system per row and Stanza 1.5.1 pretrained/charlm without a transformer. Missing references are not passes. The table also includes the previous nine-language model and a paired comparison with the same-data spaCy 3.8.18 baselines. No multilingual average substitutes for those rows. The final read covers **72,685 UD test sentences / 1,202,477 gold words**, in both gold-token and raw-text modes, plus 19 entity samples. There are **1,719 metric rows**: **1,207/1,314 best-published comparisons miss**, and **542/650 Stanza-only comparisons miss** (different view populations, not comparable pass percentages). The paired spaCy information view has 113 rows ahead, 16 overlapping and 15 behind, out of 144.
+**The published-reference quality bar is not met.** Every metric, language, input mode and confidence interval is reported in [accurate-tier-rows.md](accurate-tier-rows.md), including separate counts for the best published system per row and Stanza 1.5.1 pretrained/charlm without a transformer. Missing references are not passes. The table also includes the previous nine-language model and a paired comparison with the same-data spaCy 3.8.18 baselines. No multilingual average substitutes for those rows. The complete results cover **72,685 UD test sentences / 1,202,477 gold words**, in both gold-token and raw-text modes, plus 19 entity samples. There are **1,719 metric rows**: **1,205/1,314 best-published comparisons miss**, and **534/650 Stanza-only comparisons miss** (different view populations, not comparable pass percentages). The paired spaCy information view has 117 rows ahead, 14 overlapping and 13 behind, out of 144.
 
 ## Reproducible recipe
 
@@ -17,6 +17,30 @@ Recipe: `recipes/accurate/multilingual`, shared reader/sampler: `recipes/accurat
 - **Raw text:** Chinese uses the trained Chinese fast-tier word segmenter; Japanese, Classical Chinese, Thai and Vietnamese have segmenters trained from their allowed UD training splits. Other languages use the documented word and sentence rules. Multiword-token pieces carry their expanded word forms in `Token.Norm`, matching the encoder's training input.
 
 **Finnish is FTB**, not TDT: FTB has more training sentences in the selected corpus. Its dev slice begins with colloquial/dialectal material, and FTB/TDT XPOS and compound-lemma conventions differ. FTB scores are never compared with a TDT reference. Italian trains on the combined ParlaMint/MarkIT data but its gating test is MarkIT; the table names the actual test treebank.
+
+## Parser-only recovery on the frozen encoder
+
+The seven original languages whose full-dev evidence supports adaptation now use recovered parser heads: **de, fr, es, pt, nl, tr, zh**. English and Italian keep their exact jointly trained files. Only parser parameters changed; the graph, token table, tokenizer, all tag/morphology/lemma/entity parameters and the other 75 languages are unchanged. Recipe and complete provenance: `recipes/accurate/multilingual/PARSER-RECOVERY.md` and the package's `PROVENANCE.md`.
+
+Each candidate was selected on the **full** development split with a paired sentence-bootstrap LAS comparison against the jointly trained parser (1,000 resamples, seed 66). The lower difference bound must exceed zero. Best full-dev epochs are restored after wall-time cancellation; where no epoch completes, the final partial epoch is evaluated in full. No test-driven continuation or selection follows.
+
+The seven selected heads were then evaluated once in gold-token and raw-text modes on 6,356 official test sentences. All seven improve LAS in **both** modes, with paired 95% difference intervals excluding zero against the joint 84-language model. English and Italian reuse the previous test results because their exact files and encoder are retained. Complete before/joint/after intervals for all nine, all metrics and both published-reference views are in [accurate-tier-rows.md](accurate-tier-rows.md).
+
+| Language | Gold LAS: earlier nine → joint → recovered | Raw LAS: joint → recovered |
+|---|---|---|
+| en | 85.43 → 85.12 → 85.12 (unchanged) | 86.55 → 86.55 (unchanged) |
+| de | 83.32 → 82.17 → 83.49 | 81.05 → 82.38 |
+| fr | 86.55 → 85.83 → 86.89 | 88.96 → 89.78 |
+| es | 85.37 → 84.66 → 86.97 | 88.35 → 89.70 |
+| pt | 84.01 → 81.83 → 84.54 | 86.86 → 87.98 |
+| it | 77.27 → 77.63 → 77.63 (unchanged) | 82.22 → 82.22 (unchanged) |
+| nl | 87.63 → 83.40 → 87.24 | 89.09 → 91.11 |
+| tr | 67.92 → 64.97 → 67.13 | 62.33 → 64.31 |
+| zh | 63.29 → 57.55 → 61.42 | 58.91 → 60.98 |
+
+**Sentence-boundary trade-off:** Turkish raw sentence F1 falls from 79.89 to 78.82. Its paired difference against the joint model is **-1.073 [-1.998, -0.134]**, despite raw LAS improving by 1.978 [1.413, 2.578]. This is the only significantly negative paired row among the 139 recomputed UD metric rows. All 76 checked non-parser metric intervals are identical; sentence classification is part of the adapted parser. The selection rule was fixed to full-dev gold LAS before test, and no post-test weight selection was made. This is not a regression-free update.
+
+This is recovery relative to joint training, **not a published-system gate pass**. Chinese gold LAS remains 1.88 points below the earlier nine-language point; the original and recovered marginal intervals overlap, and both rows remain visible. Published-reference misses are still reported without relaxation. Save/reload checks reproduce the selected parsers' actual full-dev head/label predictions and preserve every non-parser head's configuration and tensor hash. Package part boundaries and payload sizes are unchanged. The affected root and Chinese packages have been built and size-checked; validation through the packed JIT consumer remains pending after its restore ran out of disk space.
 
 ## Serving and numerical checks
 

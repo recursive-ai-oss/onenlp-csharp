@@ -1,9 +1,9 @@
 # Base-size accurate tier: per-row results
 
 Two views of the same rows (no averaging over languages or metrics):
-- **Best published system per row: 1314 comparisons, 1207 misses**, 107 within the interval or ahead.
-- **Stanza 1.5.1 pretrained/charlm, no transformer: 650 comparisons, 542 misses**, 108 within the interval or ahead.
-- **All published system comparisons: 2678 comparisons, 2359 misses**, 319 within the interval or ahead.
+- **Best published system per row: 1314 comparisons, 1205 misses**, 109 within the interval or ahead.
+- **Stanza 1.5.1 pretrained/charlm, no transformer: 650 comparisons, 534 misses**, 116 within the interval or ahead.
+- **All published system comparisons: 2678 comparisons, 2346 misses**, 332 within the interval or ahead.
 
 Intervals: 95% bootstrap, 1,000 resamples, seed 20261106. The published reference passes when it is no higher than our upper bound; these are not paired intervals against the reference. Gold and raw input are never crossed. A missing reference is not a pass. The reference UD version and test-split change flag accompany every comparison; changed splits are information, not a claim of equal evaluation data. Entirely absent gold columns are not scored. Before is the previous nine-language model, where available.
 
@@ -212,22 +212,22 @@ Intervals: 95% bootstrap, 1,000 resamples, seed 20261106. The published referenc
 | da: UD_Danish-DDT | raw | Words | not measured | 98.69 [98.37, 99.02] | 99.97 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** | 99.97 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
 | da: UD_Danish-DDT | raw | XPOS | not measured | 0.99 [0.82, 1.18] | 99.97 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** | 99.97 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
 | de: UD_German-GSD | gold | AllTags | 83.34 [82.57, 84.04] | 83.09 [82.34, 83.75] | 89.21 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| de: UD_German-GSD | gold | CLAS | not measured | 77.15 [76.03, 78.29] | not published | not published |
-| de: UD_German-GSD | gold | LAS | 83.32 [82.43, 84.17] | 82.17 [81.24, 83.02] | 86.16 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| de: UD_German-GSD | gold | CLAS | not measured | 78.67 [77.54, 79.74] | not published | not published |
+| de: UD_German-GSD | gold | LAS | 83.32 [82.43, 84.17] | 83.49 [82.59, 84.31] | 86.16 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | de: UD_German-GSD | gold | Lemmas | 96.25 [95.95, 96.53] | 96.64 [96.37, 96.92] | 97.37 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| de: UD_German-GSD | gold | MLAS | not measured | 58.17 [56.95, 59.56] | 69.30 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| de: UD_German-GSD | gold | UAS | 87.01 [86.18, 87.75] | 85.90 [84.99, 86.68] | 89.24 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| de: UD_German-GSD | gold | MLAS | not measured | 59.58 [58.38, 60.86] | 69.30 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| de: UD_German-GSD | gold | UAS | 87.01 [86.18, 87.75] | 87.09 [86.26, 87.84] | 89.24 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | de: UD_German-GSD | gold | UFeats | 86.81 [86.11, 87.44] | 86.58 [85.91, 87.19] | 91.53 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | de: UD_German-GSD | gold | UPOS | 96.16 [95.83, 96.49] | 95.78 [95.43, 96.12] | 97.11 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | de: UD_German-GSD | gold | XPOS | 96.07 [95.71, 96.43] | 95.84 [95.48, 96.19] | 97.93 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | de: UD_German-GSD | raw | AllTags | 81.04 [80.35, 81.70] | 81.69 [80.99, 82.33] | 88.82 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 87.19 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| de: UD_German-GSD | raw | CLAS | not measured | 79.72 [78.63, 80.79] | 81.49 (Trankit large, UD 2.5; test changed) — **MISS** | 77.08 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
-| de: UD_German-GSD | raw | LAS | 81.17 [80.27, 82.00] | 81.05 [80.15, 81.88] | 85.20 (Trankit large, UD 2.5; test changed) — **MISS** | 81.80 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
+| de: UD_German-GSD | raw | CLAS | not measured | 81.12 [80.13, 82.07] | 81.49 (Trankit large, UD 2.5; test changed) — within or ahead | 77.08 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
+| de: UD_German-GSD | raw | LAS | 81.17 [80.27, 82.00] | 82.38 [81.55, 83.18] | 85.20 (Trankit large, UD 2.5; test changed) — **MISS** | 81.80 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
 | de: UD_German-GSD | raw | Lemmas | 93.36 [92.90, 93.78] | 94.07 [93.64, 94.48] | 97.23 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** | 97.23 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| de: UD_German-GSD | raw | MLAS | not measured | 59.29 [58.13, 60.48] | 67.63 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 62.81 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| de: UD_German-GSD | raw | Sentences | 88.70 [86.70, 90.74] | 88.63 [86.65, 90.56] | 92.72 (Trankit base, UD 2.5; test changed) — **MISS** | 83.84 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
+| de: UD_German-GSD | raw | MLAS | not measured | 60.36 [59.24, 61.44] | 67.63 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 62.81 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| de: UD_German-GSD | raw | Sentences | 88.70 [86.70, 90.74] | 88.65 [86.73, 90.58] | 92.72 (Trankit base, UD 2.5; test changed) — **MISS** | 83.84 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
 | de: UD_German-GSD | raw | Tokens | 97.40 [97.09, 97.69] | 97.40 [97.09, 97.69] | 99.75 (Trankit base, UD 2.5; test changed) — **MISS** | 99.62 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| de: UD_German-GSD | raw | UAS | 84.71 [83.86, 85.52] | 84.31 [83.43, 85.14] | 89.01 (Trankit large, UD 2.5; test changed) — **MISS** | 85.80 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| de: UD_German-GSD | raw | UAS | 84.71 [83.86, 85.52] | 85.50 [84.64, 86.25] | 89.01 (Trankit large, UD 2.5; test changed) — **MISS** | 85.80 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
 | de: UD_German-GSD | raw | UFeats | 84.39 [83.77, 85.03] | 85.16 [84.51, 85.74] | 91.68 (Trankit large, UD 2.5; test changed) — **MISS** | 89.78 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | de: UD_German-GSD | raw | UPOS | 93.27 [92.79, 93.69] | 93.33 [92.87, 93.75] | 96.87 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 95.61 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | de: UD_German-GSD | raw | Words | 97.06 [96.70, 97.39] | 97.06 [96.70, 97.39] | 99.79 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 99.60 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
@@ -292,22 +292,22 @@ Intervals: 95% bootstrap, 1,000 resamples, seed 20261106. The published referenc
 | en: UD_English-EWT | raw | Words | 98.68 [98.45, 98.90] | 98.68 [98.45, 98.90] | 99.07 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 98.92 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | en: UD_English-EWT | raw | XPOS | 95.22 [94.83, 95.58] | 95.18 [94.78, 95.54] | 96.47 (Trankit large, UD 2.5; test changed) — **MISS** | 95.75 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | es: UD_Spanish-AnCora | gold | AllTags | 83.67 [83.20, 84.13] | 83.21 [82.74, 83.67] | 95.64 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| es: UD_Spanish-AnCora | gold | CLAS | not measured | 79.49 [78.89, 80.12] | not published | not published |
-| es: UD_Spanish-AnCora | gold | LAS | 85.37 [84.89, 85.88] | 84.66 [84.20, 85.15] | 92.26 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| es: UD_Spanish-AnCora | gold | CLAS | not measured | 82.53 [81.95, 83.14] | not published | not published |
+| es: UD_Spanish-AnCora | gold | LAS | 85.37 [84.89, 85.88] | 86.97 [86.51, 87.42] | 92.26 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | es: UD_Spanish-AnCora | gold | Lemmas | 97.72 [97.58, 97.85] | 98.53 [98.42, 98.64] | 99.41 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| es: UD_Spanish-AnCora | gold | MLAS | not measured | 72.39 [71.73, 73.14] | 87.03 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| es: UD_Spanish-AnCora | gold | UAS | 88.14 [87.68, 88.63] | 87.61 [87.18, 88.08] | 94.01 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| es: UD_Spanish-AnCora | gold | MLAS | not measured | 75.87 [75.23, 76.53] | 87.03 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| es: UD_Spanish-AnCora | gold | UAS | 88.14 [87.68, 88.63] | 89.50 [89.08, 89.94] | 94.01 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | es: UD_Spanish-AnCora | gold | UFeats | 96.50 [96.33, 96.66] | 96.74 [96.58, 96.91] | 98.79 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | es: UD_Spanish-AnCora | gold | UPOS | 98.10 [97.98, 98.24] | 98.00 [97.87, 98.14] | 99.09 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | es: UD_Spanish-AnCora | gold | XPOS | 84.88 [84.41, 85.31] | 84.37 [83.90, 84.82] | 96.12 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | es: UD_Spanish-AnCora | raw | AllTags | 84.50 [84.05, 84.94] | 84.84 [84.40, 85.29] | 98.36 (Trankit large, UD 2.5; test changed) — **MISS** | 95.65 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| es: UD_Spanish-AnCora | raw | CLAS | not measured | 84.50 [83.92, 85.06] | 91.10 (Trankit large, UD 2.5; test changed) — **MISS** | 87.80 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| es: UD_Spanish-AnCora | raw | LAS | 87.42 [86.90, 87.92] | 88.35 [87.88, 88.78] | 93.29 (Trankit large, UD 2.5; test changed) — **MISS** | 91.30 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| es: UD_Spanish-AnCora | raw | CLAS | not measured | 86.36 [85.78, 86.89] | 91.10 (Trankit large, UD 2.5; test changed) — **MISS** | 87.80 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| es: UD_Spanish-AnCora | raw | LAS | 87.42 [86.90, 87.92] | 89.70 [89.24, 90.11] | 93.29 (Trankit large, UD 2.5; test changed) — **MISS** | 91.30 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | es: UD_Spanish-AnCora | raw | Lemmas | 97.75 [97.61, 97.89] | 98.58 [98.46, 98.70] | 99.37 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 99.24 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| es: UD_Spanish-AnCora | raw | MLAS | not measured | 78.68 [78.03, 79.32] | 89.23 (Trankit large, UD 2.5; test changed) — **MISS** | 85.49 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| es: UD_Spanish-AnCora | raw | Sentences | 96.66 [95.79, 97.49] | 96.54 [95.70, 97.31] | 99.39 (Trankit large, UD 2.5; test changed) — **MISS** | 98.49 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| es: UD_Spanish-AnCora | raw | MLAS | not measured | 80.63 [79.97, 81.23] | 89.23 (Trankit large, UD 2.5; test changed) — **MISS** | 85.49 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| es: UD_Spanish-AnCora | raw | Sentences | 96.66 [95.79, 97.49] | 97.05 [96.24, 97.78] | 99.39 (Trankit large, UD 2.5; test changed) — **MISS** | 98.49 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | es: UD_Spanish-AnCora | raw | Tokens | 99.84 [99.76, 99.90] | 99.84 [99.76, 99.90] | 99.97 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** | 99.97 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| es: UD_Spanish-AnCora | raw | UAS | 90.08 [89.60, 90.51] | 90.92 [90.49, 91.33] | 94.77 (Trankit large, UD 2.5; test changed) — **MISS** | 93.09 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| es: UD_Spanish-AnCora | raw | UAS | 90.08 [89.60, 90.51] | 91.93 [91.49, 92.31] | 94.77 (Trankit large, UD 2.5; test changed) — **MISS** | 93.09 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | es: UD_Spanish-AnCora | raw | UFeats | 96.57 [96.40, 96.73] | 96.83 [96.66, 96.99] | 98.85 (Trankit large, UD 2.5; test changed) — **MISS** | 98.54 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | es: UD_Spanish-AnCora | raw | UPOS | 98.09 [97.96, 98.24] | 98.20 [98.07, 98.34] | 99.06 (Trankit large, UD 2.5; test changed) — **MISS** | 98.96 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | es: UD_Spanish-AnCora | raw | Words | 99.83 [99.75, 99.89] | 99.83 [99.75, 99.89] | 99.96 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** | 99.96 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
@@ -375,20 +375,20 @@ Intervals: 95% bootstrap, 1,000 resamples, seed 20261106. The published referenc
 | fo: UD_Faroese-FarPaHC | raw | UPOS | not measured | 94.17 [93.65, 94.68] | 97.48 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 96.51 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
 | fo: UD_Faroese-FarPaHC | raw | Words | not measured | 99.39 [99.20, 99.58] | 99.74 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 99.64 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
 | fo: UD_Faroese-FarPaHC | raw | XPOS | not measured | 81.38 [80.53, 82.24] | 92.97 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 91.56 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
-| fr: UD_French-GSD | gold | CLAS | not measured | 80.98 [79.72, 82.20] | not published | not published |
-| fr: UD_French-GSD | gold | LAS | 86.55 [85.57, 87.49] | 85.83 [84.90, 86.72] | 93.11 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| fr: UD_French-GSD | gold | CLAS | not measured | 82.47 [81.26, 83.85] | not published | not published |
+| fr: UD_French-GSD | gold | LAS | 86.55 [85.57, 87.49] | 86.89 [85.93, 87.88] | 93.11 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | fr: UD_French-GSD | gold | Lemmas | 97.56 [97.23, 97.88] | 98.03 [97.72, 98.31] | 98.85 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| fr: UD_French-GSD | gold | MLAS | not measured | 73.78 [72.25, 75.26] | 86.95 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| fr: UD_French-GSD | gold | UAS | 89.36 [88.49, 90.23] | 88.98 [88.06, 89.81] | 94.99 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| fr: UD_French-GSD | gold | MLAS | not measured | 75.00 [73.45, 76.63] | 86.95 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| fr: UD_French-GSD | gold | UAS | 89.36 [88.49, 90.23] | 89.52 [88.61, 90.43] | 94.99 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | fr: UD_French-GSD | gold | UFeats | 96.24 [95.75, 96.67] | 96.06 [95.58, 96.49] | 98.30 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | fr: UD_French-GSD | gold | UPOS | 97.21 [96.82, 97.58] | 96.99 [96.60, 97.39] | 98.55 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| fr: UD_French-GSD | raw | CLAS | not measured | 85.67 [84.45, 86.80] | 90.17 (Trankit large, UD 2.5; test changed) — **MISS** | 87.44 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| fr: UD_French-GSD | raw | LAS | 88.07 [87.07, 89.05] | 88.96 [88.02, 89.84] | 93.37 (Trankit large, UD 2.5; test changed) — **MISS** | 91.28 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| fr: UD_French-GSD | raw | CLAS | not measured | 86.65 [85.41, 87.83] | 90.17 (Trankit large, UD 2.5; test changed) — **MISS** | 87.44 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
+| fr: UD_French-GSD | raw | LAS | 88.07 [87.07, 89.05] | 89.78 [88.84, 90.63] | 93.37 (Trankit large, UD 2.5; test changed) — **MISS** | 91.28 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | fr: UD_French-GSD | raw | Lemmas | 97.42 [97.09, 97.77] | 97.96 [97.64, 98.25] | 98.20 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead | 98.20 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
-| fr: UD_French-GSD | raw | MLAS | not measured | 79.66 [78.13, 81.14] | 86.35 (Trankit large, UD 2.5; test changed) — **MISS** | 84.45 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| fr: UD_French-GSD | raw | Sentences | 92.40 [89.74, 94.66] | 92.18 [89.49, 94.59] | 98.80 (Trankit large, UD 2.5; test changed) — **MISS** | 95.03 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| fr: UD_French-GSD | raw | MLAS | not measured | 80.57 [79.06, 81.91] | 86.35 (Trankit large, UD 2.5; test changed) — **MISS** | 84.45 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| fr: UD_French-GSD | raw | Sentences | 92.40 [89.74, 94.66] | 92.65 [90.07, 94.98] | 98.80 (Trankit large, UD 2.5; test changed) — **MISS** | 95.03 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | fr: UD_French-GSD | raw | Tokens | 99.88 [99.79, 99.96] | 99.88 [99.79, 99.96] | 99.77 (Trankit large, UD 2.5; test changed) — within or ahead | 99.71 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
-| fr: UD_French-GSD | raw | UAS | 90.67 [89.74, 91.58] | 91.34 [90.43, 92.18] | 94.97 (Trankit large, UD 2.5; test changed) — **MISS** | 93.27 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| fr: UD_French-GSD | raw | UAS | 90.67 [89.74, 91.58] | 91.97 [91.12, 92.76] | 94.97 (Trankit large, UD 2.5; test changed) — **MISS** | 93.27 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | fr: UD_French-GSD | raw | UFeats | 96.07 [95.59, 96.52] | 96.26 [95.82, 96.68] | 97.74 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** | 97.74 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | fr: UD_French-GSD | raw | UPOS | 97.06 [96.71, 97.42] | 97.10 [96.71, 97.46] | 97.89 (Trankit large, UD 2.5; test changed) — **MISS** | 97.63 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | fr: UD_French-GSD | raw | Words | 99.48 [99.29, 99.65] | 99.48 [99.29, 99.65] | 99.72 (Trankit large, UD 2.5; test changed) — **MISS** | 99.50 (Stanza 1.5.1, UD 2.12; test changed) — within or ahead |
@@ -991,22 +991,22 @@ Intervals: 95% bootstrap, 1,000 resamples, seed 20261106. The published referenc
 | nds: UD_Low_Saxon-LSDC | raw | UPOS | not measured | 86.22 [85.42, 87.04] | 90.25 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | nds: UD_Low_Saxon-LSDC | raw | Words | not measured | 99.41 [99.14, 99.65] | 99.25 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — within or ahead | not published |
 | nl: UD_Dutch-Alpino | gold | AllTags | 94.31 [93.48, 95.00] | 94.13 [93.32, 94.87] | 96.73 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| nl: UD_Dutch-Alpino | gold | CLAS | not measured | 78.51 [77.05, 79.84] | not published | not published |
-| nl: UD_Dutch-Alpino | gold | LAS | 87.63 [86.63, 88.59] | 83.40 [82.24, 84.47] | 93.37 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| nl: UD_Dutch-Alpino | gold | CLAS | not measured | 82.88 [81.34, 84.21] | not published | not published |
+| nl: UD_Dutch-Alpino | gold | LAS | 87.63 [86.63, 88.59] | 87.24 [86.15, 88.24] | 93.37 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | nl: UD_Dutch-Alpino | gold | Lemmas | 91.88 [91.32, 92.47] | 92.34 [91.80, 92.92] | 96.20 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| nl: UD_Dutch-Alpino | gold | MLAS | not measured | 70.51 [68.69, 72.12] | 86.35 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| nl: UD_Dutch-Alpino | gold | UAS | 90.41 [89.40, 91.32] | 87.18 [86.11, 88.11] | 95.30 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| nl: UD_Dutch-Alpino | gold | MLAS | not measured | 76.21 [74.34, 77.73] | 86.35 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| nl: UD_Dutch-Alpino | gold | UAS | 90.41 [89.40, 91.32] | 90.23 [89.24, 91.11] | 95.30 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | nl: UD_Dutch-Alpino | gold | UFeats | 96.73 [96.16, 97.22] | 96.62 [96.06, 97.12] | 97.75 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | nl: UD_Dutch-Alpino | gold | UPOS | 96.89 [96.24, 97.44] | 96.91 [96.21, 97.44] | 98.17 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | nl: UD_Dutch-Alpino | gold | XPOS | 95.09 [94.32, 95.77] | 95.05 [94.26, 95.72] | 97.12 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | nl: UD_Dutch-Alpino | raw | AllTags | 94.31 [93.58, 95.01] | 94.50 [93.79, 95.22] | 96.56 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 94.97 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
-| nl: UD_Dutch-Alpino | raw | CLAS | not measured | 85.23 [83.88, 86.40] | 89.56 (Trankit large, UD 2.5; test same size) — **MISS** | 83.94 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
-| nl: UD_Dutch-Alpino | raw | LAS | 89.06 [87.93, 89.96] | 89.09 [88.06, 89.97] | 92.49 (Trankit large, UD 2.5; test same size) — **MISS** | 88.67 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
+| nl: UD_Dutch-Alpino | raw | CLAS | not measured | 87.99 [86.70, 89.11] | 89.56 (Trankit large, UD 2.5; test same size) — **MISS** | 83.94 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
+| nl: UD_Dutch-Alpino | raw | LAS | 89.06 [87.93, 89.96] | 91.11 [90.20, 91.92] | 92.49 (Trankit large, UD 2.5; test same size) — **MISS** | 88.67 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
 | nl: UD_Dutch-Alpino | raw | Lemmas | 91.54 [90.97, 92.14] | 92.05 [91.49, 92.67] | 96.39 (Trankit large, UD 2.5; test same size) — **MISS** | 95.33 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
-| nl: UD_Dutch-Alpino | raw | MLAS | not measured | 79.56 [77.95, 81.03] | 85.14 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 79.65 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
-| nl: UD_Dutch-Alpino | raw | Sentences | 94.81 [92.78, 96.42] | 95.56 [94.03, 97.03] | 91.16 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — within or ahead | 90.08 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
+| nl: UD_Dutch-Alpino | raw | MLAS | not measured | 82.24 [80.73, 83.63] | 85.14 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 79.65 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
+| nl: UD_Dutch-Alpino | raw | Sentences | 94.81 [92.78, 96.42] | 95.90 [94.35, 97.34] | 91.16 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — within or ahead | 90.08 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
 | nl: UD_Dutch-Alpino | raw | Tokens | 99.66 [99.46, 99.82] | 99.66 [99.46, 99.82] | 99.87 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** | 99.87 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
-| nl: UD_Dutch-Alpino | raw | UAS | 91.67 [90.65, 92.52] | 91.93 [91.05, 92.69] | 94.41 (Trankit large, UD 2.5; test same size) — **MISS** | 91.42 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
+| nl: UD_Dutch-Alpino | raw | UAS | 91.67 [90.65, 92.52] | 93.37 [92.55, 94.08] | 94.41 (Trankit large, UD 2.5; test same size) — **MISS** | 91.42 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
 | nl: UD_Dutch-Alpino | raw | UFeats | 96.78 [96.26, 97.27] | 96.80 [96.29, 97.28] | 97.52 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 97.00 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
 | nl: UD_Dutch-Alpino | raw | UPOS | 96.66 [96.01, 97.23] | 96.74 [96.11, 97.27] | 97.97 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 96.75 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
 | nl: UD_Dutch-Alpino | raw | Words | 99.66 [99.46, 99.82] | 99.66 [99.46, 99.82] | 99.87 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** | 99.87 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
@@ -1165,20 +1165,20 @@ Intervals: 95% bootstrap, 1,000 resamples, seed 20261106. The published referenc
 | pro: UD_Old_Occitan-CorAG | raw | UFeats | not measured | 80.84 [79.60, 82.01] | 95.37 (UDPipe 2 2.17 models 251125, UD 2.17; test changed) — **MISS** | not published |
 | pro: UD_Old_Occitan-CorAG | raw | UPOS | not measured | 82.51 [81.42, 83.58] | 95.25 (UDPipe 2 2.17 models 251125, UD 2.17; test changed) — **MISS** | not published |
 | pro: UD_Old_Occitan-CorAG | raw | Words | not measured | 91.16 [90.34, 91.98] | 98.55 (UDPipe 2 2.17 models 251125, UD 2.17; test changed) — **MISS** | not published |
-| pt: UD_Portuguese-Bosque | gold | CLAS | not measured | 77.38 [76.47, 78.25] | not published | not published |
-| pt: UD_Portuguese-Bosque | gold | LAS | 84.01 [83.39, 84.63] | 81.83 [81.11, 82.53] | 90.93 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| pt: UD_Portuguese-Bosque | gold | CLAS | not measured | 80.24 [79.51, 81.07] | not published | not published |
+| pt: UD_Portuguese-Bosque | gold | LAS | 84.01 [83.39, 84.63] | 84.54 [83.90, 85.14] | 90.93 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | pt: UD_Portuguese-Bosque | gold | Lemmas | 97.49 [97.30, 97.70] | 97.59 [97.39, 97.79] | 98.63 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| pt: UD_Portuguese-Bosque | gold | MLAS | not measured | 67.49 [66.45, 68.46] | 81.55 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| pt: UD_Portuguese-Bosque | gold | UAS | 87.64 [87.07, 88.25] | 85.88 [85.20, 86.50] | 93.31 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| pt: UD_Portuguese-Bosque | gold | MLAS | not measured | 70.29 [69.36, 71.22] | 81.55 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| pt: UD_Portuguese-Bosque | gold | UAS | 87.64 [87.07, 88.25] | 88.22 [87.63, 88.77] | 93.31 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | pt: UD_Portuguese-Bosque | gold | UFeats | 94.80 [94.49, 95.09] | 94.48 [94.16, 94.80] | 97.15 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | pt: UD_Portuguese-Bosque | gold | UPOS | 96.56 [96.32, 96.80] | 96.10 [95.82, 96.36] | 98.09 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| pt: UD_Portuguese-Bosque | raw | CLAS | not measured | 83.83 [83.04, 84.61] | 87.75 (Trankit large, UD 2.5; test changed) — **MISS** | 82.66 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
-| pt: UD_Portuguese-Bosque | raw | LAS | 86.47 [85.84, 87.04] | 86.86 [86.27, 87.44] | 90.91 (Trankit large, UD 2.5; test changed) — **MISS** | 87.75 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
+| pt: UD_Portuguese-Bosque | raw | CLAS | not measured | 85.27 [84.54, 85.99] | 87.75 (Trankit large, UD 2.5; test changed) — **MISS** | 82.66 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
+| pt: UD_Portuguese-Bosque | raw | LAS | 86.47 [85.84, 87.04] | 87.98 [87.39, 88.55] | 90.91 (Trankit large, UD 2.5; test changed) — **MISS** | 87.75 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
 | pt: UD_Portuguese-Bosque | raw | Lemmas | 96.96 [96.73, 97.19] | 97.29 [97.09, 97.50] | 98.33 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 98.04 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
-| pt: UD_Portuguese-Bosque | raw | MLAS | not measured | 75.21 [74.33, 76.14] | 81.09 (Trankit large, UD 2.5; test changed) — **MISS** | 77.07 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
-| pt: UD_Portuguese-Bosque | raw | Sentences | 92.27 [90.68, 93.82] | 92.57 [91.08, 93.99] | 97.48 (Trankit base, UD 2.5; test changed) — **MISS** | 93.10 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
+| pt: UD_Portuguese-Bosque | raw | MLAS | not measured | 76.55 [75.69, 77.41] | 81.09 (Trankit large, UD 2.5; test changed) — **MISS** | 77.07 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
+| pt: UD_Portuguese-Bosque | raw | Sentences | 92.27 [90.68, 93.82] | 93.50 [92.14, 94.81] | 97.48 (Trankit base, UD 2.5; test changed) — **MISS** | 93.10 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
 | pt: UD_Portuguese-Bosque | raw | Tokens | 99.86 [99.79, 99.92] | 99.86 [99.79, 99.92] | 99.85 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead | 99.85 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
-| pt: UD_Portuguese-Bosque | raw | UAS | 89.38 [88.77, 89.91] | 89.73 [89.18, 90.26] | 93.31 (Trankit large, UD 2.5; test changed) — **MISS** | 90.59 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
+| pt: UD_Portuguese-Bosque | raw | UAS | 89.38 [88.77, 89.91] | 90.68 [90.16, 91.19] | 93.31 (Trankit large, UD 2.5; test changed) — **MISS** | 90.59 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
 | pt: UD_Portuguese-Bosque | raw | UFeats | 95.06 [94.75, 95.34] | 95.19 [94.90, 95.48] | 96.89 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 96.44 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
 | pt: UD_Portuguese-Bosque | raw | UPOS | 96.59 [96.32, 96.83] | 96.75 [96.50, 96.98] | 97.77 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 97.45 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
 | pt: UD_Portuguese-Bosque | raw | Words | 99.26 [99.14, 99.38] | 99.26 [99.14, 99.38] | 99.76 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** | 99.76 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
@@ -1493,22 +1493,22 @@ Intervals: 95% bootstrap, 1,000 resamples, seed 20261106. The published referenc
 | th: UD_Thai-TUD | raw | UPOS | not measured | 73.95 [72.71, 75.22] | 77.29 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | th: UD_Thai-TUD | raw | Words | not measured | 88.26 [87.23, 89.24] | 87.14 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — within or ahead | not published |
 | tr: UD_Turkish-BOUN | gold | AllTags | not measured | 37.77 [37.03, 38.61] | 73.41 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| tr: UD_Turkish-BOUN | gold | CLAS | not measured | 62.95 [61.49, 64.24] | not published | not published |
-| tr: UD_Turkish-BOUN | gold | LAS | 67.92 [66.56, 69.24] | 64.97 [63.60, 66.26] | 74.00 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| tr: UD_Turkish-BOUN | gold | CLAS | not measured | 65.35 [63.77, 66.74] | not published | not published |
+| tr: UD_Turkish-BOUN | gold | LAS | 67.92 [66.56, 69.24] | 67.13 [65.67, 68.45] | 74.00 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | tr: UD_Turkish-BOUN | gold | Lemmas | 86.40 [85.75, 87.00] | 86.00 [85.31, 86.61] | 93.62 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| tr: UD_Turkish-BOUN | gold | MLAS | not measured | 43.83 [42.52, 45.02] | 52.95 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| tr: UD_Turkish-BOUN | gold | UAS | 75.25 [73.92, 76.56] | 72.36 [70.98, 73.75] | 80.54 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| tr: UD_Turkish-BOUN | gold | MLAS | not measured | 45.80 [44.46, 47.03] | 52.95 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| tr: UD_Turkish-BOUN | gold | UAS | 75.25 [73.92, 76.56] | 74.44 [73.05, 75.76] | 80.54 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | tr: UD_Turkish-BOUN | gold | UFeats | 80.57 [79.80, 81.33] | 80.29 [79.54, 81.01] | 83.03 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | tr: UD_Turkish-BOUN | gold | UPOS | 91.50 [90.98, 92.05] | 91.28 [90.72, 91.81] | 93.14 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | tr: UD_Turkish-BOUN | gold | XPOS | not measured | 44.67 [43.81, 45.55] | 89.02 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | tr: UD_Turkish-BOUN | raw | AllTags | not measured | 37.44 [36.68, 38.26] | 73.03 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** | 73.03 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
-| tr: UD_Turkish-BOUN | raw | CLAS | not measured | 61.35 [59.79, 62.70] | 63.79 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** | 63.79 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
-| tr: UD_Turkish-BOUN | raw | LAS | 63.03 [61.61, 64.41] | 62.33 [60.88, 63.71] | 67.27 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 65.17 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
+| tr: UD_Turkish-BOUN | raw | CLAS | not measured | 63.21 [61.68, 64.58] | 63.79 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead | 63.79 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
+| tr: UD_Turkish-BOUN | raw | LAS | 63.03 [61.61, 64.41] | 64.31 [62.89, 65.78] | 67.27 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 65.17 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
 | tr: UD_Turkish-BOUN | raw | Lemmas | 84.51 [83.78, 85.20] | 84.42 [83.71, 85.09] | 90.59 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 90.37 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
-| tr: UD_Turkish-BOUN | raw | MLAS | not measured | 45.06 [43.56, 46.41] | 49.26 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 48.49 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
-| tr: UD_Turkish-BOUN | raw | Sentences | 81.28 [78.81, 83.58] | 79.89 [77.32, 82.20] | 90.08 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** | 90.08 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
+| tr: UD_Turkish-BOUN | raw | MLAS | not measured | 46.89 [45.51, 48.21] | 49.26 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 48.49 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
+| tr: UD_Turkish-BOUN | raw | Sentences | 81.28 [78.81, 83.58] | 78.82 [76.14, 81.22] | 90.08 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** | 90.08 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
 | tr: UD_Turkish-BOUN | raw | Tokens | 99.56 [99.41, 99.71] | 99.56 [99.41, 99.71] | 99.58 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead | 99.58 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
-| tr: UD_Turkish-BOUN | raw | UAS | 69.75 [68.39, 71.06] | 69.30 [67.85, 70.58] | 73.16 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 71.53 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
+| tr: UD_Turkish-BOUN | raw | UAS | 69.75 [68.39, 71.06] | 71.15 [69.82, 72.44] | 73.16 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 71.53 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
 | tr: UD_Turkish-BOUN | raw | UFeats | 80.24 [79.44, 81.03] | 80.23 [79.44, 81.03] | 81.66 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** | 81.66 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
 | tr: UD_Turkish-BOUN | raw | UPOS | 89.08 [88.46, 89.72] | 88.62 [87.99, 89.32] | 90.01 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | 89.92 (Stanza 1.5.1, UD 2.12; test same size) — **MISS** |
 | tr: UD_Turkish-BOUN | raw | Words | 96.71 [96.34, 97.08] | 96.71 [96.34, 97.08] | 96.57 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — within or ahead | 96.32 (Stanza 1.5.1, UD 2.12; test same size) — within or ahead |
@@ -1634,22 +1634,22 @@ Intervals: 95% bootstrap, 1,000 resamples, seed 20261106. The published referenc
 | yi: UD_Yiddish-YiTB | raw | UPOS | not measured | 89.78 [89.11, 90.49] | 94.50 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | yi: UD_Yiddish-YiTB | raw | Words | not measured | 96.17 [95.63, 96.70] | 99.61 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | zh: UD_Chinese-GSDSimp | gold | AllTags | 85.15 [84.47, 85.82] | 83.66 [82.95, 84.39] | 95.20 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| zh: UD_Chinese-GSDSimp | gold | CLAS | not measured | 56.22 [54.82, 57.68] | not published | not published |
-| zh: UD_Chinese-GSDSimp | gold | LAS | 63.29 [61.88, 64.70] | 57.55 [56.30, 58.83] | 83.60 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| zh: UD_Chinese-GSDSimp | gold | CLAS | not measured | 59.72 [58.32, 61.19] | not published | not published |
+| zh: UD_Chinese-GSDSimp | gold | LAS | 63.29 [61.88, 64.70] | 61.42 [60.21, 62.70] | 83.60 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | zh: UD_Chinese-GSDSimp | gold | Lemmas | 99.80 [99.71, 99.88] | 99.78 [99.67, 99.86] | 99.90 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| zh: UD_Chinese-GSDSimp | gold | MLAS | not measured | 44.42 [42.92, 45.86] | 77.62 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
-| zh: UD_Chinese-GSDSimp | gold | UAS | 69.15 [67.81, 70.55] | 64.08 [62.81, 65.38] | 86.76 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| zh: UD_Chinese-GSDSimp | gold | MLAS | not measured | 47.94 [46.40, 49.45] | 77.62 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
+| zh: UD_Chinese-GSDSimp | gold | UAS | 69.15 [67.81, 70.55] | 67.22 [66.03, 68.48] | 86.76 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | zh: UD_Chinese-GSDSimp | gold | UFeats | 96.03 [95.69, 96.39] | 95.86 [95.48, 96.23] | 99.28 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | zh: UD_Chinese-GSDSimp | gold | UPOS | 88.77 [88.18, 89.35] | 87.55 [86.92, 88.22] | 95.73 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | zh: UD_Chinese-GSDSimp | gold | XPOS | 87.86 [87.24, 88.47] | 87.14 [86.47, 87.79] | 95.97 (UDPipe 2 2.17 models 251125, UD 2.17; test same size) — **MISS** | not published |
 | zh: UD_Chinese-GSDSimp | raw | AllTags | 77.97 [77.04, 78.87] | 77.47 [76.54, 78.38] | 94.32 (Trankit large, UD 2.5; test changed) — **MISS** | 87.95 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| zh: UD_Chinese-GSDSimp | raw | CLAS | not measured | 55.70 [53.91, 57.39] | 83.23 (Trankit large, UD 2.5; test changed) — **MISS** | 67.39 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| zh: UD_Chinese-GSDSimp | raw | LAS | 58.84 [57.23, 60.35] | 58.91 [57.38, 60.42] | 84.63 (Trankit large, UD 2.5; test changed) — **MISS** | 70.65 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| zh: UD_Chinese-GSDSimp | raw | CLAS | not measured | 58.05 [56.40, 59.67] | 83.23 (Trankit large, UD 2.5; test changed) — **MISS** | 67.39 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| zh: UD_Chinese-GSDSimp | raw | LAS | 58.84 [57.23, 60.35] | 60.98 [59.49, 62.45] | 84.63 (Trankit large, UD 2.5; test changed) — **MISS** | 70.65 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | zh: UD_Chinese-GSDSimp | raw | Lemmas | 89.45 [88.61, 90.27] | 89.41 [88.61, 90.21] | 97.66 (Trankit large, UD 2.5; test changed) — **MISS** | 92.07 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| zh: UD_Chinese-GSDSimp | raw | MLAS | not measured | 47.57 [45.78, 49.21] | 79.84 (Trankit large, UD 2.5; test changed) — **MISS** | 63.96 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| zh: UD_Chinese-GSDSimp | raw | Sentences | 85.31 [82.10, 88.41] | 83.64 [80.04, 86.90] | 99.70 (Trankit base, UD 2.5; test changed) — **MISS** | 99.10 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| zh: UD_Chinese-GSDSimp | raw | MLAS | not measured | 49.33 [47.69, 50.97] | 79.84 (Trankit large, UD 2.5; test changed) — **MISS** | 63.96 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| zh: UD_Chinese-GSDSimp | raw | Sentences | 85.31 [82.10, 88.41] | 83.77 [80.32, 87.30] | 99.70 (Trankit base, UD 2.5; test changed) — **MISS** | 99.10 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | zh: UD_Chinese-GSDSimp | raw | Tokens | 89.62 [88.81, 90.43] | 89.62 [88.81, 90.43] | 97.66 (Trankit large, UD 2.5; test changed) — **MISS** | 92.14 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
-| zh: UD_Chinese-GSDSimp | raw | UAS | 62.78 [61.24, 64.26] | 62.91 [61.40, 64.43] | 87.01 (Trankit large, UD 2.5; test changed) — **MISS** | 73.41 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
+| zh: UD_Chinese-GSDSimp | raw | UAS | 62.78 [61.24, 64.26] | 64.42 [62.89, 65.87] | 87.01 (Trankit large, UD 2.5; test changed) — **MISS** | 73.41 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | zh: UD_Chinese-GSDSimp | raw | UFeats | 85.94 [85.11, 86.79] | 85.98 [85.14, 86.82] | 97.24 (Trankit large, UD 2.5; test changed) — **MISS** | 91.47 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | zh: UD_Chinese-GSDSimp | raw | UPOS | 80.96 [80.07, 81.81] | 80.66 [79.76, 81.48] | 94.99 (Trankit large, UD 2.5; test changed) — **MISS** | 88.82 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
 | zh: UD_Chinese-GSDSimp | raw | Words | 89.62 [88.81, 90.43] | 89.62 [88.81, 90.43] | 97.66 (Trankit large, UD 2.5; test changed) — **MISS** | 92.14 (Stanza 1.5.1, UD 2.12; test changed) — **MISS** |
@@ -1738,23 +1738,23 @@ Deterministic evenly spaced samples, at most 3,001 sentences per corpus. The pub
 
 ## Paired spaCy 3.8.18 comparison (information)
 
-144 rows: 113 ahead, 16 within the paired interval, 15 behind. Same gold, mode and sampled entity sentences; 1,000 paired resamples, seed 20261106. This is not the published-system gate. Positive differences favor this model.
+144 rows: 117 ahead, 14 within the paired interval, 13 behind. Same gold, mode and sampled entity sentences; 1,000 paired resamples, seed 20261106. This is not the published-system gate. Positive differences favor this model.
 
 | Language / dataset | Input | Metric | Current [95% CI] | spaCy [95% CI] | Difference [95% CI] | Verdict |
 |---|---|---|---|---|---|---|
 | de: de_gsd-ud-test | gold | UPOS | 95.78 [95.43, 96.12] | 94.59 [94.22, 94.97] | 1.19 [0.80, 1.55] | ahead |
 | de: de_gsd-ud-test | gold | UFeats | 86.58 [85.91, 87.19] | 84.71 [84.07, 85.40] | 1.87 [1.16, 2.60] | ahead |
 | de: de_gsd-ud-test | gold | Lemmas | 96.64 [96.37, 96.92] | 95.65 [95.32, 95.97] | 0.99 [0.71, 1.27] | ahead |
-| de: de_gsd-ud-test | gold | UAS | 85.90 [84.99, 86.68] | 81.88 [80.78, 82.88] | 4.02 [3.16, 4.98] | ahead |
-| de: de_gsd-ud-test | gold | LAS | 82.17 [81.24, 83.02] | 77.31 [76.19, 78.32] | 4.86 [3.98, 5.80] | ahead |
+| de: de_gsd-ud-test | gold | UAS | 87.09 [86.26, 87.84] | 81.88 [80.78, 82.88] | 5.21 [4.40, 6.16] | ahead |
+| de: de_gsd-ud-test | gold | LAS | 83.49 [82.59, 84.31] | 77.31 [76.19, 78.32] | 6.18 [5.35, 7.14] | ahead |
 | de: de_gsd-ud-test | raw | Tokens | 97.40 [97.09, 97.69] | 98.03 [97.67, 98.36] | -0.63 [-1.04, -0.21] | behind |
-| de: de_gsd-ud-test | raw | Sentences | 88.63 [86.65, 90.56] | 78.73 [76.35, 81.37] | 9.90 [7.15, 12.74] | ahead |
+| de: de_gsd-ud-test | raw | Sentences | 88.65 [86.73, 90.58] | 78.73 [76.35, 81.37] | 9.91 [7.13, 12.72] | ahead |
 | de: de_gsd-ud-test | raw | Words | 97.06 [96.70, 97.39] | 95.51 [95.03, 95.96] | 1.55 [1.22, 1.89] | ahead |
 | de: de_gsd-ud-test | raw | UPOS | 93.33 [92.87, 93.75] | 90.13 [89.52, 90.69] | 3.20 [2.76, 3.67] | ahead |
 | de: de_gsd-ud-test | raw | UFeats | 85.16 [84.51, 85.74] | 80.11 [79.31, 80.89] | 5.05 [4.33, 5.79] | ahead |
 | de: de_gsd-ud-test | raw | Lemmas | 94.07 [93.64, 94.48] | 91.28 [90.71, 91.79] | 2.80 [2.36, 3.25] | ahead |
-| de: de_gsd-ud-test | raw | UAS | 84.31 [83.43, 85.14] | 75.30 [74.13, 76.35] | 9.00 [8.09, 9.95] | ahead |
-| de: de_gsd-ud-test | raw | LAS | 81.05 [80.15, 81.88] | 70.77 [69.60, 71.89] | 10.28 [9.42, 11.21] | ahead |
+| de: de_gsd-ud-test | raw | UAS | 85.50 [84.64, 86.25] | 75.30 [74.13, 76.35] | 10.19 [9.36, 11.13] | ahead |
+| de: de_gsd-ud-test | raw | LAS | 82.38 [81.55, 83.18] | 70.77 [69.60, 71.89] | 11.61 [10.73, 12.52] | ahead |
 | en: en_ewt-ud-test | gold | UPOS | 96.49 [96.19, 96.76] | 94.29 [93.88, 94.65] | 2.20 [1.86, 2.57] | ahead |
 | en: en_ewt-ud-test | gold | UFeats | 96.37 [96.09, 96.62] | 95.18 [94.87, 95.49] | 1.19 [0.89, 1.50] | ahead |
 | en: en_ewt-ud-test | gold | Lemmas | 97.26 [97.01, 97.52] | 95.80 [95.45, 96.12] | 1.47 [1.21, 1.76] | ahead |
@@ -1771,29 +1771,29 @@ Deterministic evenly spaced samples, at most 3,001 sentences per corpus. The pub
 | es: es_ancora-ud-test | gold | UPOS | 98.00 [97.87, 98.14] | 98.18 [98.03, 98.32] | -0.18 [-0.33, -0.03] | behind |
 | es: es_ancora-ud-test | gold | UFeats | 96.74 [96.58, 96.91] | 97.74 [97.58, 97.89] | -1.00 [-1.17, -0.83] | behind |
 | es: es_ancora-ud-test | gold | Lemmas | 98.53 [98.42, 98.64] | 98.72 [98.60, 98.83] | -0.19 [-0.30, -0.07] | behind |
-| es: es_ancora-ud-test | gold | UAS | 87.61 [87.18, 88.08] | 89.04 [88.53, 89.51] | -1.44 [-1.87, -0.97] | behind |
-| es: es_ancora-ud-test | gold | LAS | 84.66 [84.20, 85.15] | 85.95 [85.40, 86.43] | -1.29 [-1.77, -0.81] | behind |
+| es: es_ancora-ud-test | gold | UAS | 89.50 [89.08, 89.94] | 89.04 [88.53, 89.51] | 0.46 [0.02, 0.91] | ahead |
+| es: es_ancora-ud-test | gold | LAS | 86.97 [86.51, 87.42] | 85.95 [85.40, 86.43] | 1.03 [0.56, 1.50] | ahead |
 | es: es_ancora-ud-test | raw | Tokens | 99.84 [99.76, 99.90] | 99.90 [99.85, 99.94] | -0.06 [-0.13, 0.01] | within |
-| es: es_ancora-ud-test | raw | Sentences | 96.54 [95.70, 97.31] | 97.70 [96.94, 98.43] | -1.16 [-2.14, -0.21] | behind |
+| es: es_ancora-ud-test | raw | Sentences | 97.05 [96.24, 97.78] | 97.70 [96.94, 98.43] | -0.66 [-1.59, 0.28] | within |
 | es: es_ancora-ud-test | raw | Words | 99.83 [99.75, 99.89] | 96.60 [96.38, 96.80] | 3.23 [3.02, 3.45] | ahead |
 | es: es_ancora-ud-test | raw | UPOS | 98.20 [98.07, 98.34] | 94.81 [94.55, 95.05] | 3.40 [3.15, 3.64] | ahead |
 | es: es_ancora-ud-test | raw | UFeats | 96.83 [96.66, 96.99] | 94.57 [94.32, 94.81] | 2.25 [2.01, 2.50] | ahead |
 | es: es_ancora-ud-test | raw | Lemmas | 98.58 [98.46, 98.70] | 95.37 [95.13, 95.59] | 3.21 [2.98, 3.45] | ahead |
-| es: es_ancora-ud-test | raw | UAS | 90.92 [90.49, 91.33] | 84.87 [84.27, 85.43] | 6.05 [5.58, 6.58] | ahead |
-| es: es_ancora-ud-test | raw | LAS | 88.35 [87.88, 88.78] | 81.82 [81.22, 82.40] | 6.54 [6.06, 7.06] | ahead |
+| es: es_ancora-ud-test | raw | UAS | 91.93 [91.49, 92.31] | 84.87 [84.27, 85.43] | 7.06 [6.56, 7.55] | ahead |
+| es: es_ancora-ud-test | raw | LAS | 89.70 [89.24, 90.11] | 81.82 [81.22, 82.40] | 7.89 [7.37, 8.38] | ahead |
 | fr: fr_gsd-ud-test | gold | UPOS | 96.99 [96.60, 97.39] | 97.07 [96.68, 97.47] | -0.09 [-0.49, 0.34] | within |
 | fr: fr_gsd-ud-test | gold | UFeats | 96.06 [95.58, 96.49] | 96.41 [95.93, 96.85] | -0.35 [-0.90, 0.19] | within |
 | fr: fr_gsd-ud-test | gold | Lemmas | 98.03 [97.72, 98.31] | 97.49 [97.13, 97.81] | 0.54 [0.22, 0.88] | ahead |
-| fr: fr_gsd-ud-test | gold | UAS | 88.98 [88.06, 89.81] | 89.10 [88.14, 90.12] | -0.12 [-1.11, 0.96] | within |
-| fr: fr_gsd-ud-test | gold | LAS | 85.83 [84.90, 86.72] | 85.98 [84.84, 87.07] | -0.15 [-1.19, 0.91] | within |
+| fr: fr_gsd-ud-test | gold | UAS | 89.52 [88.61, 90.43] | 89.10 [88.14, 90.12] | 0.42 [-0.58, 1.43] | within |
+| fr: fr_gsd-ud-test | gold | LAS | 86.89 [85.93, 87.88] | 85.98 [84.84, 87.07] | 0.91 [-0.11, 1.95] | within |
 | fr: fr_gsd-ud-test | raw | Tokens | 99.88 [99.79, 99.96] | 98.85 [98.49, 99.16] | 1.02 [0.74, 1.37] | ahead |
-| fr: fr_gsd-ud-test | raw | Sentences | 92.18 [89.49, 94.59] | 91.82 [89.08, 94.23] | 0.36 [-1.99, 2.86] | within |
+| fr: fr_gsd-ud-test | raw | Sentences | 92.65 [90.07, 94.98] | 91.82 [89.08, 94.23] | 0.83 [-1.20, 3.09] | within |
 | fr: fr_gsd-ud-test | raw | Words | 99.48 [99.29, 99.65] | 94.64 [94.01, 95.17] | 4.83 [4.31, 5.44] | ahead |
 | fr: fr_gsd-ud-test | raw | UPOS | 97.10 [96.71, 97.46] | 91.80 [91.06, 92.46] | 5.30 [4.66, 6.01] | ahead |
 | fr: fr_gsd-ud-test | raw | UFeats | 96.26 [95.82, 96.68] | 91.16 [90.40, 91.86] | 5.11 [4.40, 5.91] | ahead |
 | fr: fr_gsd-ud-test | raw | Lemmas | 97.96 [97.64, 98.25] | 92.20 [91.44, 92.88] | 5.76 [5.13, 6.48] | ahead |
-| fr: fr_gsd-ud-test | raw | UAS | 91.34 [90.43, 92.18] | 81.64 [80.34, 82.90] | 9.69 [8.61, 10.88] | ahead |
-| fr: fr_gsd-ud-test | raw | LAS | 88.96 [88.02, 89.84] | 78.10 [76.76, 79.31] | 10.86 [9.73, 12.09] | ahead |
+| fr: fr_gsd-ud-test | raw | UAS | 91.97 [91.12, 92.76] | 81.64 [80.34, 82.90] | 10.33 [9.24, 11.53] | ahead |
+| fr: fr_gsd-ud-test | raw | LAS | 89.78 [88.84, 90.63] | 78.10 [76.76, 79.31] | 11.68 [10.48, 12.84] | ahead |
 | it: it_markit-ud-test | gold | UPOS | 95.81 [95.39, 96.26] | 92.20 [91.61, 92.77] | 3.61 [3.05, 4.19] | ahead |
 | it: it_markit-ud-test | gold | UFeats | 92.12 [91.51, 92.73] | 90.11 [89.46, 90.77] | 2.01 [1.47, 2.63] | ahead |
 | it: it_markit-ud-test | gold | Lemmas | 86.38 [85.63, 87.08] | 83.80 [82.97, 84.52] | 2.58 [2.15, 3.03] | ahead |
@@ -1837,52 +1837,244 @@ Deterministic evenly spaced samples, at most 3,001 sentences per corpus. The pub
 | nl: nl_alpino-ud-test | gold | UPOS | 96.91 [96.21, 97.44] | 94.42 [93.78, 95.02] | 2.49 [2.00, 3.00] | ahead |
 | nl: nl_alpino-ud-test | gold | UFeats | 96.62 [96.06, 97.12] | 93.13 [92.47, 93.70] | 3.49 [3.04, 3.95] | ahead |
 | nl: nl_alpino-ud-test | gold | Lemmas | 92.34 [91.80, 92.92] | 91.83 [91.24, 92.37] | 0.52 [0.15, 0.91] | ahead |
-| nl: nl_alpino-ud-test | gold | UAS | 87.18 [86.11, 88.11] | 84.09 [82.87, 85.31] | 3.09 [1.99, 4.23] | ahead |
-| nl: nl_alpino-ud-test | gold | LAS | 83.40 [82.24, 84.47] | 79.85 [78.57, 81.13] | 3.55 [2.28, 4.74] | ahead |
+| nl: nl_alpino-ud-test | gold | UAS | 90.23 [89.24, 91.11] | 84.09 [82.87, 85.31] | 6.14 [5.08, 7.25] | ahead |
+| nl: nl_alpino-ud-test | gold | LAS | 87.24 [86.15, 88.24] | 79.85 [78.57, 81.13] | 7.40 [6.20, 8.55] | ahead |
 | nl: nl_alpino-ud-test | raw | Tokens | 99.66 [99.46, 99.82] | 99.82 [99.70, 99.93] | -0.16 [-0.34, 0.01] | within |
-| nl: nl_alpino-ud-test | raw | Sentences | 95.56 [94.03, 97.03] | 89.60 [86.73, 92.03] | 5.95 [3.52, 8.72] | ahead |
+| nl: nl_alpino-ud-test | raw | Sentences | 95.90 [94.35, 97.34] | 89.60 [86.73, 92.03] | 6.30 [3.78, 9.05] | ahead |
 | nl: nl_alpino-ud-test | raw | Words | 99.66 [99.46, 99.82] | 99.82 [99.70, 99.93] | -0.16 [-0.34, 0.01] | within |
 | nl: nl_alpino-ud-test | raw | UPOS | 96.74 [96.11, 97.27] | 94.36 [93.70, 94.95] | 2.38 [1.88, 2.89] | ahead |
 | nl: nl_alpino-ud-test | raw | UFeats | 96.80 [96.29, 97.28] | 92.97 [92.32, 93.58] | 3.83 [3.33, 4.36] | ahead |
 | nl: nl_alpino-ud-test | raw | Lemmas | 92.05 [91.49, 92.67] | 91.65 [91.06, 92.23] | 0.40 [0.01, 0.86] | ahead |
-| nl: nl_alpino-ud-test | raw | UAS | 91.93 [91.05, 92.69] | 83.70 [82.50, 84.92] | 8.23 [7.09, 9.32] | ahead |
-| nl: nl_alpino-ud-test | raw | LAS | 89.09 [88.06, 89.97] | 79.57 [78.38, 80.82] | 9.52 [8.37, 10.60] | ahead |
+| nl: nl_alpino-ud-test | raw | UAS | 93.37 [92.55, 94.08] | 83.70 [82.50, 84.92] | 9.67 [8.60, 10.84] | ahead |
+| nl: nl_alpino-ud-test | raw | LAS | 91.11 [90.20, 91.92] | 79.57 [78.38, 80.82] | 11.54 [10.38, 12.58] | ahead |
 | pt: pt_bosque-ud-test | gold | UPOS | 96.10 [95.82, 96.36] | 95.92 [95.66, 96.19] | 0.18 [-0.12, 0.45] | within |
 | pt: pt_bosque-ud-test | gold | UFeats | 94.48 [94.16, 94.80] | 94.11 [93.79, 94.41] | 0.37 [0.04, 0.68] | ahead |
 | pt: pt_bosque-ud-test | gold | Lemmas | 97.59 [97.39, 97.79] | 96.90 [96.69, 97.10] | 0.69 [0.50, 0.90] | ahead |
-| pt: pt_bosque-ud-test | gold | UAS | 85.88 [85.20, 86.50] | 86.05 [85.48, 86.64] | -0.18 [-0.91, 0.52] | within |
-| pt: pt_bosque-ud-test | gold | LAS | 81.83 [81.11, 82.53] | 81.96 [81.32, 82.63] | -0.13 [-0.86, 0.63] | within |
+| pt: pt_bosque-ud-test | gold | UAS | 88.22 [87.63, 88.77] | 86.05 [85.48, 86.64] | 2.17 [1.54, 2.81] | ahead |
+| pt: pt_bosque-ud-test | gold | LAS | 84.54 [83.90, 85.14] | 81.96 [81.32, 82.63] | 2.58 [1.95, 3.26] | ahead |
 | pt: pt_bosque-ud-test | raw | Tokens | 99.86 [99.79, 99.92] | 99.87 [99.80, 99.93] | -0.01 [-0.06, 0.05] | within |
-| pt: pt_bosque-ud-test | raw | Sentences | 92.57 [91.08, 93.99] | 84.48 [82.18, 86.78] | 8.09 [5.51, 10.52] | ahead |
+| pt: pt_bosque-ud-test | raw | Sentences | 93.50 [92.14, 94.81] | 84.48 [82.18, 86.78] | 9.02 [6.41, 11.50] | ahead |
 | pt: pt_bosque-ud-test | raw | Words | 99.26 [99.14, 99.38] | 88.51 [88.07, 88.99] | 10.76 [10.24, 11.20] | ahead |
 | pt: pt_bosque-ud-test | raw | UPOS | 96.75 [96.50, 96.98] | 84.15 [83.63, 84.67] | 12.60 [12.06, 13.09] | ahead |
 | pt: pt_bosque-ud-test | raw | UFeats | 95.19 [94.90, 95.48] | 82.16 [81.65, 82.69] | 13.03 [12.45, 13.58] | ahead |
 | pt: pt_bosque-ud-test | raw | Lemmas | 97.29 [97.09, 97.50] | 85.35 [84.89, 85.85] | 11.94 [11.47, 12.38] | ahead |
-| pt: pt_bosque-ud-test | raw | UAS | 89.73 [89.18, 90.26] | 70.23 [69.40, 71.06] | 19.50 [18.59, 20.36] | ahead |
-| pt: pt_bosque-ud-test | raw | LAS | 86.86 [86.27, 87.44] | 65.85 [65.01, 66.74] | 21.01 [20.09, 21.90] | ahead |
+| pt: pt_bosque-ud-test | raw | UAS | 90.68 [90.16, 91.19] | 70.23 [69.40, 71.06] | 20.45 [19.54, 21.32] | ahead |
+| pt: pt_bosque-ud-test | raw | LAS | 87.98 [87.39, 88.55] | 65.85 [65.01, 66.74] | 22.12 [21.20, 23.03] | ahead |
 | tr: tr_boun-ud-test | gold | UPOS | 91.28 [90.72, 91.81] | 88.04 [87.40, 88.67] | 3.24 [2.56, 3.86] | ahead |
 | tr: tr_boun-ud-test | gold | UFeats | 80.29 [79.54, 81.01] | 78.30 [77.53, 79.14] | 2.00 [1.32, 2.67] | ahead |
 | tr: tr_boun-ud-test | gold | Lemmas | 86.00 [85.31, 86.61] | 80.24 [79.46, 80.94] | 5.76 [5.11, 6.36] | ahead |
-| tr: tr_boun-ud-test | gold | UAS | 72.36 [70.98, 73.75] | 67.44 [66.03, 68.71] | 4.92 [3.62, 6.30] | ahead |
-| tr: tr_boun-ud-test | gold | LAS | 64.97 [63.60, 66.26] | 57.87 [56.54, 59.16] | 7.10 [5.83, 8.34] | ahead |
+| tr: tr_boun-ud-test | gold | UAS | 74.44 [73.05, 75.76] | 67.44 [66.03, 68.71] | 7.00 [5.68, 8.35] | ahead |
+| tr: tr_boun-ud-test | gold | LAS | 67.13 [65.67, 68.45] | 57.87 [56.54, 59.16] | 9.25 [7.98, 10.53] | ahead |
 | tr: tr_boun-ud-test | raw | Tokens | 99.56 [99.41, 99.71] | 99.42 [99.26, 99.60] | 0.14 [0.00, 0.27] | ahead |
-| tr: tr_boun-ud-test | raw | Sentences | 79.89 [77.32, 82.20] | 82.09 [79.45, 84.67] | -2.20 [-5.10, 0.60] | within |
+| tr: tr_boun-ud-test | raw | Sentences | 78.82 [76.14, 81.22] | 82.09 [79.45, 84.67] | -3.28 [-6.27, -0.42] | behind |
 | tr: tr_boun-ud-test | raw | Words | 96.71 [96.34, 97.08] | 97.06 [96.71, 97.41] | -0.35 [-0.70, 0.02] | within |
 | tr: tr_boun-ud-test | raw | UPOS | 88.62 [87.99, 89.32] | 86.82 [86.12, 87.52] | 1.80 [1.14, 2.48] | ahead |
 | tr: tr_boun-ud-test | raw | UFeats | 80.23 [79.44, 81.03] | 77.20 [76.40, 78.07] | 3.02 [2.35, 3.70] | ahead |
 | tr: tr_boun-ud-test | raw | Lemmas | 84.42 [83.71, 85.09] | 78.83 [78.04, 79.58] | 5.59 [4.98, 6.21] | ahead |
-| tr: tr_boun-ud-test | raw | UAS | 69.30 [67.85, 70.58] | 63.96 [62.51, 65.35] | 5.34 [4.02, 6.72] | ahead |
-| tr: tr_boun-ud-test | raw | LAS | 62.33 [60.88, 63.71] | 55.86 [54.49, 57.22] | 6.47 [5.24, 7.72] | ahead |
+| tr: tr_boun-ud-test | raw | UAS | 71.15 [69.82, 72.44] | 63.96 [62.51, 65.35] | 7.19 [5.92, 8.56] | ahead |
+| tr: tr_boun-ud-test | raw | LAS | 64.31 [62.89, 65.78] | 55.86 [54.49, 57.22] | 8.45 [7.26, 9.75] | ahead |
 | zh: zh_gsdsimp-ud-test | gold | UPOS | 87.55 [86.92, 88.22] | 90.35 [89.68, 91.02] | -2.80 [-3.57, -1.97] | behind |
 | zh: zh_gsdsimp-ud-test | gold | UFeats | 95.86 [95.48, 96.23] | 98.43 [98.21, 98.64] | -2.57 [-2.98, -2.17] | behind |
 | zh: zh_gsdsimp-ud-test | gold | Lemmas | 99.78 [99.67, 99.86] | 99.91 [99.84, 99.96] | -0.13 [-0.22, -0.05] | behind |
-| zh: zh_gsdsimp-ud-test | gold | UAS | 64.08 [62.81, 65.38] | 73.11 [71.58, 74.68] | -9.03 [-10.90, -7.24] | behind |
-| zh: zh_gsdsimp-ud-test | gold | LAS | 57.55 [56.30, 58.83] | 68.24 [66.60, 69.90] | -10.69 [-12.50, -8.78] | behind |
+| zh: zh_gsdsimp-ud-test | gold | UAS | 67.22 [66.03, 68.48] | 73.11 [71.58, 74.68] | -5.89 [-7.60, -4.07] | behind |
+| zh: zh_gsdsimp-ud-test | gold | LAS | 61.42 [60.21, 62.70] | 68.24 [66.60, 69.90] | -6.83 [-8.61, -4.99] | behind |
 | zh: zh_gsdsimp-ud-test | raw | Tokens | 89.62 [88.81, 90.43] | 39.43 [38.65, 40.19] | 50.19 [48.99, 51.37] | ahead |
-| zh: zh_gsdsimp-ud-test | raw | Sentences | 83.64 [80.04, 86.90] | 46.93 [42.54, 51.47] | 36.70 [31.22, 42.43] | ahead |
+| zh: zh_gsdsimp-ud-test | raw | Sentences | 83.77 [80.32, 87.30] | 46.93 [42.54, 51.47] | 36.84 [31.24, 42.38] | ahead |
 | zh: zh_gsdsimp-ud-test | raw | Words | 89.62 [88.81, 90.43] | 39.43 [38.65, 40.19] | 50.19 [48.99, 51.37] | ahead |
 | zh: zh_gsdsimp-ud-test | raw | UPOS | 80.66 [79.76, 81.48] | 34.92 [34.21, 35.61] | 45.73 [44.63, 46.91] | ahead |
 | zh: zh_gsdsimp-ud-test | raw | UFeats | 85.98 [85.14, 86.82] | 38.38 [37.61, 39.14] | 47.60 [46.37, 48.85] | ahead |
 | zh: zh_gsdsimp-ud-test | raw | Lemmas | 89.41 [88.61, 90.21] | 39.43 [38.65, 40.19] | 49.97 [48.77, 51.15] | ahead |
-| zh: zh_gsdsimp-ud-test | raw | UAS | 62.91 [61.40, 64.43] | 9.12 [8.48, 9.79] | 53.79 [52.10, 55.57] | ahead |
-| zh: zh_gsdsimp-ud-test | raw | LAS | 58.91 [57.38, 60.42] | 8.59 [7.96, 9.24] | 50.32 [48.71, 52.09] | ahead |
+| zh: zh_gsdsimp-ud-test | raw | UAS | 64.42 [62.89, 65.87] | 9.12 [8.48, 9.79] | 55.29 [53.62, 57.00] | ahead |
+| zh: zh_gsdsimp-ud-test | raw | LAS | 60.98 [59.49, 62.45] | 8.59 [7.96, 9.24] | 52.38 [50.74, 54.05] | ahead |
+
+## Frozen-encoder parser recovery: original nine languages
+
+English and Italian retain their exact previous files and reuse the corresponding previous test results. The other seven final heads were read once in each input mode after development selection; no test-driven continuation. Other heads, the encoder and all other languages are unchanged. Intervals use 1,000 resamples, seed 20261106.
+
+| Dataset | Input | Metric | Earlier nine-language model [95% CI] | Joint 84-language model [95% CI] | After parser recovery [95% CI] |
+|---|---|---|---|---|---|
+| de_gsd-ud-test | gold | UPOS | 96.16 [95.83, 96.49] | 95.78 [95.43, 96.12] | 95.78 [95.43, 96.12] |
+| de_gsd-ud-test | gold | XPOS | 96.07 [95.71, 96.43] | 95.84 [95.48, 96.19] | 95.84 [95.48, 96.19] |
+| de_gsd-ud-test | gold | AllTags | 83.34 [82.57, 84.04] | 83.09 [82.34, 83.75] | 83.09 [82.34, 83.75] |
+| de_gsd-ud-test | gold | UFeats | 86.81 [86.11, 87.44] | 86.58 [85.91, 87.19] | 86.58 [85.91, 87.19] |
+| de_gsd-ud-test | gold | Lemmas | 96.25 [95.95, 96.53] | 96.64 [96.37, 96.92] | 96.64 [96.37, 96.92] |
+| de_gsd-ud-test | gold | UAS | 87.01 [86.18, 87.75] | 85.90 [84.99, 86.68] | 87.09 [86.26, 87.84] |
+| de_gsd-ud-test | gold | LAS | 83.32 [82.43, 84.17] | 82.17 [81.24, 83.02] | 83.49 [82.59, 84.31] |
+| de_gsd-ud-test | gold | CLAS | not measured | 77.15 [76.03, 78.29] | 78.67 [77.54, 79.74] |
+| de_gsd-ud-test | gold | MLAS | not measured | 58.17 [56.95, 59.56] | 59.58 [58.38, 60.86] |
+| de_gsd-ud-test | raw | Tokens | 97.40 [97.09, 97.69] | 97.40 [97.09, 97.69] | 97.40 [97.09, 97.69] |
+| de_gsd-ud-test | raw | Sentences | 88.70 [86.70, 90.74] | 88.63 [86.65, 90.56] | 88.65 [86.73, 90.58] |
+| de_gsd-ud-test | raw | Words | 97.06 [96.70, 97.39] | 97.06 [96.70, 97.39] | 97.06 [96.70, 97.39] |
+| de_gsd-ud-test | raw | UPOS | 93.27 [92.79, 93.69] | 93.33 [92.87, 93.75] | 93.33 [92.87, 93.75] |
+| de_gsd-ud-test | raw | XPOS | 93.38 [92.91, 93.83] | 93.35 [92.91, 93.79] | 93.35 [92.91, 93.79] |
+| de_gsd-ud-test | raw | AllTags | 81.04 [80.35, 81.70] | 81.69 [80.99, 82.33] | 81.69 [80.99, 82.33] |
+| de_gsd-ud-test | raw | UFeats | 84.39 [83.77, 85.03] | 85.16 [84.51, 85.74] | 85.16 [84.51, 85.74] |
+| de_gsd-ud-test | raw | Lemmas | 93.36 [92.90, 93.78] | 94.07 [93.64, 94.48] | 94.07 [93.64, 94.48] |
+| de_gsd-ud-test | raw | UAS | 84.71 [83.86, 85.52] | 84.31 [83.43, 85.14] | 85.50 [84.64, 86.25] |
+| de_gsd-ud-test | raw | LAS | 81.17 [80.27, 82.00] | 81.05 [80.15, 81.88] | 82.38 [81.55, 83.18] |
+| de_gsd-ud-test | raw | CLAS | not measured | 79.72 [78.63, 80.79] | 81.12 [80.13, 82.07] |
+| de_gsd-ud-test | raw | MLAS | not measured | 59.29 [58.13, 60.48] | 60.36 [59.24, 61.44] |
+| en_ewt-ud-test | gold | UPOS | 96.58 [96.26, 96.86] | 96.49 [96.19, 96.76] | 96.49 [96.19, 96.76] |
+| en_ewt-ud-test | gold | XPOS | 96.02 [95.69, 96.32] | 95.73 [95.40, 96.04] | 95.73 [95.40, 96.04] |
+| en_ewt-ud-test | gold | AllTags | 93.66 [93.25, 94.02] | 93.47 [93.07, 93.83] | 93.47 [93.07, 93.83] |
+| en_ewt-ud-test | gold | UFeats | 96.44 [96.17, 96.69] | 96.37 [96.09, 96.62] | 96.37 [96.09, 96.62] |
+| en_ewt-ud-test | gold | Lemmas | 97.09 [96.81, 97.36] | 97.26 [97.01, 97.52] | 97.26 [97.01, 97.52] |
+| en_ewt-ud-test | gold | UAS | 88.56 [87.81, 89.26] | 88.34 [87.65, 89.01] | 88.34 [87.65, 89.01] |
+| en_ewt-ud-test | gold | LAS | 85.43 [84.61, 86.19] | 85.12 [84.40, 85.87] | 85.12 [84.40, 85.87] |
+| en_ewt-ud-test | gold | CLAS | not measured | 81.48 [80.57, 82.45] | 81.48 [80.57, 82.45] |
+| en_ewt-ud-test | gold | MLAS | not measured | 75.10 [74.10, 76.11] | 75.10 [74.10, 76.11] |
+| en_ewt-ud-test | raw | Tokens | 97.13 [96.83, 97.43] | 97.13 [96.83, 97.43] | 97.13 [96.83, 97.43] |
+| en_ewt-ud-test | raw | Sentences | 75.28 [73.54, 77.14] | 75.85 [74.20, 77.60] | 75.85 [74.20, 77.60] |
+| en_ewt-ud-test | raw | Words | 98.68 [98.45, 98.90] | 98.68 [98.45, 98.90] | 98.68 [98.45, 98.90] |
+| en_ewt-ud-test | raw | UPOS | 95.95 [95.59, 96.29] | 95.95 [95.59, 96.27] | 95.95 [95.59, 96.27] |
+| en_ewt-ud-test | raw | XPOS | 95.22 [94.83, 95.58] | 95.18 [94.78, 95.54] | 95.18 [94.78, 95.54] |
+| en_ewt-ud-test | raw | AllTags | 93.14 [92.69, 93.57] | 93.39 [92.93, 93.80] | 93.39 [92.93, 93.80] |
+| en_ewt-ud-test | raw | UFeats | 95.76 [95.42, 96.07] | 95.94 [95.61, 96.27] | 95.94 [95.61, 96.27] |
+| en_ewt-ud-test | raw | Lemmas | 96.14 [95.81, 96.48] | 96.39 [96.04, 96.74] | 96.39 [96.04, 96.74] |
+| en_ewt-ud-test | raw | UAS | 87.32 [86.58, 88.01] | 88.78 [88.07, 89.47] | 88.78 [88.07, 89.47] |
+| en_ewt-ud-test | raw | LAS | 85.02 [84.25, 85.77] | 86.55 [85.82, 87.26] | 86.55 [85.82, 87.26] |
+| en_ewt-ud-test | raw | CLAS | not measured | 83.38 [82.51, 84.30] | 83.38 [82.51, 84.30] |
+| en_ewt-ud-test | raw | MLAS | not measured | 78.46 [77.50, 79.41] | 78.46 [77.50, 79.41] |
+| es_ancora-ud-test | gold | UPOS | 98.10 [97.98, 98.24] | 98.00 [97.87, 98.14] | 98.00 [97.87, 98.14] |
+| es_ancora-ud-test | gold | XPOS | 84.88 [84.41, 85.31] | 84.37 [83.90, 84.82] | 84.37 [83.90, 84.82] |
+| es_ancora-ud-test | gold | AllTags | 83.67 [83.20, 84.13] | 83.21 [82.74, 83.67] | 83.21 [82.74, 83.67] |
+| es_ancora-ud-test | gold | UFeats | 96.50 [96.33, 96.66] | 96.74 [96.58, 96.91] | 96.74 [96.58, 96.91] |
+| es_ancora-ud-test | gold | Lemmas | 97.72 [97.58, 97.85] | 98.53 [98.42, 98.64] | 98.53 [98.42, 98.64] |
+| es_ancora-ud-test | gold | UAS | 88.14 [87.68, 88.63] | 87.61 [87.18, 88.08] | 89.50 [89.08, 89.94] |
+| es_ancora-ud-test | gold | LAS | 85.37 [84.89, 85.88] | 84.66 [84.20, 85.15] | 86.97 [86.51, 87.42] |
+| es_ancora-ud-test | gold | CLAS | not measured | 79.49 [78.89, 80.12] | 82.53 [81.95, 83.14] |
+| es_ancora-ud-test | gold | MLAS | not measured | 72.39 [71.73, 73.14] | 75.87 [75.23, 76.53] |
+| es_ancora-ud-test | raw | Tokens | 99.84 [99.76, 99.90] | 99.84 [99.76, 99.90] | 99.84 [99.76, 99.90] |
+| es_ancora-ud-test | raw | Sentences | 96.66 [95.79, 97.49] | 96.54 [95.70, 97.31] | 97.05 [96.24, 97.78] |
+| es_ancora-ud-test | raw | Words | 99.83 [99.75, 99.89] | 99.83 [99.75, 99.89] | 99.83 [99.75, 99.89] |
+| es_ancora-ud-test | raw | UPOS | 98.09 [97.96, 98.24] | 98.20 [98.07, 98.34] | 98.20 [98.07, 98.34] |
+| es_ancora-ud-test | raw | XPOS | 85.63 [85.17, 86.09] | 85.87 [85.43, 86.33] | 85.87 [85.43, 86.33] |
+| es_ancora-ud-test | raw | AllTags | 84.50 [84.05, 84.94] | 84.84 [84.40, 85.29] | 84.84 [84.40, 85.29] |
+| es_ancora-ud-test | raw | UFeats | 96.57 [96.40, 96.73] | 96.83 [96.66, 96.99] | 96.83 [96.66, 96.99] |
+| es_ancora-ud-test | raw | Lemmas | 97.75 [97.61, 97.89] | 98.58 [98.46, 98.70] | 98.58 [98.46, 98.70] |
+| es_ancora-ud-test | raw | UAS | 90.08 [89.60, 90.51] | 90.92 [90.49, 91.33] | 91.93 [91.49, 92.31] |
+| es_ancora-ud-test | raw | LAS | 87.42 [86.90, 87.92] | 88.35 [87.88, 88.78] | 89.70 [89.24, 90.11] |
+| es_ancora-ud-test | raw | CLAS | not measured | 84.50 [83.92, 85.06] | 86.36 [85.78, 86.89] |
+| es_ancora-ud-test | raw | MLAS | not measured | 78.68 [78.03, 79.32] | 80.63 [79.97, 81.23] |
+| fr_gsd-ud-test | gold | UPOS | 97.21 [96.82, 97.58] | 96.99 [96.60, 97.39] | 96.99 [96.60, 97.39] |
+| fr_gsd-ud-test | gold | UFeats | 96.24 [95.75, 96.67] | 96.06 [95.58, 96.49] | 96.06 [95.58, 96.49] |
+| fr_gsd-ud-test | gold | Lemmas | 97.56 [97.23, 97.88] | 98.03 [97.72, 98.31] | 98.03 [97.72, 98.31] |
+| fr_gsd-ud-test | gold | UAS | 89.36 [88.49, 90.23] | 88.98 [88.06, 89.81] | 89.52 [88.61, 90.43] |
+| fr_gsd-ud-test | gold | LAS | 86.55 [85.57, 87.49] | 85.83 [84.90, 86.72] | 86.89 [85.93, 87.88] |
+| fr_gsd-ud-test | gold | CLAS | not measured | 80.98 [79.72, 82.20] | 82.47 [81.26, 83.85] |
+| fr_gsd-ud-test | gold | MLAS | not measured | 73.78 [72.25, 75.26] | 75.00 [73.45, 76.63] |
+| fr_gsd-ud-test | raw | Tokens | 99.88 [99.79, 99.96] | 99.88 [99.79, 99.96] | 99.88 [99.79, 99.96] |
+| fr_gsd-ud-test | raw | Sentences | 92.40 [89.74, 94.66] | 92.18 [89.49, 94.59] | 92.65 [90.07, 94.98] |
+| fr_gsd-ud-test | raw | Words | 99.48 [99.29, 99.65] | 99.48 [99.29, 99.65] | 99.48 [99.29, 99.65] |
+| fr_gsd-ud-test | raw | UPOS | 97.06 [96.71, 97.42] | 97.10 [96.71, 97.46] | 97.10 [96.71, 97.46] |
+| fr_gsd-ud-test | raw | UFeats | 96.07 [95.59, 96.52] | 96.26 [95.82, 96.68] | 96.26 [95.82, 96.68] |
+| fr_gsd-ud-test | raw | Lemmas | 97.42 [97.09, 97.77] | 97.96 [97.64, 98.25] | 97.96 [97.64, 98.25] |
+| fr_gsd-ud-test | raw | UAS | 90.67 [89.74, 91.58] | 91.34 [90.43, 92.18] | 91.97 [91.12, 92.76] |
+| fr_gsd-ud-test | raw | LAS | 88.07 [87.07, 89.05] | 88.96 [88.02, 89.84] | 89.78 [88.84, 90.63] |
+| fr_gsd-ud-test | raw | CLAS | not measured | 85.67 [84.45, 86.80] | 86.65 [85.41, 87.83] |
+| fr_gsd-ud-test | raw | MLAS | not measured | 79.66 [78.13, 81.14] | 80.57 [79.06, 81.91] |
+| it_markit-ud-test | gold | UPOS | 95.69 [95.26, 96.12] | 95.81 [95.39, 96.26] | 95.81 [95.39, 96.26] |
+| it_markit-ud-test | gold | XPOS | 96.31 [95.90, 96.68] | 96.26 [95.87, 96.66] | 96.26 [95.87, 96.66] |
+| it_markit-ud-test | gold | AllTags | 89.51 [88.83, 90.21] | 89.79 [89.12, 90.43] | 89.79 [89.12, 90.43] |
+| it_markit-ud-test | gold | UFeats | 91.91 [91.27, 92.50] | 92.12 [91.51, 92.73] | 92.12 [91.51, 92.73] |
+| it_markit-ud-test | gold | Lemmas | 86.37 [85.60, 87.06] | 86.38 [85.63, 87.08] | 86.38 [85.63, 87.08] |
+| it_markit-ud-test | gold | UAS | 81.82 [80.77, 82.86] | 82.05 [81.01, 83.15] | 82.05 [81.01, 83.15] |
+| it_markit-ud-test | gold | LAS | 77.27 [76.19, 78.38] | 77.63 [76.52, 78.78] | 77.63 [76.52, 78.78] |
+| it_markit-ud-test | gold | CLAS | not measured | 72.13 [70.70, 73.64] | 72.13 [70.70, 73.64] |
+| it_markit-ud-test | gold | MLAS | not measured | 57.58 [56.03, 59.25] | 57.58 [56.03, 59.25] |
+| it_markit-ud-test | raw | Tokens | 99.93 [99.86, 99.98] | 99.93 [99.86, 99.98] | 99.93 [99.86, 99.98] |
+| it_markit-ud-test | raw | Sentences | 90.61 [87.84, 93.57] | 90.11 [87.27, 92.93] | 90.11 [87.27, 92.93] |
+| it_markit-ud-test | raw | Words | 99.73 [99.58, 99.86] | 99.73 [99.58, 99.86] | 99.73 [99.58, 99.86] |
+| it_markit-ud-test | raw | UPOS | 95.98 [95.54, 96.36] | 96.12 [95.75, 96.52] | 96.12 [95.75, 96.52] |
+| it_markit-ud-test | raw | XPOS | 96.56 [96.18, 96.92] | 96.45 [96.05, 96.80] | 96.45 [96.05, 96.80] |
+| it_markit-ud-test | raw | AllTags | 90.13 [89.50, 90.80] | 90.50 [89.88, 91.10] | 90.50 [89.88, 91.10] |
+| it_markit-ud-test | raw | UFeats | 92.40 [91.81, 93.01] | 92.84 [92.29, 93.42] | 92.84 [92.29, 93.42] |
+| it_markit-ud-test | raw | Lemmas | 86.46 [85.69, 87.17] | 86.65 [85.93, 87.35] | 86.65 [85.93, 87.35] |
+| it_markit-ud-test | raw | UAS | 85.40 [84.26, 86.44] | 86.39 [85.36, 87.29] | 86.39 [85.36, 87.29] |
+| it_markit-ud-test | raw | LAS | 81.12 [79.93, 82.18] | 82.22 [81.04, 83.28] | 82.22 [81.04, 83.28] |
+| it_markit-ud-test | raw | CLAS | not measured | 77.84 [76.30, 79.29] | 77.84 [76.30, 79.29] |
+| it_markit-ud-test | raw | MLAS | not measured | 64.34 [62.76, 65.86] | 64.34 [62.76, 65.86] |
+| nl_alpino-ud-test | gold | UPOS | 96.89 [96.24, 97.44] | 96.91 [96.21, 97.44] | 96.91 [96.21, 97.44] |
+| nl_alpino-ud-test | gold | XPOS | 95.09 [94.32, 95.77] | 95.05 [94.26, 95.72] | 95.05 [94.26, 95.72] |
+| nl_alpino-ud-test | gold | AllTags | 94.31 [93.48, 95.00] | 94.13 [93.32, 94.87] | 94.13 [93.32, 94.87] |
+| nl_alpino-ud-test | gold | UFeats | 96.73 [96.16, 97.22] | 96.62 [96.06, 97.12] | 96.62 [96.06, 97.12] |
+| nl_alpino-ud-test | gold | Lemmas | 91.88 [91.32, 92.47] | 92.34 [91.80, 92.92] | 92.34 [91.80, 92.92] |
+| nl_alpino-ud-test | gold | UAS | 90.41 [89.40, 91.32] | 87.18 [86.11, 88.11] | 90.23 [89.24, 91.11] |
+| nl_alpino-ud-test | gold | LAS | 87.63 [86.63, 88.59] | 83.40 [82.24, 84.47] | 87.24 [86.15, 88.24] |
+| nl_alpino-ud-test | gold | CLAS | not measured | 78.51 [77.05, 79.84] | 82.88 [81.34, 84.21] |
+| nl_alpino-ud-test | gold | MLAS | not measured | 70.51 [68.69, 72.12] | 76.21 [74.34, 77.73] |
+| nl_alpino-ud-test | raw | Tokens | 99.66 [99.46, 99.82] | 99.66 [99.46, 99.82] | 99.66 [99.46, 99.82] |
+| nl_alpino-ud-test | raw | Sentences | 94.81 [92.78, 96.42] | 95.56 [94.03, 97.03] | 95.90 [94.35, 97.34] |
+| nl_alpino-ud-test | raw | Words | 99.66 [99.46, 99.82] | 99.66 [99.46, 99.82] | 99.66 [99.46, 99.82] |
+| nl_alpino-ud-test | raw | UPOS | 96.66 [96.01, 97.23] | 96.74 [96.11, 97.27] | 96.74 [96.11, 97.27] |
+| nl_alpino-ud-test | raw | XPOS | 95.03 [94.32, 95.67] | 95.27 [94.61, 95.94] | 95.27 [94.61, 95.94] |
+| nl_alpino-ud-test | raw | AllTags | 94.31 [93.58, 95.01] | 94.50 [93.79, 95.22] | 94.50 [93.79, 95.22] |
+| nl_alpino-ud-test | raw | UFeats | 96.78 [96.26, 97.27] | 96.80 [96.29, 97.28] | 96.80 [96.29, 97.28] |
+| nl_alpino-ud-test | raw | Lemmas | 91.54 [90.97, 92.14] | 92.05 [91.49, 92.67] | 92.05 [91.49, 92.67] |
+| nl_alpino-ud-test | raw | UAS | 91.67 [90.65, 92.52] | 91.93 [91.05, 92.69] | 93.37 [92.55, 94.08] |
+| nl_alpino-ud-test | raw | LAS | 89.06 [87.93, 89.96] | 89.09 [88.06, 89.97] | 91.11 [90.20, 91.92] |
+| nl_alpino-ud-test | raw | CLAS | not measured | 85.23 [83.88, 86.40] | 87.99 [86.70, 89.11] |
+| nl_alpino-ud-test | raw | MLAS | not measured | 79.56 [77.95, 81.03] | 82.24 [80.73, 83.63] |
+| pt_bosque-ud-test | gold | UPOS | 96.56 [96.32, 96.80] | 96.10 [95.82, 96.36] | 96.10 [95.82, 96.36] |
+| pt_bosque-ud-test | gold | UFeats | 94.80 [94.49, 95.09] | 94.48 [94.16, 94.80] | 94.48 [94.16, 94.80] |
+| pt_bosque-ud-test | gold | Lemmas | 97.49 [97.30, 97.70] | 97.59 [97.39, 97.79] | 97.59 [97.39, 97.79] |
+| pt_bosque-ud-test | gold | UAS | 87.64 [87.07, 88.25] | 85.88 [85.20, 86.50] | 88.22 [87.63, 88.77] |
+| pt_bosque-ud-test | gold | LAS | 84.01 [83.39, 84.63] | 81.83 [81.11, 82.53] | 84.54 [83.90, 85.14] |
+| pt_bosque-ud-test | gold | CLAS | not measured | 77.38 [76.47, 78.25] | 80.24 [79.51, 81.07] |
+| pt_bosque-ud-test | gold | MLAS | not measured | 67.49 [66.45, 68.46] | 70.29 [69.36, 71.22] |
+| pt_bosque-ud-test | raw | Tokens | 99.86 [99.79, 99.92] | 99.86 [99.79, 99.92] | 99.86 [99.79, 99.92] |
+| pt_bosque-ud-test | raw | Sentences | 92.27 [90.68, 93.82] | 92.57 [91.08, 93.99] | 93.50 [92.14, 94.81] |
+| pt_bosque-ud-test | raw | Words | 99.26 [99.14, 99.38] | 99.26 [99.14, 99.38] | 99.26 [99.14, 99.38] |
+| pt_bosque-ud-test | raw | UPOS | 96.59 [96.32, 96.83] | 96.75 [96.50, 96.98] | 96.75 [96.50, 96.98] |
+| pt_bosque-ud-test | raw | UFeats | 95.06 [94.75, 95.34] | 95.19 [94.90, 95.48] | 95.19 [94.90, 95.48] |
+| pt_bosque-ud-test | raw | Lemmas | 96.96 [96.73, 97.19] | 97.29 [97.09, 97.50] | 97.29 [97.09, 97.50] |
+| pt_bosque-ud-test | raw | UAS | 89.38 [88.77, 89.91] | 89.73 [89.18, 90.26] | 90.68 [90.16, 91.19] |
+| pt_bosque-ud-test | raw | LAS | 86.47 [85.84, 87.04] | 86.86 [86.27, 87.44] | 87.98 [87.39, 88.55] |
+| pt_bosque-ud-test | raw | CLAS | not measured | 83.83 [83.04, 84.61] | 85.27 [84.54, 85.99] |
+| pt_bosque-ud-test | raw | MLAS | not measured | 75.21 [74.33, 76.14] | 76.55 [75.69, 77.41] |
+| tr_boun-ud-test | gold | UPOS | 91.50 [90.98, 92.05] | 91.28 [90.72, 91.81] | 91.28 [90.72, 91.81] |
+| tr_boun-ud-test | gold | XPOS | not measured | 44.67 [43.81, 45.55] | 44.67 [43.81, 45.55] |
+| tr_boun-ud-test | gold | AllTags | not measured | 37.77 [37.03, 38.61] | 37.77 [37.03, 38.61] |
+| tr_boun-ud-test | gold | UFeats | 80.57 [79.80, 81.33] | 80.29 [79.54, 81.01] | 80.29 [79.54, 81.01] |
+| tr_boun-ud-test | gold | Lemmas | 86.40 [85.75, 87.00] | 86.00 [85.31, 86.61] | 86.00 [85.31, 86.61] |
+| tr_boun-ud-test | gold | UAS | 75.25 [73.92, 76.56] | 72.36 [70.98, 73.75] | 74.44 [73.05, 75.76] |
+| tr_boun-ud-test | gold | LAS | 67.92 [66.56, 69.24] | 64.97 [63.60, 66.26] | 67.13 [65.67, 68.45] |
+| tr_boun-ud-test | gold | CLAS | not measured | 62.95 [61.49, 64.24] | 65.35 [63.77, 66.74] |
+| tr_boun-ud-test | gold | MLAS | not measured | 43.83 [42.52, 45.02] | 45.80 [44.46, 47.03] |
+| tr_boun-ud-test | raw | Tokens | 99.56 [99.41, 99.71] | 99.56 [99.41, 99.71] | 99.56 [99.41, 99.71] |
+| tr_boun-ud-test | raw | Sentences | 81.28 [78.81, 83.58] | 79.89 [77.32, 82.20] | 78.82 [76.14, 81.22] |
+| tr_boun-ud-test | raw | Words | 96.71 [96.34, 97.08] | 96.71 [96.34, 97.08] | 96.71 [96.34, 97.08] |
+| tr_boun-ud-test | raw | UPOS | 89.08 [88.46, 89.72] | 88.62 [87.99, 89.32] | 88.62 [87.99, 89.32] |
+| tr_boun-ud-test | raw | XPOS | not measured | 43.51 [42.62, 44.33] | 43.51 [42.62, 44.33] |
+| tr_boun-ud-test | raw | AllTags | not measured | 37.44 [36.68, 38.26] | 37.44 [36.68, 38.26] |
+| tr_boun-ud-test | raw | UFeats | 80.24 [79.44, 81.03] | 80.23 [79.44, 81.03] | 80.23 [79.44, 81.03] |
+| tr_boun-ud-test | raw | Lemmas | 84.51 [83.78, 85.20] | 84.42 [83.71, 85.09] | 84.42 [83.71, 85.09] |
+| tr_boun-ud-test | raw | UAS | 69.75 [68.39, 71.06] | 69.30 [67.85, 70.58] | 71.15 [69.82, 72.44] |
+| tr_boun-ud-test | raw | LAS | 63.03 [61.61, 64.41] | 62.33 [60.88, 63.71] | 64.31 [62.89, 65.78] |
+| tr_boun-ud-test | raw | CLAS | not measured | 61.35 [59.79, 62.70] | 63.21 [61.68, 64.58] |
+| tr_boun-ud-test | raw | MLAS | not measured | 45.06 [43.56, 46.41] | 46.89 [45.51, 48.21] |
+| zh_gsdsimp-ud-test | gold | UPOS | 88.77 [88.18, 89.35] | 87.55 [86.92, 88.22] | 87.55 [86.92, 88.22] |
+| zh_gsdsimp-ud-test | gold | XPOS | 87.86 [87.24, 88.47] | 87.14 [86.47, 87.79] | 87.14 [86.47, 87.79] |
+| zh_gsdsimp-ud-test | gold | AllTags | 85.15 [84.47, 85.82] | 83.66 [82.95, 84.39] | 83.66 [82.95, 84.39] |
+| zh_gsdsimp-ud-test | gold | UFeats | 96.03 [95.69, 96.39] | 95.86 [95.48, 96.23] | 95.86 [95.48, 96.23] |
+| zh_gsdsimp-ud-test | gold | Lemmas | 99.80 [99.71, 99.88] | 99.78 [99.67, 99.86] | 99.78 [99.67, 99.86] |
+| zh_gsdsimp-ud-test | gold | UAS | 69.15 [67.81, 70.55] | 64.08 [62.81, 65.38] | 67.22 [66.03, 68.48] |
+| zh_gsdsimp-ud-test | gold | LAS | 63.29 [61.88, 64.70] | 57.55 [56.30, 58.83] | 61.42 [60.21, 62.70] |
+| zh_gsdsimp-ud-test | gold | CLAS | not measured | 56.22 [54.82, 57.68] | 59.72 [58.32, 61.19] |
+| zh_gsdsimp-ud-test | gold | MLAS | not measured | 44.42 [42.92, 45.86] | 47.94 [46.40, 49.45] |
+| zh_gsdsimp-ud-test | raw | Tokens | 89.62 [88.81, 90.43] | 89.62 [88.81, 90.43] | 89.62 [88.81, 90.43] |
+| zh_gsdsimp-ud-test | raw | Sentences | 85.31 [82.10, 88.41] | 83.64 [80.04, 86.90] | 83.77 [80.32, 87.30] |
+| zh_gsdsimp-ud-test | raw | Words | 89.62 [88.81, 90.43] | 89.62 [88.81, 90.43] | 89.62 [88.81, 90.43] |
+| zh_gsdsimp-ud-test | raw | UPOS | 80.96 [80.07, 81.81] | 80.66 [79.76, 81.48] | 80.66 [79.76, 81.48] |
+| zh_gsdsimp-ud-test | raw | XPOS | 80.11 [79.28, 80.98] | 79.75 [78.91, 80.63] | 79.75 [78.91, 80.63] |
+| zh_gsdsimp-ud-test | raw | AllTags | 77.97 [77.04, 78.87] | 77.47 [76.54, 78.38] | 77.47 [76.54, 78.38] |
+| zh_gsdsimp-ud-test | raw | UFeats | 85.94 [85.11, 86.79] | 85.98 [85.14, 86.82] | 85.98 [85.14, 86.82] |
+| zh_gsdsimp-ud-test | raw | Lemmas | 89.45 [88.61, 90.27] | 89.41 [88.61, 90.21] | 89.41 [88.61, 90.21] |
+| zh_gsdsimp-ud-test | raw | UAS | 62.78 [61.24, 64.26] | 62.91 [61.40, 64.43] | 64.42 [62.89, 65.87] |
+| zh_gsdsimp-ud-test | raw | LAS | 58.84 [57.23, 60.35] | 58.91 [57.38, 60.42] | 60.98 [59.49, 62.45] |
+| zh_gsdsimp-ud-test | raw | CLAS | not measured | 55.70 [53.91, 57.39] | 58.05 [56.40, 59.67] |
+| zh_gsdsimp-ud-test | raw | MLAS | not measured | 47.57 [45.78, 49.21] | 49.33 [47.69, 50.97] |
+
+### Paired recovery regression
+
+Against the joint 84-language model, Turkish-BOUN raw **sentence F1** changes from **79.89 to 78.82**, difference **-1.073 [-1.998, -0.134]** (1,000 paired sentence resamples, seed 20261106). This is the only significantly negative difference among the 139 recomputed UD rows. Turkish raw LAS rises from 62.33 to 64.31, difference 1.978 [1.413, 2.578]. Selection was fixed to full-dev gold LAS before these test results; no test-driven reversion or additional training was performed.

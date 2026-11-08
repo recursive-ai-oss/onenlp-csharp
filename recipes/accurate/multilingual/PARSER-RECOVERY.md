@@ -21,3 +21,5 @@ Data and algorithm references are unchanged: the UD r2.18 treebanks and licences
 For a parser-only test read, `predict-package --raw 1 --skip-ner 1` writes both gold-token and raw-text syntactic predictions without re-reading unchanged entity evaluation corpora. Use the same corpus specification and segmenter arguments as the original model.
 
 `run-parser-chunk.sh` accounts CPU against an append-only ledger. Each queue chunk reserves its worst-case CPU time before launching; a normal exit replaces that reservation with measured user+system seconds through a signed correction row. A hard queue kill leaves the reservation intact, so it cannot silently reset the budget. Run chunks serially for a ledger.
+
+For step-exact reproduction, `--steps N` stops after N optimizer steps (default 0: no step limit); use a fresh output directory and a wall-time budget large enough to reach that step. The selected-step targets of the adapted files are de 181, fr 62, es 300, pt 358, nl 512, tr 345 and zh 206, with the package provenance recording runtime and data pins.

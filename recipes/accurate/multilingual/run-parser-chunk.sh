@@ -30,7 +30,7 @@ set +e
   dotnet "$RECIPE_DLL" recover-parser --lang "$LANG_CODE" --spec "$SPEC" --data "$DATA" \
     --export "$EXPORT" --out "$OUT/$LANG_CODE" --cache "$CACHE" \
     --epochs 8 --lr 0.0002 --dropout 0.1 --batch-words 1500 --seed 66 \
-    --threads "${THREADS:-4}" --budget-seconds "${CHUNK_SECONDS:-1000}")
+    --threads "${THREADS:-4}" --budget-seconds "${CHUNK_SECONDS:-1000}" --select-only "${SELECT_ONLY:-0}")
 status=$?
 set -e
 # Include failed chunks; the ledger is append-only. Run chunks serially against this ledger.
