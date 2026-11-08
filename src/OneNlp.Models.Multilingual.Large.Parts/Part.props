@@ -8,7 +8,7 @@
     <PackageId>$(PackagePrefix)$(LibName).Models.Multilingual.Large.$(PartName)</PackageId>
     <Description>spaCy-class NLP for .NET: $(PartDescription) of the base-size accurate-tier model. Pulled in by RecursiveAI.OneNlp.Models.Multilingual.Large; reference that package, not this one. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);model</PackageTags>
-    <IsPackable>true</IsPackable>
+    <IsPackable>$(ShipMultilingualLarge)</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

@@ -6,7 +6,7 @@
     <PackageId>$(PackagePrefix)$(LibName).Models.Multilingual.Large</PackageId>
     <Description>spaCy-class NLP for .NET: the base-size accurate-tier model (fine-tuned mmBERT-base) for 84 languages. UD annotations and entity heads for 19 languages for the Nlp verbs; the Nlp verbs use it for these languages when no fast-tier package is referenced. About 3.5 GB, split over several packages. No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);multilingual;model</PackageTags>
-    <IsPackable>true</IsPackable>
+    <IsPackable>$(ShipMultilingualLarge)</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
