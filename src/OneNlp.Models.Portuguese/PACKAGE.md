@@ -2,8 +2,6 @@
 
 **spaCy-class NLP for .NET.** The Portuguese fast-tier model for [RecursiveAI.OneNlp](https://www.nuget.org/packages/RecursiveAI.OneNlp): add this package and the `Nlp` verbs analyze Portuguese text with tags, morphology, lemmas, a dependency parse and named entities. No downloads, no native code, NativeAOT and trim clean. Unaffiliated with other projects named OneNLP.
 
-> **Early preview.** The weights are development models and will be retrained; the API will change.
-
 **Measured.** UD Portuguese-Bosque r2.18 test (and UNER Portuguese-Bosque test for entities), against spaCy 3.8.18 trained with its default configuration on the same data (95% paired bootstrap intervals are in the results table). Gold words: UPOS 95.89 against 95.92, UFeats 94.51 against 94.11, lemmas 97.30 against 96.90 and LAS 81.80 against 81.96 (all within noise). Raw text: UPOS 95.35 against 84.15 and LAS 81.14 against 65.85 (ahead). Entities micro F1 73.48 against 75.27 (within noise). Entity precision is 75.46 against 76.96 (paired -1.50 [-3.76, 0.83], within noise). Data lineage: UD Portuguese-Bosque and UNER Portuguese-Bosque (CC BY-SA 4.0); the weights carry share-alike lineage where the data does. Size: 104.8 MiB of weights. Speed against the managed reference is measured at the release gate.
 
 ```csharp

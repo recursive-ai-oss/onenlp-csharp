@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Models.Turkish</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Models.Turkish</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.Turkish</PackageId>
-    <Description>spaCy-class NLP for .NET: the Turkish fast-tier model. Tagging, morphology, lemmas, dependency parse and PER/ORG/LOC entities for the Nlp verbs, trained on Universal Dependencies Turkish-BOUN (CC BY-SA 4.0) and Turkish-WikiNER (CC BY-SA 4.0). No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the Turkish fast-tier model. Tagging, morphology, lemmas, dependency parse and PER/ORG/LOC entities for the Nlp verbs, trained on Universal Dependencies Turkish-BOUN (CC BY-SA 4.0) and Turkish-WikiNER (CC BY-SA 4.0). No downloads. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);turkish;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>

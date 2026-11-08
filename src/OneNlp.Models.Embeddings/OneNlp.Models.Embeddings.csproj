@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Models.Embeddings</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Models.Embeddings</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.Embeddings</PackageId>
-    <Description>spaCy-class NLP for .NET: the default English sentence embedder (bge-small-en-v1.5, MIT) for Nlp.Embed and SentenceEmbedder. Weights are exported from the authors' published model; nothing is trained here. No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the default English sentence embedder (bge-small-en-v1.5, MIT) for Nlp.Embed and SentenceEmbedder. Weights are exported from the authors' published model; nothing is trained here. No downloads. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);embeddings;sentence-embeddings;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>

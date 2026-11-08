@@ -4,7 +4,7 @@
 
 Text in, structure out: tokens, sentences, tags, morphology, lemmas, dependency parses and entities through fast and accurate model tiers; token-exact Hugging Face tokenizers; numbers, units, currency, e-mail and URLs, and dates and times resolved to values in ten languages; language identification for 75 languages; text classification, span categorization and open-type entity recognition; sentence embeddings. You can train every one of the neural parts yourself with the API that trained the shipped models.
 
-> **Pre-release.** The packages are published on nuget.org with the 1.0 release; until then build from source (below). The API may still change. Every quality and speed claim here is a row in [docs/results-table.md](docs/results-table.md), with its reference, its interval and its verdict, including the rows we lose.
+> Every quality and speed claim here is a row in [docs/results-table.md](docs/results-table.md), with its reference, its interval and its verdict, including the rows we lose.
 
 ## What is in it
 
@@ -27,8 +27,6 @@ Nothing is ever downloaded. A model is delivered with its package; without the p
     dotnet add package RecursiveAI.OneNlp
     dotnet add package RecursiveAI.OneNlp.Models.English      // a model package per language you analyze
     dotnet add package RecursiveAI.OneNlp.Models.Embeddings   // for Nlp.Embed
-
-Until the first release, build the packages from source and add them from a local folder feed.
 
 ## The happy path
 

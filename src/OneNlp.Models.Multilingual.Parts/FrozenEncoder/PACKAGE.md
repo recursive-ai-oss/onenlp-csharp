@@ -2,8 +2,6 @@
 
 **spaCy-class NLP for .NET.** The frozen distilled multilingual encoder of [RecursiveAI.OneNlp](https://www.nuget.org/packages/RecursiveAI.OneNlp): a six-layer, width-384 student of mmBERT-base (113 languages, 35.5 M weights, 142 MB as one ONNX file) and the model's `tokenizer.json`, embedded in the package. It maps the tokens of a `Doc` to 384-wide vectors, for your own heads or for `Train`. No downloads, no native code, NativeAOT and trim clean. Unaffiliated with other projects named OneNLP.
 
-> **Early preview.** The API will change.
-
 ```csharp
 using RecursiveAI.OneNlp;
 using RecursiveAI.OneNlp.Models.Multilingual.FrozenEncoder;

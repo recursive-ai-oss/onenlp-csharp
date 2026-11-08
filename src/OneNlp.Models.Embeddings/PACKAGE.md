@@ -2,8 +2,6 @@
 
 **spaCy-class NLP for .NET.** The default English sentence embedder for [RecursiveAI.OneNlp](https://www.nuget.org/packages/RecursiveAI.OneNlp): add this package and `Nlp.Embed` turns text into a 384-value, unit-length vector. No downloads, no native code, NativeAOT and trim clean. Unaffiliated with other projects named OneNLP.
 
-> **Early preview.** The API will change.
-
 **Measured.** Vectors match sentence-transformers 6.2.0 to a maximum absolute difference of 4e-7 over 2,103 texts, with no token-ID mismatches, and `mteb` 2.27.1 scores equal the same-harness sentence-transformers scores on every task: STSBenchmark 85.86 (model card 85.86), TwentyNewsgroupsClustering 48.63 (48.52), TwitterSemEval2015 73.24 (73.33), AskUbuntuDupQuestions 62.58 (62.59), SciFact 71.27 (71.28). Banking77Classification is 81.75 against the model card's 85.74: sentence-transformers itself misses the card by the same amount on that task, so the gap is in the card's number, not in the runtime. Size: 127.6 MiB of weights. Lineage: the authors' weights (MIT); nothing is trained here.
 
 

@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Models.Hindi</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Models.Hindi</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.Hindi</PackageId>
-    <Description>spaCy-class NLP for .NET: the Hindi fast-tier model. UPOS, morphology, dependency parse and PER/LOC/ORG entities for the Nlp verbs, trained on Hindi web text labelled by the accurate tier (there is no allowed Hindi treebank). No lemmatizer: the token text is the lemma. No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the Hindi fast-tier model. UPOS, morphology, dependency parse and PER/LOC/ORG entities for the Nlp verbs, trained on Hindi web text labelled by the accurate tier (there is no allowed Hindi treebank). No lemmatizer: the token text is the lemma. No downloads. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);hindi;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>

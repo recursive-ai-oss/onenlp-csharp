@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Models.Chinese</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Models.Chinese</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.Chinese</PackageId>
-    <Description>spaCy-class NLP for .NET: the Chinese fast-tier model. Word segmentation, tagging, morphology, lemmas, dependency parse and PER/LOC/ORG entities for the Nlp verbs, trained on Universal Dependencies Chinese-GSDSimp and Universal NER Chinese-GSDSIMP (CC BY-SA 4.0). No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the Chinese fast-tier model. Word segmentation, tagging, morphology, lemmas, dependency parse and PER/LOC/ORG entities for the Nlp verbs, trained on Universal Dependencies Chinese-GSDSimp and Universal NER Chinese-GSDSIMP (CC BY-SA 4.0). No downloads. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);chinese;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>

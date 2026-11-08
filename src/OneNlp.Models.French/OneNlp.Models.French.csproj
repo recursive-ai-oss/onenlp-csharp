@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Models.French</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Models.French</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.French</PackageId>
-    <Description>spaCy-class NLP for .NET: the French fast-tier model. Tokenization with French elision and contractions, morphology, lemmas, dependency parse and PER/ORG/LOC/MISC entities for the Nlp verbs, trained on Universal Dependencies French-GSD (CC BY-SA 4.0) and WikiNER French (CC BY 4.0, over Wikipedia text). No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the French fast-tier model. Tokenization with French elision and contractions, morphology, lemmas, dependency parse and PER/ORG/LOC/MISC entities for the Nlp verbs, trained on Universal Dependencies French-GSD (CC BY-SA 4.0) and WikiNER French (CC BY 4.0, over Wikipedia text). No downloads. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);french;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>

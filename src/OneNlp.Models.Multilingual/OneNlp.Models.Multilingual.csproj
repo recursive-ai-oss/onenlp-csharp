@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Models.Multilingual</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Models.Multilingual</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.Multilingual</PackageId>
-    <Description>spaCy-class NLP for .NET: the distilled accurate-tier model (a six-layer student of mmBERT-base, fine-tuned) for English, German, French, Spanish, Portuguese, Italian, Dutch, Turkish and Chinese, plus an open-type entity recognizer. Tags, morphology, lemmas, dependency parse and entities for the Nlp verbs; the Nlp verbs use it for these languages when no fast-tier package is referenced. About 500 MB, split over several packages. No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the distilled accurate-tier model (a six-layer student of mmBERT-base, fine-tuned) for English, German, French, Spanish, Portuguese, Italian, Dutch, Turkish and Chinese, plus an open-type entity recognizer. Tags, morphology, lemmas, dependency parse and entities for the Nlp verbs; the Nlp verbs use it for these languages when no fast-tier package is referenced. About 500 MB, split over several packages. No downloads. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);multilingual;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>

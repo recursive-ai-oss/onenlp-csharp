@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Models.Portuguese</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Models.Portuguese</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.Portuguese</PackageId>
-    <Description>spaCy-class NLP for .NET: the Portuguese fast-tier model. Tagging, morphology, lemmas, dependency parse and PER/LOC/ORG entities for the Nlp verbs, trained on Universal Dependencies Portuguese-Bosque (CC BY-SA 4.0) and Universal NER Portuguese-Bosque (CC BY-SA 4.0). No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: the Portuguese fast-tier model. Tagging, morphology, lemmas, dependency parse and PER/LOC/ORG entities for the Nlp verbs, trained on Universal Dependencies Portuguese-Bosque (CC BY-SA 4.0) and Universal NER Portuguese-Bosque (CC BY-SA 4.0). No downloads. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);portuguese;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>

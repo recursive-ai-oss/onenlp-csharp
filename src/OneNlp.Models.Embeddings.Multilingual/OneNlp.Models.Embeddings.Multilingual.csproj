@@ -4,7 +4,7 @@
     <AssemblyName>$(PackagePrefix)$(LibName).Models.Embeddings.Multilingual</AssemblyName>
     <RootNamespace>$(PackagePrefix)$(LibName).Models.Embeddings.Multilingual</RootNamespace>
     <PackageId>$(PackagePrefix)$(LibName).Models.Embeddings.Multilingual</PackageId>
-    <Description>spaCy-class NLP for .NET: a multilingual sentence embedder (multilingual-e5-small, MIT, about 100 languages) for Nlp.Embed and SentenceEmbedder. Weights are exported from the authors' published model; nothing is trained here. No downloads. An early preview. Unaffiliated with other projects named OneNLP.</Description>
+    <Description>spaCy-class NLP for .NET: a multilingual sentence embedder (multilingual-e5-small, MIT, about 100 languages) for Nlp.Embed and SentenceEmbedder. Weights are exported from the authors' published model; nothing is trained here. No downloads. Unaffiliated with other projects named OneNLP.</Description>
     <PackageTags>$(PackageTags);embeddings;sentence-embeddings;multilingual;model</PackageTags>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
