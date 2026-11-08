@@ -880,7 +880,10 @@ internal static partial class Program
         {
             packages[lang] = PipelineFile.Load(Path.Combine(dir, "heads", lang + ".onenlp"));
             stores[lang] = new StringStore();
-            nerStores[lang] = new StringStore();
+            if (Num(args, "skip-ner", 0) == 0)
+            {
+                nerStores[lang] = new StringStore();
+            }
         }
 
         PredictSplit(encoder, lang => [.. packages[lang].Components.OfType<ITrainableComponent>()], Required(args, "data"), Opt(args, "split", "test"), Num(args, "raw", 0) == 1, langs, outDir, stores, nerStores);

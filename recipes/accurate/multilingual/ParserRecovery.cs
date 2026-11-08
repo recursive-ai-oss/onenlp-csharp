@@ -61,21 +61,46 @@ internal static partial class Program
             using Pipeline train = Pipeline.Blank(original.Language);
             train.Add(parser);
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(Num(args, "budget-seconds", 1000)));
-            TrainResult result = train.Train(data.Train, new TrainOptions
+            TrainResult result;
+            if (Num(args, "select-only", 0) == 1)
             {
-                Epochs = Num(args, "epochs", 8),
-                BatchWords = Num(args, "batch-words", 1500),
-                LearningRate = Flt(args, "lr", 0.0002f),
-                Dropout = Flt(args, "dropout", 0.1f),
-                Seed = (ulong)Num(args, "seed", 66),
-                FreezeEncoder = true,
-                DevExamples = data.Dev,
-                Score = _ => Bootstrap.F1Points(RecoveryCounts(parser, data.Dev)),
-                Patience = 3,
-                CheckpointDirectory = output,
-                CheckpointEvery = 25,
-                Progress = new RecoveryProgress(),
-            }, cts.Token);
+                using JsonDocument saved = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(output, "selection.json")));
+                JsonElement r = saved.RootElement;
+                result = new TrainResult(r.GetProperty("steps").GetInt64(), r.GetProperty("epochs").GetInt32(),
+                    r.GetProperty("completed").GetBoolean(), false, 0, double.NaN, r.GetProperty("bestStep").GetInt64(), string.Empty);
+            }
+            else
+            {
+                result = train.Train(data.Train, new TrainOptions
+                {
+                    Epochs = Num(args, "epochs", 8),
+                    BatchWords = Num(args, "batch-words", 1500),
+                    LearningRate = Flt(args, "lr", 0.0002f),
+                    Dropout = Flt(args, "dropout", 0.1f),
+                    Seed = (ulong)Num(args, "seed", 66),
+                    FreezeEncoder = true,
+                    DevExamples = data.Dev,
+                    Score = _ => Bootstrap.F1Points(RecoveryCounts(parser, data.Dev)),
+                    Patience = 3,
+                    CheckpointDirectory = output,
+                    CheckpointEvery = 25,
+                    Progress = new RecoveryProgress(),
+                }, cts.Token);
+            }
+
+            // Train deliberately leaves the current weights on cancellation so that last.ckpt can resume.
+            // Selection must still use the best full-dev epoch, not the arbitrary end of a wall-time chunk.
+            string best = Path.Combine(output, "best.ckpt");
+            if (File.Exists(best))
+            {
+                var target = parser.Weights.StateDict().Select(t => ("head0." + t.Name, t.Tensor)).ToArray();
+                WarmStartReport restored = WarmStart.Apply(best, target, [parser.Name], [parser.Name]);
+                if (restored.Missing != 0 || restored.Mismatched != 0 || restored.Copied != target.Length)
+                {
+                    throw new InvalidDataException("The selected parser checkpoint does not match the loaded head.");
+                }
+            }
+
             MetricCounts[] candidate = RecoveryCounts(parser, data.Dev, out string candidatePredictions);
             PairedResult paired = Bootstrap.Paired(candidate, baseline, Bootstrap.F1Points, seed: 66);
             // Keep only an improvement separated from zero by the paired interval; otherwise the previous head wins.
@@ -118,6 +143,11 @@ internal static partial class Program
             w.WriteNumber("steps", result.Steps);
             w.WriteNumber("epochs", result.Epochs);
             w.WriteNumber("bestStep", result.BestStep);
+            w.WriteString("selectedCheckpoint", File.Exists(best) ? "best.ckpt" : "last in-memory step");
+            if (File.Exists(best))
+            {
+                w.WriteString("checkpointSha256", HashFile(best));
+            }
             w.WriteBoolean("keepCandidate", keep);
             w.WriteString("encoderSha256", graphHash);
             w.WriteString("tokenizerSha256", tokenizerHash);
