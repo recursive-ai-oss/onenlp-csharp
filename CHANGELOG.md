@@ -6,7 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- The neural runtime and trainer use OneModel 1.2.0-preview.2. Checkpoints stream through OneModel, including files over 2 GiB; single-resource embedded encoders and embeddings load in place and keep their resource streams open for the lifetime of the model. Split-resource graphs still use the buffered concatenation path.
+
 ### Added
+
+- `TransformerEncoder.FromStreams` and `SentenceEmbedder.Load` have stream-ownership overloads (`leaveOpen`). They opt into in-place loading for embedded graphs; the existing overloads keep their buffered lifetime contract. With `leaveOpen: false`, the model stream is closed on disposal or load failure; tokenizer streams remain caller-owned.
 
 - `EntityRecognizer.MinConfidence` drops decoded entities below a confidence (default 0, which changes nothing); it is saved in the model file only when above 0, so existing files load unchanged. The Chinese entity model ships with 0.6.
 

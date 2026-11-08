@@ -47,6 +47,49 @@ public class TransformerStreamTests
     }
 
     [Fact]
+    public void TheBufferedOverloadDoesNotBorrowTheResourceStorage()
+    {
+        using Stream graph = typeof(TransformerStreamTests).Assembly.GetManifestResourceStream("tiny-bert.onnx")!;
+        using FileStream json = File.OpenRead(Path.Combine(Dir, "tiny-bert.tokenizer.json"));
+        using TransformerEncoder encoder = TransformerEncoder.FromStreams(graph, json);
+        Assert.True(graph.CanRead);
+        graph.Dispose();
+        using var reference = new TransformerEncoder(Path.Combine(Dir, "tiny-bert.onnx"), Path.Combine(Dir, "tiny-bert.tokenizer.json"));
+        Doc[] docs = [Plain("the cat sat", new StringStore())];
+        Assert.Equal(reference.Encode(docs).Vectors.Data<float>().ToArray(), encoder.Encode(docs).Vectors.Data<float>().ToArray());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void EmbeddedWeightsStayUsableUntilDisposal(bool leaveOpen)
+    {
+        using Stream graph = typeof(TransformerStreamTests).Assembly.GetManifestResourceStream("tiny-bert.onnx")!;
+        Assert.IsAssignableFrom<UnmanagedMemoryStream>(graph);
+        using FileStream json = File.OpenRead(Path.Combine(Dir, "tiny-bert.tokenizer.json"));
+        using TransformerEncoder encoder = TransformerEncoder.FromStreams(graph, json, leaveOpen);
+        using var reference = new TransformerEncoder(Path.Combine(Dir, "tiny-bert.onnx"), Path.Combine(Dir, "tiny-bert.tokenizer.json"));
+        var strings = new StringStore();
+        Doc[] docs = [Plain("the cat sat", strings), Plain("a dog", strings)];
+        Assert.Equal(reference.Encode(docs).Vectors.Data<float>().ToArray(), encoder.Encode(docs).Vectors.Data<float>().ToArray());
+        encoder.Dispose();
+        Assert.Equal(leaveOpen, graph.CanRead);
+        Assert.True(json.CanRead);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void FailedLoadsHonorStreamOwnership(bool leaveOpen)
+    {
+        using Stream graph = typeof(TransformerStreamTests).Assembly.GetManifestResourceStream("tiny-bert.onnx")!;
+        using var json = new MemoryStream("not json"u8.ToArray());
+        Assert.ThrowsAny<Exception>(() => TransformerEncoder.FromStreams(graph, json, leaveOpen));
+        Assert.Equal(leaveOpen, graph.CanRead);
+        Assert.True(json.CanRead);
+    }
+
+    [Fact]
     public void ExpandedWordFormsGiveTheVectorsOfTheTextWrittenWithSpaces()
     {
         string model = Path.Combine(Dir, "tiny-bert.onnx");

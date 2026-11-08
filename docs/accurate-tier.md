@@ -43,6 +43,33 @@ An all-embedded layout failed NativeAOT `ilc` with “Format of the executable (
 
 These are **shared-host indicative observations, not throughput benchmarks or a speed-gate result**. Linux x64, AMD Ryzen 9 7950X3D (16 cores/32 logical CPUs, AVX2/AVX-512 available), four logical processors exposed to the process; .NET SDK 10.0.403/runtime 10.0.14, OneModel 1.0.0, CPU only. One-minute load before/during/after was 8.04/8.04/7.96 for JIT and 9.83/9.36/9.36 for AOT. No swapping occurred. These are fresh processes with warm filesystem caches. Materializing every language in the same process peaked at 8,304 MiB in the JIT smoke and 8,323 MiB in AOT; applications loading one language need not materialize all heads.
 
+### OneModel runtime update: memory and exactness
+
+OneModel **1.2.0-preview.2** replaces 1.0.0 in the neural package. Single-resource embedded graphs now load in place: the distilled encoders and the English sentence embedder transfer their model streams to the encoder/embedder, which keeps them open until disposal. The existing stream-loading overloads retain their buffered lifetime contract; the new `leaveOpen` overloads explicitly select the borrowed/owned in-place path. Tokenizer streams remain caller-owned. Training checkpoints use OneModel's streamed loader rather than a local checkpoint-format implementation.
+
+The following **indicative, non-isolated** observations compare the same committed weight manifests in fresh JIT processes. They use the source model projects, one German pipeline's `Load("de")` and `Process` on “Angela Merkel besuchte gestern die Universität in Heidelberg.” The first-process interval includes graph/head loading and the first inference, but **not language detection**; it is not the `Nlp.Analyze` workload in the preceding table. Filesystem caches were warm. RSS and elapsed time come from `/usr/bin/time -v`.
+
+| Model | OneModel | First process | Peak RSS | Process elapsed |
+|---|---|---:|---:|---:|
+| `.Multilingual.Large`, German | 1.0.0 | 2,325 ms | 4,001,228 KiB | 2.58 s |
+| `.Multilingual.Large`, German | 1.2.0-preview.2 | 5,895 ms | 3,966,344 KiB | 6.43 s |
+| `.Multilingual`, German | 1.0.0 | 1,049 ms | 826,412 KiB | 1.12 s |
+| `.Multilingual`, German | 1.2.0-preview.2 | 3,064 ms | 653,292 KiB | 3.29 s |
+
+The distilled model's observed peak falls by **169.1 MiB**. The base-size model shows no substantial memory saving: **its six resource pieces still require a full serialized-graph buffer**. OneModel's in-place stream API recognizes a single `UnmanagedMemoryStream`, not a concatenation of resources. The three-shard multilingual E5 embedder has the same limitation. No tensors, weights or package layout changed to work around it.
+
+These observations were made on 2026-11-08, Linux x64, AMD Ryzen 9 7950X3D (16 cores/32 logical CPUs; AVX2 and AVX-512 available), SDK 10.0.403/runtime 10.0.14, CPU only. Four logical processors were exposed; graph sessions used their default four intra-op threads and eager components used one. One-minute load before/during/after the base-size process was **2.21/2.21/2.36** before the update and **6.68/6.68/7.35** after; the distilled process saw **2.36/2.36/2.36** and **7.35/7.35/8.68** respectively. Other CPU jobs and disk pressure overlapped the after run. **The slower startup observations are not isolated latency comparisons, and no speed improvement is claimed.**
+
+Exact-output checks across these runtime versions found:
+
+- English fast-tier predictions on **2,077 EWT r2.18 test sentences / 25,094 gold words**: byte-identical JSON in gold-token/sentence and raw-text modes, including tags, morphology, lemmas, dependency heads/labels, entities and confidences. Thus UPOS and LAS inputs are unchanged, not merely within tolerance.
+- Both German accurate pipelines on the nine-word probe above: byte-identical annotation JSON, including confidences.
+- BGE sentence embeddings on **2,103 fixed texts**: byte-identical float32 vectors across versions, zero token-ID mismatches against cached sentence-transformers **6.2.0** references, and the same maximum absolute reference difference, **4.02797e-7**, before and after. The English embedded model's process peak was 454,104 → 323,116 KiB (four single-text probes; process elapsed 0.40 → 0.77 s, likewise not isolated).
+- Multilingual E5 on the same **2,103-text** corpus: float32 bytes and token IDs match the cached pre-update packaged-model run exactly. The unchanged maximum absolute difference from sentence-transformers 6.2.0 / PyTorch 2.15.0 CPU is **3.203749656677246e-7**; zero token-ID mismatches. Its resource shards remain on the buffered loading path.
+- The fixed-seed toy training recipe retained its 1.0.0 checkpoint SHA-256, `50ecab9ecc658026aba8868555f658010006f59d6093685b347073f742764d25`, at one and four processors. Resume still reproduces the uninterrupted checkpoint bytes; warm start and restore-best paths pass.
+
+The source-linked sample consumer and the base-size consumer pass on JIT and NativeAOT with no trim/AOT warnings. The latter loads all 84 language heads and publishes all **75 copied head assets**. These checks do not replace validation of the final packed release.
+
 ## Evaluation conventions and gaps
 
 - Gold-token and raw-text rows are distinct. UD scoring uses the same public metrics tool, 1,000 sentence/document bootstrap resamples, seed 20261106. Published references have no paired predictions: their value is compared with our upper interval bound, not a paired difference.

@@ -116,9 +116,9 @@ public static class MultilingualModel
                 return;
             }
 
-            using Stream onnx = Encoder.Part.Open();
             using Stream tokenizer = Resource("tokenizer.json");
-            _encoder = TransformerEncoder.FromStreams(onnx, tokenizer, SubwordPooling.Mean, expandWordForms: true);
+            Stream onnx = Encoder.Part.Open();
+            _encoder = TransformerEncoder.FromStreams(onnx, tokenizer, leaveOpen: false, SubwordPooling.Mean, expandWordForms: true);
             SharedEncoder.Register(SharedName, _encoder);
         }
     }
@@ -133,9 +133,9 @@ public static class MultilingualModel
                 return;
             }
 
-            using Stream onnx = FrozenEncoder.Part.Open();
             using Stream tokenizer = Resource("tokenizer.json");
-            _frozen = TransformerEncoder.FromStreams(onnx, tokenizer, SubwordPooling.Mean);
+            Stream onnx = FrozenEncoder.Part.Open();
+            _frozen = TransformerEncoder.FromStreams(onnx, tokenizer, leaveOpen: false, SubwordPooling.Mean);
             SharedEncoder.Register(FrozenName, _frozen);
         }
     }

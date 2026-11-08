@@ -26,6 +26,10 @@
     <ProjectReference Include="../../tools/OneNlp.Parity/OneNlp.Parity.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="../../testdata/accurate/tiny-bert.onnx" LogicalName="tiny-bert.onnx" />
+  </ItemGroup>
+
   <ItemGroup Label="Parity self-check fixtures">
     <None Include="Parity/toy/**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
