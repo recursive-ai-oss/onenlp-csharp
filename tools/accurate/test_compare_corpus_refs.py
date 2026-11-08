@@ -8,6 +8,7 @@ from pathlib import Path
 import tempfile
 import types
 import unittest
+from unittest.mock import patch
 
 import compare_corpus_refs as report
 import stage_large_weights as stage
@@ -38,6 +39,37 @@ class ReferencesTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 stage.groups(files, 5)
 
+    def test_generated_heads_are_transitive_assets_and_keep_bytes(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            repo, export, weights = root / 'repo', root / 'export', root / 'weights'
+            package = repo / 'src/OneNlp.Models.Multilingual.Large'
+            package.mkdir(parents=True)
+            parts = repo / 'src/OneNlp.Models.Multilingual.Large.Parts'
+            for name in ['Encoder1', 'Encoder2', 'TokenTable1', 'TokenTable2', 'TokenTable3', 'TokenTable4', 'Chinese']:
+                (parts / name).mkdir(parents=True)
+            (export / 'heads').mkdir(parents=True)
+            languages = sorted(stage.NINE | {'cs'})
+            for code in languages:
+                (export / 'heads' / (code + '.onenlp')).write_bytes(code.encode())
+            (export / 'encoder.onnx').write_bytes(b'0123456789ab')
+            (export / 'tokenizer.json').write_text('{}')
+            spec = root / 'corpus.json'
+            spec.write_text(json.dumps({'languages': [{'code': code} for code in languages]}))
+            (repo / 'OneNlp.slnx').write_text(
+                '    <Project Path="src/OneNlp.Models.Multilingual.Large/OneNlp.Models.Multilingual.Large.csproj" />')
+            with patch('sys.argv', ['stage', str(export), str(weights), '--repo', str(repo), '--spec', str(spec)]):
+                with contextlib.redirect_stdout(io.StringIO()):
+                    stage.main()
+            generated = parts / 'Heads1'
+            targets = (generated / 'RecursiveAI.OneNlp.Models.Multilingual.Large.Heads1.targets').read_text()
+            self.assertIn('$(MSBuildThisFileDirectory)../weights/multilingual-large/heads/cs.onenlp', targets)
+            self.assertIn('CopyToPublishDirectory="PreserveNewest"', targets)
+            self.assertIn('<PartFiles>true</PartFiles>', (generated / 'OneNlp.Models.Multilingual.Large.Heads1.csproj').read_text())
+            self.assertIn('"cs" => "cs.onenlp"', (generated / 'Part.cs').read_text())
+            self.assertEqual(b'cs', (weights / 'heads/cs.onenlp').read_bytes())
+            self.assertEqual(b'0123456789ab', b''.join((weights / f'encoder.onnx.part{i}').read_bytes() for i in range(1, 7)))
+
     def test_same_treebank_mode_and_model(self):
         good = self.row()
         others = [dict(good, treebank='UD_Finnish-TDT'), dict(good, input='gold'),
@@ -45,6 +77,23 @@ class ReferencesTests(unittest.TestCase):
         self.assertEqual(report.eligible([good] + others, 'UD_Finnish-FTB', 'raw', 'UPOS', True), [(91.0, good)])
         self.assertEqual(report.eligible([good] + others, 'UD_Finnish-FTB', 'raw', 'UPOS')[0][0], 99)
         self.assertEqual(report.eligible([good], 'UD_Finnish-FTB', 'gold', 'UPOS'), [])
+
+    def test_paired_rows_keep_modes_and_direction(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            score = {'estimate': 92, 'low': 90, 'high': 94}
+            row = dict(language='fi', dataset='fi_ftb-ud-test', metric='UPOS', score=score,
+                       reference=90, difference={'estimate': 2, 'low': 1, 'high': 3})
+            (root / 'fi_ftb-ud-test.gold.json').write_text(json.dumps([row]))
+            (root / 'fi_ftb-ud-test.raw.json').write_text(json.dumps([
+                dict(row, difference={'estimate': -2, 'low': -3, 'high': -1})]))
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                report.render_paired(root)
+            text = out.getvalue()
+            self.assertIn('2 rows: 1 ahead, 0 within the paired interval, 1 behind', text)
+            self.assertIn('| gold | UPOS |', text)
+            self.assertIn('| raw | UPOS |', text)
 
     def test_two_views_counts_and_missing_reference(self):
         with tempfile.TemporaryDirectory() as d:

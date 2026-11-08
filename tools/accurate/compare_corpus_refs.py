@@ -109,6 +109,47 @@ def render(a):
     print('\n'.join(rows))
 
 
+def interval(score):
+    return f"{score['estimate']:.2f} [{score['low']:.2f}, {score['high']:.2f}]"
+
+
+def render_entities(directory, before):
+    print('\n## Entity samples (gold tokens)\n')
+    print('Deterministic evenly spaced samples, at most 3,001 sentences per corpus. '
+          'The published UD references above do not supply comparable entity predictions; '
+          'these rows are information. The paired spaCy view below uses identical sampled sentences.\n')
+    print('| Language | Metric | Before [95% CI] | Current [95% CI] |')
+    print('|---|---|---|---|')
+    for path in sorted(directory.glob('ner-*.json')):
+        old_path = before / path.name if before else None
+        old = {r['metric']: r['score'] for r in json.loads(old_path.read_text())} if old_path and old_path.exists() else {}
+        for row in json.loads(path.read_text()):
+            previous = interval(old[row['metric']]) if row['metric'] in old else 'not measured'
+            print(f"| {row['language']} | {row['metric']} | {previous} | {interval(row['score'])} |")
+
+
+def render_paired(directory):
+    rows = [row for path in sorted(directory.glob('*.json')) for row in json.loads(path.read_text())]
+    counts = {'ahead': 0, 'within': 0, 'behind': 0}
+    for row in rows:
+        difference = row['difference']
+        verdict = 'ahead' if difference['low'] > 0 else 'behind' if difference['high'] < 0 else 'within'
+        counts[verdict] += 1
+    print('\n## Paired spaCy 3.8.18 comparison (information)\n')
+    print(f"{len(rows)} rows: {counts['ahead']} ahead, {counts['within']} within the paired interval, {counts['behind']} behind. "
+          'Same gold, mode and sampled entity sentences; 1,000 paired resamples, seed 20261106. '
+          'This is not the published-system gate. Positive differences favor this model.\n')
+    print('| Language / dataset | Input | Metric | Current [95% CI] | spaCy | Difference [95% CI] | Verdict |')
+    print('|---|---|---|---|---|---|---|')
+    for path in sorted(directory.glob('*.json')):
+        mode = 'entities (gold)' if path.name.startswith('ner-') else 'gold' if '.gold.' in path.name else 'raw'
+        for row in json.loads(path.read_text()):
+            d = row['difference']
+            verdict = 'ahead' if d['low'] > 0 else 'behind' if d['high'] < 0 else 'within'
+            print(f"| {row['language']}: {row['dataset']} | {mode} | {row['metric']} | {interval(row['score'])} | "
+                  f"{row['reference']:.2f} | {interval(d)} | {verdict} |")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('scores', type=Path)
@@ -116,7 +157,12 @@ def main():
     ap.add_argument('--spec', type=Path, required=True)
     ap.add_argument('--before', type=Path)
     ap.add_argument('--treebanks', type=Path, default=Path('tools/fetch/ud/treebanks.tsv'))
-    render(ap.parse_args())
+    ap.add_argument('--paired', type=Path, help='Paired spaCy score JSON directory')
+    a = ap.parse_args()
+    render(a)
+    render_entities(a.scores, a.before)
+    if a.paired:
+        render_paired(a.paired)
 
 
 if __name__ == '__main__':

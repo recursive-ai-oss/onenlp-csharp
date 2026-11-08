@@ -2,6 +2,7 @@
   <PropertyGroup>
     <PartName>Heads2</PartName>
     <PartDescription>language-specific heads</PartDescription>
+    <PartFiles>true</PartFiles>
   </PropertyGroup>
   <Import Project="../Part.props" />
 </Project>

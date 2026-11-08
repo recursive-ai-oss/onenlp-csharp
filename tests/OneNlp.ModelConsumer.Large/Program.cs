@@ -10,7 +10,7 @@ internal static class Program
 {
     private static int failures;
 
-    private static int Main()
+    private static int Main(string[] args)
     {
         string[] texts =
         [
@@ -34,6 +34,13 @@ internal static class Program
         double loadMs = clock.Elapsed.TotalMilliseconds;
         Check("one sentence", first.Sentences.Count == 1);
         Console.WriteLine($"first Analyze (loads the encoder and the heads): {loadMs:F0} ms");
+        // A separate process lets /usr/bin/time measure one language without materializing every head.
+        if (args is ["--single-language"])
+        {
+            Check("German tags and parse", first.Length > 0 && first.All(t => t.Pos.Length > 0 && t.Dep.Length > 0));
+            Console.WriteLine(failures == 0 ? "OK" : $"FAILED {failures}");
+            return failures == 0 ? 0 : 1;
+        }
         foreach (string text in texts)
         {
             Doc doc = Nlp.Analyze(text);
@@ -60,7 +67,8 @@ internal static class Program
         {
             using Pipeline accurate = Pipeline.Create(Language.FromCode(code), Tier.Accurate)
                 .Add<RecursiveAI.OneNlp.Neural.Components.Morphologizer>()
-                .Add<RecursiveAI.OneNlp.Neural.Components.Parser>();
+                .Add<RecursiveAI.OneNlp.Neural.Components.Lemmatizer>()
+                .Add<RecursiveAI.OneNlp.Neural.Components.DependencyParser>();
             Doc doc = accurate.Process(text);
             Check("expanded language offsets: " + code, doc.All(t => text.Substring(t.Idx, t.EndIdx - t.Idx) == t.ToString()));
             Check("expanded language heads: " + code, doc.Length > 0 && doc.All(t => t.Pos.Length > 0 && t.Dep.Length > 0));

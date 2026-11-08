@@ -1,5 +1,5 @@
 <Project>
-  <!-- Shared by the parts of the base-size accurate tier: each part packs one slice of the model's weights as an embedded resource, so that
+  <!-- Shared by the parts of the base-size accurate tier: each part packs one slice of the model's weights, so that
        every package stays under the 250 MB size limit of nuget.org. Without a weights directory (environment variable ONENLP_MLLARGE_WEIGHTS or
        property LargeWeightsDir) a part builds, but cannot be packed. -->
   <PropertyGroup>
@@ -25,7 +25,17 @@
     <None Include="../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
-  <Target Name="EmbedLargeWeights" BeforeTargets="AssignTargetPaths" Condition="'$(LargeWeightsDir)' != ''">
+  <!-- Declare copied assets during evaluation: packing without a build gathers files before build targets run. -->
+  <ItemGroup Condition="'$(PartFiles)' == 'true' and '$(LargeWeightsDir)' != ''">
+    <Content Include="@(LargeWeight-&gt;'$(LargeWeightsDir)/%(Identity)')"
+             Link="weights/multilingual-large/heads/%(Filename)%(Extension)"
+             TargetPath="weights/multilingual-large/heads/%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"
+             Pack="true" PackagePath="weights/multilingual-large/heads/%(Filename)%(Extension)" />
+    <None Include="$(PackageId).targets" Pack="true" PackagePath="buildTransitive/" />
+  </ItemGroup>
+
+  <Target Name="EmbedLargeWeights" BeforeTargets="AssignTargetPaths;GenerateNuspec" Condition="'$(LargeWeightsDir)' != ''">
     <ItemGroup>
       <_Weight Include="@(LargeWeight)" Path="$([MSBuild]::EnsureTrailingSlash('$(LargeWeightsDir)'))%(Identity)" WeightName="%(Identity)" />
     </ItemGroup>
@@ -37,13 +47,7 @@
            Text="Weights file '%(_WeightHashed.WeightName)' does not match the manifest: sha256 %(_WeightHashed.FileHash), expected %(_WeightHashed.Sha256). Use the weights listed in weights.manifest.props, or update the manifest and PROVENANCE.md together." />
     <ItemGroup>
       <EmbeddedResource Include="@(_WeightHashed)" LogicalName="weights/%(_WeightHashed.WeightName)" Condition="'$(PartFiles)' != 'true'" />
-      <!-- Copied assets keep the aggregate NativeAOT resource table below its image limit. -->
-      <Content Include="@(_WeightHashed)" Condition="'$(PartFiles)' == 'true'"
-               Link="weights/multilingual-large/%(_WeightHashed.WeightName)"
-               TargetPath="weights/multilingual-large/%(_WeightHashed.WeightName)"
-               CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"
-               Pack="true" PackagePath="contentFiles/any/any/weights/multilingual-large/%(_WeightHashed.WeightName)"
-               PackageCopyToOutput="true" PackageFlatten="false" BuildAction="None" />
+
     </ItemGroup>
   </Target>
 

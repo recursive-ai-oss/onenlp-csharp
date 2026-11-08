@@ -112,6 +112,15 @@ def main():
             '<Project Sdk="Microsoft.NET.Sdk">\n  <PropertyGroup>\n    <PartName>' + name + '</PartName>\n'
             '    <PartDescription>language-specific heads</PartDescription>\n    <PartFiles>true</PartFiles>\n  </PropertyGroup>\n'
             '  <Import Project="../Part.props" />\n</Project>\n', encoding='utf-8')
+        # buildTransitive also reaches apps that reference only the root package;
+        # NuGet contentFiles copy metadata does not flow through that dependency.
+        targets = ['<Project>', '  <ItemGroup>']
+        for code, _ in group:
+            asset = 'weights/multilingual-large/heads/' + code + '.onenlp'
+            targets.append(f'    <None Include="$(MSBuildThisFileDirectory)../{asset}" Link="{asset}" '
+                           f'TargetPath="{asset}" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />')
+        targets.extend(['  </ItemGroup>', '</Project>', ''])
+        (directory / ('RecursiveAI.OneNlp.Models.Multilingual.Large.' + name + '.targets')).write_text('\n'.join(targets), encoding='utf-8')
         (directory / 'Part.cs').write_text(
             'namespace RecursiveAI.OneNlp.Models.Multilingual.Large.' + name + ';\n\n'
             '/// <summary>Language heads supplied as copied assets by this part of the base-size accurate-tier model.</summary>\n'
