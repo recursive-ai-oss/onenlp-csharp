@@ -29,13 +29,13 @@ The language of the text is detected with the built-in language identifier, and 
 
 Without a package for the text's language, `Nlp.Analyze` returns tokens and sentence boundaries only, and the model verbs (`Nlp.Entities`, `Nlp.Lemmas`) throw `InvalidOperationException`. The message names the exact package to add:
 
-> No model is available for language 'de'. Add the NuGet package RecursiveAI.OneNlp.Models.German (fast tier), or RecursiveAI.OneNlp.Models.Multilingual; models are never downloaded.
+> No model is available for language 'de'. Add the NuGet package RecursiveAI.OneNlp.Models.German (or RecursiveAI.OneNlp.Models.Multilingual); models are never downloaded.
 
 The same for embeddings, when no embedding package is referenced:
 
 > No embedding model is available. Add the NuGet package RecursiveAI.OneNlp.Models.Embeddings; models are never downloaded.
 
-Resolution order for a text: the fast-tier package of its language if referenced, otherwise the multilingual accurate-tier package once it is released. To use a particular package regardless of detection, load its pipeline (`EnglishModel.Load()`, ...) or any saved pipeline file (`PipelineFile.Load`) and call `Process` on it; the low level takes any file or stream, including models you trained yourself or fine-tuned from another source.
+Resolution order for a text: the fast-tier package of its language if referenced, otherwise an accurate-tier package that covers it: `RecursiveAI.OneNlp.Models.Multilingual.Large` if referenced, else `RecursiveAI.OneNlp.Models.Multilingual`. To use a particular package regardless of detection, load its pipeline (`EnglishModel.Load()`, ...) or any saved pipeline file (`PipelineFile.Load`) and call `Process` on it; the low level takes any file or stream, including models you trained yourself or fine-tuned from another source.
 
 ## How core reaches a pipeline that lives in a package
 
