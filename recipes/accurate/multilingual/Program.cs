@@ -24,7 +24,7 @@ namespace RecursiveAI.OneNlp.Recipes.Accurate;
 // only on that language's sentences (ScopedHead); the encoder sees every language. With one language this is plain per-language
 // fine-tuning, so the same command measures the shared encoder against per-language ones. Adding a treebank means adding a row to
 // Treebanks, not code. Run it again with the same arguments to continue (bit-exact with an uninterrupted run).
-internal static class Program
+internal static partial class Program
 {
     // code -> directory under DATA/train/ud (and DATA/eval/ud) and the file prefix of the gating treebank.
     private static readonly Dictionary<string, (string Dir, string Prefix)> Treebanks = new(StringComparer.Ordinal)
@@ -80,6 +80,12 @@ internal static class Program
     {
         try
         {
+            if (args.Length > 0 && args[0] == "recover-parser")
+            {
+                TensorCompute.Threads = Num(args, "threads", 4);
+                return RecoverParser(args);
+            }
+
             if (args.Length > 0 && args[0] == "plan")
             {
                 return PlanOnly(args);
