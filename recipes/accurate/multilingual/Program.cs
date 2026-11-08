@@ -551,6 +551,11 @@ internal static class Program
             }
         }
 
+        if (result.Completed && Num(args, "tune-lexicons", 0) == 1)
+        {
+            TuneLexicons(encoder, pipeline, langs, headInit, dev, stores, outDir);
+        }
+
         if (result.Completed && Opt(args, "export", string.Empty) is { Length: > 0 } exportDir)
         {
             Export(encoder, pipeline, langs, exportDir);
@@ -563,6 +568,82 @@ internal static class Program
         }
 
         return 0;
+    }
+
+    // Choose on the same held-out UD documents as training selection, using the model's UPOS
+    // and the exact C# lexicon lookup. This also covers languages whose dev was held out of train.
+    private static void TuneLexicons(IEncoder encoder, Pipeline pipeline, string[] langs, List<Example> train, List<Example> dev,
+        Dictionary<string, StringStore> stores, string outDir)
+    {
+        using var log = new StreamWriter(Path.Combine(outDir, "lexicon-dev.tsv"), false, new UTF8Encoding(false));
+        log.WriteLine("code\tdev_words\tsetting\tbase_accuracy\tselected_accuracy\tentries");
+        foreach (string lang in langs)
+        {
+            ITrainableComponent[] mine = [.. pipeline.Components.OfType<ScopedHead>()
+                .Where(h => h.Name.EndsWith("-" + lang, StringComparison.Ordinal) && h.Kind is "morphologizer" or "lemmatizer").Select(h => h.Inner)];
+            EditTreeLemmatizer? head = mine.OfType<EditTreeLemmatizer>().FirstOrDefault();
+            if (head is null)
+            {
+                continue;
+            }
+
+            List<Example> examples = [.. dev.Where(e => ReferenceEquals(e.Predicted.Strings, stores[lang]))];
+            if (examples.Count == 0)
+            {
+                log.WriteLine(lang + "\t0\tnone\t\t\t0");
+                continue;
+            }
+
+            head.Lexicon = null;
+            // One document at a time bounds activations even for long development sentences.
+            foreach (Example example in examples)
+            {
+                Annotate(encoder, mine, [example.Predicted]);
+            }
+
+            var probes = new List<(string Form, string Pos, string Base, string Gold)>();
+            foreach (Example example in examples)
+            {
+                for (int t = 0; t < example.Reference.Length; t++)
+                {
+                    Token gold = example.Reference[t];
+                    Token pred = example.Predicted[t];
+                    if (gold.Lemma.Length > 0)
+                    {
+                        string form = (pred.Norm.Length > 0 ? pred.Norm : pred.Text.ToString()).ToLowerInvariant();
+                        probes.Add((form, pred.Pos, pred.Lemma, gold.Lemma));
+                    }
+                }
+            }
+
+            int baseline = probes.Count(p => p.Base == p.Gold);
+            int best = baseline;
+            string setting = "none";
+            LemmaLexicon? selected = null;
+            List<Doc> references = [.. train.Where(e => ReferenceEquals(e.Predicted.Strings, stores[lang])).Select(e => e.Reference).Distinct()];
+            foreach (int minCount in new[] { 1, 2 })
+            {
+                foreach (double minShare in new[] { 0.6, 0.8, 0.9, 1.0 })
+                {
+                    LemmaLexicon table = LemmaLexicon.Build(references, minCount, minShare);
+                    int correct = probes.Count(p => (table.TryGet(p.Form, p.Pos, out string lemma) ? lemma : p.Base) == p.Gold);
+                    if (correct > best)
+                    {
+                        best = correct;
+                        selected = table;
+                        setting = string.Create(CultureInfo.InvariantCulture, $"{minCount}:{minShare}");
+                    }
+                }
+            }
+
+            head.Lexicon = selected;
+            double denominator = Math.Max(1, probes.Count);
+            string row = string.Create(CultureInfo.InvariantCulture,
+                $"{lang}\t{probes.Count}\t{setting}\t{100.0 * baseline / denominator:F2}\t{100.0 * best / denominator:F2}\t{selected?.Count ?? 0}");
+            log.WriteLine(row);
+            log.Flush();
+            Console.WriteLine("lexicon-dev " + row);
+        }
     }
 
     // The best-dev weights as the model package ships them: the encoder's layers (the token table is frozen and comes from the ONNX file, see
@@ -748,23 +829,31 @@ internal static class Program
         return 0;
     }
 
-    // verify-export --export DIR --lang pt --data DATA [--predict-limit 100]: the packaged model, rebuilt from its files the way the package does
-    // (encoder from parts, heads from the per-language file), analyses the first sentences of the test file as raw text; the output is written
+    // verify-export --export DIR --lang pt --data DATA [--split dev|test] [--predict-limit 100]: the packaged model, rebuilt from its files the way the package does
+    // (encoder from parts, heads from the per-language file), analyses the first sentences of the chosen split as raw text; the output is written
     // in the format of --raw predictions so that it can be compared line by line with them.
     private static int VerifyExport(string[] args)
     {
         string dir = Required(args, "export");
         string lang = Required(args, "lang");
         predictLimit = Num(args, "predict-limit", 100);
+        string split = Opt(args, "split", "test");
+        if (split is not ("test" or "dev"))
+        {
+            throw new ArgumentException("--split must be dev or test.");
+        }
+
         string gold;
         if (corpus is not null)
         {
-            gold = Path.Combine(Required(args, "data"), corpus[lang].Gating.Test ?? throw new ArgumentException(lang + " has no test file."));
+            string? relative = split == "test" ? corpus[lang].Gating.Test : corpus[lang].Gating.Dev;
+            gold = Path.Combine(Required(args, "data"), relative ?? throw new ArgumentException(lang + " has no " + split + " file."));
         }
         else
         {
             (string td, string prefix) = Treebanks[lang];
-            gold = Path.Combine(Required(args, "data"), "eval", "ud", td, lang == "it" ? "it_markit-ud-test.conllu" : $"{prefix}-test.conllu");
+            gold = Path.Combine(Required(args, "data"), split == "test" ? "eval" : "train", "ud", td,
+                lang == "it" && split == "test" ? "it_markit-ud-test.conllu" : $"{prefix}-{split}.conllu");
         }
 
         var load = Stopwatch.StartNew();
