@@ -212,6 +212,58 @@ Two shipped models, scored with `mteb` 2.27.1 as a black box. "Ours minus senten
 
 The four bold cells are below the card for sentence-transformers itself, unchanged across `mteb` 1.1.1, 1.12.94 and 2.27.1; the card's numbers could not be reproduced from the published model with the released harness, whoever computes the vectors. The int8 variants are information only (0.3 to 3.8 points lower).
 
+## Open-type NER
+
+Release measurement through packed `Models.Multilingual`/`FrozenEncoder`
+**0.3.0-preview.1**, core/Neural **0.4.0-preview.1**, frozen student-v1 and default
+threshold **0.5**. The newer scratch feed had no multilingual package: this is
+not a test of a newly packed 0.4.0-preview.1 model. The embedded head, frozen
+encoder and tokenizer match the current weight manifests byte for byte. Every
+score and interval below reproduces `recipes/openner/results.md` to its reported
+precision. Strict token-span-and-type micro F1; 1,000 sentence-bootstrap
+resamples, seed 1.
+
+Published reference: Zaratiana et al., [GLiNER, arXiv:2311.08526v1](https://arxiv.org/abs/2311.08526v1),
+**Table 1, §4.1**. Model sizes and encoders (§3.2, Table 1): **GLiNER-S 50M**
+(primary, smallest), **M 90M**, **L 0.3B**, DeBERTa-v3 family
+(as reported for S/M/L, with no exact checkpoint identifiers or revisions specified). Ours is a frozen
+**6×384 student-v1, 35.5M encoder weights + 595,969 head parameters**, about
+36.1M total. The head parameter count is measured from the loaded package.
+
+| Row (test) | Sentences scored | Ours F1 [95% CI] | GLiNER-S | M (info) | L (info) | Position vs S point | Protocol verdict |
+|---|---:|---|---:|---:|---:|---|---|
+| UNER English-EWT, fixed PER/ORG/LOC | 2,077 | **67.14 [64.34, 69.97]** | — | — | — | — | Not comparable: no UNER row in paper |
+| Few-NERD, seen types | 37,637 | **49.89 [49.63, 50.15]** | — | — | — | — | Not comparable: no Few-NERD row in paper |
+| CrossNER politics, zero-shot | 651 | **41.27 [38.58, 44.09]** | 61.5 | 68.6 | 72.6 | **Behind** | Not comparable: protocol not identical/verified |
+| CrossNER science, zero-shot | 543 | **36.50 [33.09, 40.06]** | 55.6 | 58.1 | 62.6 | **Behind** | Not comparable: protocol not identical/verified |
+| CrossNER music, zero-shot | 465 | **26.01 [23.67, 28.35]** | 60.9 | 69.4 | 69.6 | **Behind** | Not comparable: protocol not identical/verified |
+| CrossNER literature, zero-shot | 416 | **30.38 [27.88, 33.05]** | 60.0 | 59.7 | 64.4 | **Behind** | Not comparable: protocol not identical/verified |
+| CrossNER AI, zero-shot | 431 | **21.10 [17.79, 24.52]** | 50.7 | 51.8 | 57.2 | **Behind** | Not comparable: protocol not identical/verified |
+
+Position is relative to our CI, since the paper has no CI: published S above our
+upper bound = behind, below our lower bound = ahead, otherwise within noise.
+It is not a paired test. **All five CrossNER rows lose numerically to S, M and L**;
+the gaps to S are politics **20.23**, science **19.10**, music **34.89**, literature
+**29.62**, AI **29.60** points. None proves the published-small-model quality target
+is met. “Not comparable” is not a passing verdict.
+
+The fixed-type black-box spaCy 3.8.18 comparison on UNER English-EWT remains
+**62.32 [59.45, 65.20]**, trained on the same UNER data with documented defaults.
+Ours is **ahead** by the point-vs-CI convention, but intervals overlap and this is
+not a new paired test or a zero-shot reference.
+
+Protocol caveats ([full audit](open-ner.md#protocol-audit)): our unchanged scorer
+uses gold tokens and skips empty/>120-token sentences and whitespace-containing
+tokens (none excluded in UNER/CrossNER; 11 of 37,648 excluded in Few-NERD);
+asks the retained file's whole type inventory using our expanded label
+names; and keeps scores **≥0.5**, whereas paper §2.3 says **>0.5**. Paper §3.4
+names the OOD benchmark and exact-match entity F1 but supplies no split hashes,
+retained sentence counts, full label-name lists or matching filters. Equivalence
+cannot be established from the paper alone. Few-NERD includes both fine and
+coarse gold labels on the same mention, with flat predictions: it is not the
+conventional fine-only benchmark. The [model/protocol notes](open-ner.md#published-comparison)
+and `tools/OneNlp.OpenNerGate/README.md` give provenance and reproduction commands.
+
 ## Accurate tier (information; the base-size model is not yet packaged)
 
 No accurate-tier model package is released yet, so these rows are information and no gate is claimed. Rows come from [accurate-encoder.md](accurate-encoder.md), `recipes/accurate/student-v1/RESULTS.md` and, for the references, [references.md](references.md) (published numbers on other UD releases: compare the direction, not the last digit).
@@ -229,8 +281,8 @@ No accurate-tier model package is released yet, so these rows are information an
 - **Embeddings:** the five cells below the model cards, shared with sentence-transformers (above).
 - **Language ID:** the languages named under the table are below Lingua on short text.
 - **Entities per type:** per-type rows are in each source file; several have intervals that overlap with a paired difference that excludes zero (for example English LOC with the single-encoder option); the packaged English model has none of those.
-- **Gaps:** Hindi has a fast tier but only on transferred labels (see "Hindi", not a gated comparison); no German, Spanish, Portuguese, Italian, Dutch, Turkish or Chinese rows against Catalyst (it has English models only); open-type NER and the accurate-tier packages are in progress and have no rows yet.
+- **Gaps:** Hindi has a fast tier but only on transferred labels (see "Hindi", not a gated comparison); no German, Spanish, Portuguese, Italian, Dutch, Turkish or Chinese rows against Catalyst (it has English models only); the accurate-tier packages are in progress; open-type NER rows are above, with all five CrossNER rows numerically behind GLiNER-S and protocol equivalence unverified.
 - **Speed against Catalyst 26.10.6514** (English, 1 thread, arm64 Apple M2, release gate; median tokens/s of the last 10 of 12 passes): tagging path (Catalyst tagging 1,007,344 tokens/s, 307 B/token; ours sentences, UPOS/UFeats and lemmas 670,783, 330 B/token) is **0.666x**, above the 0.5x bar. It counts under matched or better accuracy on raw EWT test: Tokens 99.00 vs 94.47, Sentences 71.08 vs 64.57, UPOS 92.90 vs 80.70, Lemmas 95.03 vs 83.84. NER path: Catalyst with WikiNER 478,220 vs ours sentences and entities 333,620 (0.70x), not matched work (ours excludes tagging; Catalyst's NER needs it), and so indicative only; entities on UNER character spans 63.09 vs 57.77. Ours parser path 25,535 and full pipeline 22,634 tokens/s (Catalyst has no parser). RSS 311 MB against 1,401 MB. English model load time not measured in this run. x64: measured in the release run, part 2.
 - **Spanish gold LAS** is within noise at the release gate (86.41 [85.90, 86.89] vs 85.95); an earlier version of this table showed an older parser.
-- **Rows behind at the gate:** English raw MLAS (information); Hindi raw Tokens 99.38 vs 99.82 and raw UPOS 82.41 vs 83.65 (Hindi is not a gated comparison); Language ID below Lingua on short text for the languages named under that table; embeddings cells below the model cards (shared with sentence-transformers); tokenizer load time (three rows, above); es WikiNER PER per type as listed in `results.md`. No recognizer, fast-tier gated or tokenizer exactness row is behind.
-- **Not re-run at the gate:** open-type NER (it sits on the distilled encoder being retrained; part 2); Duckling and Lingua predictions were reused from pinned earlier runs; English entities have no paired spaCy file at the gate; embeddings MTEB rows stand because the package manifests are unchanged since those runs (parity re-run on the packaged files: bge max abs 4.03e-7, e5 3.20e-7, 0 id mismatches).
+- **Rows behind at the gate:** English raw MLAS (information); Hindi raw Tokens 99.38 vs 99.82 and raw UPOS 82.41 vs 83.65 (Hindi is not a gated comparison); Language ID below Lingua on short text for the languages named under that table; embeddings cells below the model cards (shared with sentence-transformers); tokenizer load time (three rows, above); es WikiNER PER per type as listed in `results.md`. All five open-type CrossNER rows are numerically behind GLiNER-S (protocol caveats above). No recognizer, fast-tier gated or tokenizer exactness row is behind.
+- **Not re-run at the gate:** Duckling and Lingua predictions were reused from pinned earlier runs; English entities have no paired spaCy file at the gate; embeddings MTEB rows stand because the package manifests are unchanged since those runs (parity re-run on the packaged files: bge max abs 4.03e-7, e5 3.20e-7, 0 id mismatches).
